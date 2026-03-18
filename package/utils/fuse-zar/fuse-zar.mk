@@ -4,6 +4,7 @@
 #
 ################################################################################
 
+# Internal REG-Linux project - no tagged releases yet
 FUSE_ZAR_VERSION = master
 FUSE_ZAR_SITE = $(call github,REG-Linux,fuse-zar,$(FUSE_ZAR_VERSION))
 FUSE_ZAR_LICENSE = GPL-3.0

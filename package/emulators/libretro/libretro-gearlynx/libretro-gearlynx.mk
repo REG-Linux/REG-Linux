@@ -3,8 +3,8 @@
 # libretro-gearlynx
 #
 ################################################################################
-# Version: Release on Jan 24, 2026
-LIBRETRO_GEARLYNX_VERSION = 1.0.0
+# Version: Release on Mar 15, 2026
+LIBRETRO_GEARLYNX_VERSION = 1.2.2
 LIBRETRO_GEARLYNX_SITE = $(call github,drhelius,Gearlynx,$(LIBRETRO_GEARLYNX_VERSION))
 LIBRETRO_GEARLYNX_LICENSE = GPLv3
 

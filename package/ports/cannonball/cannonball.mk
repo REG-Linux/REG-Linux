@@ -3,8 +3,8 @@
 # cannonball
 #
 ################################################################################
-# Version.: Commits on Feb 1, 2026
-CANNONBALL_VERSION = v1.4
+# Version.: Commits on Mar 15, 2026
+CANNONBALL_VERSION = v1.41
 CANNONBALL_SITE = $(call github,J1mbo,cannonball-se,$(CANNONBALL_VERSION))
 CANNONBALL_LICENSE = GPLv2
 CANNONBALL_DEPENDENCIES = sdl2 boost tinyxml2
@@ -55,11 +55,6 @@ define CANNONBALL_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/cannonball/
 	$(INSTALL) -D $(@D)/res/config.xml \
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/cannonball/config_help.txt
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cannonball/cannonball.cannonball.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

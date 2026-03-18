@@ -1,0 +1,15 @@
+--- a/Makefile.libretro
++++ b/Makefile.libretro
+@@ -118,6 +118,12 @@
+       endif
+    endif
+
++   # RISC-V
++   ifneq (,$(findstring riscv64,$(platform)))
++      ENDIANNESS_DEFINES += -DALIGN_LONG
++      CFLAGS += -fomit-frame-pointer -ffast-math
++   endif
++
+ # Portable Linux
+ else ifeq ($(platform), linux-portable)
+    TARGET := $(TARGET_NAME)_libretro.so

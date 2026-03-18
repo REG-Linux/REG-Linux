@@ -1,0 +1,355 @@
+# REG Linux Arcade Plymouth Theme Script
+#
+# Boot mode:     Fade in logo frames, then blink "INSERT COIN"
+# Shutdown mode:  Full logo visible with "GAME OVER" text below
+# Reboot mode:   Static full logo, no text
+# Updates mode:       Static full logo, progress bar, message, title, subtitle
+# System-reset mode:  Static full logo, progress bar, message, title, subtitle
+
+# ---------------------------------------------------------------------------
+# Screen setup
+# ---------------------------------------------------------------------------
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+
+# Scale factor: half size for screens narrower than 1200px,
+# three-quarter size for screens up to 1280px, full size above
+if (screen_w < 1200) {
+    scale = 0.5;
+    font_title = "Sans Bold 10";
+    font_sub   = "Sans 8";
+    font_msg   = "Sans 7";
+} else if (screen_w < 1300) {
+    scale = 0.75;
+    font_title = "Sans Bold 15";
+    font_sub   = "Sans 12";
+    font_msg   = "Sans 10";
+} else {
+    scale = 1.0;
+    font_title = "Sans Bold 20";
+    font_sub   = "Sans 16";
+    font_msg   = "Sans 14";
+}
+
+# ---------------------------------------------------------------------------
+# Animation parameters
+# ---------------------------------------------------------------------------
+Plymouth.SetRefreshRate(30);
+
+# Fade-in phase: frames 0-3, each faded in over 8 ticks (0.27s) = 32 ticks total (1.07s)
+fade_frames = 4;
+fade_ticks = 8;
+fade_total = fade_frames * fade_ticks;
+
+# Hold phase: frames 4-9, each shown for 6 ticks
+num_frames = 10;
+hold_start_frame = 4;
+hold_count = num_frames - hold_start_frame;
+hold_ticks = 6;
+hold_total = hold_count * hold_ticks;
+
+anim_total = fade_total + hold_total;
+
+blink_half = 15;
+
+# ---------------------------------------------------------------------------
+# One-time initialization: create all sprites only on first run
+# ---------------------------------------------------------------------------
+if (notfirstrun != 1) {
+    frame = 0;
+    notfirstrun = 1;
+
+    # -------------------------------------------------------------------
+    # Load frame images
+    # -------------------------------------------------------------------
+    for (i = 0; i < num_frames; i++) {
+        raw_img = Image("logo_frame_" + i + ".png");
+        if (scale < 1) {
+            frame_img[i] = raw_img.Scale(
+                Math.Int(raw_img.GetWidth() * scale),
+                Math.Int(raw_img.GetHeight() * scale));
+        } else {
+            frame_img[i] = raw_img;
+        }
+    }
+
+    logo_w = frame_img[0].GetWidth();
+    logo_h = frame_img[0].GetHeight();
+
+    logo_left = Math.Int(screen_w / 2 - logo_w / 2);
+    logo_top  = Math.Int(screen_h / 2 - logo_h / 2);
+
+    # -------------------------------------------------------------------
+    # Fade-in sprites: frames 0-3, stacked with increasing z-order
+    # -------------------------------------------------------------------
+    for (i = 0; i < 4; i++) {
+        fade_sprite[i] = Sprite(frame_img[i]);
+        fade_sprite[i].SetPosition(logo_left, logo_top, 10 + i);
+        fade_sprite[i].SetOpacity(0);
+    }
+
+    # Hold sprite: used for frames 4-9, image swapped in place
+    hold_sprite = Sprite(frame_img[4]);
+    hold_sprite.SetPosition(logo_left, logo_top, 14);
+    hold_sprite.SetOpacity(0);
+
+    # Track which image is currently set on the hold sprite
+    current_hold_index = hold_start_frame;
+
+    # -------------------------------------------------------------------
+    # Create text sprites
+    # -------------------------------------------------------------------
+    insert_coin_img = Image.Text("INSERT COIN", 1, 1, 1, 1, font_title);
+    game_over_img   = Image.Text("GAME OVER",   1, 1, 1, 1, font_title);
+
+    text_y = logo_top + logo_h + Math.Int(30 * scale);
+
+    insert_coin_sprite = Sprite(insert_coin_img);
+    insert_coin_sprite.SetOpacity(0);
+
+    game_over_sprite = Sprite(game_over_img);
+    game_over_sprite.SetOpacity(0);
+
+    # -------------------------------------------------------------------
+    # Updates mode elements
+    # -------------------------------------------------------------------
+    updating_img = Image.Text("UPDATING SHARE", 1, 1, 1, 1, font_title);
+    subtitle_img = Image.Text("Do not switch off your device!", 1, 1, 1, 1, font_sub);
+
+    # -------------------------------------------------------------------
+    # System-reset mode elements
+    # -------------------------------------------------------------------
+    sysreset_title_img = Image.Text("*** ERROR MOUNTING /userdata ***", 1, 1, 1, 1, font_title);
+    sysreset_sub_img   = Image.Text("*** USING A RAMDISK INSTEAD ***", 1, 1, 1, 1, font_sub);
+
+    # -------------------------------------------------------------------
+    # Layout: progress bar → message → title → subtitle
+    # -------------------------------------------------------------------
+
+    # Progress bar at text_y, full logo width
+    dot_img = Image("dot.png");
+    dot_size = dot_img.GetHeight();
+    bar_max_w = logo_w;
+    bar_h = Math.Int(dot_size * 2 * scale);
+    bar_y = text_y;
+    bar_left = Math.Int(screen_w / 2 - bar_max_w / 2);
+
+    # Background bar (dimmed)
+    bar_bg_img = dot_img.Scale(bar_max_w, bar_h);
+    bar_bg_sprite = Sprite(bar_bg_img);
+    bar_bg_sprite.SetPosition(bar_left, bar_y, 10);
+    bar_bg_sprite.SetOpacity(0);
+
+    # Foreground bar (filled portion)
+    bar_fg_sprite = Sprite();
+    bar_fg_sprite.SetPosition(bar_left, bar_y, 11);
+    bar_fg_sprite.SetOpacity(0);
+
+    bg_counter = 35; # opacity = bg_counter / 100; range 5..35
+    bg_dir = -1;     # -1 = fading out, 1 = fading in
+
+    # Message line (below progress bar)
+    msg_ref_img = Image.Text("X", 1, 1, 1, 1, font_msg);
+    msg_y = bar_y + bar_h + Math.Int(10 * scale);
+    msg_sprite = Sprite();
+    msg_sprite.SetPosition(0, msg_y, 10);
+    msg_sprite.SetOpacity(0);
+
+    # Title (below message line, small gap)
+    title_y = msg_y + msg_ref_img.GetHeight() + Math.Int(15 * scale);
+
+    updating_sprite = Sprite(updating_img);
+    updating_sprite.SetPosition(
+        Math.Int(screen_w / 2 - updating_img.GetWidth() / 2),
+        title_y, 10);
+    updating_sprite.SetOpacity(0);
+
+    sysreset_title_sprite = Sprite(sysreset_title_img);
+    sysreset_title_sprite.SetPosition(
+        Math.Int(screen_w / 2 - sysreset_title_img.GetWidth() / 2),
+        title_y, 10);
+    sysreset_title_sprite.SetOpacity(0);
+
+    # Position INSERT COIN and GAME OVER at title_y
+    insert_coin_sprite.SetPosition(
+        Math.Int(screen_w / 2 - insert_coin_img.GetWidth() / 2),
+        title_y, 10);
+    game_over_sprite.SetPosition(
+        Math.Int(screen_w / 2 - game_over_img.GetWidth() / 2),
+        title_y, 10);
+
+    # Subtitle (below title)
+    sub_y = title_y + updating_img.GetHeight() + Math.Int(5 * scale);
+
+    subtitle_sprite = Sprite(subtitle_img);
+    subtitle_sprite.SetPosition(
+        Math.Int(screen_w / 2 - subtitle_img.GetWidth() / 2),
+        sub_y, 10);
+    subtitle_sprite.SetOpacity(0);
+
+    sysreset_sub_sprite = Sprite(sysreset_sub_img);
+    sysreset_sub_sprite.SetPosition(
+        Math.Int(screen_w / 2 - sysreset_sub_img.GetWidth() / 2),
+        sub_y, 10);
+    sysreset_sub_sprite.SetOpacity(0);
+}
+
+# ---------------------------------------------------------------------------
+# Update mode — detect mode changes without resetting animation
+# ---------------------------------------------------------------------------
+new_mode = Plymouth.GetMode();
+
+if (new_mode != mode) {
+    # Hide all text/UI elements from previous mode
+    insert_coin_sprite.SetOpacity(0);
+    game_over_sprite.SetOpacity(0);
+    updating_sprite.SetOpacity(0);
+    bar_bg_sprite.SetOpacity(0);
+    bar_fg_sprite.SetOpacity(0);
+    subtitle_sprite.SetOpacity(0);
+    msg_sprite.SetOpacity(0);
+    sysreset_title_sprite.SetOpacity(0);
+    sysreset_sub_sprite.SetOpacity(0);
+
+    mode = new_mode;
+
+    # Show the full logo immediately when switching to a non-boot mode
+    if (mode != "boot") {
+        # Hide fade-in layers, show final frame on hold sprite
+        for (i = 0; i < fade_frames; i++)
+            fade_sprite[i].SetOpacity(0);
+        hold_sprite.SetImage(frame_img[num_frames - 1]);
+        hold_sprite.SetOpacity(1);
+        current_hold_index = num_frames - 1;
+
+        # Skip animation — ensure frame is past anim_total
+        if (frame <= anim_total)
+            frame = anim_total + 1;
+    }
+
+    # Show mode-specific elements
+    if (mode == "updates") {
+        updating_sprite.SetOpacity(1);
+        bar_bg_sprite.SetOpacity(0.3);
+        bar_fg_sprite.SetOpacity(1);
+        subtitle_sprite.SetOpacity(1);
+    } else if (mode == "shutdown") {
+        game_over_sprite.SetOpacity(1);
+    } else if (mode == "system-reset") {
+        sysreset_title_sprite.SetOpacity(1);
+        bar_bg_sprite.SetOpacity(0.3);
+        bar_fg_sprite.SetOpacity(1);
+        sysreset_sub_sprite.SetOpacity(1);
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Refresh callback
+# ---------------------------------------------------------------------------
+fun refresh_callback() {
+    global.frame++;
+
+    # --------------------------------------------------------------
+    # Fade-in phase: frames 0-3 (layered)
+    # --------------------------------------------------------------
+    if (global.frame <= global.fade_total) {
+        phase = global.frame - 1;
+        current_layer = Math.Int(phase / global.fade_ticks);
+        if (current_layer >= global.fade_frames)
+            current_layer = global.fade_frames - 1;
+
+        # Previous layers stay fully opaque
+        for (i = 0; i < current_layer; i++)
+            global.fade_sprite[i].SetOpacity(1);
+
+        # Current layer fades in
+        tick_in_phase = phase % global.fade_ticks;
+        opacity = (tick_in_phase + 1) / global.fade_ticks;
+        global.fade_sprite[current_layer].SetOpacity(opacity);
+
+    # --------------------------------------------------------------
+    # Hold phase: frames 4-9, each for hold_ticks
+    # --------------------------------------------------------------
+    } else if (global.frame <= global.anim_total) {
+        # Ensure all fade layers are fully visible
+        for (i = 0; i < global.fade_frames; i++)
+            global.fade_sprite[i].SetOpacity(1);
+
+        hold_phase = global.frame - global.fade_total - 1;
+        img_index = global.hold_start_frame + Math.Int(hold_phase / global.hold_ticks);
+        if (img_index >= global.num_frames)
+            img_index = global.num_frames - 1;
+
+        if (img_index != global.current_hold_index) {
+            global.hold_sprite.SetImage(global.frame_img[img_index]);
+            global.current_hold_index = img_index;
+        }
+
+        global.hold_sprite.SetOpacity(1);
+
+    # --------------------------------------------------------------
+    # Animation complete — show final frame, handle per-mode behavior
+    # --------------------------------------------------------------
+    } else {
+        # Hide fade-in layers, show only the final frame
+        for (i = 0; i < global.fade_frames; i++)
+            global.fade_sprite[i].SetOpacity(0);
+
+        if (global.current_hold_index != global.num_frames - 1) {
+            global.hold_sprite.SetImage(global.frame_img[global.num_frames - 1]);
+            global.current_hold_index = global.num_frames - 1;
+        }
+        global.hold_sprite.SetOpacity(1);
+
+        if (global.mode == "updates" || global.mode == "system-reset") {
+            global.bg_counter = global.bg_counter + global.bg_dir;
+            if (global.bg_counter <= 5)  { global.bg_dir =  1; }
+            if (global.bg_counter >= 35) { global.bg_dir = -1; }
+            global.bar_bg_sprite.SetOpacity(global.bg_counter / 100);
+        }
+
+        # Boot mode: blink INSERT COIN
+        if (global.mode == "boot") {
+            blink_pos = (global.frame - global.anim_total) % (global.blink_half * 2);
+            if (blink_pos < global.blink_half)
+                global.insert_coin_sprite.SetOpacity(1);
+            else
+                global.insert_coin_sprite.SetOpacity(0);
+        }
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+# ---------------------------------------------------------------------------
+# System update callback (updates mode) — triggered by
+#   plymouth system-update --progress <0-100>
+# ---------------------------------------------------------------------------
+fun system_update_callback(progress) {
+    if (global.mode == "updates" || global.mode == "system-reset") {
+        fill_w = Math.Int(progress / 100 * global.bar_max_w);
+        if (fill_w > 0) {
+            fill_img = global.dot_img.Scale(fill_w, global.bar_h);
+            global.bar_fg_sprite.SetImage(fill_img);
+        }
+    }
+}
+
+Plymouth.SetSystemUpdateFunction(system_update_callback);
+
+# ---------------------------------------------------------------------------
+# Message callback (updates mode)
+# ---------------------------------------------------------------------------
+fun message_callback(text) {
+    if (global.mode == "updates" || global.mode == "system-reset") {
+        msg_img = Image.Text(text, 0.7, 0.7, 0.7, 1, global.font_msg);
+        global.msg_sprite.SetImage(msg_img);
+        global.msg_sprite.SetX(Math.Int(global.screen_w / 2 - msg_img.GetWidth() / 2));
+        global.msg_sprite.SetOpacity(1);
+    }
+}
+
+Plymouth.SetMessageFunction(message_callback);

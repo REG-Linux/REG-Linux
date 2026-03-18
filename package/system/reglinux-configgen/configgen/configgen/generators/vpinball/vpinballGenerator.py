@@ -1,10 +1,10 @@
 from configparser import ConfigParser, DuplicateOptionError
 from pathlib import Path
 from shutil import copy
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 from configgen.utils.systemServices import get_service_status
@@ -25,6 +25,7 @@ eslog = get_logger(__name__)
 
 class VPinballGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 

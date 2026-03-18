@@ -1,14 +1,15 @@
 from os import chdir
 from pathlib import Path
 from shutil import copyfile
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
-from configgen.generators.generator import Generator
+from configgen.config.paths import OVERLAYS
+from configgen.core import Command
+from configgen.core.exceptions import FileMissingError
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.settings import UnixSettings
-from configgen.systemFiles import OVERLAYS
 from configgen.utils.logger import get_logger
-from configgen.utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
+from configgen.video.videoMode import getAltDecoration, getGLVendor, getGLVersion
 
 from .libretroConfig import (
     coreForceSlangShaders,
@@ -27,6 +28,7 @@ eslog = get_logger(__name__)
 
 
 class LibretroGenerator(Generator):
+    @override
     def supportsInternalBezels(self):
         return True
 
@@ -38,8 +40,8 @@ class LibretroGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         # Get the graphics backend first
@@ -79,6 +81,7 @@ class LibretroGenerator(Generator):
                 shaderBezel = True
 
         # Settings system default config file if no user defined one
+
         if "configfile" not in system.config:
             # Using system config file
             system.config["configfile"] = retroarchCustom
@@ -98,6 +101,11 @@ class LibretroGenerator(Generator):
             # some systems (ie gw) won't bezels
             if system.isOptSet("forceNoBezel") and system.getOptBoolean("forceNoBezel"):
                 bezel = None
+
+            # Remove existing config file to ensure clean state (no dynamic values)
+            retroarchcustom = Path(retroarchCustom)
+            if retroarchcustom.exists():
+                retroarchcustom.unlink()
 
             writeLibretroConfig(
                 self,
@@ -130,7 +138,7 @@ class LibretroGenerator(Generator):
             "/usr/share/libretro/info/" + system.config["core"] + "_libretro.info"
         )
         if not Path(infoFile).exists():
-            raise Exception("missing file " + infoFile)
+            raise FileMissingError(infoFile, context="libretro core info file")
 
         romName = Path(rom).name
 

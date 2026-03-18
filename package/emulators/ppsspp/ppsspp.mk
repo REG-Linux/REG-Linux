@@ -4,12 +4,13 @@
 #
 ################################################################################
 
-PPSSPP_VERSION = v1.19.3
+PPSSPP_VERSION = v1.20.3
 PPSSPP_SITE = https://github.com/hrydgard/ppsspp.git
 PPSSPP_SITE_METHOD=git
 PPSSPP_GIT_SUBMODULES=YES
 PPSSPP_LICENSE = GPLv2
 PPSSPP_DEPENDENCIES = sdl2 sdl2_ttf libzip
+PPSSPP_SUPPORTS_IN_SOURCE_BUILD = NO
 
 PPSSPP_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 PPSSPP_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
@@ -109,6 +110,11 @@ endif
 PPSSPP_CONF_OPTS += -DCMAKE_C_FLAGS="$(PPSSPP_TARGET_CFLAGS)"
 PPSSPP_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(PPSSPP_TARGET_CFLAGS)"
 
+ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
+    PPSSPP_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS=-lmali
+    PPSSPP_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS=-lmali
+endif
+
 define PPSSPP_UPDATE_INCLUDES
 	sed -i 's/unknown/"$(shell echo $(PPSSPP_VERSION) | cut -c 1-7)"/g' $(@D)/git-version.cmake
 	sed -i "s+/opt/vc+$(STAGING_DIR)/usr+g" $(@D)/CMakeLists.txt
@@ -116,7 +122,7 @@ endef
 
 define PPSSPP_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/bin
-    $(INSTALL) -D -m 0755 $(@D)/$(PPSSPP_TARGET_BINARY) \
+    $(INSTALL) -D -m 0755 $(@D)/buildroot-build/$(PPSSPP_TARGET_BINARY) \
         $(TARGET_DIR)/usr/bin/PPSSPP
     mkdir -p $(TARGET_DIR)/usr/share/ppsspp
     cp -R $(@D)/assets $(TARGET_DIR)/usr/share/ppsspp/PPSSPP
@@ -126,13 +132,6 @@ define PPSSPP_INSTALL_TARGET_CMDS
         $(TARGET_DIR)/usr/share/ppsspp/PPSSPP/Roboto-Condensed.ttf
 endef
 
-define PPSSPP_POST_PROCESS
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/ppsspp/psp.ppsspp.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
 PPSSPP_PRE_CONFIGURE_HOOKS += PPSSPP_UPDATE_INCLUDES
-PPSSPP_POST_INSTALL_TARGET_HOOKS += PPSSPP_POST_PROCESS
 
 $(eval $(cmake-package))

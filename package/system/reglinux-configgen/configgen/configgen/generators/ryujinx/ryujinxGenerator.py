@@ -3,13 +3,13 @@ from json import dump, dumps, load
 from os import environ, path
 from pathlib import Path
 from shutil import copyfile
-from typing import Any
+from typing import Any, override
 
 from evdev import InputDevice, list_devices
 
-from configgen.command import Command
+from configgen.config.paths import BIOS, CONF
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import BIOS, CONF
 
 RYUJINX_CONFIG_DIR = str(CONF / "Ryujinx")
 RYUJINX_SYSTEM_DIR = str(CONF / "Ryujinx" / "system")
@@ -73,6 +73,7 @@ ryujinxCtrl = {
 
 class RyujinxGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -176,6 +177,11 @@ class RyujinxGenerator(Generator):
             conf["max_anisotropy"] = -1
 
         conf["input_config"] = []
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(RYUJINX_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         # write / update the config file
         js_out = dumps(conf, indent=2)

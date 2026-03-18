@@ -1,0 +1,7 @@
+config BR2_PACKAGE_ZFTPD
+	bool "zftpd"
+
+	help
+	  High-performance, zero-copy FTP server for Linux.
+
+	  https://github.com/seregonwar/zftpd

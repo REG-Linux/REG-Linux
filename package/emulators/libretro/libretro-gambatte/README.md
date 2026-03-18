@@ -1,10 +1,5 @@
-# Libretro Gambatte
+# libretro-gambatte
 
-The `libretro-gambatte` core delivers Game Boy/Game Boy Color emulation under REG-Linux with Raspberry Pi tuning baked in.
+Game Boy / Game Boy Color libretro core (Gambatte). Upstream: https://github.com/REG-Linux/gambatte-libretro
 
-## Build notes
-
-- `Version`: 5707c1806fbca784c22550db1fa2ce7ed646df09
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-RPi5-tuning.patch`
+Hosted on the REG-Linux fork. Platform string maps Raspberry Pi models to specific `rpi*` targets and Cortex-A7 to `classic_armv7_a7`.

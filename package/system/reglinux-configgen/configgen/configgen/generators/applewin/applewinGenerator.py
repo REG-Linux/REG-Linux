@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.config.paths import HOME
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import HOME
 
 APPLEWIN_CONFIG_PATH = str(Path(HOME) / "applewin" / "applewin.conf")
 APPLEWIN_BIN_PATH = "/usr/bin/applewin"

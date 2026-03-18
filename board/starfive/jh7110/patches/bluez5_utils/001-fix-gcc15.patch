@@ -1,0 +1,11 @@
+--- a/src/shared/shell.c	2026-02-23 01:32:39.342404394 +0100
++++ b/src/shared/shell.c	2026-02-23 01:32:48.692568850 +0100
+@@ -1421,7 +1421,7 @@
+ 	if (data.history[0] != '\0')
+ 		write_history(data.history);
+ 
+-	rl_message("");
++	rl_message();
+ 	rl_callback_handler_remove();
+ }
+ 

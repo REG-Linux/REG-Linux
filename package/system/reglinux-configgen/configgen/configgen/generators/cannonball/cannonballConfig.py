@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import CONF
+from configgen.config.paths import CONF
 
 CANNONBALL_CONFIG_PATH = str(Path(CONF) / "cannonball" / "config.xml")
 CANNONBALL_BIN_PATH = "/usr/bin/cannonball"

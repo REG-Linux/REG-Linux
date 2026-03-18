@@ -1,0 +1,51 @@
+#!/bin/sh
+BOOTCONF="/boot/system-boot.conf"
+REBOOT_FLAG="/var/run/emulationstation-standalone"
+
+. /etc/profile.d/xdg.sh
+. /etc/profile.d/dbus.sh
+
+case "$1" in
+    start)
+        enabled="$(/usr/bin/system-settings-get system.es.atstartup)"
+        if [ "$enabled" != "0" ]; then
+            if pidof emulationstation > /dev/null; then
+                echo "Emulationstation is already running..."
+                exit 1
+            fi
+
+            emulationstation-standalone &
+        fi
+        ;;
+
+    stop)
+        rm -f "${REBOOT_FLAG}"
+        killall emulationstation 2>/dev/null
+        killall openbox   2>/dev/null # for xorg
+        killall sway      2>/dev/null # for wayland
+        killall touchegg 2>/dev/null
+
+        # Wait up to 20 seconds before force killing
+        timeout=80
+        while pidof emulationstation > /dev/null; do
+            sleep 0.25
+            timeout=$((timeout - 1))
+            if [ "$timeout" -le 0 ]; then
+                echo "EmulationStation did not stop, force killing..."
+                pkill -9 -f emulationstation
+                break
+            fi
+        done
+        ;;
+
+    restart|reload)
+        "$0" stop
+        "$0" start
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

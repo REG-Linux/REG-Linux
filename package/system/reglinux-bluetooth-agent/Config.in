@@ -1,0 +1,6 @@
+config BR2_PACKAGE_REGLINUX_BLUETOOTH_AGENT
+	bool "reglinux-bluetooth-agent"
+	select BR2_PACKAGE_BASU
+	help
+	  C bluetooth agent daemon using sd-bus (basu).
+	  Auto-pairs and connects bluetooth input devices.

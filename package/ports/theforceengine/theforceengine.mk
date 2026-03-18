@@ -58,13 +58,6 @@ define THEFORCEENGINE_PATCH_ZIP
         $(THEFORCEENGINE_CONF_INIT)/Mods
 endef
 
-define THEFORCEENGINE_EVMAPY
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/theforceengine/theforceengine.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
 THEFORCEENGINE_POST_INSTALL_TARGET_HOOKS += THEFORCEENGINE_PATCH_ZIP
-THEFORCEENGINE_POST_INSTALL_TARGET_HOOKS += THEFORCEENGINE_EVMAPY
 
 $(eval $(cmake-package))

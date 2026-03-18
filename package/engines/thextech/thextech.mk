@@ -29,12 +29,14 @@ else ifeq ($(BR2_PACKAGE_HAS_GLES2),y)
 endif
 endif
 
+ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
+    THEXTECH_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS=-lmali
+    THEXTECH_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS=-lmali
+endif
+
 define THEXTECH_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/output/bin/thextech $(TARGET_DIR)/usr/bin/
 	cp -avf $(@D)/output/lib/libSDL2_mixer_ext.so* $(TARGET_DIR)/usr/lib/
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -avf $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/thextech/thextech.keys \
-	    $(TARGET_DIR)/usr/share/evmapy/
 endef
 
 $(eval $(cmake-package))

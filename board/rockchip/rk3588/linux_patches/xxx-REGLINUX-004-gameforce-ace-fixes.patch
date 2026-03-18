@@ -1,0 +1,76 @@
+Subject: [PATCH] arm64: dts: rockchip: Fix eMMC regulators and SPI2 power domain on Gameforce Ace
+
+This patch fixes critical power supply configuration issues on the
+Gameforce Ace handheld gaming device based on the Rockchip RK3588S SoC.
+
+Problems fixed:
+
+1. eMMC HS400 Mode Failure
+   -------------------------
+   The sdhci (eMMC) node was missing the required vmmc-supply and
+   vqmmc-supply properties. This caused the following error during boot:
+
+   [    2.320060] sdhci-dwcmshc fe2e0000.mmc: Can't reduce the clock
+                          below 52MHz in HS200/HS400 mode
+
+   Without proper regulator definitions, the eMMC controller could not
+   reliably manage power states, leading to timing violations in HS400
+   mode. The RK3588 power management driver requires explicit regulator
+   bindings to properly configure voltage domains.
+
+   Fix: Add vmmc-supply (3.3V main power) and vqmmc-supply (1.8V I/O)
+   properties pointing to the RK806 PMIC regulators vcc_3v3_s0 and
+   vcc_1v8_s0 respectively.
+
+2. SPI2 Power Domain Integration
+   ------------------------------
+   The SPI2 controller (which hosts the RK806 PMIC) was not associated
+   with any power domain. This caused a device link creation failure:
+
+   [    2.129694] rockchip-pm-domain fd8d8000.power-management:
+                  power-controller: Failed to create device link (0x180)
+                  with supplier spi2.0 for /power-management@fd8d8000/
+                  power-controller/power-domain@12
+
+   While this warning is benign (the system continues to function),
+   adding the power-domains property improves power management
+   integration and may help with proper probe ordering.
+
+   Fix: Add power-domains property referencing RK3588_PD_AUDIO, which
+   is the appropriate power domain for the SPI2 controller.
+
+Hardware context:
+- SoC: Rockchip RK3588S
+- PMIC: Rockchip RK806 (connected via SPI2)
+- eMMC: 256GB HS400 mode
+- Device: Gameforce Ace handheld gaming console
+
+This patch follows the same pattern used in other RK3588-based devices
+such as ODROID M2 and Rock 5B, which also use the RK806 PMIC.
+---
+ arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+index 8e8f082af..7c4c8f891 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+@@ -1028,6 +1028,8 @@ &sdhci {
+ 	no-sd;
+ 	no-sdio;
+ 	non-removable;
++	vmmc-supply = <&vcc_3v3_s0>;
++	vqmmc-supply = <&vcc_1v8_s0>;
+ 	status = "okay";
+ };
+
+@@ -1079,6 +1081,7 @@ &spi2 {
+ 	pinctrl-0 = <&spi2m2_pins>, <&spi2m2_cs0>;
+ 	pinctrl-names = "default";
+ 	#size-cells = <0>;
++	power-domains = <&power RK3588_PD_AUDIO>;
+ 	status = "okay";
+
+ 	pmic@0 {
+--
+2.39.0

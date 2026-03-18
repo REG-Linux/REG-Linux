@@ -1,10 +1,5 @@
-# Libretro Beetle PC-FX
+# libretro-beetle-pcfx
 
-The `libretro-beetle-pcfx` core runs the PC-FX emulator inside REG-Linux’s libretro stack for ARM builds.
+PC-FX libretro core (Beetle PC-FX). Upstream: https://github.com/libretro/beetle-pcfx-libretro
 
-## Build notes
-
-- `Version`: f559b8f4e1d72af43537260ee9335556b4a424b8
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-makefile.patch`
+Per-SoC platform overrides: S922X/SM6115/A3GEN2 → `CortexA73_G12B`, RK3399/BCM2711 → `rpi4`, BCM2712 → `rpi5_64`.

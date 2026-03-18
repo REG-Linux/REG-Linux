@@ -29,10 +29,6 @@ define IZAPPLE2_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
 	$(INSTALL) -D $(@D)/frontend/a2sdl/a2sdl $(TARGET_DIR)/usr/bin/izapple2
 	$(TARGET_STRIP) $(TARGET_DIR)/usr/bin/izapple2
-	# evmapy
-	#mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	#cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/izapple2/izapple2.keys \
-	#    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(golang-package))

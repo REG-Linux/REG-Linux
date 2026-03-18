@@ -2,10 +2,10 @@ from os import chdir
 from pathlib import Path
 from re import search
 
-from configgen.command import Command
+from configgen.config.paths import CONF, ROMS, SAVES
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
-from configgen.systemFiles import CONF, ROMS, SAVES
 
 from .openborControllers import setControllerConfig
 
@@ -49,6 +49,11 @@ class OpenborGenerator(Generator):
             configfilename = "config7142.ini"
         elif core == "openbor7530":
             configfilename = "config7530.ini"
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(OPENBOR_CONF_DIR + "/" + configfilename)
+        if config_path.exists():
+            config_path.unlink()
 
         config = UnixSettings(OPENBOR_CONF_DIR + "/" + configfilename, separator="")
 

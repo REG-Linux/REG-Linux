@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Mount debugfs
+mount -t debugfs debugfs /sys/kernel/debug
+if [ $? -eq 0 ]; then
+    logger "debugfs successfully mounted."
+else
+    logger "Failed to mount debugfs."
+    exit 1
+fi

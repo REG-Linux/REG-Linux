@@ -4,7 +4,7 @@ from pathlib import Path
 from struct import pack, unpack
 from typing import Any
 
-from configgen.systemFiles import CONF, SAVES
+from configgen.config.paths import CONF, SAVES
 from configgen.utils.logger import get_logger
 
 DOLPHIN_CONFIG_DIR = Path(CONF) / "dolphin-emu"

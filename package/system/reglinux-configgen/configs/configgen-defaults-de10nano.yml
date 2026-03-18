@@ -1,0 +1,66 @@
+default:
+  options:
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+    retroarch.audio_out_rate: 44100
+
+# MiSTer FPGA defaults for supported systems
+nes:
+  emulator: mister
+  core:     NES
+snes:
+  emulator: mister
+  core:     SNES
+megadrive:
+  emulator: mister
+  core:     Genesis
+mastersystem:
+  emulator: mister
+  core:     SMS
+gamegear:
+  emulator: mister
+  core:     SMS
+atari2600:
+  emulator: mister
+  core:     Atari2600
+atari7800:
+  emulator: mister
+  core:     Atari7800
+gb:
+  emulator: mister
+  core:     Gameboy
+gbc:
+  emulator: mister
+  core:     Gameboy
+gba:
+  emulator: mister
+  core:     GBA
+neogeo:
+  emulator: mister
+  core:     NeoGeo
+pcengine:
+  emulator: mister
+  core:     TurboGrafx16
+
+# Non-FPGA overrides (keep existing)
+c64:
+  emulator: vice
+  core:     x64
+c128:
+  emulator: vice
+  core:     x128
+c20:
+  emulator: vice
+  core:     xvic
+pet:
+  emulator: vice
+  core:     xpet
+cplus4:
+  emulator: vice
+  core:     xplus4
+fmtowns:
+  emulator: libretro
+  core:     mame
+flash:
+  emulator: lightspark
+  core:     lightspark

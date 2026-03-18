@@ -3,6 +3,7 @@
 from __future__ import absolute_import, print_function
 
 from optparse import OptionParser, make_option
+import ctypes
 import dbus
 import dbus.service
 import dbus.mainloop.glib
@@ -11,7 +12,14 @@ import time
 import os
 import logging
 import signal
-from gi.repository import GLib
+
+# Use ctypes to access GLib main loop directly, avoiding the need for
+# python-gobject (PyGObject) and the entire gobject-introspection chain.
+_libglib = ctypes.CDLL('libglib-2.0.so.0')
+_libglib.g_main_loop_new.restype = ctypes.c_void_p
+_libglib.g_main_loop_new.argtypes = [ctypes.c_void_p, ctypes.c_int]
+_libglib.g_main_loop_run.argtypes = [ctypes.c_void_p]
+_libglib.g_main_loop_quit.argtypes = [ctypes.c_void_p]
 
 AGENT_INTERFACE = 'org.bluez.Agent1'
 
@@ -469,8 +477,8 @@ def do_main_loop(dev_id):
   signal.signal(signal.SIGUSR2, user_signal_stop_discovery)
   logging.info("signals set")
   
-  mainloop = GLib.MainLoop()
-  mainloop.run()
+  mainloop = _libglib.g_main_loop_new(None, 0)
+  _libglib.g_main_loop_run(mainloop)
 
 if __name__ == '__main__':
   # options

@@ -1,9 +1,5 @@
-# Libretro FBNeo
+# libretro-fbneo
 
-The `libretro-fbneo` core runs the Final Burn Neo arcade platform inside REG-Linux for ARM builds.
+Arcade libretro core (FinalBurn Neo). Upstream: https://github.com/libretro/FBNeo
 
-## Build notes
-
-- `Version`: ff295ebb49dbe5f2aa8b245c09b90db8b3d20669
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
+Platform uses `unix-rpi*` variants for RPi targets and `classic_armv7_a7` for Cortex-A7; 32-bit ARM builds also enable `USE_CYCLONE=1` for the Motorola 68000 dynarec.

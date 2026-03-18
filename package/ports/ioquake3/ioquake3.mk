@@ -18,12 +18,10 @@ IOQUAKE3_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
 IOQUAKE3_CONF_OPTS += -DUSE_INTERNAL_LIBS=OFF
 IOQUAKE3_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/ioquake3/"
 
-define IOQUAKE3_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/ioquake3/quake3.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-IOQUAKE3_POST_INSTALL_TARGET_HOOKS += IOQUAKE3_EVMAPY
+# GCC 15 LTO workaround on rv64gc
+ifeq ($(BR2_riscv),y)
+IOQUAKE3_CONF_OPTS += -DCMAKE_C_FLAGS="-mno-relax"
+IOQUAKE3_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-mno-relax"
+endif
 
 $(eval $(cmake-package))

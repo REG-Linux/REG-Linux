@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import HOME
+from configgen.config.paths import HOME
 from configgen.utils.logger import get_logger
-from configgen.utils.videoMode import getRefreshRate
+from configgen.video.videoMode import getRefreshRate
 
 eslog = get_logger(__name__)
 

@@ -1,0 +1,662 @@
+diff --git a/src/plugins/renderers/frame-buffer/plugin.c b/src/plugins/renderers/frame-buffer/plugin.c
+index 3ce9b3d9..5573b2c1 100644
+--- a/src/plugins/renderers/frame-buffer/plugin.c
++++ b/src/plugins/renderers/frame-buffer/plugin.c
+@@ -51,6 +51,7 @@
+ #include "ply-rectangle.h"
+ #include "ply-region.h"
+ #include "ply-terminal.h"
++#include "ply-utils.h"
+ 
+ #include "ply-renderer.h"
+ #include "ply-renderer-plugin.h"
+@@ -64,6 +65,7 @@
+         ply_pixel_buffer_t *pixel_buffer;
+         ply_rectangle_t     area;
+         char               *map_address;
++        ply_pixel_buffer_rotation_t rotation;
+         size_t              size;
+ };
+ 
+@@ -111,6 +113,11 @@
+         uint32_t                    is_active : 1;
+         uint32_t                    input_source_is_open : 1;
+ 
++        ply_pixel_buffer_rotation_t panel_rotation;
++        int                         panel_width;
++        int                         panel_height;
++        uint8_t                     channel_lut[3][256];
++
+         void                        (*flush_area) (ply_renderer_backend_t *backend,
+                                                    ply_renderer_head_t    *head,
+                                                    ply_rectangle_t        *area_to_flush);
+@@ -125,44 +132,28 @@
+ 
+ static inline uint_fast32_t
+ argb32_pixel_value_to_device_pixel_value (ply_renderer_backend_t *backend,
+-                                          uint32_t                pixel_value)
++                                          uint32_t                pixel_value,
++                                          int32_t                *dither_r,
++                                          int32_t                *dither_g,
++                                          int32_t                *dither_b)
+ {
+         uint8_t r, g, b, a;
+         int orig_r, orig_g, orig_b, orig_a;
+-        uint8_t new_r, new_g, new_b;
+-        int i;
+ 
+         orig_a = pixel_value >> 24;
+         a = orig_a >> (8 - backend->bits_for_alpha);
+ 
+-        orig_r = ((pixel_value >> 16) & 0xff) - backend->dither_red;
++        orig_r = ((pixel_value >> 16) & 0xff) - *dither_r;
+         r = CLAMP (orig_r, 0, 255) >> (8 - backend->bits_for_red);
++        *dither_r = (int32_t) backend->channel_lut[0][r] - orig_r;
+ 
+-        orig_g = ((pixel_value >> 8) & 0xff) - backend->dither_green;
++        orig_g = ((pixel_value >> 8) & 0xff) - *dither_g;
+         g = CLAMP (orig_g, 0, 255) >> (8 - backend->bits_for_green);
++        *dither_g = (int32_t) backend->channel_lut[1][g] - orig_g;
+ 
+-        orig_b = (pixel_value & 0xff) - backend->dither_blue;
++        orig_b = (pixel_value & 0xff) - *dither_b;
+         b = CLAMP (orig_b, 0, 255) >> (8 - backend->bits_for_blue);
+-
+-        new_r = r << (8 - backend->bits_for_red);
+-        new_g = g << (8 - backend->bits_for_green);
+-        new_b = b << (8 - backend->bits_for_blue);
+-
+-        for (i = backend->bits_for_red; i < 8; i <<= 1) {
+-                new_r |= new_r >> i;
+-        }
+-
+-        for (i = backend->bits_for_green; i < 8; i <<= 1) {
+-                new_g |= new_g >> i;
+-        }
+-
+-        for (i = backend->bits_for_blue; i < 8; i <<= 1) {
+-                new_b |= new_b >> i;
+-        }
+-
+-        backend->dither_red = new_r - orig_r;
+-        backend->dither_green = new_g - orig_g;
+-        backend->dither_blue = new_b - orig_b;
++        *dither_b = (int32_t) backend->channel_lut[2][b] - orig_b;
+ 
+         return (a << backend->alpha_bit_position)
+                | (r << backend->red_bit_position)
+@@ -175,38 +166,189 @@
+                           ply_renderer_head_t    *head,
+                           ply_rectangle_t        *area_to_flush)
+ {
+-        unsigned long row, column;
++        unsigned long column;
+         uint32_t *shadow_buffer;
+         char *row_backend;
+         unsigned long x1, y1, x2, y2;
++        unsigned long x1_offset, row_width_bytes;
++        const uint32_t *src_row;
++        char *dst_row;
++        int32_t dr, dg, db;
+ 
+         x1 = area_to_flush->x;
+         y1 = area_to_flush->y;
+         x2 = x1 + area_to_flush->width;
+         y2 = y1 + area_to_flush->height;
+ 
+-        row_backend = malloc (backend->row_stride);
++        x1_offset       = x1 * backend->bytes_per_pixel;
++        row_width_bytes = area_to_flush->width * backend->bytes_per_pixel;
++
++        dr = backend->dither_red;
++        dg = backend->dither_green;
++        db = backend->dither_blue;
++
++        row_backend   = malloc (backend->row_stride);
+         shadow_buffer = ply_pixel_buffer_get_argb32_data (backend->head.pixel_buffer);
+-        for (row = y1; row < y2; row++) {
+-                unsigned long offset;
+ 
+-                for (column = x1; column < x2; column++) {
+-                        uint32_t pixel_value;
+-                        uint_fast32_t device_pixel_value;
++        src_row = shadow_buffer + y1 * head->area.width + x1;
++        dst_row = head->map_address + y1 * backend->row_stride;
+ 
+-                        pixel_value = shadow_buffer[row * head->area.width + column];
++        for (; y1 < y2; y1++, src_row += head->area.width, dst_row += backend->row_stride) {
++                const uint32_t *src = src_row;
++                char *dst = row_backend + x1_offset;
++
++                for (column = x1; column < x2; column++, src++, dst += backend->bytes_per_pixel) {
++                        uint_fast32_t device_pixel_value;
+ 
+                         device_pixel_value = argb32_pixel_value_to_device_pixel_value (backend,
+-                                                                                       pixel_value);
++                                                                                       *src,
++                                                                                       &dr, &dg, &db);
++                        memcpy (dst, &device_pixel_value, backend->bytes_per_pixel);
++                }
++
++                memcpy (dst_row + x1_offset, row_backend + x1_offset, row_width_bytes);
++        }
++
++        backend->dither_red   = dr;
++        backend->dither_green = dg;
++        backend->dither_blue  = db;
++
++        free (row_backend);
++}
++
++static void
++flush_area_to_xrgb32_device_rotated (ply_renderer_backend_t *backend,
++                                     ply_renderer_head_t    *head,
++                                     ply_rectangle_t        *area_to_flush)
++{
++        unsigned long x, y, x1, y1, x2, y2;
++        uint32_t *shadow_buffer;
++        unsigned long source_width;
++        int scale;
++
++        shadow_buffer = ply_pixel_buffer_get_argb32_data (head->pixel_buffer);
++        scale = ply_pixel_buffer_get_device_scale (head->pixel_buffer);
++        source_width = ply_pixel_buffer_get_width (head->pixel_buffer) * scale;
++
++        x1 = area_to_flush->x;
++        y1 = area_to_flush->y;
++        x2 = x1 + area_to_flush->width;
++        y2 = y1 + area_to_flush->height;
++
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                for (y = y1; y < y2; y++) {
++                        uint32_t *dst_row = (uint32_t *) &head->map_address[y * backend->row_stride];
++                        const uint32_t *src = shadow_buffer + (head->area.width - 1 - x1) * source_width + y;
++
++                        for (x = x1; x < x2; x++, src -= source_width)
++                                dst_row[x] = *src;
++                }
++        } else if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                for (y = y1; y < y2; y++) {
++                        uint32_t *dst_row = (uint32_t *) &head->map_address[y * backend->row_stride];
++                        const uint32_t *src = shadow_buffer + x1 * source_width + (head->area.height - 1 - y);
+ 
+-                        memcpy (row_backend + column * backend->bytes_per_pixel,
+-                                &device_pixel_value, backend->bytes_per_pixel);
++                        for (x = x1; x < x2; x++, src += source_width)
++                                dst_row[x] = *src;
+                 }
++        } else {
++                /* UPSIDE_DOWN */
++                for (y = y1; y < y2; y++) {
++                        uint32_t *dst_row = (uint32_t *) &head->map_address[y * backend->row_stride];
++                        const uint32_t *src = shadow_buffer +
++                                             (head->area.height - 1 - y) * source_width +
++                                             (head->area.width - 1 - x1);
+ 
+-                offset = row * backend->row_stride + x1 * backend->bytes_per_pixel;
+-                memcpy (head->map_address + offset, row_backend + x1 * backend->bytes_per_pixel,
+-                        area_to_flush->width * backend->bytes_per_pixel);
++                        for (x = x1; x < x2; x++, src--)
++                                dst_row[x] = *src;
++                }
+         }
++}
++
++static void
++flush_area_to_any_device_rotated (ply_renderer_backend_t *backend,
++                                  ply_renderer_head_t    *head,
++                                  ply_rectangle_t        *area_to_flush)
++{
++        unsigned long x, y, x1, y1, x2, y2;
++        uint32_t *shadow_buffer;
++        unsigned long source_width;
++        int scale;
++        char *row_backend;
++        int32_t dr, dg, db;
++
++        shadow_buffer = ply_pixel_buffer_get_argb32_data (head->pixel_buffer);
++        scale = ply_pixel_buffer_get_device_scale (head->pixel_buffer);
++        source_width = ply_pixel_buffer_get_width (head->pixel_buffer) * scale;
++
++        x1 = area_to_flush->x;
++        y1 = area_to_flush->y;
++        x2 = x1 + area_to_flush->width;
++        y2 = y1 + area_to_flush->height;
++
++        dr = backend->dither_red;
++        dg = backend->dither_green;
++        db = backend->dither_blue;
++
++        row_backend = malloc (backend->row_stride);
++
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                for (y = y1; y < y2; y++) {
++                        const uint32_t *src = shadow_buffer + (head->area.width - 1 - x1) * source_width + y;
++                        unsigned long offset;
++
++                        for (x = x1; x < x2; x++, src -= source_width) {
++                                uint_fast32_t device_pixel_value = argb32_pixel_value_to_device_pixel_value (backend, *src, &dr, &dg, &db);
++                                memcpy (row_backend + x * backend->bytes_per_pixel,
++                                        &device_pixel_value, backend->bytes_per_pixel);
++                        }
++
++                        offset = y * backend->row_stride + x1 * backend->bytes_per_pixel;
++                        memcpy (head->map_address + offset,
++                                row_backend + x1 * backend->bytes_per_pixel,
++                                area_to_flush->width * backend->bytes_per_pixel);
++                }
++        } else if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                for (y = y1; y < y2; y++) {
++                        const uint32_t *src = shadow_buffer + x1 * source_width + (head->area.height - 1 - y);
++                        unsigned long offset;
++
++                        for (x = x1; x < x2; x++, src += source_width) {
++                                uint_fast32_t device_pixel_value = argb32_pixel_value_to_device_pixel_value (backend, *src, &dr, &dg, &db);
++                                memcpy (row_backend + x * backend->bytes_per_pixel,
++                                        &device_pixel_value, backend->bytes_per_pixel);
++                        }
++
++                        offset = y * backend->row_stride + x1 * backend->bytes_per_pixel;
++                        memcpy (head->map_address + offset,
++                                row_backend + x1 * backend->bytes_per_pixel,
++                                area_to_flush->width * backend->bytes_per_pixel);
++                }
++        } else {
++                /* UPSIDE_DOWN */
++                for (y = y1; y < y2; y++) {
++                        const uint32_t *src = shadow_buffer +
++                                             (head->area.height - 1 - y) * source_width +
++                                             (head->area.width - 1 - x1);
++                        unsigned long offset;
++
++                        for (x = x1; x < x2; x++, src--) {
++                                uint_fast32_t device_pixel_value = argb32_pixel_value_to_device_pixel_value (backend, *src, &dr, &dg, &db);
++                                memcpy (row_backend + x * backend->bytes_per_pixel,
++                                        &device_pixel_value, backend->bytes_per_pixel);
++                        }
++
++                        offset = y * backend->row_stride + x1 * backend->bytes_per_pixel;
++                        memcpy (head->map_address + offset,
++                                row_backend + x1 * backend->bytes_per_pixel,
++                                area_to_flush->width * backend->bytes_per_pixel);
++                }
++        }
++
++        backend->dither_red   = dr;
++        backend->dither_green = dg;
++        backend->dither_blue  = db;
++
+         free (row_backend);
+ }
+ 
+@@ -269,14 +411,191 @@
+         return backend;
+ }
+ 
++static ply_pixel_buffer_rotation_t
++parse_panel_orientation_value (const char *value)
++{
++        if (strcmp (value, "left_side_up") == 0)
++                return PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE;
++
++        if (strcmp (value, "right_side_up") == 0)
++                return PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE;
++
++        if (strcmp (value, "upside_down") == 0)
++                return PLY_PIXEL_BUFFER_ROTATE_UPSIDE_DOWN;
++
++        return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++}
++
++static char *
++get_panel_orientation_from_video_param (void)
++{
++        const char *video_value;
++        const char *video_end;
++        const char *orientation;
++
++        /* Look for panel_orientation= inside video= kernel parameters,
++         * e.g. video=DSI-1:panel_orientation=left_side_up
++         */
++        video_value = ply_kernel_command_line_get_string_after_prefix ("video=");
++        if (video_value == NULL)
++                return NULL;
++
++        /* Find the end of this video= parameter (next space or end of line) */
++        video_end = video_value + strcspn (video_value, " \n");
++
++        orientation = strstr (video_value, "panel_orientation=");
++        if (orientation == NULL || orientation >= video_end)
++                return NULL;
++
++        /* Verify it's preceded by ':' within the video= parameter */
++        if (orientation > video_value && orientation[-1] != ':')
++                return NULL;
++
++        orientation += strlen ("panel_orientation=");
++
++        /* Extract the value, terminated by space, newline, comma, or colon */
++        return strndup (orientation, strcspn (orientation, " \n,:"));
++}
++
++static ply_pixel_buffer_rotation_t
++fbcon_rotate_to_rotation (int rotate_value)
++{
++        switch (rotate_value) {
++        case 1:
++                return PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE;
++        case 2:
++                return PLY_PIXEL_BUFFER_ROTATE_UPSIDE_DOWN;
++        case 3:
++                return PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE;
++        default:
++                return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++        }
++}
++
++static int
++read_sysfs_rotate (const char *path)
++{
++        int fd;
++        char buf[16];
++        ssize_t n;
++
++        fd = open (path, O_RDONLY);
++        if (fd < 0)
++                return 0;
++
++        n = read (fd, buf, sizeof (buf) - 1);
++        close (fd);
++
++        if (n <= 0)
++                return 0;
++
++        buf[n] = '\0';
++        return atoi (buf);
++}
++
++static ply_pixel_buffer_rotation_t
++get_rotation_from_fb_sysfs (void)
++{
++        int rotate_int;
++        const char *source;
++
++        rotate_int = read_sysfs_rotate ("/sys/class/graphics/fb0/rotate");
++        if (rotate_int != 0) {
++                source = "fb0/rotate";
++        } else {
++                rotate_int = read_sysfs_rotate ("/sys/class/graphics/fbcon/rotate");
++                source = "fbcon/rotate";
++        }
++
++        if (rotate_int == 0)
++                return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++
++        ply_trace ("fb sysfs rotate: %d (from %s)", rotate_int, source);
++
++        return fbcon_rotate_to_rotation (rotate_int);
++}
++
++static ply_pixel_buffer_rotation_t
++get_rotation_from_fbcon_kernel_param (void)
++{
++        const char *fbcon_value;
++        const char *rotate_param;
++        int rotate_value;
++
++        /* Look for fbcon=rotate:<N> in the kernel command line */
++        fbcon_value = ply_kernel_command_line_get_string_after_prefix ("fbcon=");
++        if (fbcon_value == NULL)
++                return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++
++        /* Within the fbcon= value, find the rotate:<N> option */
++        rotate_param = strstr (fbcon_value, "rotate:");
++        if (rotate_param == NULL)
++                return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++
++        /* Verify it's at the start or preceded by a comma */
++        if (rotate_param != fbcon_value && rotate_param[-1] != ',')
++                return PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++
++        rotate_param += strlen ("rotate:");
++        rotate_value = atoi (rotate_param);
++        return fbcon_rotate_to_rotation (rotate_value);
++}
++
++static ply_pixel_buffer_rotation_t
++get_panel_rotation (void)
++{
++        char *value;
++        ply_pixel_buffer_rotation_t rotation;
++
++        /* 1. Try standalone kernel parameter: panel_orientation=... */
++        value = ply_kernel_command_line_get_key_value ("panel_orientation=");
++
++        /* 2. Fall back to video= sub-parameter: video=<connector>:panel_orientation=... */
++        if (value == NULL)
++                value = get_panel_orientation_from_video_param ();
++
++        if (value != NULL) {
++                ply_trace ("panel_orientation kernel parameter: %s", value);
++                rotation = parse_panel_orientation_value (value);
++                free (value);
++                return rotation;
++        }
++
++        /* 3. Try fbcon=rotate:<N> kernel parameter */
++        rotation = get_rotation_from_fbcon_kernel_param ();
++        if (rotation != PLY_PIXEL_BUFFER_ROTATE_UPRIGHT) {
++                ply_trace ("fbcon=rotate kernel parameter rotation: %d", rotation);
++                return rotation;
++        }
++
++        /* 4. Fall back to fb sysfs rotation (fb0/rotate or fbcon/rotate) */
++        return get_rotation_from_fb_sysfs ();
++}
++
+ static void
+ initialize_head (ply_renderer_backend_t *backend,
+                  ply_renderer_head_t    *head)
+ {
++        unsigned long buffer_width;
++        unsigned long buffer_height;
++
+         ply_trace ("initializing %lux%lu head",
+                    head->area.width, head->area.height);
+-        head->pixel_buffer = ply_pixel_buffer_new (head->area.width,
+-                                                   head->area.height);
++
++        head->rotation = backend->panel_rotation;
++
++        buffer_width = head->area.width;
++        buffer_height = head->area.height;
++
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE ||
++            head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                buffer_width = head->area.height;
++                buffer_height = head->area.width;
++        }
++
++        head->pixel_buffer = ply_pixel_buffer_new_with_device_rotation (buffer_width,
++                                                                        buffer_height,
++                                                                        PLY_PIXEL_BUFFER_ROTATE_UPRIGHT);
+         ply_pixel_buffer_fill_with_color (backend->head.pixel_buffer, NULL,
+                                           0.0, 0.0, 0.0, 1.0);
+         ply_list_append_data (backend->heads, head);
+@@ -422,6 +741,7 @@
+ static bool
+ query_device (ply_renderer_backend_t *backend)
+ {
++        ply_pixel_buffer_rotation_t rotation;
+         struct fb_var_screeninfo variable_screen_info;
+         struct fb_fix_screeninfo fixed_screen_info;
+ 
+@@ -512,13 +832,57 @@
+ 
+         backend->head.size = backend->head.area.height * backend->row_stride;
+ 
++        /* Precompute per-channel bit-expansion LUTs for the generic (non-xRGB32) flush path */
++        {
++                unsigned int ch;
++
++                for (ch = 0; ch < 3; ch++) {
++                        unsigned int bits = (ch == 0) ? backend->bits_for_red :
++                                            (ch == 1) ? backend->bits_for_green :
++                                                        backend->bits_for_blue;
++                        unsigned int v, max = 1u << bits;
++                        unsigned int shift = 8u - bits;
++
++                        for (v = 0; v < max; v++) {
++                                unsigned int i;
++                                uint8_t expanded = (uint8_t) (v << shift);
++
++                                for (i = bits; i < 8; i <<= 1)
++                                        expanded |= expanded >> i;
++                                backend->channel_lut[ch][v] = expanded;
++                        }
++                }
++        }
++
++        rotation = get_panel_rotation ();
++
+         if (backend->bytes_per_pixel == 4 &&
+             backend->red_bit_position == 16 && backend->bits_for_red == 8 &&
+             backend->green_bit_position == 8 && backend->bits_for_green == 8 &&
+-            backend->blue_bit_position == 0 && backend->bits_for_blue == 8)
+-                backend->flush_area = flush_area_to_xrgb32_device;
+-        else
+-                backend->flush_area = flush_area_to_any_device;
++            backend->blue_bit_position == 0 && backend->bits_for_blue == 8) {
++                if (rotation != PLY_PIXEL_BUFFER_ROTATE_UPRIGHT)
++                        backend->flush_area = flush_area_to_xrgb32_device_rotated;
++                else
++                        backend->flush_area = flush_area_to_xrgb32_device;
++        } else {
++                if (rotation != PLY_PIXEL_BUFFER_ROTATE_UPRIGHT)
++                        backend->flush_area = flush_area_to_any_device_rotated;
++                else
++                        backend->flush_area = flush_area_to_any_device;
++        }
++
++        backend->panel_rotation = rotation;
++        backend->panel_width = backend->head.area.width;
++        backend->panel_height = backend->head.area.height;
++
++        if (rotation != PLY_PIXEL_BUFFER_ROTATE_UPRIGHT)
++                ply_trace ("Framebuffer panel rotation: %d", rotation);
++
++        if (rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE ||
++            rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                ply_trace ("Framebuffer logical size after rotation: %lux%lu",
++                           backend->head.area.height, backend->head.area.width);
++        }
+ 
+         initialize_head (backend, &backend->head);
+ 
+@@ -573,6 +937,44 @@
+         }
+ }
+ 
++static bool
++head_needs_software_rotation (ply_renderer_head_t *head)
++{
++        return head->rotation != PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++}
++
++static void
++rotate_area_for_head (ply_renderer_head_t *head,
++                      ply_rectangle_t     *source_area,
++                      ply_rectangle_t     *rotated_area)
++{
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                rotated_area->x = (long) head->area.width -
++                                  (long) source_area->height -
++                                  source_area->y;
++                rotated_area->y = source_area->x;
++                rotated_area->width = source_area->height;
++                rotated_area->height = source_area->width;
++        } else if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                rotated_area->x = source_area->y;
++                rotated_area->y = (long) head->area.height -
++                                  (long) source_area->width -
++                                  source_area->x;
++                rotated_area->width = source_area->height;
++                rotated_area->height = source_area->width;
++        } else {
++                /* UPSIDE_DOWN */
++                rotated_area->x = (long) head->area.width -
++                                  (long) source_area->width -
++                                  source_area->x;
++                rotated_area->y = (long) head->area.height -
++                                  (long) source_area->height -
++                                  source_area->y;
++                rotated_area->width = source_area->width;
++                rotated_area->height = source_area->height;
++        }
++}
++
+ static void
+ flush_head (ply_renderer_backend_t *backend,
+             ply_renderer_head_t    *head)
+@@ -610,7 +1012,14 @@
+ 
+                 next_node = ply_list_get_next_node (areas_to_flush, node);
+ 
+-                backend->flush_area (backend, head, area_to_flush);
++                if (head_needs_software_rotation (head)) {
++                        ply_rectangle_t rotated_area;
++
++                        rotate_area_for_head (head, area_to_flush, &rotated_area);
++                        backend->flush_area (backend, head, &rotated_area);
++                } else {
++                        backend->flush_area (backend, head, area_to_flush);
++                }
+ 
+                 node = next_node;
+         }
+@@ -623,10 +1032,12 @@
+                           ply_renderer_head_t    *head)
+ {
+         ply_region_t *region;
++        ply_rectangle_t redraw_area;
+ 
+         region = ply_pixel_buffer_get_updated_areas (head->pixel_buffer);
+ 
+-        ply_region_add_rectangle (region, &head->area);
++        ply_pixel_buffer_get_size (head->pixel_buffer, &redraw_area);
++        ply_region_add_rectangle (region, &redraw_area);
+ 
+         flush_head (backend, head);
+ }
+@@ -911,6 +1322,23 @@
+         sync_input_devices (backend);
+ }
+ 
++static bool
++get_panel_properties (ply_renderer_backend_t      *backend,
++                      int                         *width,
++                      int                         *height,
++                      ply_pixel_buffer_rotation_t *rotation,
++                      int                         *scale)
++{
++        if (!backend->panel_width)
++                return false;
++
++        *width = backend->panel_width;
++        *height = backend->panel_height;
++        *rotation = backend->panel_rotation;
++        *scale = 1;
++        return true;
++}
++
+ ply_renderer_plugin_interface_t *
+ ply_renderer_backend_get_interface (void)
+ {
+@@ -933,6 +1361,7 @@
+                 .set_handler_for_input_source = set_handler_for_input_source,
+                 .close_input_source           = close_input_source,
+                 .get_device_name              = get_device_name,
++                .get_panel_properties         = get_panel_properties,
+                 .get_capslock_state           = get_capslock_state,
+                 .get_keymap                   = get_keymap,
+                 .add_input_device             = add_input_device,

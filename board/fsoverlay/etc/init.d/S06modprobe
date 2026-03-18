@@ -1,3 +1,3 @@
 #!/bin/dash
 { [ "$1" = "start" ] && [ -f /etc/modules.conf ]; } || exit 0
-awk '!/^#/ && NF { print $1 }' /etc/modules.conf | xargs modprobe 2>/dev/null
+awk '!/^#/ && NF { print $1 }' /etc/modules.conf | xargs -n1 modprobe 2>/dev/null

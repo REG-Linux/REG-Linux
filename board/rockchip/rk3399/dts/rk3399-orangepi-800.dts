@@ -10,7 +10,6 @@
 #include <dt-bindings/input/linux-event-codes.h>
 #include <dt-bindings/pwm/pwm.h>
 #include "rockchip/rk3399.dtsi"
-#include "rockchip/rk3399-opp.dtsi"
 
 / {
 	model = "OrangePi 800";
@@ -993,4 +992,3 @@
 &hdmi_in_vopb {
         status = "okay";
 };
-

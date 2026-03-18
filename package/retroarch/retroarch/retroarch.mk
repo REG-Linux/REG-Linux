@@ -62,7 +62,10 @@ else
 endif
 
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
+# PowerVR GE8300 is fbdev-only — no GBM, so KMS context cannot be built
+ifneq ($(BR2_PACKAGE_POWERVR_GE8300_DRIVER),y)
     RETROARCH_CONF_OPTS += --enable-kms
+endif
 endif
 
 ifeq ($(BR2_ARM_FPU_NEON_VFPV4)$(BR2_ARM_FPU_NEON)$(BR2_ARM_FPU_NEON_FP_ARMV8),y)
@@ -158,7 +161,7 @@ ifeq ($(BR2_riscv),y)
 	RETROARCH_TARGET_CFLAGS += -DMESA_EGL_NO_X11_HEADERS=1
 endif
 
-ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY),yy)
+ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY)$(BR2_PACKAGE_WESTON),yy)
     RETROARCH_CONF_OPTS += --enable-wayland
 else
     RETROARCH_CONF_OPTS += --disable-wayland

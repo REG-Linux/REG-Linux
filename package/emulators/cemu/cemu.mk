@@ -5,7 +5,7 @@
 ################################################################################
 
 # Unstable because of WIP aarch64 upstreamed support
-CEMU_VERSION = 4fe73a3582187e721619eb728c7c1ae3e28c0375
+CEMU_VERSION = a04eb53822d306435f4efaba36225bc3bd297f5d
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
@@ -72,13 +72,6 @@ define CEMU_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D \
 	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/get-audio-device \
 	    $(TARGET_DIR)/usr/bin/cemu/
-	# keys.txt
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/cemu
-	touch $(TARGET_DIR)/usr/share/reglinux/datainit/bios/cemu/keys.txt
-	#evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/wiiu.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

@@ -100,13 +100,6 @@ define IORTCW_CONFIG_FILE
 		$(IORTCW_CONF_INIT)
 endef
 
-define IORTCW_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/iortcw/iortcw.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
 IORTCW_POST_INSTALL_TARGET_HOOKS += IORTCW_CONFIG_FILE
-IORTCW_POST_INSTALL_TARGET_HOOKS += IORTCW_EVMAPY
 
 $(eval $(generic-package))

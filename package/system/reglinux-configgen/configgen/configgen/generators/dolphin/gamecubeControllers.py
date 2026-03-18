@@ -115,7 +115,8 @@ def generateControllerConfig_any(
         double_pads: dict[str, int] = {}
 
         for nplayer, (_key, pad) in enumerate(
-            sorted(playersControllers.items()), start=1
+            sorted(playersControllers.items()),
+            start=1,
         ):
             # Handle x pads having the same name
             nsamepad = double_pads.get(pad.name.strip(), 0)
@@ -177,7 +178,6 @@ def generateControllerConfig_any_auto(
 
     for x in pad.inputs:
         input_obj = pad.inputs[x]
-        eslog.debug(f"\n ==> Processing input: {input_obj}")
         keyname = None
         if input_obj.name in current_mapping:
             keyname = current_mapping[input_obj.name]
@@ -295,6 +295,12 @@ def write_key(
 
 def generateHotkeys(playersControllers: Any) -> None:
     configFileName = str(Path(DOLPHIN_CONFIG_DIR) / "Hotkeys.ini")
+
+    # Remove existing config file to ensure clean state (no dynamic values)
+    config_path = Path(configFileName)
+    if config_path.exists():
+        config_path.unlink()
+
     with codecs_open(configFileName, "w", encoding="utf_8_sig") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
@@ -316,7 +322,8 @@ def generateHotkeys(playersControllers: Any) -> None:
         }
 
         for nplayer, (_key, pad) in enumerate(
-            sorted(playersControllers.items()), start=1
+            sorted(playersControllers.items()),
+            start=1,
         ):
             if nplayer == 1:
                 f.write("[Hotkeys1]" + "\n")

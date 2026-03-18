@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Paths
+VOLUME_BUTTON_STATE="/var/run/volume-button-state.flag"
+
+echo "0" > "$VOLUME_BUTTON_STATE"
+
+exit 0

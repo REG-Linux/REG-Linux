@@ -24,7 +24,7 @@ from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH
 # NKCODE_F11 = 141,
 # NKCODE_F12 = 142,
 
-# Will later be used to convert SDL input ids
+# SDL input id conversion constants
 NKCODE_BUTTON_1 = 188
 NKCODE_BUTTON_2 = 189
 NKCODE_BUTTON_3 = 190

@@ -1,26 +1,25 @@
 #!/bin/dash
-
-BOOT_CONF="/boot/system-boot.conf"
-
 get_key() {
-    value="$("/usr/bin/regmsg" systemconf getconfigkey "$1" 2>/dev/null || true)"
-    if [ -n "${value}" ]; then
-        printf '%s\n' "${value}"
-        return 0
-    fi
-    [ -r "${BOOT_CONF}" ] || return 0
-    awk -F'=' -v k="$1" '
-        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
-    ' "${BOOT_CONF}"
+    /usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || awk -F'=' -v k="$1" '$0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}' /boot/system-boot.conf 2>/dev/null
 }
+usbmode=$(get_key system.usb.mode)
 
-mode="$(get_key system.usb.mode)"
-if [ -n "${mode}" ]; then
-    [ "${mode}" = "adb" ] || exit 0
-else
-    enabled="$(get_key system.usb.adb)"
-    [ "${enabled}" = "1" ] || exit 0
-fi
+case "$1" in
+    enable|enabled)
+        /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.usb.mode adb
+        exit 0
+        ;;
+    disable|disabled)
+        # Only disable if currently in adb mode, otherwise we might be overriding mtp.
+        [ "$usbmode" = "adb" ] && /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.usb.mode off
+        exit 0
+        ;;
+    status)
+        { [ "$usbmode" = "adb" ] && printf 'ADB status: enabled\n'; } || printf 'ADB status: disabled\n'
+        ;;
+esac
+
+[ "$usbmode" = "adb" ] || exit 0
 
 case "$1" in
     start)
@@ -34,7 +33,7 @@ case "$1" in
         /usr/bin/usbgadget adb
         ;;
     *)
-        printf '%s\n' "Usage: $0 {start|stop|restart}" >&2
+        printf '%s\n' "Usage: $0 {start|stop|restart|enable|disable|status}" >&2
         exit 1
         ;;
 esac

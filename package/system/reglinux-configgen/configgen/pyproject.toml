@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 name = "reglinux-configgen"
 
 # Project version (semantic versioning recommended)
-version = "0.0.9"
+version = "0.0.10"
 
 # Short, one-line description of the project
 description = "Config generator for REG-Linux"
@@ -67,7 +67,7 @@ dependencies = [
 
 # ---------------------------------------------------------------------------
 # Optional dependencies
-# Installed via: pip install reglinux-configgen[dev]
+# Installed via: pip install reglinux-configgen[dev] or [test]
 # ---------------------------------------------------------------------------
 [project.optional-dependencies]
 dev = [
@@ -76,6 +76,14 @@ dev = [
 
     # Static type checker
     "pyright>=1.1.386"
+]
+
+test = [
+    # Testing framework
+    "pytest>=8.0.0",
+
+    # Coverage reporting
+    "pytest-cov>=4.0.0",
 ]
 
 
@@ -95,6 +103,11 @@ exclude = ["tests*", "docs*"]
 [tool.setuptools.package-data]
 # Include controller configuration files required at runtime
 "configgen.generators.xash3d_fwgs" = ["gamepad.cfg"]
+
+# Include data files for various generators
+"configgen" = ["*.yml", "*.sh", "data/**/*"]
+"configgen.data" = ["*"]
+"configgen.generators" = ["*.yml", "data/**/*"]
 
 
 # ---------------------------------------------------------------------------

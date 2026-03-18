@@ -132,12 +132,19 @@ dtparam=audio=on
 dtparam=krnbt=on
 
 # Enable DRM VC4 V3D driver
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-kms-v3d,cma-128
 
 [DPI]
 # Put any DPI required display code here
 # i.e. Official 7" DSI Raspberry Pi Touch Display for 'Full' KMS
 #ignore_lcd=1
 #dtoverlay=vc4-kms-dsi-7inch
+
+# Retroflag GPI Case overlay - uncomment the appropriate line for your model
+# GPI Case (Pi Zero/1 - 240x320 portrait)
+#dtoverlay=retroflag-gpicase
+
+# GPI Case 2W (Pi Zero 2 W - 640x480 landscape)
+#dtoverlay=retroflag-gpicase2w
 
 [all]

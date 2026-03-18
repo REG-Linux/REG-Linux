@@ -1,0 +1,70 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,7 @@
+ option(USE_GPIOD         "Use GPIOD to control GPIO LEDs" OFF)
+ option(USE_DBUS          "Use DBus to control the emulator" OFF)
+ option(USE_OPENGL        "Use OpenGL for rendering" ON)
++option(USE_GLES          "Use OpenGL ES instead of desktop OpenGL (for embedded Linux without GLX)" OFF)
+ option(USE_IPC_SOCKET    "Use Unix socket for IPC control (cross-platform)" ON)
+ option(WITH_LTO          "Enable Link Time Optimization" OFF)
+ option(WITH_OPTIMIZE     "Enable GCC native CPU optimizations" OFF)
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -22,9 +22,14 @@
+ if (USE_OPENGL)
+     target_compile_definitions(${PROJECT_NAME} PRIVATE USE_OPENGL)
+     if (NOT ANDROID)
+-        find_package(OpenGL REQUIRED)
+-        target_link_libraries(${PROJECT_NAME} PRIVATE ${TARGET_LINK_LIBRARIES} OpenGL::GL)
++        if (USE_GLES)
++            target_compile_definitions(${PROJECT_NAME} PRIVATE USE_GLES3)
++            target_link_libraries(${PROJECT_NAME} PRIVATE GLESv2 EGL)
++        else()
++            find_package(OpenGL REQUIRED)
++            target_link_libraries(${PROJECT_NAME} PRIVATE ${TARGET_LINK_LIBRARIES} OpenGL::GL)
++        endif()
+     else()
+         target_link_libraries(${PROJECT_NAME} PRIVATE GLESv3 EGL)
+     endif()
+ endif ()
+diff --git a/external/imgui/CMakeLists.txt b/external/imgui/CMakeLists.txt
+--- a/external/imgui/CMakeLists.txt
++++ b/external/imgui/CMakeLists.txt
+@@ -40,6 +40,9 @@
+     if(ANDROID)
+         # On Android, we use OpenGL ES. GLESv3 is usually what's needed for the OpenGL3 backend.
+         target_link_libraries(imgui PRIVATE GLESv3)
++    elseif(USE_GLES)
++        target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_ES3)
++        target_link_libraries(imgui PRIVATE GLESv2)
+     else()
+         find_package(OpenGL REQUIRED)
+         target_link_libraries(imgui PRIVATE OpenGL::GL)
+diff --git a/src/osdep/gl_platform.h b/src/osdep/gl_platform.h
+--- a/src/osdep/gl_platform.h
++++ b/src/osdep/gl_platform.h
+@@ -16,8 +16,8 @@
+
+ #ifdef USE_OPENGL
+
+-#ifdef __ANDROID__
+-// Android: GLES3 provides all functions directly
++#if defined(__ANDROID__) || defined(USE_GLES3)
++// Android/GLES3: Functions are provided by <GLES3/gl3.h>
+ #include <GLES3/gl3.h>
+ #include <SDL3/SDL_opengles2.h>
+
+diff --git a/src/osdep/gl_platform.cpp b/src/osdep/gl_platform.cpp
+--- a/src/osdep/gl_platform.cpp
++++ b/src/osdep/gl_platform.cpp
+@@ -13,7 +13,7 @@
+ #include "gl_platform.h"
+ #include "sysdeps.h"
+
+-#ifndef __ANDROID__
++#if !defined(__ANDROID__) && !defined(USE_GLES3)
+ // Desktop: Define the function pointers
+ PFNGLGENVERTEXARRAYSPROC glp_GenVertexArrays = nullptr;
+ PFNGLBINDVERTEXARRAYPROC glp_BindVertexArray = nullptr;

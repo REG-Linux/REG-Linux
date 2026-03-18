@@ -1,10 +1,5 @@
-# Libretro PCSX
+# libretro-pcsx
 
-The `libretro-pcsx` core delivers PlayStation 1 emulation to REG-Linux’s ARM libretro builds with Pi-specific patches already baked in.
+PlayStation libretro core (PCSX ReARMed). Upstream: https://github.com/libretro/pcsx_rearmed
 
-## Build notes
-
-- `Version`: 228c14e10e9a8fae0ead8adf30daad2cdd8655b9
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-makefile-rk3326-64.patch` and `001-RPi5-tuning.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets.

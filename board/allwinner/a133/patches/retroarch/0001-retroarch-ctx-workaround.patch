@@ -1,0 +1,17 @@
+--- a/gfx/drivers_context/sdl_gl_ctx.c	2023-05-04 16:44:44.298271739 +0000
++++ b/gfx/drivers_context/sdl_gl_ctx.c	2023-05-04 16:46:36.009986927 +0000
+@@ -149,6 +149,14 @@
+ #ifdef HAVE_SDL2
+    unsigned profile;
+ 
++   // Workaround
++   if (major == 0)
++   {
++      major = 2;
++      minor = 0;
++      api = GFX_CTX_OPENGL_ES_API;
++   }
++
+    if (api != GFX_CTX_OPENGL_API && api != GFX_CTX_OPENGL_ES_API)
+       return false;
+ 

@@ -2,7 +2,6 @@
 
 __author__ = "matthieu"
 
-from .command import Command
-from .emulator import Emulator
+from configgen.core import Command, Emulator
 
 __all__ = ["Command", "Emulator"]

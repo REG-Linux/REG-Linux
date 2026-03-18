@@ -1,8 +1,8 @@
 diff --git a/package/util-linux/util-linux.mk b/package/util-linux/util-linux.mk
-index ed30c0b107..aa96caf6cd 100644
+index 763d3872be..d9ab6b082c 100644
 --- a/package/util-linux/util-linux.mk
 +++ b/package/util-linux/util-linux.mk
-@@ -224,6 +224,11 @@ HOST_UTIL_LINUX_CONF_OPTS += \
+@@ -228,6 +228,11 @@ HOST_UTIL_LINUX_CONF_OPTS += \
  	--without-ncursesw \
  	--without-tinfo
  
@@ -14,7 +14,7 @@ index ed30c0b107..aa96caf6cd 100644
  # Disable raw command since starting from version 2.37 needs a
  # work-around to build but in the end we don't need at all.
  HOST_UTIL_LINUX_CONF_OPTS += \
-@@ -317,14 +322,12 @@ endef
+@@ -321,14 +326,12 @@ endef
  UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
  endif
  

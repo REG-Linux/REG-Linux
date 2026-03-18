@@ -1,10 +1,10 @@
 import pathlib
 from os import path
 from shlex import split
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 
 from .gzdoomConfig import (
     GZDOOM_CONFIG_DIR,
@@ -18,6 +18,7 @@ from .gzdoomControllers import setGzdoomControllers
 
 class GZDoomGenerator(Generator):
     # this emulator/core requires wayland compositor to run
+    @override
     def requiresWayland(self):
         return True
 
@@ -35,8 +36,8 @@ class GZDoomGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         # check directories exist

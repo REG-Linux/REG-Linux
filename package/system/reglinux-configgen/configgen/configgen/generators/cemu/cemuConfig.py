@@ -3,7 +3,7 @@ from pathlib import Path
 from subprocess import PIPE, CalledProcessError, check_output, run
 from typing import Any
 
-from configgen.systemFiles import BIOS, CONF, ROMS, SAVES
+from configgen.config.paths import BIOS, CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

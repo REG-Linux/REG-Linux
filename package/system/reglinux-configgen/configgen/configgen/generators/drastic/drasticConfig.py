@@ -2,7 +2,7 @@ from os import environ
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import CONF
+from configgen.config.paths import CONF
 
 DRASTIC_CONFIG_DIR = "/usr/share/drastic"
 DRASTIC_CONFIG_DIR_USER = str(Path(CONF) / "drastic")

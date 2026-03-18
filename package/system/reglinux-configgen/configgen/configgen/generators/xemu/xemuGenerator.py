@@ -2,8 +2,8 @@ from pathlib import Path
 from shutil import copyfile
 from typing import Any
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 from .xemuConfig import XEMU_BIN_PATH, XEMU_CONFIG_PATH, XEMU_SAVES_DIR, setXemuConfig

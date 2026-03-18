@@ -71,19 +71,19 @@ diff -u -r a/srcmame/cave/cv1k.cpp b/src/mame/cave/cv1k.cpp
  
  uint64_t cv1k_state::speedup_r()
  {
-@@ -1068,10 +1064,10 @@
- GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
+@@ -1044,10 +1044,10 @@
+ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (Japan, 2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
  
  // CA021  Akai Katana
--//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
-+GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+-//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
++GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
  
  // CA??? DoDonPachi SaiDaiOuJou
--//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
-+GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
+-//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
++GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
  
  // CMDL01 Medal Mahjong Moukari Bancho
- GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
+ GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
 diff -u -r a/srcmame/mame.lst b/src/mame/mame.lst
 --- a/srcmame/mame.lst	2024-06-10 08:47:56.171567852 +0200
 +++ b/src/mame/mame.lst	2024-06-10 10:08:52.055747655 +0200

@@ -4,52 +4,47 @@
 #
 ################################################################################
 
-LEDSPICER_VERSION = 0.6.3.1
+LEDSPICER_VERSION = 0.7.3
 LEDSPICER_SITE = $(call github,meduzapat,LEDSpicer,$(LEDSPICER_VERSION))
 LEDSPICER_LICENSE = GPLv3
-LEDSPICER_DEPENDENCIES = tinyxml2 libusb libtool udev libpthread-stubs
-LEDSPICER_AUTORECONF = YES
-LEDSPICER_CONF_OPTS = CXXFLAGS='-g0 -O3' --enable-nanoled --enable-pacdrive --enable-pacled64
-LEDSPICER_CONF_OPTS += --enable-ultimateio --enable-ledwiz32 --enable-howler --enable-adalight
-LEDSPICER_CONF_OPTS += --sysconfdir=/userdata/system/configs/ledspicer
-LEDSPICER_CONF_OPTS += --docdir=/usr/share/ledspicer/doc
+LEDSPICER_DEPENDENCIES = tinyxml2 libusb udev
 
-ifeq ($(BR2_PACKAGE_PIGPIO),y)
-    LEDSPICER_DEPENDENCIES += pigpio
-endif
+# Override data/config directories to use userdata
+LEDSPICER_CONF_OPTS = -DPROJECT_DATA_DIR=/userdata/system/configs/ledspicer/
+LEDSPICER_CONF_OPTS += -DPROJECT_CONF_DIR=/userdata/system/configs/ledspicer
+LEDSPICER_CONF_OPTS += -DCMAKE_CXX_FLAGS='-g0 -O3'
+
+# Device plugins
+LEDSPICER_CONF_OPTS += -DENABLE_NANOLED=ON -DENABLE_PACDRIVE=ON -DENABLE_PACLED64=ON
+LEDSPICER_CONF_OPTS += -DENABLE_ULTIMATEIO=ON -DENABLE_LEDWIZ32=ON -DENABLE_HOWLER=ON
+LEDSPICER_CONF_OPTS += -DENABLE_ADALIGHT=ON
 
 ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
-    LEDSPICER_CONF_OPTS += --enable-pulseaudio
-    LEDSPICER_DEPENDENCIES += pulseaudio
+LEDSPICER_CONF_OPTS += -DENABLE_PULSEAUDIO=ON
+LEDSPICER_DEPENDENCIES += pulseaudio
 else
-    LEDSPICER_CONF_OPTS += --disable-pulseaudio
+LEDSPICER_CONF_OPTS += -DENABLE_PULSEAUDIO=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
-    LEDSPICER_CONF_OPTS += --enable-alsaaudio
-    LEDSPICER_DEPENDENCIES += alsa-lib
+LEDSPICER_CONF_OPTS += -DENABLE_ALSAAUDIO=ON
+LEDSPICER_DEPENDENCIES += alsa-lib
 else
-    LEDSPICER_CONF_OPTS += --disable-alsaaudio
-endif
-
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY),y)
-	LEDSPICER_CONF_OPTS += --enable-raspberrypi
-else
-	LEDSPICER_CONF_OPTS += --disable-raspberrypi
+LEDSPICER_CONF_OPTS += -DENABLE_ALSAAUDIO=OFF
 endif
 
 define LEDSPICER_UDEV_RULE
-    mkdir -p $(TARGET_DIR)/etc/udev/rules.d
-    cp $(@D)/data/21-ledspicer.rules $(TARGET_DIR)/etc/udev/rules.d/99-ledspicer.rules
+	mkdir -p $(TARGET_DIR)/etc/udev/rules.d
+	cp $(@D)/data/21-ledspicer.rules $(TARGET_DIR)/etc/udev/rules.d/99-ledspicer.rules
 endef
 
 define LEDSPICER_SERVICE_INSTALL
-    mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
 	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/ledspicer/ledspicer \
-        $(TARGET_DIR)/usr/share/reglinux/services/
+		$(TARGET_DIR)/usr/share/reglinux/services/
 endef
 
 LEDSPICER_POST_INSTALL_TARGET_HOOKS += LEDSPICER_UDEV_RULE
 LEDSPICER_POST_INSTALL_TARGET_HOOKS += LEDSPICER_SERVICE_INSTALL
 
-$(eval $(autotools-package))
+$(eval $(cmake-package))

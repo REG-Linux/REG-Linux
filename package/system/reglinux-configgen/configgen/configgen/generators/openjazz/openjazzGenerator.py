@@ -1,9 +1,9 @@
 from os import chdir
 
-from configgen.command import Command
+from configgen.config.paths import ROMS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import ROMS
 from configgen.utils.logger import get_logger
 
 OPENJAZZ_ROMS_DIR = str(ROMS / "openjazz")
@@ -38,7 +38,7 @@ class OpenJazzGenerator(Generator):
                 f"ERROR: OS error when changing to OpenJazz ROMs directory {OPENJAZZ_ROMS_DIR}: {e}. Game assets may not be installed.",
             )
 
-        command_array = [OPENJAZZ_BIN_PATH, "-f", OPENJAZZ_ROMS_DIR + rom]
+        command_array = [OPENJAZZ_BIN_PATH, OPENJAZZ_ROMS_DIR + rom]
 
         return Command(
             array=command_array,

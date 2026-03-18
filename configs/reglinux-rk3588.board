@@ -19,7 +19,7 @@ BR2_KERNEL_HEADERS_6_18=y
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.8"
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.17"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/rockchip/rk3588/linux_patches"
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/rockchip/rk3588/linux-defconfig.config"
@@ -32,6 +32,9 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3588s-gameforce-ace rockchip/rk3588
 #rockchip/rk3588s-9tripod-linux
 #rockchip/rk3588-blueberry-edge-v12-linux
 #rockchip/rk3588-evb1-lp4-v10-linux
+
+# Custom CPIO dracut.conf for firmware
+BR2_TARGET_ROOTFS_CPIO_DRACUT_CONF_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/rockchip/rk3588/dracut.conf"
 
 # Use 'extreme' ZSTD compression for a smaller image, but a bit more CPU to decompress
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y

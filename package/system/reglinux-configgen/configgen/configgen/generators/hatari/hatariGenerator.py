@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.core import Command
+from configgen.core.exceptions import MachineNotFoundError
 from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
@@ -125,4 +126,4 @@ class HatariGenerator(Generator):
                         return filename
                     eslog.warning(f"tos filename {filename} not found")
 
-        raise Exception(f"no bios found for machine {machine}")
+        raise MachineNotFoundError(machine, "hatari")

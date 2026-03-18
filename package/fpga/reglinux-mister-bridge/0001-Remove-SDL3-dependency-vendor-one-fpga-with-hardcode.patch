@@ -1,0 +1,1056 @@
+From 04c589b844faa4bfabd043f86c99fd6ecd641cc7 Mon Sep 17 00:00:00 2001
+From: REG-Linux <reglinux@reglinux.org>
+Date: Fri, 20 Feb 2026 00:29:01 +0100
+Subject: [PATCH] Remove SDL3 dependency: vendor one-fpga with hardcoded SDL3
+ constants
+
+Replace the one-fpga crate SDL3 dependency with a local version that
+uses hardcoded SDL3 ABI-stable integer constants for Button (0-20),
+Axis, and Scancode types. This eliminates the sdl3-sys bundled cmake
+build that fails during cross-compilation with:
+  arm-buildroot-linux-musleabihf-gcc: ERROR: unsafe header/library
+  path used in cross-compilation: '-L' '/usr/local/lib'
+
+The patched one-fpga maintains full API compatibility with mister-fpga.
+---
+ Cargo.toml                      |   3 +
+ one-fpga/Cargo.toml             |  18 ++
+ one-fpga/src/core.rs            | 488 ++++++++++++++++++++++++++++++++
+ one-fpga/src/core/bios.rs       |  31 ++
+ one-fpga/src/core/null.rs       | 125 ++++++++
+ one-fpga/src/core/rom.rs        |  12 +
+ one-fpga/src/inputs.rs          |   5 +
+ one-fpga/src/inputs/gamepad.rs  | 103 +++++++
+ one-fpga/src/inputs/keyboard.rs |  65 +++++
+ one-fpga/src/lib.rs             |   7 +
+ one-fpga/src/runner.rs          |  87 ++++++
+ 11 files changed, 944 insertions(+)
+ create mode 100644 one-fpga/Cargo.toml
+ create mode 100644 one-fpga/src/core.rs
+ create mode 100644 one-fpga/src/core/bios.rs
+ create mode 100644 one-fpga/src/core/null.rs
+ create mode 100644 one-fpga/src/core/rom.rs
+ create mode 100644 one-fpga/src/inputs.rs
+ create mode 100644 one-fpga/src/inputs/gamepad.rs
+ create mode 100644 one-fpga/src/inputs/keyboard.rs
+ create mode 100644 one-fpga/src/lib.rs
+ create mode 100644 one-fpga/src/runner.rs
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 60940eb..c871e26 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -22,6 +22,9 @@ roxmltree = "0.20"
+ chd = { version = "0.3", default-features = false, features = ["std", "cd_full"] }
+ image = { version = "0.25", default-features = false, features = ["png"] }
+ 
++[patch.crates-io]
++one-fpga = { path = "one-fpga" }
++
+ [profile.release]
+ opt-level = "s"
+ strip = true
+diff --git a/one-fpga/Cargo.toml b/one-fpga/Cargo.toml
+new file mode 100644
+index 0000000..c4d6ac8
+--- /dev/null
++++ b/one-fpga/Cargo.toml
+@@ -0,0 +1,18 @@
++[package]
++edition = "2021"
++name = "one-fpga"
++version = "0.1.0"
++description = "One FPGA general traits and types (SDL3-free patch for cross-compilation)."
++license = "MIT"
++
++[lib]
++name = "one_fpga"
++path = "src/lib.rs"
++
++[dependencies]
++byteorder = "1.5.0"
++image = "0.25"
++serde = { version = "1.0.198", features = ["derive"] }
++static_assertions = "1.1"
++strum = { version = "0.26.3", features = ["derive"] }
++thiserror = "1.0.59"
+diff --git a/one-fpga/src/core.rs b/one-fpga/src/core.rs
+new file mode 100644
+index 0000000..98d1e93
+--- /dev/null
++++ b/one-fpga/src/core.rs
+@@ -0,0 +1,488 @@
++use std::any::Any;
++use std::cell::UnsafeCell;
++use std::io::{Read, Seek, Write};
++use std::rc::Rc;
++use std::time::SystemTime;
++
++pub use bios::Bios;
++use image::DynamicImage;
++pub use null::NullCore;
++pub use rom::Rom;
++use serde::Serialize;
++
++use crate::inputs::{gamepad, keyboard};
++
++pub mod bios;
++pub mod null;
++pub mod rom;
++
++/// An ID that is given by the core implementation for a config menu. This
++/// ID is used to identify the menu item that was selected by the user.
++#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
++pub struct SettingId(u32);
++
++impl Serialize for SettingId {
++    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
++        self.0.serialize(serializer)
++    }
++}
++
++impl From<u32> for SettingId {
++    fn from(value: u32) -> Self {
++        Self(value)
++    }
++}
++
++impl From<SettingId> for u32 {
++    fn from(value: SettingId) -> Self {
++        value.0
++    }
++}
++
++impl From<&str> for SettingId {
++    fn from(value: &str) -> Self {
++        Self::from_label(value)
++    }
++}
++
++impl From<&String> for SettingId {
++    fn from(value: &String) -> Self {
++        Self::from_label(value)
++    }
++}
++
++impl SettingId {
++    pub fn new(id: u32) -> Self {
++        Self(id)
++    }
++
++    pub fn from_label(label: &str) -> Self {
++        let mut s: u32 = 0;
++        for c in label.as_bytes() {
++            s = s.wrapping_mul(223).wrapping_add(*c as u32);
++        }
++        Self(s)
++    }
++
++    pub fn as_u32(&self) -> u32 {
++        self.0
++    }
++}
++
++/// Core Settings, which is a list of setting items that can be displayed
++/// in the core's setting menu. This is an abstraction over all possible
++/// settings that a core can have.
++#[derive(Debug, Serialize)]
++pub struct CoreSettings {
++    title: String,
++    items: Vec<CoreSettingItem>,
++}
++
++impl CoreSettings {
++    pub fn new(title: String, items: Vec<CoreSettingItem>) -> Self {
++        Self { title, items }
++    }
++
++    pub fn items(&self) -> &[CoreSettingItem] {
++        &self.items
++    }
++}
++
++/// A core setting item that can be displayed in the core's setting menu.
++#[derive(Debug, Serialize)]
++#[serde(rename_all = "camelCase", tag = "kind")]
++pub enum CoreSettingItem {
++    Page {
++        id: SettingId,
++        label: String,
++        title: String,
++        items: Vec<CoreSettingItem>,
++        disabled: bool,
++    },
++    Separator,
++    Label {
++        selectable: bool,
++        label: String,
++        disabled: bool,
++    },
++    #[serde(rename = "file")]
++    FileSelect {
++        id: SettingId,
++        label: String,
++        extensions: Vec<String>,
++        disabled: bool,
++    },
++    Trigger {
++        id: SettingId,
++        label: String,
++        disabled: bool,
++    },
++    #[serde(rename = "bool")]
++    BoolOption {
++        id: SettingId,
++        label: String,
++        value: bool,
++        disabled: bool,
++    },
++    #[serde(rename = "int")]
++    IntOption {
++        id: SettingId,
++        label: String,
++        choices: Vec<String>,
++        value: usize,
++        disabled: bool,
++    },
++}
++
++impl CoreSettingItem {
++    pub fn with_disabled(mut self, disabled: bool) -> Self {
++        self.set_disable(disabled);
++        self
++    }
++
++    pub fn set_disable(&mut self, new_disabled: bool) {
++        match self {
++            CoreSettingItem::Page { disabled, .. }
++            | CoreSettingItem::Label { disabled, .. }
++            | CoreSettingItem::Trigger { disabled, .. }
++            | CoreSettingItem::FileSelect { disabled, .. }
++            | CoreSettingItem::BoolOption { disabled, .. }
++            | CoreSettingItem::IntOption { disabled, .. } => {
++                *disabled = new_disabled;
++            }
++            _ => {}
++        }
++    }
++
++    pub fn page(
++        id: impl Into<SettingId>,
++        label: &str,
++        title: &str,
++        items: Vec<CoreSettingItem>,
++    ) -> Self {
++        CoreSettingItem::Page {
++            id: id.into(),
++            label: label.to_string(),
++            title: title.to_string(),
++            items,
++            disabled: false,
++        }
++    }
++
++    pub fn items(&self) -> Option<&Vec<CoreSettingItem>> {
++        match self {
++            CoreSettingItem::Page { items, .. } => Some(items),
++            _ => None,
++        }
++    }
++
++    pub fn items_mut(&mut self) -> Option<&mut Vec<CoreSettingItem>> {
++        match self {
++            CoreSettingItem::Page { items, .. } => Some(items),
++            _ => None,
++        }
++    }
++
++    pub fn separator() -> Self {
++        CoreSettingItem::Separator
++    }
++
++    pub fn label(selectable: bool, label: &str) -> Self {
++        CoreSettingItem::Label {
++            selectable,
++            label: label.to_string(),
++            disabled: false,
++        }
++    }
++
++    pub fn file_select(id: impl Into<SettingId>, label: &str, extensions: Vec<String>) -> Self {
++        CoreSettingItem::FileSelect {
++            id: id.into(),
++            label: label.to_string(),
++            extensions,
++            disabled: false,
++        }
++    }
++
++    pub fn trigger(id: impl Into<SettingId>, label: &str) -> Self {
++        CoreSettingItem::Trigger {
++            id: id.into(),
++            label: label.to_string(),
++            disabled: false,
++        }
++    }
++
++    pub fn bool_option(id: impl Into<SettingId>, label: &str, value: Option<bool>) -> Self {
++        CoreSettingItem::BoolOption {
++            id: id.into(),
++            label: label.to_string(),
++            value: value.unwrap_or_default(),
++            disabled: false,
++        }
++    }
++
++    pub fn int_option(
++        id: impl Into<SettingId>,
++        label: &str,
++        choices: Vec<String>,
++        value: Option<usize>,
++    ) -> Self {
++        CoreSettingItem::IntOption {
++            id: id.into(),
++            label: label.to_string(),
++            choices,
++            value: value.unwrap_or_default(),
++            disabled: false,
++        }
++    }
++
++    pub fn add_item(&mut self, sub: CoreSettingItem) {
++        if let CoreSettingItem::Page { items, .. } = self {
++            items.push(sub);
++        }
++    }
++}
++
++/// A save state, if cores support it.
++pub trait SaveState {
++    fn is_dirty(&self) -> bool;
++    fn save(&mut self, writer: &mut dyn Write) -> Result<(), Error>;
++    fn load(&mut self, reader: &mut dyn Read) -> Result<(), Error>;
++}
++
++/// A mounted file to the core.
++pub trait MountedFile: Read + Write + Seek {}
++
++/// An error that can be returned by a core.
++#[derive(Debug, thiserror::Error)]
++pub enum Error {
++    #[error("An error occurred: {0}")]
++    Generic(String),
++
++    #[error("An error occurred: {0}")]
++    IoError(#[from] std::io::Error),
++
++    #[error("An error occurred: {0}")]
++    Message(String),
++
++    #[error("An error occurred: {0}")]
++    AnyError(#[from] Box<dyn std::error::Error>),
++}
++
++impl From<String> for Error {
++    fn from(value: String) -> Self {
++        Error::Generic(value)
++    }
++}
++
++/// An iterator over the save states of a core.
++#[derive(Copy, Clone)]
++pub struct SaveStateIter<'a, T: Core> {
++    core: &'a T,
++    valid: bool,
++    index: usize,
++}
++
++impl<'a, T: Core> SaveStateIter<'a, T> {
++    pub fn new(core: &'a T) -> Self {
++        Self {
++            core,
++            valid: true,
++            index: 0,
++        }
++    }
++}
++
++impl<'a, T: Core> Iterator for SaveStateIter<'a, T> {
++    type Item = &'a dyn SaveState;
++
++    fn next(&mut self) -> Option<Self::Item> {
++        if !self.valid {
++            return None;
++        }
++
++        match self.core.save_state(self.index) {
++            Ok(Some(state)) => {
++                self.index += 1;
++                Some(state)
++            }
++            Ok(None) => None,
++            Err(_e) => {
++                self.valid = false;
++                None
++            }
++        }
++    }
++}
++
++pub trait Core {
++    fn init(&mut self) -> Result<(), Error>;
++    fn name(&self) -> &str;
++    fn reset(&mut self) -> Result<(), Error>;
++    fn set_volume(&mut self, volume: u8) -> Result<(), Error>;
++    fn set_rtc(&mut self, time: SystemTime) -> Result<(), Error>;
++    fn screenshot(&self) -> Result<DynamicImage, Error>;
++    fn save_state_mut(&mut self, slot: usize) -> Result<Option<&mut dyn SaveState>, Error>;
++    fn save_state(&self, slot: usize) -> Result<Option<&dyn SaveState>, Error>;
++    fn mounted_file_mut(&mut self, slot: usize) -> Result<Option<&mut dyn MountedFile>, Error>;
++    fn send_rom(&mut self, rom: Rom) -> Result<(), Error>;
++    fn send_bios(&mut self, bios: Bios) -> Result<(), Error>;
++    fn key_up(&mut self, key: keyboard::Scancode) -> Result<(), Error>;
++    fn key_down(&mut self, key: keyboard::Scancode) -> Result<(), Error>;
++    fn keys_set(&mut self, keys: keyboard::ScancodeSet) -> Result<(), Error>;
++    fn keys(&self) -> Result<keyboard::ScancodeSet, Error>;
++    fn gamepad_button_up(&mut self, index: usize, button: gamepad::Button) -> Result<(), Error>;
++    fn gamepad_button_down(&mut self, index: usize, button: gamepad::Button) -> Result<(), Error>;
++    fn gamepad_buttons_set(
++        &mut self,
++        index: usize,
++        buttons: gamepad::ButtonSet,
++    ) -> Result<(), Error>;
++    fn gamepad_buttons(&self, index: usize) -> Result<Option<gamepad::ButtonSet>, Error>;
++    fn settings(&self) -> Result<CoreSettings, Error>;
++    fn trigger(&mut self, id: SettingId) -> Result<(), Error>;
++    fn file_select(&mut self, id: SettingId, path: String) -> Result<(), Error>;
++    fn int_option(&mut self, id: SettingId, value: u32) -> Result<u32, Error>;
++    fn bool_option(&mut self, id: SettingId, value: bool) -> Result<bool, Error>;
++    fn as_any(&self) -> &dyn Any;
++    fn as_any_mut(&mut self) -> &mut dyn Any;
++    fn quit(&mut self);
++    fn should_quit(&self) -> bool;
++}
++
++#[derive(Clone)]
++pub struct OneFpgaCore {
++    name: String,
++    inner: Rc<UnsafeCell<dyn Core + 'static>>,
++}
++
++impl OneFpgaCore {
++    pub fn new(core: impl Core + 'static) -> Self {
++        Self {
++            name: core.name().to_string(),
++            inner: Rc::new(UnsafeCell::new(core)),
++        }
++    }
++
++    pub fn null() -> Self {
++        Self::new(NullCore)
++    }
++}
++
++impl Core for OneFpgaCore {
++    fn init(&mut self) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.init()
++    }
++
++    fn name(&self) -> &str {
++        &self.name
++    }
++
++    fn reset(&mut self) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.reset()
++    }
++
++    fn set_volume(&mut self, volume: u8) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.set_volume(volume)
++    }
++
++    fn set_rtc(&mut self, time: SystemTime) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.set_rtc(time)
++    }
++
++    fn screenshot(&self) -> Result<DynamicImage, Error> {
++        unsafe { &mut *self.inner.get() }.screenshot()
++    }
++
++    fn save_state_mut(&mut self, slot: usize) -> Result<Option<&mut dyn SaveState>, Error> {
++        unsafe { &mut *self.inner.get() }.save_state_mut(slot)
++    }
++
++    fn save_state(&self, slot: usize) -> Result<Option<&dyn SaveState>, Error> {
++        unsafe { &mut *self.inner.get() }.save_state(slot)
++    }
++
++    fn mounted_file_mut(&mut self, slot: usize) -> Result<Option<&mut dyn MountedFile>, Error> {
++        unsafe { &mut *self.inner.get() }.mounted_file_mut(slot)
++    }
++
++    fn send_rom(&mut self, rom: Rom) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.send_rom(rom)
++    }
++
++    fn send_bios(&mut self, bios: Bios) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.send_bios(bios)
++    }
++
++    fn key_up(&mut self, key: keyboard::Scancode) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.key_up(key)
++    }
++
++    fn key_down(&mut self, key: keyboard::Scancode) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.key_down(key)
++    }
++
++    fn keys_set(&mut self, keys: keyboard::ScancodeSet) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.keys_set(keys)
++    }
++
++    fn keys(&self) -> Result<keyboard::ScancodeSet, Error> {
++        unsafe { &mut *self.inner.get() }.keys()
++    }
++
++    fn gamepad_button_up(&mut self, index: usize, button: gamepad::Button) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.gamepad_button_up(index, button)
++    }
++
++    fn gamepad_button_down(&mut self, index: usize, button: gamepad::Button) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.gamepad_button_down(index, button)
++    }
++
++    fn gamepad_buttons_set(
++        &mut self,
++        index: usize,
++        buttons: gamepad::ButtonSet,
++    ) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.gamepad_buttons_set(index, buttons)
++    }
++
++    fn gamepad_buttons(&self, index: usize) -> Result<Option<gamepad::ButtonSet>, Error> {
++        unsafe { &mut *self.inner.get() }.gamepad_buttons(index)
++    }
++
++    fn settings(&self) -> Result<CoreSettings, Error> {
++        unsafe { &mut *self.inner.get() }.settings()
++    }
++
++    fn trigger(&mut self, id: SettingId) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.trigger(id)
++    }
++
++    fn file_select(&mut self, id: SettingId, path: String) -> Result<(), Error> {
++        unsafe { &mut *self.inner.get() }.file_select(id, path)
++    }
++
++    fn int_option(&mut self, id: SettingId, value: u32) -> Result<u32, Error> {
++        unsafe { &mut *self.inner.get() }.int_option(id, value)
++    }
++
++    fn bool_option(&mut self, id: SettingId, value: bool) -> Result<bool, Error> {
++        unsafe { &mut *self.inner.get() }.bool_option(id, value)
++    }
++
++    fn as_any(&self) -> &dyn Any {
++        unsafe { &mut *self.inner.get() }.as_any()
++    }
++
++    fn as_any_mut(&mut self) -> &mut dyn Any {
++        unsafe { &mut *self.inner.get() }.as_any_mut()
++    }
++
++    fn quit(&mut self) {
++        unsafe { &mut *self.inner.get() }.quit();
++    }
++
++    fn should_quit(&self) -> bool {
++        unsafe { &*self.inner.get() }.should_quit()
++    }
++}
+diff --git a/one-fpga/src/core/bios.rs b/one-fpga/src/core/bios.rs
+new file mode 100644
+index 0000000..02728f4
+--- /dev/null
++++ b/one-fpga/src/core/bios.rs
+@@ -0,0 +1,31 @@
++use std::io::{Cursor, Read, Seek, SeekFrom};
++use std::path::PathBuf;
++use std::sync::Arc;
++
++/// A BIOS, including any information the core needs to know about the BIOS.
++#[derive(Debug, Clone)]
++pub enum Bios {
++    /// A BIOS that is stored in memory.
++    Memory(Option<PathBuf>, Cursor<Vec<u8>>),
++
++    /// A BIOS that is stored in a file.
++    File(PathBuf, Arc<std::fs::File>),
++}
++
++impl Read for Bios {
++    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
++        match self {
++            Self::Memory(_, data) => data.read(buf),
++            Self::File(_, file) => file.read(buf),
++        }
++    }
++}
++
++impl Seek for Bios {
++    fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64> {
++        match self {
++            Self::Memory(_, data) => data.seek(pos),
++            Self::File(_, file) => file.seek(pos),
++        }
++    }
++}
+diff --git a/one-fpga/src/core/null.rs b/one-fpga/src/core/null.rs
+new file mode 100644
+index 0000000..ee993a8
+--- /dev/null
++++ b/one-fpga/src/core/null.rs
+@@ -0,0 +1,125 @@
++use std::any::Any;
++use std::time::SystemTime;
++
++use image::{ColorType, DynamicImage};
++
++use crate::core::{Bios, CoreSettings, Error, MountedFile, Rom, SaveState, SettingId};
++use crate::inputs::gamepad::ButtonSet;
++use crate::inputs::keyboard::ScancodeSet;
++use crate::inputs::{Button, Scancode};
++use crate::Core;
++
++/// A Core that does nothing.
++pub struct NullCore;
++
++impl Core for NullCore {
++    fn init(&mut self) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn name(&self) -> &str {
++        "null"
++    }
++
++    fn reset(&mut self) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn set_volume(&mut self, _volume: u8) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn set_rtc(&mut self, _time: SystemTime) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn screenshot(&self) -> Result<DynamicImage, Error> {
++        Ok(DynamicImage::new(1, 1, ColorType::Rgb8))
++    }
++
++    fn save_state_mut(&mut self, _slot: usize) -> Result<Option<&mut dyn SaveState>, Error> {
++        Ok(None)
++    }
++
++    fn save_state(&self, _slot: usize) -> Result<Option<&dyn SaveState>, Error> {
++        Ok(None)
++    }
++
++    fn mounted_file_mut(&mut self, _slot: usize) -> Result<Option<&mut dyn MountedFile>, Error> {
++        Ok(None)
++    }
++
++    fn send_rom(&mut self, _rom: Rom) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn send_bios(&mut self, _bios: Bios) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn key_up(&mut self, _key: Scancode) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn key_down(&mut self, _key: Scancode) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn keys_set(&mut self, _keys: ScancodeSet) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn keys(&self) -> Result<ScancodeSet, Error> {
++        Ok(ScancodeSet::new())
++    }
++
++    fn gamepad_button_up(&mut self, _index: usize, _button: Button) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn gamepad_button_down(&mut self, _index: usize, _button: Button) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn gamepad_buttons_set(&mut self, _index: usize, _buttons: ButtonSet) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn gamepad_buttons(&self, _index: usize) -> Result<Option<ButtonSet>, Error> {
++        Ok(None)
++    }
++
++    fn settings(&self) -> Result<CoreSettings, Error> {
++        Ok(CoreSettings::new("null".to_string(), vec![]))
++    }
++
++    fn trigger(&mut self, _id: SettingId) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn file_select(&mut self, _id: SettingId, _path: String) -> Result<(), Error> {
++        Ok(())
++    }
++
++    fn int_option(&mut self, _id: SettingId, _value: u32) -> Result<u32, Error> {
++        Ok(0)
++    }
++
++    fn bool_option(&mut self, _id: SettingId, _value: bool) -> Result<bool, Error> {
++        Ok(false)
++    }
++
++    fn as_any(&self) -> &dyn Any {
++        self
++    }
++
++    fn as_any_mut(&mut self) -> &mut dyn Any {
++        self
++    }
++
++    fn quit(&mut self) {}
++
++    fn should_quit(&self) -> bool {
++        false
++    }
++}
+diff --git a/one-fpga/src/core/rom.rs b/one-fpga/src/core/rom.rs
+new file mode 100644
+index 0000000..3fa7b53
+--- /dev/null
++++ b/one-fpga/src/core/rom.rs
+@@ -0,0 +1,12 @@
++use std::io::Cursor;
++use std::path::PathBuf;
++
++/// A ROM, including any information the core needs to know about the ROM.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub enum Rom {
++    /// A ROM that is stored in memory.
++    Memory(Option<PathBuf>, Cursor<Vec<u8>>),
++
++    /// A ROM that is stored in a file on the file system.
++    File(PathBuf),
++}
+diff --git a/one-fpga/src/inputs.rs b/one-fpga/src/inputs.rs
+new file mode 100644
+index 0000000..179c7d5
+--- /dev/null
++++ b/one-fpga/src/inputs.rs
+@@ -0,0 +1,5 @@
++pub mod gamepad;
++pub mod keyboard;
++
++pub use gamepad::{Axis, Button};
++pub use keyboard::Scancode;
+diff --git a/one-fpga/src/inputs/gamepad.rs b/one-fpga/src/inputs/gamepad.rs
+new file mode 100644
+index 0000000..0f83986
+--- /dev/null
++++ b/one-fpga/src/inputs/gamepad.rs
+@@ -0,0 +1,103 @@
++use serde::{Deserialize, Serialize};
++use static_assertions::const_assert;
++use strum::{Display, EnumCount, EnumIter, EnumString, FromRepr, IntoEnumIterator};
++
++/// Gamepad buttons.
++/// Values match SDL3 SDL_GamepadButton enum (stable ABI).
++#[derive(
++    Copy,
++    Clone,
++    Eq,
++    PartialEq,
++    Hash,
++    Debug,
++    Serialize,
++    Deserialize,
++    EnumIter,
++    EnumString,
++    Display,
++    EnumCount,
++    FromRepr,
++)]
++#[repr(u8)]
++pub enum Button {
++    A = 0,
++    B = 1,
++    X = 2,
++    Y = 3,
++    Back = 4,
++    Guide = 5,
++    Start = 6,
++    LeftStick = 7,
++    RightStick = 8,
++    LeftShoulder = 9,
++    RightShoulder = 10,
++    DPadUp = 11,
++    DPadDown = 12,
++    DPadLeft = 13,
++    DPadRight = 14,
++    Misc1 = 15,
++    Paddle1 = 16,
++    Paddle2 = 17,
++    Paddle3 = 18,
++    Paddle4 = 19,
++    Touchpad = 20,
++}
++
++impl Button {
++    pub fn as_repr(&self) -> u8 {
++        *self as u8
++    }
++}
++
++/// A set of pressed buttons.
++#[derive(Copy, Clone, Eq, PartialEq, Hash, Default)]
++pub struct ButtonSet(u32);
++
++// Make sure we don't have more than 32 buttons (or u32 might overflow).
++const_assert!(Button::COUNT <= 32);
++
++impl ButtonSet {
++    pub fn new() -> Self {
++        Self(0)
++    }
++
++    pub fn contains(&self, button: Button) -> bool {
++        self.0 & (1 << button.as_repr()) != 0
++    }
++
++    pub fn insert(&mut self, button: Button) {
++        self.0 |= 1 << button.as_repr();
++    }
++
++    pub fn remove(&mut self, button: Button) {
++        self.0 &= !(1 << button.as_repr());
++    }
++}
++
++impl std::fmt::Debug for ButtonSet {
++    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        let mut f = f.debug_tuple("ButtonSet");
++
++        for b in Button::iter() {
++            if self.contains(b) {
++                f.field(&b.to_string());
++            }
++        }
++
++        f.finish()
++    }
++}
++
++/// Gamepad axes.
++/// Values match SDL3 SDL_GamepadAxis enum (stable ABI).
++#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
++#[repr(i32)]
++pub enum Axis {
++    LeftX = 0,
++    LeftY = 1,
++    RightX = 2,
++    RightY = 3,
++    LeftTrigger = 4,
++    RightTrigger = 5,
++}
+diff --git a/one-fpga/src/inputs/keyboard.rs b/one-fpga/src/inputs/keyboard.rs
+new file mode 100644
+index 0000000..8d7b252
+--- /dev/null
++++ b/one-fpga/src/inputs/keyboard.rs
+@@ -0,0 +1,65 @@
++use std::collections::HashSet;
++use std::fmt;
++
++/// A scancode representing a physical key on the keyboard.
++/// The inner value matches SDL3 scancode integers (USB HID usage values).
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
++pub struct Scancode(i32);
++
++impl Scancode {
++    /// Create a scancode from a raw integer value.
++    pub fn new(value: i32) -> Self {
++        Self(value)
++    }
++
++    /// Get an integer representation of the key (the key scan code).
++    #[inline]
++    pub fn as_repr(&self) -> i32 {
++        self.0
++    }
++}
++
++impl std::str::FromStr for Scancode {
++    type Err = String;
++
++    fn from_str(s: &str) -> Result<Self, Self::Err> {
++        s.parse::<i32>()
++            .map(Scancode)
++            .map_err(|_| format!("Could not parse scancode: {}", s))
++    }
++}
++
++impl fmt::Display for Scancode {
++    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
++        write!(f, "Scancode({})", self.0)
++    }
++}
++
++impl From<i32> for Scancode {
++    fn from(value: i32) -> Self {
++        Self(value)
++    }
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Default)]
++pub struct ScancodeSet {
++    set: HashSet<Scancode>,
++}
++
++impl ScancodeSet {
++    pub fn new() -> Self {
++        Self::default()
++    }
++
++    pub fn contains(&self, scancode: Scancode) -> bool {
++        self.set.contains(&scancode)
++    }
++
++    pub fn insert(&mut self, scancode: Scancode) {
++        self.set.insert(scancode);
++    }
++
++    pub fn remove(&mut self, scancode: Scancode) {
++        self.set.remove(&scancode);
++    }
++}
+diff --git a/one-fpga/src/lib.rs b/one-fpga/src/lib.rs
+new file mode 100644
+index 0000000..abf17f5
+--- /dev/null
++++ b/one-fpga/src/lib.rs
+@@ -0,0 +1,7 @@
++pub use core::Core;
++pub use core::OneFpgaCore;
++
++pub mod core;
++pub mod runner;
++
++pub mod inputs;
+diff --git a/one-fpga/src/runner.rs b/one-fpga/src/runner.rs
+new file mode 100644
+index 0000000..850c4cc
+--- /dev/null
++++ b/one-fpga/src/runner.rs
+@@ -0,0 +1,87 @@
++use std::collections::BTreeMap;
++use std::path::PathBuf;
++
++use crate::core::{Bios, Rom};
++
++/// The type of core to launch.
++#[derive(Debug, Clone)]
++pub enum CoreType {
++    /// Don't launch a new core, keep the current one running.
++    Current,
++
++    /// Launch a core from an RBF file.
++    RbfFile(PathBuf),
++
++    /// Launch the menu core.
++    Menu,
++}
++
++#[derive(Debug, Clone)]
++pub enum Slot {
++    File(PathBuf),
++    Memory(PathBuf, Vec<u8>),
++}
++
++#[derive(Debug, Clone)]
++pub struct CoreLaunchInfo<T> {
++    pub core: CoreType,
++    pub rom: Option<Rom>,
++    pub bios: Vec<Bios>,
++    pub files: BTreeMap<usize, Slot>,
++    pub save_state: Vec<Slot>,
++
++    pub data: T,
++}
++
++impl CoreLaunchInfo<()> {
++    fn new(core_loader: CoreType) -> Self {
++        Self {
++            core: core_loader,
++            rom: None,
++            bios: Default::default(),
++            files: Default::default(),
++            save_state: Default::default(),
++            data: (),
++        }
++    }
++
++    pub fn rbf(rbf_path: PathBuf) -> Self {
++        Self::new(CoreType::RbfFile(rbf_path))
++    }
++
++    pub fn menu() -> Self {
++        Self::new(CoreType::Menu)
++    }
++
++    pub fn current() -> Self {
++        Self::new(CoreType::Current)
++    }
++}
++
++impl<T> CoreLaunchInfo<T> {
++    pub fn with_rom(mut self, rom: Rom) -> Self {
++        self.rom = Some(rom);
++        self
++    }
++
++    pub fn with_file(mut self, slot: usize, content: Slot) -> Self {
++        self.files.insert(slot, content);
++        self
++    }
++
++    pub fn with_save_state(mut self, content: Slot) -> Self {
++        self.save_state.push(content);
++        self
++    }
++
++    pub fn with_data<U>(self, data: U) -> CoreLaunchInfo<U> {
++        CoreLaunchInfo {
++            core: self.core,
++            rom: self.rom,
++            bios: self.bios,
++            files: self.files,
++            save_state: self.save_state,
++            data,
++        }
++    }
++}
+-- 
+2.43.0
+

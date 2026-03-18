@@ -1,0 +1,19 @@
+# Retroflag GPI Case - Input Rules
+# Install to: /etc/udev/rules.d/99-retroflag-input.rules
+
+# Retroflag GPI Case buttons and controls
+SUBSYSTEM=="input", ATTRS{name}=="retroflag*", MODE="0666", ENV{ID_INPUT_JOYSTICK}="1"
+
+# DPI Panel events
+SUBSYSTEM=="input", ATTRS{name}=="dpi-*", MODE="0666"
+
+# Ensure proper permissions for all gamepads
+KERNEL=="event[0-9]*", SUBSYSTEM=="input", MODE="0666"
+KERNEL=="js[0-9]*", SUBSYSTEM=="input", MODE="0666"
+
+# Disable Xbox 360 Controller LEDs (power saving for Zero/Zero 2 W)
+# Turn off all 4 quadrant LEDs on Xbox 360 controller (vendor 045e, product 028e)
+ACTION=="add", SUBSYSTEM=="input", ATTRS{idVendor}=="045e", ATTRS{idProduct}=="028e", ATTRS{name}=="Microsoft X-Box 360 pad", RUN+="/bin/sh -c 'echo 0 > /sys/class/leds/xpad*/brightness 2>/dev/null || true'"
+
+# Alternative method using attribute
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="xpad*", ATTR{brightness}="0"

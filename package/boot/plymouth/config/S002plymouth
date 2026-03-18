@@ -1,12 +1,13 @@
 #!/bin/dash
 case "$1" in
     start)
+        echo 0 > /sys/class/vtconsole/vtcon1/bind
         # Boot splash with "insert coin"
         /usr/sbin/plymouthd --mode=boot --graphical-boot --attach-to-session
         /usr/bin/plymouth --show-splash
     ;;
     stop)
-        # Shutdown splash with "game over" set by S12populateshare
-        /usr/bin/plymouth --wait quit --retain-splash
+        # Shutdown splash with "game over" set by S99services
+        /usr/bin/plymouth quit
     ;;
 esac

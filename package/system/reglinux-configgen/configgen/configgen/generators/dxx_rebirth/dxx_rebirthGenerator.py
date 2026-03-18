@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
+from configgen.config.paths import CONF
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
 
 DXX_REBIRTH1_CONFIG_DIR = str(Path(CONF) / "d1x-rebirth")
 DXX_REBIRTH1_CONFIG_PATH = str(Path(DXX_REBIRTH1_CONFIG_DIR) / "descent.cfg")
@@ -16,6 +16,7 @@ DXX_REBIRTH2_BIN_PATH = "/usr/bin/d2x-rebirth"
 
 class DXX_RebirthGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -110,6 +111,7 @@ class DXX_RebirthGenerator(Generator):
         return Command(array=command_array)
 
     # Show mouse for menu / play actions
+    @override
     def getMouseMode(self, config, rom):
         return True
 

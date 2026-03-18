@@ -93,10 +93,6 @@ define MUPEN64PLUS_CORE_INSTALL_TARGET_CMDS
 	ln -sf /usr/share/fonts/dejavu/DejaVuSans.ttf $(TARGET_DIR)/usr/share/mupen64plus/font.ttf
 	cp $(@D)/data/mupen64plus.ini $(TARGET_DIR)/usr/share/mupen64plus/mupen64plus.ini
 	cp $(@D)/data/mupencheat.txt "$(TARGET_DIR)/usr/share/mupen64plus/mupencheat.txt"
-
-	# evmapy files
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mupen64plus/mupen64plus-core/evmapy/*.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 define MUPEN64PLUS_CORE_CROSS_FIXUP

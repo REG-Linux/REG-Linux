@@ -1,0 +1,12 @@
+diff --git a/arch/arm64/boot/dts/qcom/qcs6490-radxa-dragon-q6a.dts b/arch/arm64/boot/dts/qcom/qcs6490-radxa-dragon-q6a.dts
+index 0b65239..fc55c04 100644
+--- a/arch/arm64/boot/dts/qcom/qcs6490-radxa-dragon-q6a.dts
++++ b/arch/arm64/boot/dts/qcom/qcs6490-radxa-dragon-q6a.dts
+@@ -1335,6 +1335,7 @@ &usb_2_hsphy {
+ 
+ &venus {
+ 	status = "okay";
++	firmware-name = "qcom/vpu/vpu20_p1.mbn";
+ };
+ 
+ /* PINCTRL - additions to nodes defined in sc7280.dtsi */

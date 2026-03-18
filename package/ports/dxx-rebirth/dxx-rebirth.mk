@@ -42,12 +42,4 @@ define DXX_REBIRTH_INSTALL_TARGET_CMDS
     cp $(@D)/build/d2x-rebirth/d2x-rebirth $(TARGET_DIR)/usr/bin/
 endef
 
-define DXX_REBIRTH_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/dxx-rebirth/dxx-rebirth.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-DXX_REBIRTH_POST_INSTALL_TARGET_HOOKS += DXX_REBIRTH_EVMAPY
-
 $(eval $(generic-package))

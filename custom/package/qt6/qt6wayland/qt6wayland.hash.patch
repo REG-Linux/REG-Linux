@@ -1,12 +1,12 @@
 diff --git a/package/qt6/qt6wayland/qt6wayland.hash b/package/qt6/qt6wayland/qt6wayland.hash
-index a378097eb4..45842ceb01 100644
+index a378097eb4..8e13551c3f 100644
 --- a/package/qt6/qt6wayland/qt6wayland.hash
 +++ b/package/qt6/qt6wayland/qt6wayland.hash
 @@ -1,5 +1,5 @@
 -# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtwayland-everywhere-src-6.8.1.tar.xz.sha256
 -sha256  2226fbde4e2ddd12f8bf4b239c8f38fd706a54e789e63467dfddc77129eca203  qtwayland-everywhere-src-6.8.1.tar.xz
-+# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qtwayland-everywhere-src-6.10.1.tar.xz.sha256
-+sha256  49bf6db800227a6b2c971f4c5d03dd1e81297e7ffb296ce4a96437304f27cb13  qtwayland-everywhere-src-6.10.1.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.2/submodules/qtwayland-everywhere-src-6.10.2.tar.xz.sha256
++sha256  391998eb432719df26a6a67d8efdc67f8bf2afdd76c1ee3381ebff4fe7527ee2  qtwayland-everywhere-src-6.10.2.tar.xz
  
  # Hashes for license files:
  sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt

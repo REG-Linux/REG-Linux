@@ -1,0 +1,115 @@
+--- a/pcsx2/ImGui/ImGuiFullscreen.cpp
++++ b/pcsx2/ImGui/ImGuiFullscreen.cpp
+@@ -2578,9 +2578,14 @@
+ 		if (s_focus_reset_queued != FocusResetType::None)
+ 			ImGui::SetKeyboardFocusHere();
+ 		
+-		ImGui::InputText("##input", &s_input_dialog_text, flags, 
+-			(s_input_dialog_filter_type != InputFilterType::None) ? input_callback : nullptr,
+-			(s_input_dialog_filter_type != InputFilterType::None) ? static_cast<void*>(&s_input_dialog_filter_type) : nullptr);
++		ImGuiInputTextCallback callback = nullptr;
++		void* callback_user_data = nullptr;
++		if (s_input_dialog_filter_type != InputFilterType::None)
++		{
++			callback = +input_callback;
++			callback_user_data = static_cast<void*>(&s_input_dialog_filter_type);
++		}
++		ImGui::InputText("##input", &s_input_dialog_text, flags, callback, callback_user_data);
+ 
+ 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + LayoutScale(10.0f));
+ 
+--- a/pcsx2/GS/Renderers/SW/GSSetupPrimCodeGenerator.arm64.cpp
++++ b/pcsx2/GS/Renderers/SW/GSSetupPrimCodeGenerator.arm64.cpp
+@@ -20,7 +20,9 @@
+ static const auto& _scratchaddr = x7;
+ static const auto& _vscratch = v31;
+ 
++#define DDATA_STRIDE static_cast<int>(sizeof(((GSScanlineLocalData*)0)->d[0]))
+ #define _local(field) MemOperand(_locals, offsetof(GSScanlineLocalData, field))
++#define _local_d(i, field) MemOperand(_locals, static_cast<int32_t>(offsetof(GSScanlineLocalData, d[0].field) + (i) * DDATA_STRIDE))
+ #define armAsm (&m_emitter)
+ 
+ GSSetupPrimCodeGenerator::GSSetupPrimCodeGenerator(u64 key, void* code, size_t maxsize)
+@@ -89,7 +91,7 @@
+ 				armAsm->Fcvtzs(v2.V4S(), v2.V4S());
+ 				armAsm->Trn1(v2.V8H(), v2.V8H(), v2.V8H());
+ 
+-				armAsm->Str(v2.V4S(), _local(d[i].f));
++				armAsm->Str(v2.V4S(), _local_d(i, f));
+ 			}
+ 		}
+ 
+@@ -113,7 +115,7 @@
+ 				// m_local.d[i].z1 = dz.mul64(VectorF::f32to64(half_shift[2 * i + 3]));
+ 
+ 				armAsm->Fmul(v1.V4S(), v0.V4S(), VRegister(4 + i, kFormat4S));
+-				armAsm->Str(v1.V4S(), _local(d[i].z));
++				armAsm->Str(v1.V4S(), _local_d(i, z));
+ 			}
+ 		}
+ 	}
+@@ -194,8 +196,8 @@
+ 
+ 				switch (j)
+ 				{
+-					case 0: armAsm->Str(v2, _local(d[i].s)); break;
+-					case 1: armAsm->Str(v2, _local(d[i].t)); break;
++					case 0: armAsm->Str(v2, _local_d(i, s)); break;
++					case 1: armAsm->Str(v2, _local_d(i, t)); break;
+ 				}
+ 			}
+ 			else
+@@ -204,9 +206,9 @@
+ 
+ 				switch (j)
+ 				{
+-					case 0: armAsm->Str(v2, _local(d[i].s)); break;
+-					case 1: armAsm->Str(v2, _local(d[i].t)); break;
+-					case 2: armAsm->Str(v2, _local(d[i].q)); break;
++					case 0: armAsm->Str(v2, _local_d(i, s)); break;
++					case 1: armAsm->Str(v2, _local_d(i, t)); break;
++					case 2: armAsm->Str(v2, _local_d(i, q)); break;
+ 				}
+ 			}
+ 		}
+@@ -254,7 +256,7 @@
+ 
+ 			// m_local.d[i].rb = r.trn1_16(b); // Not currently in GSVector since that's mainly targeting x86 for now
+ 			armAsm->Trn1(v2.V8H(), v2.V8H(), v3.V8H());
+-			armAsm->Str(v2, _local(d[i].rb));
++			armAsm->Str(v2, _local_d(i, rb));
+ 		}
+ 
+ 		// GSVector4 c = dscan.c;
+@@ -280,7 +282,7 @@
+ 			// m_local.d[i].ga = g.trn1_16(a); // Not currently in GSVector since that's mainly targeting x86 for now
+ 
+ 			armAsm->Trn1(v2.V8H(), v2.V8H(), v3.V8H());
+-			armAsm->Str(v2, _local(d[i].ga));
++			armAsm->Str(v2, _local_d(i, ga));
+ 		}
+ 	}
+ 	else
+--- a/pcsx2/GS/Renderers/SW/GSDrawScanlineCodeGenerator.arm64.cpp
++++ b/pcsx2/GS/Renderers/SW/GSDrawScanlineCodeGenerator.arm64.cpp
+@@ -77,6 +77,10 @@
+ static const auto& _test = v8;
+ static const auto& _fd = v2;
+ 
++static constexpr int kLodStride = sizeof(u32);
++static constexpr int kGlobalLodOffset = static_cast<int>(offsetof(GSScanlineGlobalData, lod.i.U32[0]));
++static constexpr int kLocalTempLodOffset = static_cast<int>(offsetof(GSScanlineLocalData, temp.lod.i.U32[0]));
++
+ #define _local(field) MemOperand(_locals, offsetof(GSScanlineLocalData, field))
+ #define _global(field) MemOperand(_globals, offsetof(GSScanlineGlobalData, field))
+ #define armAsm (&m_emitter)
+@@ -2266,7 +2270,8 @@
+ {
+ 	pxAssert(addr.IsX());
+ 	pxAssert(m_sel.mmin);
+-	armAsm->Ldr(addr.W(), m_sel.lcm ? _global(lod.i.U32[lod]) : _local(temp.lod.i.U32[lod]));
++	const int lod_offset = (m_sel.lcm ? kGlobalLodOffset : kLocalTempLodOffset) + lod * kLodStride;
++	armAsm->Ldr(addr.W(), MemOperand(m_sel.lcm ? _globals : _locals, lod_offset));
+ 	if (mip_offset != 0)
+ 		armAsm->Add(addr.W(), addr.W(), mip_offset);
+ 	armAsm->Ldr(addr.X(), MemOperand(_global_tex0, addr, LSL, 3));

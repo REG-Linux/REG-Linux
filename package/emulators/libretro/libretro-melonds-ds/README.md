@@ -1,9 +1,5 @@
-# Libretro melonDS DS
+# libretro-melonds-ds
 
-The `libretro-melonds-ds` core recreates melonDS inside REG-Linux with a focus on parity and reliability while reusing the standalone experience.
+Nintendo DS libretro core (melonDS DS). Upstream: https://github.com/JesseTG/melonds-ds
 
-## Build notes
-
-- `Version`: e1391cc10a53b205963b7d1bd2b1f8d87d0d2cc7
-- `Dependencies`: `BR2_PACKAGE_LIBPCAP`, supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: CMake-based (`cmake-package`)
+Pinned to a specific commit rather than a tagged release due to stability issues. Uses `cmake-package` with out-of-source build (`SUPPORTS_IN_SOURCE_BUILD = NO`).

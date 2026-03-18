@@ -1,45 +1,27 @@
-#!/bin/sh
-
+#!/bin/dash
 DAEMON="/usr/bin/ledspicerd"
 CONFIG_DIR="/userdata/system/configs/ledspicer"
 DAEMON_ARGS=""
 
 start() {
         echo -n "Starting LEDSpicer: "
-
         # If the configuration directory does not exist, initialize the config
         if [ ! -e "$CONFIG_DIR" ]; then
-                initialize
+                # Use an externalized configuration directory for editing
+                mkdir -p "$CONFIG_DIR" || exit 1
+                # Copy example config file
+                cp "/usr/share/ledspicer/doc/examples/ledspicer.conf" "$CONFIG_DIR/ledspicer.conf" || exit 1
+                # Copy the /usr/share/ledspicer configs
+                rsync -aq --exclude="doc" "/usr/share/ledspicer/" "$CONFIG_DIR" || exit 1
         fi
         
         # Start the LEDSpicer daemon (ledspicerd)
-        start-stop-daemon --start --quiet --exec $DAEMON --background -- $DAEMON_ARGS
-        RETVAL=$?
-
-	echo "done"
-        return $RETVAL
+        { start-stop-daemon --start --quiet --exec $DAEMON --background -- $DAEMON_ARGS && echo "done."; } || { echo "failed."; exit 1; }
 }
 
 stop() {
         echo -n "Stopping LEDSpicer: "
-
-        # Stop the LEDSpicer daemon (ledspicerd)
-        start-stop-daemon --stop --quiet --exec $DAEMON
-	RETVAL=$?
-	
-        echo "done"
-        return $RETVAL
-}
-
-initialize() {
-        # Use an externalized configuration directory for editing
-        mkdir -p "$CONFIG_DIR" || exit 1
-
-        # Copy example config file
-        cp "/usr/share/ledspicer/doc/examples/ledspicer.conf" "$CONFIG_DIR/ledspicer.conf" || exit 1
-
-        # Copy the /usr/share/ledspicer configs
-        rsync -aq --exclude="doc" "/usr/share/ledspicer/" "$CONFIG_DIR" || exit 1
+        { start-stop-daemon --stop --quiet --exec $DAEMON && echo "done."; } || { echo "failed."; exit 1; }
 }
 
 case "$1" in
@@ -49,9 +31,17 @@ case "$1" in
         stop)
                 stop
                 ;;
+        restart|reload)
+                stop
+                sleep 1
+                start
+                ;;
+        status)
+                { pgrep -x "ledspicerd" > /dev/null && echo "LEDSpicer is running."; } || { echo "LEDSpicer is not running."; }
+                ;;
+        enable|enabled|disable|disabled) ;;
         *)
-                echo "Usage: $0 {start|stop}"
+                printf '%s\n' "Usage: $0 {start|stop|restart|enable|disable|status}" >&2
                 exit 1
+                ;;
 esac
-
-exit $?

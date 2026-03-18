@@ -1,15 +1,15 @@
 from csv import reader
-from os import chdir, listdir
+from os import listdir
 from pathlib import Path
 from shutil import copy2, rmtree
-from typing import Any
+from typing import Any, override
 from xml.etree.ElementTree import parse
 
 from configgen.bezel.mame_bezel_manager import setup_mame_bezels
-from configgen.command import Command
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
-from configgen.utils.videoMode import getScreensInfos
+from configgen.video.videoMode import getScreensInfos
 
 logger = get_logger(__name__)
 
@@ -18,10 +18,12 @@ class MameGenerator(Generator):
     """MAME Generator for creating command arrays and configurations for MAME/MESS emulators."""
 
     # TODO MAME requires a wayland compositor *if* bgfx is used
+    @override
     def requiresWayland(self) -> bool:
         """Indicate if the generator requires Wayland compositor."""
         return True
 
+    @override
     def supportsInternalBezels(self) -> bool:
         """Indicate if the generator supports internal bezels."""
         return True
@@ -32,8 +34,8 @@ class MameGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, Any],
     ) -> Command:
         """Generate the MAME command array for the specified ROM and system configuration.
@@ -62,6 +64,7 @@ class MameGenerator(Generator):
         subdirSoftList = ["mac_hdd", "bbc_hdd", "cdi", "archimedes_hdd", "fmtowns_cd"]
 
         # Generate userdata folders if needed
+
         mamePaths = [
             "system/configs/mame",
             "saves/mame",
@@ -80,9 +83,8 @@ class MameGenerator(Generator):
             "bios/mame/artwork/crosshairs",
         ]
         for checkPath in mamePaths:
-            check_path = Path("/userdata") / checkPath
-            if not check_path.exists():
-                check_path.mkdir(parents=True, exist_ok=True)
+            full_path = str(Path("/userdata") / checkPath)
+            Path(full_path).mkdir(exist_ok=True, parents=True)
 
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
         with Path(messDataFile).open() as openFile:
@@ -114,6 +116,10 @@ class MameGenerator(Generator):
             romParentPath = Path(romDirname).name
             if Path(f"/userdata/roms/fmtowns/{romParentPath}.zip").exists():
                 softList = "fmtowns_cd"
+
+        logger.debug(
+            f"MAME: system={system.name}, mess={messMode}, softlist={softList or 'none'}"
+        )
 
         command_array = ["/usr/bin/mame/mame"]
         # MAME options used here are explained as it's not always straightforward
@@ -185,11 +191,7 @@ class MameGenerator(Generator):
                 cfgPath = Path("/userdata/system/configs/mame/custom/")
             else:
                 cfgPath = Path("/userdata/system/configs/mame/")
-            if not Path("/userdata/system/configs/mame/").exists():
-                Path("/userdata/system/configs/mame/").mkdir(
-                    parents=True,
-                    exist_ok=True,
-                )
+            Path("/userdata/system/configs/mame/").mkdir(exist_ok=True, parents=True)
         else:
             if customCfg:
                 cfgPath = (
@@ -199,15 +201,10 @@ class MameGenerator(Generator):
                 )
             else:
                 cfgPath = Path("/userdata/system/configs/mame/") / messSysName[messMode]
-            if not (
-                Path("/userdata/system/configs/mame/") / messSysName[messMode]
-            ).exists():
-                (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
-                    parents=True,
-                    exist_ok=True,
-                )
-        if not cfgPath.exists():
-            cfgPath.mkdir(parents=True, exist_ok=True)
+            Path(
+                str(Path("/userdata/system/configs/mame/") / messSysName[messMode])
+            ).mkdir(exist_ok=True, parents=True)
+        Path(str(cfgPath)).mkdir(exist_ok=True, parents=True)
 
         # MAME will create custom configs per game for MAME ROMs and MESS ROMs with no system attached (LCD games, TV games, etc.)
         # This will allow an alternate config path per game for MESS console/computer ROMs that may need additional config.
@@ -375,10 +372,6 @@ class MameGenerator(Generator):
         ):
             command_array += ["-offscreen_reload"]
 
-        # wheels
-        # The 'wheels' variable was unused, and the 'pass' statement for system.isOptSet("use_wheels") is unnecessary.
-        # If 'use_wheels' is set and true, no MAME arguments are added here, so the block can be removed.
-
         if system.isOptSet("multiscreens") and system.getOptBoolean("multiscreens"):
             screens = getScreensInfos(system.config)
             if len(screens) > 1:
@@ -516,6 +509,14 @@ class MameGenerator(Generator):
                             command_array += ["-flop1"]
                         else:
                             command_array += ["-cart"]
+                    elif system.name == "atom":
+                        # UEF is a cassette tape format for Acorn Atom
+                        if Path(romBasename).suffix.casefold() == ".uef":
+                            command_array += ["-cass"]
+                        elif Path(romBasename).suffix.casefold() == ".dsk":
+                            command_array += ["-flop1"]
+                        else:
+                            command_array += ["-cart"]
                     else:
                         command_array += ["-" + messRomType[messMode]]
                 elif system.isOptSet("bootdisk"):
@@ -535,11 +536,21 @@ class MameGenerator(Generator):
                     elif system.isOptSet("altromtype"):
                         command_array += ["-" + system.config["altromtype"]]
                     else:
-                        command_array += ["-" + messRomType[messMode]]
+                        # Auto-detect CD-ROM images for Macintosh
+                        rom_extension = Path(romBasename).suffix.lower()
+                        if rom_extension in [".img", ".iso", ".chd", ".cue"]:
+                            command_array += ["-cdrom"]
+                        else:
+                            command_array += ["-" + messRomType[messMode]]
                 elif system.isOptSet("altromtype"):
                     command_array += ["-" + system.config["altromtype"]]
                 else:
-                    command_array += ["-" + messRomType[messMode]]
+                    # Auto-detect CD-ROM images for Macintosh
+                    rom_extension = Path(romBasename).suffix.lower()
+                    if rom_extension in [".img", ".iso", ".chd", ".cue"]:
+                        command_array += ["-cdrom"]
+                    else:
+                        command_array += ["-" + messRomType[messMode]]
                 # Use the full filename for MESS ROMs
                 command_array += [rom]
             # Prepare software lists
@@ -561,17 +572,19 @@ class MameGenerator(Generator):
                     if hashFile.endswith(".xml"):
                         Path(str(hashDir / hashFile)).unlink()
                 Path(str(hashDir / f"{softList}.xml")).symlink_to(
-                    f"/usr/bin/mame/hash/{softList}.xml"
+                    f"/usr/bin/mame/hash/{softList}.xml",
                 )
                 if softList in subdirSoftList:
                     romPath = Path(romDirname)
                     Path(str(softDirPath / softList)).symlink_to(
-                        str(romPath.parent), target_is_directory=True
+                        str(romPath.parent),
+                        target_is_directory=True,
                     )
                     command_array += [Path(romDirname).name]
                 else:
                     Path(str(softDirPath / softList)).symlink_to(
-                        romDirname, target_is_directory=True
+                        romDirname,
+                        target_is_directory=True,
                     )
                     command_array += [Path(romBasename).stem]
 
@@ -720,6 +733,9 @@ class MameGenerator(Generator):
             if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd = autoRunCmd.replace("'", "")
+                logger.debug(
+                    f"MAME autoboot: delay={autoRunDelay}s, cmd={autoRunCmd.strip()}"
+                )
                 command_array += [
                     "-autoboot_delay",
                     str(autoRunDelay),
@@ -734,8 +750,12 @@ class MameGenerator(Generator):
         setup_mame_bezels(system, rom, messSysNameForBezel, game_resolution, guns)
 
         # Change directory to MAME folder (allows data plugin to load properly)
-        chdir("/usr/bin/mame")
-        return Command(array=command_array, env={"PWD": "/usr/bin/mame/"})
+        # Using the cwd parameter in Command to avoid global chdir
+        return Command(
+            array=command_array,
+            env={"PWD": "/usr/bin/mame/"},
+            cwd="/usr/bin/mame",
+        )
 
     @staticmethod
     def getRoot(config: Any, name: str) -> Any:

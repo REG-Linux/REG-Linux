@@ -4,8 +4,7 @@
 #
 ################################################################################
 
-# Version.: Commits on Nov 30, 2025
-GAMECONTROLLERDB_VERSION = b57e20920a5c524344c24468260f06a927bcd44a
+GAMECONTROLLERDB_VERSION = e26193b280825a73bd47d05ecdb7d14fe0b2b338
 GAMECONTROLLERDB_SITE = $(call github,REG-Linux,SDL_GameControllerDB,$(GAMECONTROLLERDB_VERSION))
 
 GAMECONTROLLERDB_PATH = $(TARGET_DIR)/usr/share/emulationstation

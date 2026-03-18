@@ -1,8 +1,8 @@
 diff --git a/package/cmake/cmake.mk b/package/cmake/cmake.mk
-index 1eb4da90ad..361022ae1a 100644
+index 304dc3755a..aa61e87d8e 100644
 --- a/package/cmake/cmake.mk
 +++ b/package/cmake/cmake.mk
-@@ -61,7 +61,6 @@ define HOST_CMAKE_CONFIGURE_CMDS
+@@ -59,7 +59,6 @@ define HOST_CMAKE_CONFIGURE_CMDS
  			-DCMAKE_C_FLAGS="$(HOST_CMAKE_CFLAGS)" \
  			-DCMAKE_CXX_FLAGS="$(HOST_CMAKE_CXXFLAGS)" \
  			-DCMAKE_EXE_LINKER_FLAGS="$(HOST_LDFLAGS)" \

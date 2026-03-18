@@ -1,0 +1,58 @@
+include toolchain-gcc14-glibc.common
+include reglinux-board.common
+
+# Target definition (AArch64, Cortex-A57 for Tegra T210)
+BR2_aarch64=y
+BR2_cortex_a57=y
+BR2_ARM_FPU_NEON_FP_ARMV8=y
+BR2_PACKAGE_SYSTEM_TARGET_L4T=y
+BR2_TARGET_OPTIMIZATION="-pipe -march=armv8-a+crypto+crc -mtune=cortex-a57"
+BR2_TARGET_GENERIC_GETTY_PORT="ttyS0"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/nvidia/l4t/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/nvidia/l4t/fsoverlay"
+
+# Kernel headers: use 5.4 (oldest available in Buildroot) for toolchain
+# The actual kernel is 4.9 L4T but userspace headers can be slightly newer
+BR2_KERNEL_HEADERS_5_4=y
+
+# glibc: enable kernel compat so glibc doesn't assume min kernel 5.4
+# (the actual runtime kernel is 4.9 L4T)
+BR2_PACKAGE_GLIBC_KERNEL_COMPAT=y
+
+# Kernel: L4T 4.9 assembled from multiple switchroot/CTCaer repositories
+# IMPORTANT: Before building, run the assembly script to create the kernel tarball:
+#   ./board/nvidia/l4t/assemble-l4t-kernel.sh
+# This creates dl/linux-l4t-4.9.tar.gz automatically.
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
+BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="file://$(TOPDIR)/dl/linux-l4t-4.9.tar.gz"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/nvidia/l4t/linux-l4t-defconfig.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/nvidia/l4t/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/nvidia/l4t/kernel_build_patches"
+BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+
+# Build the DTBs from the kernel sources
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="nvidia/tegra210-p3450-0000"
+
+# Use ZSTD compression for squashfs
+BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
+
+# Enable Wayland
+BR2_PACKAGE_REGLINUX_SWAY=y
+BR2_PACKAGE_REGLINUX_XWAYLAND=y
+
+# GPU: Mesa3D with Nouveau/Tegra Gallium driver + tegra-bsp proprietary stack
+BR2_PACKAGE_SYSTEM_NOUVEAU_MESA3D=y
+
+# Firmware
+BR2_PACKAGE_FIRMWARE_TEGRA=y
+
+# L4T boot chain and board support
+BR2_PACKAGE_SWITCH_BOOTLOADER=y
+BR2_PACKAGE_SWITCH_BSP=y
+
+# Filesystem
+BR2_TARGET_ROOTFS_CPIO_LZ4=y

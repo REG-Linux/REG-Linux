@@ -1,5 +1,5 @@
 diff --git a/package/dropbear/dropbear.mk b/package/dropbear/dropbear.mk
-index d57d6b6e37..98774a85fd 100644
+index e4e42cf994..7c73a353f3 100644
 --- a/package/dropbear/dropbear.mk
 +++ b/package/dropbear/dropbear.mk
 @@ -108,8 +108,8 @@ endef

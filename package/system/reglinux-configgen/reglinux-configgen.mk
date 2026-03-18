@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_CONFIGGEN_VERSION = 0.0.9
+REGLINUX_CONFIGGEN_VERSION = 0.0.10
 REGLINUX_CONFIGGEN_LICENSE = GPL
 REGLINUX_CONFIGGEN_SOURCE=
 REGLINUX_CONFIGGEN_SETUP_TYPE = pep517
@@ -14,6 +14,8 @@ REGLINUX_CONFIGGEN_DEPENDENCIES = \
 	python-lxml \
 	python-ruamel-yaml \
 	python-toml \
+	python-tomli \
+	python-tomli-w \
 	python-pillow \
 	python-evdev \
 	python-pyudev \
@@ -21,6 +23,10 @@ REGLINUX_CONFIGGEN_DEPENDENCIES = \
 
 ifeq ($(BR2_PACKAGE_FFMPEG),y)
 REGLINUX_CONFIGGEN_DEPENDENCIES += ffmpeg-python
+endif
+
+ifeq ($(BR2_PACKAGE_MANGOHUD),y)
+REGLINUX_CONFIGGEN_DEPENDENCIES += mangohud
 endif
 
 REGLINUX_CONFIGGEN_INSTALL_STAGING = YES
@@ -81,14 +87,14 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H616),y)
 	REGLINUX_CONFIGGEN_SYSTEM=h616
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
 	REGLINUX_CONFIGGEN_SYSTEM=h700
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A133),y)
+	REGLINUX_CONFIGGEN_SYSTEM=a133
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 	REGLINUX_CONFIGGEN_SYSTEM=s812
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3128),y)
 	REGLINUX_CONFIGGEN_SYSTEM=rk3128
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SDM845),y)
 	REGLINUX_CONFIGGEN_SYSTEM=sdm845
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115),y)
-	REGLINUX_CONFIGGEN_SYSTEM=sm6115
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_QCS6490),y)
 	REGLINUX_CONFIGGEN_SYSTEM=qcs6490
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
@@ -101,14 +107,14 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 	REGLINUX_CONFIGGEN_SYSTEM=jh7110
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 	REGLINUX_CONFIGGEN_SYSTEM=k1
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
-	REGLINUX_CONFIGGEN_SYSTEM=th1520
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 	REGLINUX_CONFIGGEN_SYSTEM=asahi
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JZ4770),y)
 	REGLINUX_CONFIGGEN_SYSTEM=jz4770
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
 	REGLINUX_CONFIGGEN_SYSTEM=mt8395
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_DE10NANO),y)
+	REGLINUX_CONFIGGEN_SYSTEM=de10nano
 endif
 
 define REGLINUX_CONFIGGEN_INSTALL_STAGING_CMDS
@@ -141,16 +147,11 @@ endef
 define REGLINUX_CONFIGGEN_ES_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/powermode_launch_hooks.sh \
 	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/powermode_launch_hooks.sh
-	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/usb_gadget_hooks.sh \
-	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/usb_gadget_hooks.sh
 endef
 
 define REGLINUX_CONFIGGEN_X86_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/tdp_hooks.sh \
 	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/tdp_hooks.sh
-
-	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/nvidia-workaround.sh \
-	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/nvidia-workaround.sh
 endef
 
 REGLINUX_CONFIGGEN_POST_INSTALL_TARGET_HOOKS = REGLINUX_CONFIGGEN_CONFIGS

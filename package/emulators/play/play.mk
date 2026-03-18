@@ -33,13 +33,4 @@ ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     PLAY_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
 
-define PLAY_EVMAPY
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/play/*.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-PLAY_POST_INSTALL_TARGET_HOOKS += PLAY_EVMAPY
-
 $(eval $(cmake-package))

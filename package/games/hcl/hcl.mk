@@ -15,9 +15,6 @@ HCL_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON
 define HCL_INSTALL_TARGET_CMDS
 	cp $(@D)/buildroot-build/hcl $(TARGET_DIR)/usr/bin/hcl
 	chmod 0754 $(TARGET_DIR)/usr/bin/hcl
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/hcl/hcl.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

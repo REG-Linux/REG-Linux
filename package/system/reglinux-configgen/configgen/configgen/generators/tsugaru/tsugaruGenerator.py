@@ -1,9 +1,10 @@
 from pathlib import Path
+from typing import override
 
-from configgen.command import Command
+from configgen.config.paths import BIOS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import BIOS
 
 TSUGARU_BIN_PATH = "/usr/bin/Tsugaru_CUI"
 TSUGARU_BIOS_DIR = str(BIOS / "fmtowns")
@@ -11,6 +12,7 @@ TSUGARU_BIOS_DIR = str(BIOS / "fmtowns")
 
 class TsugaruGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 

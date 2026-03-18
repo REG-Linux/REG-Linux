@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=REG Linux Arcade
+Description=REG Linux arcade-style Plymouth theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/reglinux-arcade
+ScriptFile=/usr/share/plymouth/themes/reglinux-arcade/reglinux-arcade.script

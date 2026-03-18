@@ -3,12 +3,12 @@ from os import listdir
 from pathlib import Path
 from re import search
 from shutil import copy2, copyfile
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
+from configgen.config.paths import CONF
 from configgen.controllers import generate_sdl_controller_config, gunsNeedCrosses
-from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -20,6 +20,7 @@ SUPERMODEL_BIN_PATH = Path("/usr/bin/supermodel")
 
 class SupermodelGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -162,7 +163,7 @@ def configPadsIni(
     system: Any,
     rom: str,
     players_controllers: Any,
-    guns: Any,
+    guns: DeviceConfig,
     altControl: Any,
     sensitivity: Any,
 ) -> tuple[str, dict[str, str | None]]:
@@ -228,7 +229,7 @@ def configPadsIni(
         key: str,
         value: str,
         system: Any,
-        guns: Any,
+        guns: DeviceConfig,
         players_controllers: Any,
         mapping: Any,
         mapping_fallback: Any,

@@ -1,6 +1,8 @@
---- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts.orig	2025-12-06 22:13:27.385871318 +0100
-+++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts	2025-12-06 22:16:35.329911597 +0100
-@@ -47,71 +47,115 @@
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+index b98e1a336..8e8f082af 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+@@ -47,71 +47,157 @@ button-vol-down {
  		};
  	};
  
@@ -12,42 +14,19 @@
 -		poll-interval = <60>;
 -		#address-cells = <1>;
 -		#size-cells = <0>;
--
++    joypad: gameforce-ace-joypad {
++		compatible = "gameforce-joypad";
++		pinctrl-0 = <&joypad_gpio_pins>;
++		pinctrl-names = "default";
++		poll-interval = <10>;
++		status = "okay";
+ 
 -		axis@0 {
 -			reg = <0>;
 -			abs-flat = <40>;
 -			abs-fuzz = <30>;
 -			abs-range = <0 4095>;
 -			linux,code = <ABS_RX>;
--		};
--
--		axis@1 {
--			reg = <1>;
--			abs-flat = <40>;
--			abs-fuzz = <30>;
--			abs-range = <0 4095>;
--			linux,code = <ABS_RY>;
--		};
--
--		axis@2 {
--			reg = <2>;
--			abs-flat = <40>;
--			abs-fuzz = <30>;
--			abs-range = <0 4095>;
--			linux,code = <ABS_Y>;
--		};
--
--		axis@3 {
--			reg = <3>;
--			abs-flat = <40>;
--			abs-fuzz = <30>;
--			abs-range = <0 4095>;
--			linux,code = <ABS_X>;
-+    joypad: gameforce-ace-joypad {
-+		compatible = "gameforce-joypad";
-+		poll-interval = <10>;
-+		status = "okay";
-+
 +		joypad-name = "GameForce ACE Gamepad";
 +		joypad-product = <0x1000>;
 +		joypad-revision = <0x0100>;
@@ -78,6 +57,42 @@
 +			label = "GPIO Key MODE";
 +			linux,code = <BTN_MODE>;
  		};
+-
+-		axis@1 {
+-			reg = <1>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_RY>;
++		sw2 {
++			gpios = <&gpio1 RK_PB0 0x01>;
++			label = "GPIO Key HOME";
++			linux,code = <BTN_C>;
+ 		};
+-
+-		axis@2 {
+-			reg = <2>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_Y>;
++		sw3 {
++			gpios = <&gpio1 RK_PB6 0x01>;
++			label = "GPIO Key START";
++			linux,code = <BTN_START>;
+ 		};
+-
+-		axis@3 {
+-			reg = <3>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_X>;
++		sw4 {
++			gpios = <&gpio1 RK_PA3 0x01>;
++			label = "GPIO Key SELECT";
++			linux,code = <BTN_SELECT>;
+ 		};
 -	};
 -
 -	/* Trigger range values based on hardware observation. */
@@ -95,29 +110,6 @@
 -			abs-fuzz = <15>;
 -			abs-range = <890 1530>;
 -			linux,code = <ABS_HAT2X>;
--		};
--
--		axis@1 {
--			reg = <1>;
--			abs-flat = <15>;
--			abs-fuzz = <15>;
--			abs-range = <1010 1550>;
--			linux,code = <ABS_HAT2Y>;
-+		sw2 {
-+			gpios = <&gpio1 RK_PB0 0x01>;
-+			label = "GPIO Key HOME";
-+			linux,code = <BTN_C>;
-+		};
-+		sw3 {
-+			gpios = <&gpio1 RK_PB6 0x01>;
-+			label = "GPIO Key START";
-+			linux,code = <BTN_START>;
-+		};
-+		sw4 {
-+			gpios = <&gpio1 RK_PA3 0x01>;
-+			label = "GPIO Key SELECT";
-+			linux,code = <BTN_SELECT>;
-+		};
 +		sw5 {
 +			gpios = <&gpio1 RK_PA2 0x01>;
 +			label = "GPIO Key Up";
@@ -178,9 +170,55 @@
 +			label = "GPIO Key THUMBR";
 +			linux,code = <BTN_THUMBR>;
  		};
++	};
+ 
+-		axis@1 {
+-			reg = <1>;
+-			abs-flat = <15>;
+-			abs-fuzz = <15>;
+-			abs-range = <1010 1550>;
+-			linux,code = <ABS_HAT2Y>;
++	pinctrl {
++		joypad {
++			joypad_gpio_pins: joypad-gpio-pins {
++				rockchip,pins =
++					/* MODE - GPIO1_PA0 */
++					<1 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* HOME - GPIO1_PB0 */
++					<1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* START - GPIO1_PB6 */
++					<1 RK_PB6 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* SELECT - GPIO1_PA3 */
++					<1 RK_PA3 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* UP - GPIO1_PA2 */
++					<1 RK_PA2 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* DOWN - GPIO1_PB1 */
++					<1 RK_PB1 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* LEFT - GPIO1_PD7 */
++					<1 RK_PD7 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* RIGHT - GPIO1_PB7 */
++					<1 RK_PB7 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* X - GPIO1_PB4 */
++					<1 RK_PB4 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* Y - GPIO1_PB3 */
++					<1 RK_PB3 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* B - GPIO1_PC6 */
++					<1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* A - GPIO1_PA5 */
++					<1 RK_PA5 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* THUMBL - GPIO1_PA4 */
++					<1 RK_PA4 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* TL - GPIO1_PB5 */
++					<1 RK_PB5 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* TR - GPIO1_PB2 */
++					<1 RK_PB2 RK_FUNC_GPIO &pcfg_pull_up>,
++					/* THUMBR - GPIO1_PD6 */
++					<1 RK_PD6 RK_FUNC_GPIO &pcfg_pull_up>;
++			};
+ 		};
  	};
  
-@@ -172,108 +216,6 @@
+@@ -172,108 +258,6 @@ battery: battery {
  		voltage-min-design-microvolt = <7400000>;
  	};
  

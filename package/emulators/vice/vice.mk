@@ -114,15 +114,6 @@ VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_X64DTV),, rm -Rf $(TA
 VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_X64SC),, rm -Rf $(TARGET_DIR)/usr/bin/x64sc ; )
 VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_XSCPU64),, rm -Rf $(TARGET_DIR)/usr/bin/xscpu64 ; )
 
-define VICE_POST_PROCESS_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/vice/c64.vice.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/vice/c128.vice.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
-VICE_POST_INSTALL_TARGET_HOOKS += VICE_POST_PROCESS_EVMAPY
 VICE_POST_INSTALL_TARGET_HOOKS += VICE_KEEP_ONLY_SELECTED_TARGETS
 
 $(eval $(autotools-package))

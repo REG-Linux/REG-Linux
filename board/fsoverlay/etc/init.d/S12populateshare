@@ -118,7 +118,7 @@ case "$1" in
         if [ "$TOTALSTEPS" -gt 0 ]; then
             /usr/bin/plymouth system-update --progress 100
             /usr/bin/plymouth display-message --text=" "
-            /usr/bin/plymouth change-mode --boot-up
+            /usr/bin/plymouth change-mode --reboot
             /usr/bin/plymouth --show-splash
         fi
         ;;

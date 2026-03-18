@@ -6,20 +6,20 @@ from typing import Any
 from xml.etree.ElementTree import parse
 
 from configgen.bezel.libretro_bezel_manager import writeBezelConfig
+from configgen.config.paths import (
+    CONF,
+    CONF_INIT,
+    ES_SETTINGS,
+    SAVES,
+)
 from configgen.controllers import (
     getDevicesInformation,
     getGamesMetaData,
     guns_borders_size_name,
 )
 from configgen.settings import UnixSettings
-from configgen.systemFiles import (
-    CONF,
-    CONF_INIT,
-    ES_SETTINGS,
-    SAVES,
-)
 from configgen.utils.logger import get_logger
-from configgen.utils.videoMode import getAltDecoration, supportSystemRotation
+from configgen.video.videoMode import getAltDecoration, supportSystemRotation
 
 from .libretroMAMEConfig import generateMAMEConfigs
 from .libretroOptions import generateCoreSettings, generateHatariConf
@@ -620,7 +620,7 @@ def createLibretroConfig(
         # wheel
         if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
             deviceInfos = getDevicesInformation()
-            for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
+            for nplayer, (_key, pad) in enumerate(sorted(controllers.items()), start=1):
                 if pad.dev in deviceInfos and deviceInfos[pad.dev]["isWheel"]:
                     retroarchConfig[
                         "input_player" + str(nplayer) + "_analog_dpad_mode"
@@ -1718,7 +1718,7 @@ def configureGunInputsForPlayer(
 
     # controller mapping
     hatstoname = {"1": "up", "2": "right", "4": "down", "8": "left"}
-    for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
+    for nplayer, (_key, pad) in enumerate(sorted(controllers.items()), start=1):
         if nplayer == n:
             for m in mapping:
                 if mapping[m] in pad.inputs:

@@ -1,9 +1,8 @@
-from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
+from configgen.config.paths import CONF, SAVES
 from configgen.settings import TOMLSettings
-from configgen.systemFiles import CONF, SAVES
 
 # Constants
 MAX_PLAYERS = 4
@@ -19,13 +18,12 @@ def setXemuConfig(
     playersControllers: Any,
     gameResolution: Any,
 ) -> None:
+    # Remove existing config file to ensure clean state (no dynamic values)
+    if XEMU_CONFIG_PATH.exists():
+        XEMU_CONFIG_PATH.unlink()
+
     # Create TOML settings instance
     settings = TOMLSettings(XEMU_CONFIG_PATH, auto_load=False)
-
-    # Load existing config if it exists
-    if XEMU_CONFIG_PATH.exists():
-        with suppress(Exception):
-            settings.load()
 
     createXemuConfig(settings, system, rom, playersControllers, gameResolution)
 
@@ -99,7 +97,7 @@ def createXemuConfig(
     config_data["sys.files"]["bootrom_path"] = "/userdata/bios/mcpx_1.0.bin"
     config_data["sys.files"]["hdd_path"] = "/userdata/saves/xbox/xbox_hdd.qcow2"
     config_data["sys.files"]["eeprom_path"] = "/userdata/saves/xbox/xemu_eeprom.bin"
-    config_data["sys.files"]["dvd_path"] = rom
+    config_data["sys.files"]["cdrom"] = rom
 
     # Audio quality
     if system.isOptSet("xemu_use_dsp"):

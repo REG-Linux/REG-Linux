@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version: Release on Dec 23, 2024
-XPADNEO_VERSION = v0.9.7
+XPADNEO_VERSION = v0.10
 XPADNEO_SITE = $(call github,atar-axis,xpadneo,$(XPADNEO_VERSION))
 XPADNEO_DEPENDENCIES = host-cabextract bluez5_utils
 XPADNEO_MODULE_SUBDIRS = hid-xpadneo/src

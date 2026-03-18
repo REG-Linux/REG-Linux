@@ -1,0 +1,38 @@
+--- a/src/main/sdl2/snes_ntsc.cpp
++++ b/src/main/sdl2/snes_ntsc.cpp
+@@ -387,11 +387,11 @@
+   uint16_t first_val = EXTRACT_SIMD_REGISTER_VALUE(first_line, 0);                  \
+   vuint16m1_t ref = __riscv_vmv_v_x_u16m1(first_val, 4);                            \
+   vbool16_t cmp   = __riscv_vmseq_vv_u16m1_b16(first_line, ref, 4);                \
+-  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm1, ref, 4));       \
+-  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm2, ref, 4));       \
+-  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm3, ref, 4));       \
+-  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm4, ref, 4));       \
+-  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm5, ref, 4));       \
++  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm1, ref, 4), 4);   \
++  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm2, ref, 4), 4);   \
++  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm3, ref, 4), 4);   \
++  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm4, ref, 4), 4);   \
++  cmp = __riscv_vmand_mm_b16(cmp, __riscv_vmseq_vv_u16m1_b16(xmm5, ref, 4), 4);   \
+   uint16_t mask = (uint16_t)-(__riscv_vcpop_m_b16(cmp, 4) == 4);                   \
+   this_colour = first_val & mask;                                                   \
+ } while(0)
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -473,6 +473,16 @@
+   endif()
+ endif()
+
++# GCC 15 has an ICE in riscv_vector::expand_builtin when RVV intrinsics
++# go through LTO.  Disable LTO on the translation units that pull in
++# <riscv_vector.h> via snes_ntsc.h so the build succeeds with -flto.
++if(CMAKE_SYSTEM_PROCESSOR MATCHES "riscv64")
++    set_source_files_properties(
++        src/main/sdl2/snes_ntsc.cpp
++        src/main/sdl2/rendersurface.cpp
++        PROPERTIES COMPILE_OPTIONS "-fno-lto")
++endif()
++
+ option(WITH_RVV "Enable RISC-V Vector (RVV) SIMD (requires -march=..._v)" OFF)
+ if(WITH_RVV AND CMAKE_SYSTEM_PROCESSOR MATCHES "riscv64")
+     target_compile_options(cannonball-se PRIVATE -march=rv64gcv)

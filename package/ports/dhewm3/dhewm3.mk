@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DHEWM3_VERSION = 1.5.5_RC2
+DHEWM3_VERSION = 1.5.5_RC3
 DHEWM3_SITE = https://github.com/dhewm/dhewm3
 DHEWM3_LICENSE = GPLv3
 DHEWM3_LICENSE_FILES = COPYING.txt
@@ -20,13 +20,5 @@ DHEWM3_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
 DHEWM3_CONF_OPTS += -DENABLE_TEST=OFF
 DHEWM3_CONF_OPTS += -DSDL2=OFF
 DHEWM3_CONF_OPTS += -DSDL3=ON
-
-define DHEWM3_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/dhewm3/doom3.dhewm3.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-DHEWM3_POST_INSTALL_TARGET_HOOKS = DHEWM3_EVMAPY
 
 $(eval $(cmake-package))

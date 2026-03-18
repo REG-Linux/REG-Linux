@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xwayland/xwayland.mk b/package/x11r7/xwayland/xwayland.mk
-index e3b6727c19..08927f86a6 100644
+index 59d607fb5b..f7827e101b 100644
 --- a/package/x11r7/xwayland/xwayland.mk
 +++ b/package/x11r7/xwayland/xwayland.mk
 @@ -30,6 +30,14 @@ XWAYLAND_CONF_OPTS = \

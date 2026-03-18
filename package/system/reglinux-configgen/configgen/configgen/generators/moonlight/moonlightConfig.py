@@ -1,6 +1,6 @@
 from typing import Any
 
-from configgen.systemFiles import CONF
+from configgen.config.paths import CONF
 
 MOONLIGHT_CONFIG_DIR = str(CONF / "moonlight")
 MOONLIGHT_CONFIG_PATH = str(CONF / "moonlight" / "moonlight.conf")

@@ -1,8 +1,5 @@
-# yquake2 Xatrix
+# yquake2-xatrix
 
-Mission pack library for the Xatrix expansion.
+The Reckoning expansion game library for Yamagi Quake II. Upstream: https://github.com/yquake2/xatrix
 
-## Build notes
-- **Version:** tag `XATRIX_2_16`.
-- **Config:** requires SDL2.
-- **Build system:** CMake release build that installs the compiled `game.so` under `/usr/yquake2/xatrix/`.
+Builds a single `game.so` installed to `/usr/yquake2/xatrix/`.

@@ -114,7 +114,7 @@ class LoggerManager:
 
             # Create directory if it doesn't exist
             log_dir = Path(log_file_path).parent
-            if log_dir and not log_dir.exists():
+            if not log_dir.exists():
                 log_dir.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(

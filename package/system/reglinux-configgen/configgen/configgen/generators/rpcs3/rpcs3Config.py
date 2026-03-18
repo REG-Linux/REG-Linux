@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from configgen.systemFiles import CONF, ROMS, SAVES
+from configgen.config.paths import CONF, ROMS, SAVES
 
 RPCS3_CONFIG_DIR = str(CONF / "rpcs3")
 RPCS3_SAVES_DIR = str(SAVES)

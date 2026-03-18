@@ -3,7 +3,8 @@
 This module handles the generation of corsixth emulator configurations.
 """
 
+from . import corsixth_keys
 from .corsixthConfig import setCorsixthConfig
 from .corsixthGenerator import CorsixTHGenerator
 
-__all__ = ["CorsixTHGenerator", "setCorsixthConfig"]
+__all__ = ["CorsixTHGenerator", "setCorsixthConfig", "corsixth_keys"]

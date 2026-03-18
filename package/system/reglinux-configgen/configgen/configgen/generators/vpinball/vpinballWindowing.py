@@ -1,6 +1,6 @@
 from typing import Any
 
-from configgen.utils.videoMode import getScreensInfos
+from configgen.video.videoMode import getScreensInfos
 
 # Constants
 SCREEN_COUNT_THRESHOLD = 2

@@ -1,8 +1,8 @@
 from typing import Any
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 
 from .iortcwConfig import IORTCW_BIN_PATH, setIortcwConfig
 
@@ -14,8 +14,8 @@ class IORTCWGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         setIortcwConfig(system, game_resolution)

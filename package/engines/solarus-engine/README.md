@@ -1,12 +1,5 @@
-# Solarus engine
+# Solarus
 
-Solarus is a Lua-scripted Zelda-like engine built with CMake and LuaJIT for REG-Linux.
+Lua-scripted action-RPG engine. Upstream: https://gitlab.com/solarus-games/solarus
 
-## Configuration
-- **Version:** v2.0.2 (December 2025 release).
-- **Config selections:** requires `reglinux-luajit`, OpenAL, GL/GLES, libmodplug, libogg, libvorbis, PhysFS, SDL2 (+image/ttf), GLM, and `BR2_TOOLCHAIN` features for threads/NPTL.
-- **Build options:** disables the Qt-based GUI, sets custom write directories, forces LuaJIT, and enables GLES when available.
-
-## Patches
-- `001-cmake-remove-Werror.patch` removes `-Werror` for Buildroot builds.
-- `002-pad.patch` and `003-padnum.patch` fix controller mapping and pad numbering issues.
+Staging install is enabled so that game packages can link against `libsolarus.so`. GLES is enabled when the target has no desktop GL. Write directory is hardwired to `/userdata/saves/solarus`. The Qt5 launcher GUI is disabled; only the headless library and SDL2 runtime are built.

@@ -60,7 +60,7 @@ else ifeq ($(BR2_x86_64),y)
 	REGLINUX_QT6_CPU = x86_64
 endif
 
-REGLINUX_QT6_VERSION = 6.10.1
+REGLINUX_QT6_VERSION = 6.10.2
 REGLINUX_QT6_SITE = https://github.com/REG-Linux/REG-Qt6-binaries/releases/download/$(REGLINUX_QT6_VERSION)
 REGLINUX_QT6_SOURCE = reglinux-qt6-$(REGLINUX_QT6_VERSION)-$(REGLINUX_QT6_CPU).tar.xz
 

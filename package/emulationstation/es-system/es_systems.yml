@@ -6,6 +6,8 @@ snes:
   extensions: [smc, fig, sfc, gd3, gd7, dx2, bsx, swc, zip, 7z]
   group: snes
   emulators:
+    mister:
+      SNES: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       pocketsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_POCKETSNES] }
       snes9x_next: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X_NEXT] }
@@ -43,6 +45,8 @@ c64:
   platform: c64
   group: c64
   emulators:
+    mister:
+      C64: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     vice:
       x64:
         {
@@ -108,6 +112,8 @@ c20:
     [20, 40, 60, rom, a0, b0, crt, d64, d81, prg, tap, t64, m3u, zip, 7z]
   platform: c20
   emulators:
+    mister:
+      VIC20: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     vice:
       xvic:
         {
@@ -143,6 +149,8 @@ amiga500:
   platform: amiga
   group: amiga
   emulators:
+    mister:
+      Minimig: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     amiberry:
       A500:
         {
@@ -189,6 +197,8 @@ amiga1200:
   platform: amiga
   group: amiga
   emulators:
+    mister:
+      Minimig: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     amiberry:
       A1200:
         {
@@ -247,6 +257,8 @@ nes:
   extensions: [nes, unif, unf, zip, 7z]
   group: nes
   emulators:
+    mister:
+      NES: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       fceumm: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FCEUMM] }
       nestopia: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_NESTOPIA] }
@@ -265,6 +277,8 @@ n64:
   hardware: console
   extensions: [z64, n64, v64, zip, 7z]
   emulators:
+    mister:
+      N64: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     mupen64plus:
       gliden64:
         {
@@ -321,6 +335,8 @@ gba:
   hardware: portable
   extensions: [gba, zip, 7z]
   emulators:
+    mister:
+      GBA: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mgba: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       vba-m: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
@@ -339,6 +355,8 @@ gbc:
   hardware: portable
   extensions: [gbc, zip, 7z]
   emulators:
+    mister:
+      Gameboy: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       gambatte: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GAMBATTE] }
       mgba: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
@@ -360,6 +378,8 @@ gb:
   hardware: portable
   extensions: [gb, zip, 7z]
   emulators:
+    mister:
+      Gameboy: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       gambatte: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GAMBATTE] }
       mgba: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
@@ -382,6 +402,8 @@ sgb:
   extensions: [gb, gbc, zip, 7z]
   group: snes
   emulators:
+    mister:
+      SGB: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mgba: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
@@ -457,6 +479,8 @@ gameandwatch:
   extensions: [mgw, zip, 7z]
   group: lcdgames
   emulators:
+    mister:
+      GameNWatch: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       gw: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GW] }
       mame:
@@ -540,6 +564,8 @@ megadrive:
   platform: genesis, megadrive
   group: megadrive
   emulators:
+    mister:
+      Genesis: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       genesisplusgx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX] }
       clownmdemu: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_CLOWNMDEMU] }
@@ -560,6 +586,8 @@ segacd:
   extensions: [cue, iso, chd, m3u]
   platform: segacd
   emulators:
+    mister:
+      MegaCD: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       genesisplusgx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX] }
       picodrive: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
@@ -572,6 +600,8 @@ sega32x:
   extensions: [32x, chd, smd, bin, md, zip, 7z]
   group: megadrive
   emulators:
+    mister:
+      S32X: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       picodrive: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
 
@@ -594,6 +624,8 @@ mastersystem:
   hardware: console
   extensions: [bin, sms, zip, 7z]
   emulators:
+    mister:
+      SMS: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       genesisplusgx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX] }
       picodrive: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
@@ -619,6 +651,8 @@ gamegear:
   hardware: portable
   extensions: [bin, gg, zip, 7z]
   emulators:
+    mister:
+      SMS: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       genesisplusgx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX] }
       picodrive: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
@@ -634,6 +668,8 @@ sg1000:
   platform: sg-1000
   theme: sg-1000
   emulators:
+    mister:
+      SG1000: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       genesisplusgx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX] }
       gearsystem: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARSYSTEM] }
@@ -675,6 +711,8 @@ psx:
   hardware: console
   extensions: [cue, img, mdf, pbp, toc, cbn, m3u, ccd, chd, iso]
   emulators:
+    mister:
+      PSX: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       pcsx_rearmed: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PCSX] }
       swanstation: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SWANSTATION] }
@@ -701,6 +739,8 @@ pcengine:
   hardware: console
   extensions: [pce, bin, zip, 7z]
   emulators:
+    mister:
+      TurboGrafx16: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       pce: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
       pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
@@ -716,6 +756,8 @@ pcenginecd:
   extensions: [pce, cue, ccd, iso, img, chd]
   theme: pce-cd
   emulators:
+    mister:
+      TurboGrafx16: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       pce: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
       pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
@@ -730,6 +772,8 @@ supergrafx:
   hardware: console
   extensions: [pce, sgx, zip, 7z]
   emulators:
+    mister:
+      SuperGrafx: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mednafen_supergrafx:
         { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_SUPERGRAFX] }
@@ -808,6 +852,8 @@ dos:
   theme: pc
   platform: pc
   emulators:
+    mister:
+      AO486: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     dosbox_staging:
       dosbox_staging:
         {
@@ -1022,6 +1068,8 @@ neogeo:
   extensions: [7z, zip, neo]
   platform: neogeo, arcade
   emulators:
+    mister:
+      NeoGeo: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       fbalpha:
         {
@@ -1083,6 +1131,8 @@ colecovision:
   hardware: console
   extensions: [bin, col, rom, zip, 7z]
   emulators:
+    mister:
+      ColecoVision: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       bluemsx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BLUEMSX] }
       gearcoleco: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARCOLECO] }
@@ -1172,6 +1222,8 @@ atari800:
   extensions: [rom, xfd, atr, atx, cdm, cas, car, bin, a52, xex, zip, 7z, m3u]
   group: atari8bit
   emulators:
+    mister:
+      Atari800: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       atari800: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_ATARI800] }
 
@@ -1205,6 +1257,8 @@ atari2600:
   hardware: console
   extensions: [a26, bin, zip, 7z]
   emulators:
+    mister:
+      Atari2600: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       stella: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_STELLA] }
       stella2014: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_STELLA2014] }
@@ -1218,6 +1272,8 @@ atari5200:
   hardware: console
   extensions: [rom, xfd, atr, atx, cdm, cas, car, bin, a52, xex, zip, 7z]
   emulators:
+    mister:
+      Atari800: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       atari800: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_ATARI800] }
       a5200: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_A5200] }
@@ -1229,6 +1285,8 @@ atari7800:
   hardware: console
   extensions: [a78, bin, zip, 7z]
   emulators:
+    mister:
+      Atari7800: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       prosystem: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PROSYSTEM] }
 
@@ -1241,6 +1299,8 @@ lynx:
   theme: atarilynx
   platform: atarilynx
   emulators:
+    mister:
+      Lynx: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mednafen_lynx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_LYNX] }
       handy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_HANDY] }
@@ -1280,6 +1340,8 @@ wswan:
   theme: wonderswan
   platform: wonderswan
   emulators:
+    mister:
+      WonderSwan: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mednafen_wswan: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN] }
     mednafen:
@@ -1294,6 +1356,8 @@ wswanc:
   theme: wonderswancolor
   platform: wonderswancolor
   emulators:
+    mister:
+      WonderSwan: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mednafen_wswan: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN] }
     mednafen:
@@ -1375,6 +1439,8 @@ channelf:
   hardware: console
   extensions: [zip, rom, bin, chf]
   emulators:
+    mister:
+      ChannelF: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       freechaf: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FREECHAF] }
 
@@ -1427,6 +1493,8 @@ vectrex:
   hardware: console
   extensions: [bin, gam, vec, zip, 7z]
   emulators:
+    mister:
+      Vectrex: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       vecx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VECX] }
     mame:
@@ -1469,6 +1537,8 @@ atarist:
   hardware: computer
   extensions: [st, msa, stx, dim, ipf, m3u, zip, 7z, hd, gemdos, vhd, gem, ide]
   emulators:
+    mister:
+      AtariST: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       hatari:
         {
@@ -1497,6 +1567,8 @@ amstradcpc:
   hardware: computer
   extensions: [dsk, sna, tap, cdt, voc, m3u, zip, 7z]
   emulators:
+    mister:
+      Amstrad: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       cap32: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_CAP32] }
   comment_en: |
@@ -1517,6 +1589,8 @@ msx1:
   extensions: [dsk, mx1, rom, zip, 7z, cas, m3u, ogv, openmsx]
   platform: msx
   emulators:
+    mister:
+      MSX: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       bluemsx:
         {
@@ -1625,6 +1699,8 @@ msx2:
   extensions: [dsk, mx2, rom, zip, 7z, cas, m3u, ogv, openmsx]
   platform: msx2
   emulators:
+    mister:
+      MSX: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       bluemsx:
         {
@@ -1857,6 +1933,8 @@ o2em:
   path: o2em
   theme: odyssey2
   emulators:
+    mister:
+      Odyssey2: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       o2em: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_O2EM] }
 
@@ -1895,6 +1973,8 @@ zxspectrum:
   hardware: computer
   extensions: [tzx, tap, z80, rzx, scl, trd, dsk, zip, 7z]
   emulators:
+    mister:
+      Spectrum: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       fuse: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FUSE] }
   comment_en: |
@@ -1972,6 +2052,8 @@ apple2:
   extensions:
     [nib, do, po, dsk, mfi, dfi, rti, edd, woz, wav, zip, 7z, chd, hdv, 2mg]
   emulators:
+    mister:
+      Apple-II: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -2004,6 +2086,8 @@ saturn:
   hardware: console
   extensions: [cue, ccd, m3u, chd, iso, zip, mds]
   emulators:
+    mister:
+      Saturn: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       beetle-saturn:
         {
@@ -2093,8 +2177,8 @@ triforce:
   extensions: [gcm, iso, gcz, ciso, wbfs, elf, dol, m3u]
   platform: triforce, arcade
   emulators:
-    dolphin_triforce:
-      dolphin_triforce: { requireAnyOf: [BR2_PACKAGE_DOLPHIN_TRIFORCE] }
+    dolphin:
+      dolphin: { requireAnyOf: [BR2_PACKAGE_DOLPHIN_EMU] }
   comment_en: |
     Triforce is an arcade machine based on the GameCube's hardware. This build only supports certain games.
     Playable - Mario Kart GP 1, Mario Kart GP 2 (after loading save state).
@@ -2212,6 +2296,8 @@ intellivision:
   hardware: console
   extensions: [int, bin, rom, zip, 7z]
   emulators:
+    mister:
+      Intellivision: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       freeintv: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FREEINTV] }
 
@@ -2248,6 +2334,7 @@ x1:
       panda3ds: { requireAnyOf: [BR2_PACKAGE_PANDA3DS] }
     libretro:
       panda3ds: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PANDA3DS] }
+      azahar: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_AZAHAR] }
 
 openbor:
   name: OpenBOR
@@ -2301,6 +2388,8 @@ pokemini:
   hardware: portable
   extensions: [min, zip, 7z]
   emulators:
+    mister:
+      PokemonMini: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       pokemini: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_POKEMINI] }
 
@@ -2927,23 +3016,6 @@ xbox:
   comment_br: |
     Para mais informações: https://wiki.reglinux.org/systems/xbox
 
-steam:
-  name: Steam
-  manufacturer: Valve
-  release:
-  hardware:
-  extensions: [steam]
-  platform: windows
-  emulators:
-    steam:
-      steam: { requireAnyOf: [BR2_PACKAGE_STEAM] }
-  comment_en: |
-    Play Steam.
-    Run system-steam-update to update the roms directory according to your installed games.
-  comment_br: |
-    Execute o Steam.
-    Em seguida execute o comando system-steam-update para atualizar o diretório de roms de acordo com seus jogos instalados.
-
 supervision:
   name: Supervision
   manufacturer: Watara
@@ -2951,6 +3023,8 @@ supervision:
   hardware: portable
   extensions: [sv, zip, 7z]
   emulators:
+    mister:
+      Supervision: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       potator: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_WATARA] }
 
@@ -3172,6 +3246,8 @@ advision:
   hardware: console
   extensions: [bin, zip, 7z]
   emulators:
+    mister:
+      AdventureVision: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3208,6 +3284,8 @@ megaduck:
   hardware: portable
   extensions: [bin, zip, 7z]
   emulators:
+    mister:
+      MegaDuck: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3241,6 +3319,8 @@ gamate:
   hardware: portable
   extensions: [bin, zip, 7z]
   emulators:
+    mister:
+      Gamate: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3655,6 +3735,8 @@ bbc:
       7z,
     ]
   emulators:
+    mister:
+      BBCMicro: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3779,6 +3861,8 @@ astrocde:
   theme: astrocade
   extensions: [bin, zip, 7z]
   emulators:
+    mister:
+      Astrocade: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3799,6 +3883,8 @@ ti99:
   hardware: computer
   extensions: [rpk, wav, zip, 7z]
   emulators:
+    mister:
+      TI-99_4A: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {
@@ -3843,6 +3929,8 @@ coco:
   hardware: computer
   extensions: [wav, cas, dsk, ccc, rom, zip, 7z]
   emulators:
+    mister:
+      CoCo3: { requireAnyOf: [BR2_PACKAGE_REGLINUX_MISTER_BRIDGE] }
     libretro:
       mame:
         {

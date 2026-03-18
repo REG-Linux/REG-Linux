@@ -1,0 +1,13 @@
+# MiSTer FPGA device rules for DE10-Nano
+#
+# Ensure FPGA manager and bridge devices are accessible.
+# Tag input devices for mister-bridge gamepad/keyboard/mouse enumeration.
+
+# FPGA manager device: allow access
+SUBSYSTEM=="fpga_manager", MODE="0660", GROUP="root"
+
+# FPGA bridge: allow access
+SUBSYSTEM=="fpga_bridge", MODE="0660", GROUP="root"
+
+# UIO devices (user-space I/O for FPGA register access)
+SUBSYSTEM=="uio", MODE="0660", GROUP="root"

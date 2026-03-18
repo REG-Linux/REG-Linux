@@ -1,8 +1,5 @@
-# dhewm3 (Doom 3)
+# dhewm3
 
-Cross-compiles the GPL Doom 3 port built with SDL2.
+GPL Doom 3 source port. Upstream: https://github.com/dhewm/dhewm3
 
-## Build notes
-- **Version:** 1.5.4, built from the `dhewm/dhewm3` git tree with `neo` subdir as the build target.
-- **Config:** selects SDL2, libjpeg, libogg/vorbis, OpenAL, libcurl, and zlib; the package builds host tools by virtue of the `host-dhewm3` dependency.
-- **Build system:** CMake release build that disables tests, uses static libs, and copies the `doom3.dhewm3.keys` file into `/usr/share/evmapy` via `post-install`.
+Builds from the `neo/` subdirectory. Uses SDL3 (SDL2 disabled). `host-libjpeg` is a build-time dependency for texture processing.

@@ -31,10 +31,6 @@ endef
 define IKEMEN_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
 	$(INSTALL) -D $(@D)/bin/Ikemen_GO_Linux $(TARGET_DIR)/usr/bin/ikemen
-	# evmapy
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/ikemen/ikemen.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(golang-package))

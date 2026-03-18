@@ -1,4 +1,4 @@
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 

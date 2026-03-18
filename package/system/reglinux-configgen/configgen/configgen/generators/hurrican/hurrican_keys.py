@@ -1,0 +1,50 @@
+"""Evmapy controller mappings for HURRICAN (HURRICAN).
+
+This module defines button mappings for HURRICAN games using evmapy.
+Mappings are loaded directly without file I/O for optimal performance.
+
+Example:
+    from configgen.generators.hurrican import evmapy_hurrican
+    config = evmapy_hurrican.get_config()
+
+"""
+
+from typing import Any
+
+# Evmapy configuration for HURRICAN controller
+# This replaces the need for external .keys files
+CONFIG: dict[str, Any] = {
+    "actions_player1": [
+        {
+            "trigger": ["hotkey", "start"],
+            "type": "key",
+            "target": ["KEY_LEFTALT", "KEY_F4"],
+        },
+        {"trigger": "start", "type": "key", "target": "KEY_ENTER"},
+        {"trigger": "select", "type": "key", "target": "KEY_ESC"},
+        {"trigger": "a", "type": "key", "target": "KEY_LEFTALT"},
+        {"trigger": "b", "type": "key", "target": "KEY_LEFTCTRL"},
+        {"trigger": "x", "type": "key", "target": "KEY_LEFTSHIFT"},
+        {"trigger": "y", "type": "key", "target": "KEY_SPACE"},
+        {"trigger": "pageup", "type": "key", "target": "KEY_RIGHTSHIFT"},
+        {"trigger": "pagedown", "type": "key", "target": "KEY_RIGHTCTRL"},
+        {"trigger": "up", "type": "key", "target": "KEY_UP"},
+        {"trigger": "down", "type": "key", "target": "KEY_DOWN"},
+        {"trigger": "left", "type": "key", "target": "KEY_LEFT"},
+        {"trigger": "right", "type": "key", "target": "KEY_RIGHT"},
+        {"trigger": "joystick1up", "type": "key", "target": "KEY_UP"},
+        {"trigger": "joystick1down", "type": "key", "target": "KEY_DOWN"},
+        {"trigger": "joystick1left", "type": "key", "target": "KEY_LEFT"},
+        {"trigger": "joystick1right", "type": "key", "target": "KEY_RIGHT"},
+    ]
+}
+
+
+def get_config() -> dict[str, Any]:
+    """Return the evmapy configuration for HURRICAN.
+
+    Returns:
+        Configuration dictionary compatible with evmapy format.
+
+    """
+    return CONFIG

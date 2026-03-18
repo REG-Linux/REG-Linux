@@ -1,7 +1,8 @@
 from configparser import ConfigParser
 from pathlib import Path
+from typing import override
 
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
@@ -18,6 +19,7 @@ eslog = get_logger(__name__)
 
 class DuckstationGenerator(Generator):
     # Duckstation is now QT-only, requires wayland compositor to run
+    @override
     def requiresWayland(self):
         return True
 

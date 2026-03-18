@@ -8,3 +8,6 @@ system.suspendmode=suspend
 
 # default wayland environment (rotate)
 system.es.environment=wayland
+
+# default card
+audio.device=alsa_output._sys_devices_platform_es8316-sound_sound_card0.HiFi__Speaker__sink

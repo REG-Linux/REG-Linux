@@ -3,7 +3,7 @@ from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
-from configgen.systemFiles import CONF
+from configgen.config.paths import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

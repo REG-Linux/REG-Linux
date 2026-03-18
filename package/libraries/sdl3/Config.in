@@ -45,6 +45,14 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
 		!BR2_PACKAGE_HAS_LIBEGL || \
 		!(BR2_PACKAGE_SDL3_OPENGL || BR2_PACKAGE_SDL3_OPENGLES)
 
+config BR2_PACKAGE_SDL3_MALI
+	bool "Mali fbdev EGL video driver"
+	depends on BR2_PACKAGE_POWERVR_GE8300_DRIVER
+	depends on BR2_PACKAGE_HAS_LIBEGL
+
+comment "Mali fbdev video driver needs the PowerVR GE8300 driver"
+	depends on !BR2_PACKAGE_POWERVR_GE8300_DRIVER
+
 # REG
 config BR2_PACKAGE_SDL3_WAYLAND
     bool "SDL3 Wayland support"

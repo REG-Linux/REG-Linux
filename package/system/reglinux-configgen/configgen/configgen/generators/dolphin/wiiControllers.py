@@ -174,11 +174,10 @@ def generateControllerConfig_emulatedwiimotes(
         wii_mapping["y"] = "Buttons/A"
         wii_mapping["a"] = "Buttons/2"
         wii_mapping["b"] = "Buttons/1"
-        # Note: The original code overwrites triggerleft multiple times, which is likely a bug
-        # I'm preserving the original behavior but this should be reviewed
+        # Map shake actions to different buttons for better control
         wii_mapping["triggerleft"] = "Shake/X"
-        wii_mapping["triggerleft"] = "Shake/Y"
-        wii_mapping["triggerleft"] = "Shake/Z"
+        wii_mapping["triggerright"] = "Shake/Y"
+        wii_mapping["leftshoulder"] = "Shake/Z"
 
     # i: infrared, s: swing, t: tilt, n: nunchuk
     # 12 possible combinations : is si / it ti / in ni / st ts / sn ns / tn nt
@@ -528,7 +527,8 @@ def generateControllerConfig_any(
         double_pads: dict[str, int] = {}
 
         for nplayer, (_key, pad) in enumerate(
-            sorted(playersControllers.items()), start=1
+            sorted(playersControllers.items()),
+            start=1,
         ):
             # Handle x pads having the same name
             nsamepad = double_pads.get(pad.name.strip(), 0)
@@ -756,6 +756,12 @@ def write_key(
 
 def generateHotkeys(playersControllers: Any) -> None:
     configFileName = str(Path(DOLPHIN_CONFIG_DIR) / "Hotkeys.ini")
+
+    # Remove existing config file to ensure clean state (no dynamic values)
+    config_path = Path(configFileName)
+    if config_path.exists():
+        config_path.unlink()
+
     with codecs_open(configFileName, "w", encoding="utf_8_sig") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
@@ -777,7 +783,8 @@ def generateHotkeys(playersControllers: Any) -> None:
         }
 
         for nplayer, (_key, pad) in enumerate(
-            sorted(playersControllers.items()), start=1
+            sorted(playersControllers.items()),
+            start=1,
         ):
             if nplayer == 1:
                 f.write("[Hotkeys1]" + "\n")

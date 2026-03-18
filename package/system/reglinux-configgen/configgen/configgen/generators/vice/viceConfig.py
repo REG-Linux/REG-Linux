@@ -1,8 +1,8 @@
 import pathlib
 from typing import Any
 
+from configgen.config.paths import CONF
 from configgen.settings import UnixSettings
-from configgen.systemFiles import CONF
 
 VICE_CONFIG_DIR = str(CONF / "vice")
 VICE_CONFIG_PATH = str(CONF / "vice" / "sdl-vicerc")
@@ -13,6 +13,11 @@ VICE_BIN_DIR = "/usr/bin/"
 def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
     # Create directory if it doesn't exist
     pathlib.Path(VICE_CONFIG_DIR).mkdir(exist_ok=True, parents=True)
+
+    # Remove existing config file to ensure clean state (no dynamic values)
+    config_path = pathlib.Path(VICE_CONFIG_PATH)
+    if config_path.exists():
+        config_path.unlink()
 
     viceConfig = UnixSettings(VICE_CONFIG_PATH)
 

@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.config.paths import SAVES
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import SAVES
 
 EASYRPG_SAVE_DIR = str(Path(SAVES) / "easyrpg")
 EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"

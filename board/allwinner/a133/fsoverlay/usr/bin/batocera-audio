@@ -1,0 +1,172 @@
+#!/bin/bash
+
+do_usage() {
+    echo "$1 list"
+    echo "$1 get"
+    echo "$1 set {auto|<device>}"
+    echo "$1 list-profiles"
+    echo "$1 get-profile"
+    echo "$1 set-profile {auto|<profile>}"
+    echo "$1 getSystemVolume"
+    echo "$1 setSystemVolume {mute|unmute|mute-toggle|[+-]<0...100>}"
+    echo "$1 test"
+}
+
+# Export XDG for PW
+export XDG_RUNTIME_DIR=/var/run
+
+# Set variables
+MAX_VOLUME="$(/usr/bin/batocera-settings-get audio.volume.boost)" || MAX_VOLUME=100
+DEFAULT_SINK=$(LANG=C pactl info | grep -E '^Default Sink: ' | sed -e s+"^Default Sink: "+""+ | head -1)
+DETECT_VOLUME=$(LANG=C pactl list sinks-raw | grep -E '^[^ ]* name="'"${DEFAULT_SINK}"'"' | sed -e s+"^.* volume=\"\([0-9]*\)\" .*$"+'\1'+)
+
+ACTION="$1"
+
+case "${ACTION}" in
+    list)
+        printf "auto\tauto\n"
+        LANG=C pactl list sinks-raw | sed -e s+"^sink=\"[0-9]*\" name=\"\([^ ]*\)\" .* description=\"\(.*\)\"$"+"\1\t\2"+
+        ;;
+
+    get)
+        /usr/bin/batocera-settings-get audio.device
+        ;;
+
+    set)
+        MODE="$2"
+        case "${MODE}" in
+            auto)
+                BT_SINK=$(LANG=C pactl list short sinks | grep bluez_output | awk '{print $2}' | head -n1)
+                if [ -n "$BT_SINK" ]; then
+                    MODE="$BT_SINK"
+                    LANG=C pactl set-default-sink "${MODE}" || exit 1
+                else
+                    ARCH=$(cat /usr/share/batocera/batocera.arch)
+                    BOARD=$(cat /boot/boot/system.board)
+
+                    case "${ARCH}" in
+                        "rk3399")
+                            MODE=alsa_output.platform-hdmi-sound.stereo-fallback
+                            LANG=C pactl set-default-sink "${MODE}" || exit 1
+                            ;;
+                        "s922x")
+                            if [[ "$BOARD" == "ogu" ]]; then
+                                LANG=C pactl set-default-sink INTERNAL
+                                amixer -c 0 -q sset "Master" 100%
+                                amixer -c 0 sset 'Playback Mux' SPK
+                                amixer -c 0 -q sset 'FRDDR_A SINK 1 SEL' 'OUT 1'
+                                amixer -c 0 -q sset 'FRDDR_A SRC 1 EN' 'on'
+                            fi
+                            ;;
+                        "rk3326")
+                            if [[ "$BOARD" == "r36s" ]]; then
+                                amixer -c 0 sset "Playback Path" "SPK_HP"
+                            else
+                                LANG=C pactl set-default-sink INTERNAL
+                                amixer -c 0 cset name='Playback Path' SPK
+                            fi
+                            ;;
+                        "h700")
+                            # Needed if booted with hdmi cable plugged in
+                            HDMI_STATE="$(cat /sys/devices/platform/soc/6000000.hdmi/extcon/hdmi/state)"
+                            if [ "$HDMI_STATE" = "HDMI=1" ]; then
+                                MODE=alsa_output._sys_devices_platform_soc_soc_03000000_ahub1_mach_sound_card2.stereo-fallback
+                            else
+                                MODE=alsa_output._sys_devices_platform_soc_soc_03000000_codec_mach_sound_card0.stereo-fallback
+                            fi
+                            amixer -c 0 sset "OutputL Mixer DACL" on
+                            amixer -c 0 sset "OutputL Mixer DACR" off
+                            amixer -c 0 sset "OutputR Mixer DACL" off
+                            amixer -c 0 sset "OutputR Mixer DACR" on
+                            amixer -c 0 sset LINEOUT on
+                            LANG=C pactl set-default-sink "${MODE}" || exit 1
+                            ;;
+                        "a133")
+                            MODE=alsa_output._sys_devices_platform_soc_sndcodec_sound_card0.playback.0.0
+                            amixer -c 0 sset Headphone "$(batocera-settings-get audio.headphone || echo 0)"
+                            amixer -c 0 sset LINEOUT on
+                            LANG=C pactl set-default-sink "${MODE}" || exit 1
+                            ;;
+                        *)
+                            # do nothing!
+                            ;;
+                    esac
+                fi
+                ;;
+            *)
+                LANG=C pactl set-default-sink "${MODE}" || exit 1
+                if [[ $(LANG=C pactl get-default-sink) != "${MODE}" ]]; then
+                    # default-sink didn't switch right away for some reason, try again later
+                    exit 1
+                fi
+                ;;
+        esac
+        ;;
+
+    list-profiles)
+        printf "auto\tauto\n"
+        LANG=C pactl list cards-profiles-raw | grep 'available="1"' | sed -E 's/^card="[0-9]+" name="(.*)" profile="(.*)" available="[01]" active="[01]" description="(.*)"$/\2@\1\t\3/'
+        ;;
+
+    get-profile)
+        /usr/bin/batocera-settings-get audio.profile
+        ;;
+
+    set-profile)
+        MODE="$2"
+        if [[ "${MODE}" != "auto" ]]; then
+            if batocera-audio list-profiles | grep -q "${MODE}"; then
+                PROFILE_NAME=$(echo "${MODE}" | cut -d '@' -f 1)
+                CARD_NAME=$(echo "${MODE}" | cut -d '@' -f 2)
+                LANG=C pactl set-card-profile "${CARD_NAME}" "${PROFILE_NAME}" || exit 1
+            else
+                # the profile isn't available yet, try again later
+                exit 1
+            fi
+        fi
+        ;;
+
+    getSystemVolume)
+        echo "${DETECT_VOLUME}"
+        ;;
+
+    setSystemVolume)
+        VOLUME="$2"
+        case "${VOLUME}" in
+            "mute")
+                LANG=C pactl set-sink-mute @DEFAULT_SINK@ 1 || exit 1
+                ;;
+            "unmute")
+                if [ -f /var/run/toggle-switch-mute ]; then # This is a workaround to a quirk of the a133 (unmutes automatically when switching audio ouput)
+                    echo "Mute toggle switch is active, blocking unmute" >/dev/null 2>&1
+                    exit 0
+                fi
+                LANG=C pactl set-sink-mute @DEFAULT_SINK@ 0 || exit 1
+                ;;
+            "mute-toggle")
+                LANG=C pactl set-sink-mute @DEFAULT_SINK@ toggle || exit 1
+                ;;
+            *)
+                if echo "${VOLUME}" | grep -qE '^[0-9]+$'; then
+                    if [[ "${VOLUME}" -ge 0 && "${VOLUME}" -le "${MAX_VOLUME}" ]]; then
+                        LANG=C pactl set-sink-volume @DEFAULT_SINK@ "${VOLUME}%" || exit 1
+                        exit 0
+                    fi
+                elif echo "${VOLUME}" | grep -qE '^[+-][0-9]+$'; then
+                    let NEW_VOLUME=${DETECT_VOLUME}${VOLUME}
+                    NEW_VOLUME=$(( NEW_VOLUME < 0 ? 0 : (NEW_VOLUME > MAX_VOLUME ? MAX_VOLUME : NEW_VOLUME) ))
+                    LANG=C pactl set-sink-volume @DEFAULT_SINK@ "${NEW_VOLUME}%" || exit 1
+                    exit 0
+                fi
+                echo "invalid volume value" >&2
+                exit 1
+                ;;
+        esac
+        ;;
+
+    test)
+        aplay "/usr/share/sounds/stereo-test.wav" || exit 1
+        ;;
+    *)
+        do_usage "$(basename "$0")"
+esac

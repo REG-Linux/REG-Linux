@@ -85,9 +85,6 @@ class TOMLSettings:
     def write(self) -> bool:
         """Write the current configuration data to the TOML file.
 
-        Args:
-            indent (int, optional): Number of spaces for JSON indentation. Defaults to 4.
-
         Returns:
             bool: True if writing was successful, False otherwise.
 

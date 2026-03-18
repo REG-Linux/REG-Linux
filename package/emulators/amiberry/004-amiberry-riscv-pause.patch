@@ -1,0 +1,20 @@
+--- a/src/newcpu.cpp
++++ b/src/newcpu.cpp
+@@ -5336,7 +5336,7 @@
+ #elif defined(CPU_x86_64) || defined(CPU_i386)
+ 		__asm__ __volatile__ ("pause");
+ #elif defined(__riscv)
+-		__asm__ __volatile__ ("pause");
++		__asm__ __volatile__ (".insn i 0x0f, 0, x0, x0, 0x010");
+ #endif
+ 	}
+ }
+@@ -5382,7 +5382,7 @@
+ #elif defined(CPU_x86_64) || defined(CPU_i386)
+ 		__asm__ __volatile__ ("pause");
+ #elif defined(__riscv)
+-		__asm__ __volatile__ ("pause");
++		__asm__ __volatile__ (".insn i 0x0f, 0, x0, x0, 0x010");
+ #endif
+ 	}
+ }

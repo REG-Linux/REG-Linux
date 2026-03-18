@@ -43,7 +43,7 @@ index 0000000..f619679
 +    local _sbin=("fbsplash" "fsfreeze" "i2ctransfer" "ifdown" "ifup"
 +                "ipneigh" "mim" "mkdosfs" "mke2fs" "nologin" "partprobe"
 +                "poweroff" "reboot" "run-init" "seedrng" "swapoff"
-+                "swapon" "switch_root" "ubirename")
++                "swapon" "switch_root" "ubirename" "watchdog")
 +
 +    _busybox=$(find_binary busybox)
 +    inst "$_busybox" /bin/busybox

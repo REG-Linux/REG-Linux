@@ -39,9 +39,6 @@ define LIBRETRO_CAP32_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib/libretro
 	$(INSTALL) -D $(@D)/cap32_libretro.so \
 		$(TARGET_DIR)/usr/lib/libretro/cap32_libretro.so
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-cap32/amstradcpc.keys \
-	    $(TARGET_DIR)/usr/share/evmapy/
 endef
 
 $(eval $(generic-package))

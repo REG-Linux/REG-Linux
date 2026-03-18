@@ -1,0 +1,20 @@
+--- a/usb_modeswitch.c	2026-02-23 01:24:52.321314658 +0100
++++ b/usb_modeswitch.c	2026-02-23 01:25:20.133225898 +0100
+@@ -570,7 +570,7 @@
+ 	/* Get current configuration of default device, note value if Configuration
+ 	 * parameter is set. Also sets active_config
+ 	 */
+-	currentConfigVal = get_current_config_value(dev);
++	currentConfigVal = get_current_config_value();
+ 	if (Configuration > -1) {
+ 		SHOW_PROGRESS(output,"Current configuration number is %d\n", currentConfigVal);
+ 	} else
+@@ -772,7 +772,7 @@
+ 	if (Configuration > 0) {
+ 		if (currentConfigVal != Configuration) {
+ 			if (switchConfiguration()) {
+-				currentConfigVal = get_current_config_value(dev);
++				currentConfigVal = get_current_config_value();
+ 				if (currentConfigVal == Configuration) {
+ 					SHOW_PROGRESS(output,"The configuration was set successfully\n");
+ 				} else {

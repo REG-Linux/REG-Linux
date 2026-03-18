@@ -671,6 +671,10 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_18
 	bool
 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_17
 
+config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_19
+	bool
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_18
+
 # This should be selected by the latest version, above, to indicate that
 # Buildroot does not know of more recent headers than the ones selected.
 # This allows using toolchains with headers more recent than Buildroot
@@ -682,6 +686,7 @@ config BR2_TOOLCHAIN_HEADERS_LATEST
 # stops affecting a value on the first matching default.
 config BR2_TOOLCHAIN_HEADERS_AT_LEAST
 	string
+	default "6.19" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_19
 	default "6.18" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_18
 	default "6.17" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_17
 	default "6.16" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_16
@@ -831,10 +836,15 @@ config BR2_TOOLCHAIN_GCC_AT_LEAST_14
 	bool
 	select BR2_TOOLCHAIN_GCC_AT_LEAST_13
 
+config BR2_TOOLCHAIN_GCC_AT_LEAST_15
+	bool
+	select BR2_TOOLCHAIN_GCC_AT_LEAST_14
+
 # This order guarantees that the highest version is set, as kconfig
 # stops affecting a value on the first matching default.
 config BR2_TOOLCHAIN_GCC_AT_LEAST
 	string
+	default "15"	if BR2_TOOLCHAIN_GCC_AT_LEAST_15
 	default "14"	if BR2_TOOLCHAIN_GCC_AT_LEAST_14
 	default "13"	if BR2_TOOLCHAIN_GCC_AT_LEAST_13
 	default "12"	if BR2_TOOLCHAIN_GCC_AT_LEAST_12

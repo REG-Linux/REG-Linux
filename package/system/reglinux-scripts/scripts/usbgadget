@@ -1,598 +1,379 @@
 #!/bin/sh
+#
+# usbgadget - USB Gadget Mode Manager for REG-Linux
+#
+# Manages USB gadget configurations for MTP and ADB modes using ConfigFS.
+#
+# Supported modes:
+#   - mtp (file_transfer): Media Transfer Protocol for file access
+#   - adb: Android Debug Bridge for development
+#
+# Usage:
+#   usbgadget {start|stop|restart|status|adb}
+#   usbgadget mtp [/path]   # Default: /userdata
+#
+# Examples:
+#   usbgadget mtp                    # Start MTP with /userdata
+#   usbgadget mtp /                  # Start MTP with root filesystem
+#   usbgadget mtp /sdcard            # Start MTP with /sdcard
+#   usbgadget adb                    # Start ADB debugging
+#   usbgadget status                 # Check current USB mode
+#   usbgadget stop                   # Stop all USB gadgets
+#
+# Exit codes:
+#   0 - Success
+#   1 - Failure (missing resources, configuration errors)
+#
+# Files:
+#   /etc/umtprd/umtprd.conf          - MTP daemon configuration
+#   /sys/kernel/config/usb_gadget/   - USB gadget ConfigFS interface
+#   /userdata/system/.cache/         - Runtime cache and state
+#
+# Author: REG-Linux Team
+# License: GPL-2.0
+#
 
 set -u
 
-CACHEDIR="/userdata/system/.cache/usbgadget"
-GADGETCONF="${CACHEDIR}/usbgadget.conf"
-GADGET_MTP_DIR="/sys/kernel/config/usb_gadget/mtp"
-GADGET_ADB_DIR="/sys/kernel/config/usb_gadget/adb"
-GADGET_MASS_DIR="/sys/kernel/config/usb_gadget/mass_storage"
-MTP_MOUNT="/dev/ffs-umtp"
-ADB_MOUNT="/dev/usb-ffs/adb"
-UMTP_CONF="/etc/umtprd/umtprd.conf"
-GAME_MARKER="/var/run/reglinux-game.running"
-BOOT_CONF="/boot/system-boot.conf"
+# =============================================================================
+# Configuration Paths
+# =============================================================================
 
+CACHEDIR="/userdata/system/.cache/usbgadget"           # Runtime cache directory
+GADGETCONF="${CACHEDIR}/usbgadget.conf"                # USB mode state file
+GADGET_MTP_DIR="/sys/kernel/config/usb_gadget/mtp"     # MTP gadget ConfigFS path
+GADGET_ADB_DIR="/sys/kernel/config/usb_gadget/adb"     # ADB gadget ConfigFS path
+MTP_MOUNT="/dev/ffs-umtp"                              # MTP FunctionFS mount point
+ADB_MOUNT="/dev/usb-ffs/adb"                           # ADB FunctionFS mount point
+UMTP_CONF="/etc/umtprd/umtprd.conf"                    # uMTP daemon configuration
+
+# =============================================================================
+# USB Device Identifiers
+# =============================================================================
+
+# USB IDs (Linux Foundation defaults)
+VENDOR_ID="0x1d6b"       # Linux Foundation
+PRODUCT_ID="0x0100"      # Linux Foundation Generic
+DEV_VERSION="0x0100"     # Device version 1.0.0
+
+# Device identification strings
+SERIAL_VALUE="00000001"
+[ -r /etc/machine-id ] && SERIAL_VALUE="$(cat /etc/machine-id)"
+MANUFACTURER="REG-Linux"
+PRODUCT="REG-Linux Device"
+
+# =============================================================================
+# Binary Detection
+# =============================================================================
+
+# Detect umtprd binary location
+UMTPRD_BIN=""
+[ -x /usr/bin/umtprd ] && UMTPRD_BIN="/usr/bin/umtprd"
+[ -z "${UMTPRD_BIN}" ] && [ -x /usr/sbin/umtprd ] && UMTPRD_BIN="/usr/sbin/umtprd"
+
+# Detect adbd binary location
+ADBD_BIN=""
+[ -x /usr/bin/adbd ] && ADBD_BIN="/usr/bin/adbd"
+[ -z "${ADBD_BIN}" ] && [ -x /usr/sbin/adbd ] && ADBD_BIN="/usr/sbin/adbd"
+
+# =============================================================================
+# Hardware Detection
+# =============================================================================
+
+# Detect if running on RK3566 SoC (requires special USB handling)
+# Returns: 0 if RK3566, 1 otherwise
 is_rk3566() {
     for compat in /proc/device-tree/compatible /sys/firmware/devicetree/base/compatible; do
         [ -r "${compat}" ] || continue
-        if tr -d '\0' < "${compat}" | grep -q "rockchip,rk3566"; then
-            return 0
-        fi
+        tr -d '\0' < "${compat}" | grep -q "rockchip,rk3566" && return 0
     done
     return 1
 }
 
 IS_RK3566=0
-if is_rk3566; then
-    IS_RK3566=1
-fi
+is_rk3566 && IS_RK3566=1
 
-UMTPRD_BIN=""
-[ -x /usr/bin/umtprd ] && UMTPRD_BIN="/usr/bin/umtprd"
-[ -z "${UMTPRD_BIN}" ] && [ -x /usr/sbin/umtprd ] && UMTPRD_BIN="/usr/sbin/umtprd"
+# =============================================================================
+# USB Device Controller (UDC) Management
+# =============================================================================
 
-ADBD_BIN=""
-[ -x /usr/bin/adbd ] && ADBD_BIN="/usr/bin/adbd"
-[ -z "${ADBD_BIN}" ] && [ -x /usr/sbin/adbd ] && ADBD_BIN="/usr/sbin/adbd"
-
-OS_NAME="REG-Linux"
-OS_VERSION="0"
-if [ -r /etc/os-release ]; then
-    # shellcheck disable=SC1091
-    . /etc/os-release
-    OS_NAME="${NAME:-${OS_NAME}}"
-    OS_VERSION="${VERSION_ID:-${OS_VERSION}}"
-fi
-
-SERIAL="00000001"
-[ -r /etc/machine-id ] && SERIAL="$(cat /etc/machine-id)"
-
-mkdir -p "${CACHEDIR}"
-
-USB_MODE=""
-if [ -r "${GADGETCONF}" ]; then
-    # shellcheck disable=SC1090
-    . "${GADGETCONF}"
-fi
-[ -z "${USB_MODE:-}" ] && USB_MODE="mtp"
-
-conf_get_string() {
-    key="$1"
-    [ -r "${UMTP_CONF}" ] || return 1
-    awk -F'"' -v k="${key}" '
-        $0 !~ /^[[:space:]]*#/ && $1 ~ "^[[:space:]]*"k"[[:space:]]+" {print $2; exit}
-    ' "${UMTP_CONF}"
-}
-
-conf_get_value() {
-    key="$1"
-    [ -r "${UMTP_CONF}" ] || return 1
-    awk -v k="${key}" '
-        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
-    ' "${UMTP_CONF}"
-}
-
-escape_sed() {
-    printf '%s' "$1" | sed 's/[\\/&]/\\\\&/g'
-}
-
-update_conf_string() {
-    key="$1"
-    value="$2"
-    [ -w "${UMTP_CONF}" ] || return 0
-    esc_value="$(escape_sed "${value}")"
-    if grep -q -E "^[[:space:]]*${key}[[:space:]]+\"" "${UMTP_CONF}"; then
-        sed -i -E "s|^[[:space:]]*${key}[[:space:]]+\".*\"|${key} \"${esc_value}\"|" "${UMTP_CONF}"
-    else
-        printf '%s \"%s\"\\n' "${key}" "${value}" >> "${UMTP_CONF}"
-    fi
-}
-
-CONF_MANUFACTURER="$(conf_get_string manufacturer || true)"
-CONF_PRODUCT="$(conf_get_string product || true)"
-CONF_SERIAL="$(conf_get_string serial || true)"
-
-MANUFACTURER="${OS_NAME}"
-PRODUCT="${OS_NAME} Device"
-SERIAL_VALUE="${SERIAL}"
-
-[ -n "${CONF_MANUFACTURER}" ] && MANUFACTURER="${CONF_MANUFACTURER}"
-[ -n "${CONF_PRODUCT}" ] && PRODUCT="${CONF_PRODUCT}"
-if [ -n "${CONF_SERIAL}" ] && [ "${CONF_SERIAL}" != "00000001" ]; then
-    SERIAL_VALUE="${CONF_SERIAL}"
-fi
-
-update_conf_string manufacturer "${MANUFACTURER}"
-update_conf_string product "${PRODUCT}"
-update_conf_string serial "${SERIAL_VALUE}"
-
-VENDOR_ID="$(conf_get_value usb_vendor_id || true)"
-[ -z "${VENDOR_ID}" ] && VENDOR_ID="0x1d6b"
-
-PRODUCT_ID="$(conf_get_value usb_product_id || true)"
-[ -z "${PRODUCT_ID}" ] && PRODUCT_ID="0x0100"
-
-DEV_VERSION="$(conf_get_value usb_dev_version || true)"
-[ -z "${DEV_VERSION}" ] && DEV_VERSION="0x0100"
-
+# Get the name of the first available USB Device Controller
+# Returns: UDC name via stdout (e.g., "dwc3", "musb-hdrc")
 udc_name() {
     ls /sys/class/udc 2>/dev/null | head -n 1
 }
 
+# Set UDC_NAME global variable for use in gadget functions
+# Returns: 0 on success, 1 if no UDC found
 set_udc() {
     UDC_NAME="$(udc_name)"
-    if [ -z "${UDC_NAME}" ]; then
-        msg="No UDC found. USB gadget unavailable."
-        echo "${msg}" >&2
-        [ -w /dev/console ] && echo "${msg}" > /dev/console
-        return 1
-    fi
-    return 0
+    [ -n "${UDC_NAME}" ] || return 1
 }
 
-log_game_block() {
-    msg="USB gadget start deferred (game running)."
-    echo "${msg}" >&2
-    [ -w /dev/console ] && echo "${msg}" > /dev/console
-}
+# =============================================================================
+# ConfigFS Management
+# =============================================================================
 
+# Ensure ConfigFS is mounted and gadget modules are loaded
+# Returns: 0 on success, 1 on failure
 ensure_configfs() {
     [ -d /sys/kernel/config ] || return 1
-    if ! grep -q " /sys/kernel/config " /proc/mounts; then
+    grep -q " /sys/kernel/config " /proc/mounts || \
         mount -t configfs none /sys/kernel/config || return 1
-    fi
-    # Load gadget components explicitly; passing names as params causes warnings.
-    modprobe -q libcomposite 2>/dev/null || true
-    modprobe -q usb_f_fs 2>/dev/null || true
-    modprobe -q usb_f_mass_storage 2>/dev/null || true
+    modprobe -q libcomposite 2>/dev/null || true       # Core composite USB gadget
+    modprobe -q usb_f_fs 2>/dev/null || true           # FunctionFS for MTP/ADB
 }
 
+# Set USB role (device/host) for the UDC
+# Args: $1 - role ("device" or "host")
 set_role() {
-    role="$1"
-    [ -n "${UDC_NAME:-}" ] || return 0
+    [ -z "${UDC_NAME:-}" ] && return 0
     for sw in /sys/class/udc/"${UDC_NAME}"/device/usb_role/*/role; do
-        [ -e "${sw}" ] || continue
-        echo "${role}" > "${sw}" 2>/dev/null || true
+        [ -e "${sw}" ] && echo "$1" > "${sw}" 2>/dev/null && break
     done
 }
 
-get_config_key() {
-    [ -x /usr/bin/regmsg ] || return 0
-    value="$(/usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || true)"
-    if [ -n "${value}" ]; then
-        printf '%s\n' "${value}"
-        return 0
-    fi
-    [ -r "${BOOT_CONF}" ] || return 0
-    awk -F'=' -v k="$1" '
-        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
-    ' "${BOOT_CONF}"
+# =============================================================================
+# Gadget Cleanup
+# =============================================================================
+
+# Clean up USB gadget configuration from ConfigFS
+# Unbinds UDC and removes gadget directory
+# Args: $1 - gadget directory path
+cleanup_gadget() {
+    dir="$1"
+    [ -d "${dir}" ] || return 0
+    # Unbind UDC first
+    [ -w "${dir}/UDC" ] && echo "" > "${dir}/UDC" 2>/dev/null || true
+    # Remove symlinks
+    rm -f "${dir}/configs/c.1/ffs."* 2>/dev/null || true
+    # Force remove directory tree
+    rm -rf "${dir}" 2>/dev/null || true
 }
 
-normalize_mode() {
-    case "$1" in
-        "" ) echo "" ;;
-        off|disabled|0) echo "disabled" ;;
-        mtp|file_transfer) echo "mtp" ;;
-        mass|mass_storage|ums) echo "mass_storage" ;;
-        adb) echo "adb" ;;
-        *) echo "$1" ;;
-    esac
-}
+# =============================================================================
+# Gadget Preparation
+# =============================================================================
 
-get_desired_mode() {
-    mode="$(normalize_mode "$(get_config_key system.usb.mode)")"
-    if [ -n "${mode}" ]; then
-        echo "${mode}"
-        return
-    fi
-
-    if [ "$(get_config_key system.usb.adb)" = "1" ]; then
-        echo "adb"
-        return
-    fi
-
-    if [ "$(get_config_key system.usb.mtp)" = "1" ]; then
-        if [ -n "${USB_MODE:-}" ] && [ "${USB_MODE}" != "disabled" ] && [ "${USB_MODE}" != "mass_storage" ]; then
-            echo "${USB_MODE}"
-        else
-            echo "mtp"
-        fi
-        return
-    fi
-
-    if [ -n "${USB_MODE:-}" ]; then
-        echo "${USB_MODE}"
-        return
-    fi
-
-    echo "disabled"
-}
-
-start_auto() {
-    if [ -e "${GAME_MARKER}" ]; then
-        log_game_block
-        return 0
-    fi
-    mode="$(get_desired_mode)"
-    case "${mode}" in
-        adb)
-            start_adb
-            ;;
-        mtp|file_transfer|"")
-            start_mtp
-            ;;
-        mass_storage|mass|ums)
-            start_mass_storage
-            ;;
-        disabled|off)
-            stop_mtp
-            stop_adb
-            stop_mass_storage
-            ;;
-        *)
-            start_mtp
-            ;;
-    esac
-}
-
-prepare_mtp_gadget() {
+# Prepare USB gadget configuration in ConfigFS
+# Creates complete USB gadget structure with FunctionFS
+# Args: $1 - gadget directory, $2 - function label (mtp/adb)
+# Returns: 0 on success, 1 on failure
+prepare_gadget() {
+    dir="$1"
+    label="$2"
     ensure_configfs || return 1
     [ -d /sys/kernel/config/usb_gadget ] || return 1
-    [ -d "${GADGET_MTP_DIR}" ] && return 0
 
-    mkdir -p "${GADGET_MTP_DIR}"
-    echo "0x0200" > "${GADGET_MTP_DIR}/bcdUSB"
-    echo "0x00" > "${GADGET_MTP_DIR}/bDeviceClass"
-    echo "${VENDOR_ID}" > "${GADGET_MTP_DIR}/idVendor"
-    echo "${PRODUCT_ID}" > "${GADGET_MTP_DIR}/idProduct"
-    echo "${DEV_VERSION}" > "${GADGET_MTP_DIR}/bcdDevice"
-
-    mkdir -p "${GADGET_MTP_DIR}/strings/0x409"
-    echo "${MANUFACTURER}" > "${GADGET_MTP_DIR}/strings/0x409/manufacturer"
-    echo "${PRODUCT}" > "${GADGET_MTP_DIR}/strings/0x409/product"
-    echo "${SERIAL_VALUE}" > "${GADGET_MTP_DIR}/strings/0x409/serialnumber"
-
-    mkdir -p "${GADGET_MTP_DIR}/configs/c.1"
-    echo "0xC0" > "${GADGET_MTP_DIR}/configs/c.1/bmAttributes"
-    echo "0xFA" > "${GADGET_MTP_DIR}/configs/c.1/MaxPower"
-    mkdir -p "${GADGET_MTP_DIR}/configs/c.1/strings/0x409"
-    echo "mtp" > "${GADGET_MTP_DIR}/configs/c.1/strings/0x409/configuration"
-
-    mkdir -p "${GADGET_MTP_DIR}/functions/ffs.mtp"
-    [ -L "${GADGET_MTP_DIR}/configs/c.1/ffs.mtp" ] || ln -s "${GADGET_MTP_DIR}/functions/ffs.mtp" "${GADGET_MTP_DIR}/configs/c.1/ffs.mtp"
-}
-
-cleanup_mtp_gadget() {
-    [ -d "${GADGET_MTP_DIR}" ] || return 0
-    rm -f "${GADGET_MTP_DIR}/configs/c.1/ffs.mtp"
-    rmdir "${GADGET_MTP_DIR}/configs/c.1/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_MTP_DIR}/configs/c.1" 2>/dev/null || true
-    rmdir "${GADGET_MTP_DIR}/functions/ffs.mtp" 2>/dev/null || true
-    rmdir "${GADGET_MTP_DIR}/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_MTP_DIR}" 2>/dev/null || true
-}
-
-mass_storage_backing_file() {
-    dev="$(awk '$2 == "/userdata" {print $1; exit}' /proc/mounts)"
-    [ -n "${dev}" ] || return 1
-    case "${dev}" in
-        /dev/*) ;;
-        *) return 1 ;;
-    esac
-    dev_real="$(readlink -f "${dev}" 2>/dev/null || true)"
-    [ -n "${dev_real}" ] || dev_real="${dev}"
-    [ -b "${dev_real}" ] || return 1
-    echo "${dev_real}"
-}
-
-prepare_mass_storage_gadget() {
-    backing="$1"
-    ensure_configfs || return 1
-    [ -d /sys/kernel/config/usb_gadget ] || return 1
-    [ -d "${GADGET_MASS_DIR}" ] && return 0
-
-    mkdir -p "${GADGET_MASS_DIR}"
-    echo "0x0200" > "${GADGET_MASS_DIR}/bcdUSB"
-    echo "0x00" > "${GADGET_MASS_DIR}/bDeviceClass"
-    echo "${VENDOR_ID}" > "${GADGET_MASS_DIR}/idVendor"
-    echo "${PRODUCT_ID}" > "${GADGET_MASS_DIR}/idProduct"
-    echo "${DEV_VERSION}" > "${GADGET_MASS_DIR}/bcdDevice"
-
-    mkdir -p "${GADGET_MASS_DIR}/strings/0x409"
-    echo "${MANUFACTURER}" > "${GADGET_MASS_DIR}/strings/0x409/manufacturer"
-    echo "${PRODUCT}" > "${GADGET_MASS_DIR}/strings/0x409/product"
-    echo "${SERIAL_VALUE}" > "${GADGET_MASS_DIR}/strings/0x409/serialnumber"
-
-    mkdir -p "${GADGET_MASS_DIR}/configs/c.1"
-    echo "0xC0" > "${GADGET_MASS_DIR}/configs/c.1/bmAttributes"
-    echo "0xFA" > "${GADGET_MASS_DIR}/configs/c.1/MaxPower"
-    mkdir -p "${GADGET_MASS_DIR}/configs/c.1/strings/0x409"
-    echo "mass_storage" > "${GADGET_MASS_DIR}/configs/c.1/strings/0x409/configuration"
-
-    mkdir -p "${GADGET_MASS_DIR}/functions/mass_storage.0"
-    echo 1 > "${GADGET_MASS_DIR}/functions/mass_storage.0/stall"
-    echo 1 > "${GADGET_MASS_DIR}/functions/mass_storage.0/lun.0/removable"
-    echo 1 > "${GADGET_MASS_DIR}/functions/mass_storage.0/lun.0/ro"
-    echo "${backing}" > "${GADGET_MASS_DIR}/functions/mass_storage.0/lun.0/file"
-    [ -L "${GADGET_MASS_DIR}/configs/c.1/mass_storage.0" ] || ln -s "${GADGET_MASS_DIR}/functions/mass_storage.0" "${GADGET_MASS_DIR}/configs/c.1/mass_storage.0"
-}
-
-cleanup_mass_storage_gadget() {
-    [ -d "${GADGET_MASS_DIR}" ] || return 0
-    rm -f "${GADGET_MASS_DIR}/configs/c.1/mass_storage.0"
-    rmdir "${GADGET_MASS_DIR}/configs/c.1/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_MASS_DIR}/configs/c.1" 2>/dev/null || true
-    rmdir "${GADGET_MASS_DIR}/functions/mass_storage.0" 2>/dev/null || true
-    rmdir "${GADGET_MASS_DIR}/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_MASS_DIR}" 2>/dev/null || true
-}
-
-start_mass_storage() {
-    if [ -e "${GAME_MARKER}" ]; then
-        log_game_block
-        return 0
-    fi
-    set_udc || return 1
-
-    backing="$(mass_storage_backing_file || true)"
-    if [ -z "${backing}" ]; then
-        msg="No /userdata block device found for mass storage."
-        echo "${msg}" >&2
-        [ -w /dev/console ] && echo "${msg}" > /dev/console
-        return 1
+    # Force cleanup existing gadget
+    if [ -d "${dir}" ]; then
+        [ -w "${dir}/UDC" ] && echo "" > "${dir}/UDC" 2>/dev/null || true
+        rm -f "${dir}/configs/c.1/ffs."* 2>/dev/null || true
+        sleep 0.2
+        rm -rf "${dir}" 2>/dev/null || true
     fi
 
-    if [ -r "${GADGET_MTP_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MTP_DIR}/UDC" 2>/dev/null)" ]; then
-        stop_mtp
-    fi
-    if [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
-        stop_adb
-    fi
+    sleep 0.2
+    mkdir -p "${dir}" 2>/dev/null || true
+    mkdir -p "${CACHEDIR}" 2>/dev/null || true
 
-    set_role device
-    prepare_mass_storage_gadget "${backing}" || return 1
+    # USB 2.0 configuration
+    echo "0x0200" > "${dir}/bcdUSB" 2>/dev/null || true           # USB 2.0
+    echo "0x00" > "${dir}/bDeviceClass" 2>/dev/null || true       # Per-interface class
+    echo "${VENDOR_ID}" > "${dir}/idVendor" 2>/dev/null || true   # Vendor ID
+    echo "${PRODUCT_ID}" > "${dir}/idProduct" 2>/dev/null || true # Product ID
+    echo "${DEV_VERSION}" > "${dir}/bcdDevice" 2>/dev/null || true # Device version
 
-    echo "${UDC_NAME}" > "${GADGET_MASS_DIR}/UDC"
-    echo "USB_MODE=mass_storage" > "${GADGETCONF}"
-    usb_trigger &
+    # Device strings (English US)
+    mkdir -p "${dir}/strings/0x409" 2>/dev/null || true
+    echo "${MANUFACTURER}" > "${dir}/strings/0x409/manufacturer" 2>/dev/null || true
+    echo "${PRODUCT}" > "${dir}/strings/0x409/product" 2>/dev/null || true
+    echo "${SERIAL_VALUE}" > "${dir}/strings/0x409/serialnumber" 2>/dev/null || true
+
+    # Configuration
+    mkdir -p "${dir}/configs/c.1" 2>/dev/null || true
+    echo "0xC0" > "${dir}/configs/c.1/bmAttributes" 2>/dev/null || true  # Self-powered
+    echo "0xFA" > "${dir}/configs/c.1/MaxPower" 2>/dev/null || true      # 500mA
+    mkdir -p "${dir}/configs/c.1/strings/0x409" 2>/dev/null || true
+    echo "${label}" > "${dir}/configs/c.1/strings/0x409/configuration" 2>/dev/null || true
+
+    # FunctionFS function
+    mkdir -p "${dir}/functions/ffs.${label}" 2>/dev/null || true
+    ln -s "${dir}/functions/ffs.${label}" "${dir}/configs/c.1/ffs.${label}" 2>/dev/null || true
 }
 
-stop_mass_storage() {
-    UDC_NAME="$(udc_name)"
-    if [ -n "${UDC_NAME}" ] && [ -w "${GADGET_MASS_DIR}/UDC" ]; then
-        echo "" > "${GADGET_MASS_DIR}/UDC"
-    fi
-    cleanup_mass_storage_gadget
-    echo "USB_MODE=disabled" > "${GADGETCONF}"
-    set_role host
-}
+# =============================================================================
+# MTP Functions
+# =============================================================================
 
-prepare_adb_gadget() {
-    ensure_configfs || return 1
-    [ -d /sys/kernel/config/usb_gadget ] || return 1
-    [ -d "${GADGET_ADB_DIR}" ] && return 0
-
-    mkdir -p "${GADGET_ADB_DIR}"
-    echo "0x0200" > "${GADGET_ADB_DIR}/bcdUSB"
-    echo "0x00" > "${GADGET_ADB_DIR}/bDeviceClass"
-    echo "${VENDOR_ID}" > "${GADGET_ADB_DIR}/idVendor"
-    echo "${PRODUCT_ID}" > "${GADGET_ADB_DIR}/idProduct"
-    echo "${DEV_VERSION}" > "${GADGET_ADB_DIR}/bcdDevice"
-
-    mkdir -p "${GADGET_ADB_DIR}/strings/0x409"
-    echo "${MANUFACTURER}" > "${GADGET_ADB_DIR}/strings/0x409/manufacturer"
-    echo "${PRODUCT}" > "${GADGET_ADB_DIR}/strings/0x409/product"
-    echo "${SERIAL_VALUE}" > "${GADGET_ADB_DIR}/strings/0x409/serialnumber"
-
-    mkdir -p "${GADGET_ADB_DIR}/configs/c.1"
-    echo "0xC0" > "${GADGET_ADB_DIR}/configs/c.1/bmAttributes"
-    echo "0xFA" > "${GADGET_ADB_DIR}/configs/c.1/MaxPower"
-    mkdir -p "${GADGET_ADB_DIR}/configs/c.1/strings/0x409"
-    echo "adb" > "${GADGET_ADB_DIR}/configs/c.1/strings/0x409/configuration"
-
-    mkdir -p "${GADGET_ADB_DIR}/functions/ffs.adb"
-    [ -L "${GADGET_ADB_DIR}/configs/c.1/ffs.adb" ] || ln -s "${GADGET_ADB_DIR}/functions/ffs.adb" "${GADGET_ADB_DIR}/configs/c.1/ffs.adb"
-}
-
-cleanup_adb_gadget() {
-    [ -d "${GADGET_ADB_DIR}" ] || return 0
-    rm -f "${GADGET_ADB_DIR}/configs/c.1/ffs.adb"
-    rmdir "${GADGET_ADB_DIR}/configs/c.1/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_ADB_DIR}/configs/c.1" 2>/dev/null || true
-    rmdir "${GADGET_ADB_DIR}/functions/ffs.adb" 2>/dev/null || true
-    rmdir "${GADGET_ADB_DIR}/strings/0x409" 2>/dev/null || true
-    rmdir "${GADGET_ADB_DIR}" 2>/dev/null || true
-}
-
+# Start MTP USB gadget
+# Starts uMTP daemon for Media Transfer Protocol file access
+# Args: $1 - optional storage path (default: /userdata)
+# Returns: 0 on success, 1 on failure
 start_mtp() {
-    if [ -e "${GAME_MARKER}" ]; then
-        log_game_block
-        return 0
-    fi
-    set_udc || return 1
-    if [ -z "${UMTPRD_BIN}" ]; then
-        start_mass_storage
-        return $?
+    set_udc || { echo "No UDC found."; return 1; }
+    [ -z "${UMTPRD_BIN}" ] && { echo "umtprd not found."; return 1; }
+
+    # Handle storage path argument (default: /userdata)
+    storage_path="${1:-/userdata}"
+
+    # Update umtprd.conf storage path if writable
+    if [ -w "${UMTP_CONF}" ]; then
+        grep -q '^storage "' "${UMTP_CONF}" && \
+            sed -i "s|^storage \".*\".*|storage \"${storage_path}\"  \"Storage\"|" "${UMTP_CONF}"
     fi
 
-    if [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
-        stop_adb
-    fi
+    # Stop ADB if running
+    [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ] && stop_adb
+    rm -rf "${GADGET_ADB_DIR}" 2>/dev/null || true
 
     set_role device
-    if ! prepare_mtp_gadget; then
-        start_mass_storage
-        return $?
-    fi
+    prepare_gadget "${GADGET_MTP_DIR}" "mtp" || { echo "Failed to prepare MTP."; return 1; }
 
+    # Mount FunctionFS
     mkdir -p "${MTP_MOUNT}"
-    if ! grep -q " ${MTP_MOUNT} " /proc/mounts; then
-        if ! mount -t functionfs mtp "${MTP_MOUNT}"; then
-            cleanup_mtp_gadget
-            start_mass_storage
-            return $?
-        fi
-    fi
+    grep -q " ${MTP_MOUNT} " /proc/mounts || \
+        mount -t functionfs mtp "${MTP_MOUNT}" || { echo "Failed to mount."; return 1; }
 
-    if ! pidof umtprd >/dev/null 2>&1; then
-        "${UMTPRD_BIN}" >/dev/null 2>&1 &
-    fi
+    # Start uMTP daemon
+    pidof umtprd >/dev/null 2>&1 || "${UMTPRD_BIN}" >/dev/null 2>&1 &
 
     sleep 1
-    echo "${UDC_NAME}" > "${GADGET_MTP_DIR}/UDC"
+    [ -w "${GADGET_MTP_DIR}/UDC" ] && echo "${UDC_NAME}" > "${GADGET_MTP_DIR}/UDC" 2>/dev/null || true
     echo "USB_MODE=mtp" > "${GADGETCONF}"
-    usb_trigger &
+    echo "MTP started (${storage_path})"
 }
 
+# Stop MTP USB gadget
+# Stops umtprd daemon, unmounts FunctionFS, and cleans up ConfigFS
 stop_mtp() {
+    # Kill daemon with force
+    killall -9 umtprd 2>/dev/null || true
+    sleep 0.5
+
+    # Unbind UDC
     UDC_NAME="$(udc_name)"
-    if [ -n "${UDC_NAME}" ] && [ -w "${GADGET_MTP_DIR}/UDC" ]; then
-        echo "" > "${GADGET_MTP_DIR}/UDC"
-    fi
+    [ -n "${UDC_NAME}" ] && [ -w "${GADGET_MTP_DIR}/UDC" ] && \
+        echo "" > "${GADGET_MTP_DIR}/UDC" 2>/dev/null || true
 
-    killall umtprd 2>/dev/null || true
-
+    # Lazy unmount to avoid busy errors
     if grep -q " ${MTP_MOUNT} " /proc/mounts; then
-        umount "${MTP_MOUNT}" 2>/dev/null || true
+        umount -l "${MTP_MOUNT}" 2>/dev/null || umount "${MTP_MOUNT}" 2>/dev/null || true
     fi
     rmdir "${MTP_MOUNT}" 2>/dev/null || true
-    cleanup_mtp_gadget
-    echo "USB_MODE=disabled" > "${GADGETCONF}"
+
+    # Force cleanup symlinks and directory
+    rm -f "${GADGET_MTP_DIR}/configs/c.1/ffs."* 2>/dev/null || true
+    cleanup_gadget "${GADGET_MTP_DIR}"
+    echo "USB_MODE=disabled" > "${GADGETCONF}" 2>/dev/null || true
     set_role host
+    echo "MTP stopped"
 }
 
-start_adb() {
-    if [ -e "${GAME_MARKER}" ]; then
-        log_game_block
-        return 0
-    fi
-    set_udc || return 1
-    [ -n "${ADBD_BIN}" ] || return 0
+# =============================================================================
+# ADB Functions
+# =============================================================================
 
-    if [ -r "${GADGET_MTP_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MTP_DIR}/UDC" 2>/dev/null)" ]; then
-        stop_mtp
+# Start ADB USB gadget
+# Starts adbd daemon for Android Debug Bridge access
+# Returns: 0 on success, 1 on failure
+start_adb() {
+    set_udc || { echo "No UDC found."; return 1; }
+    [ -z "${ADBD_BIN}" ] && { echo "adbd not found."; return 1; }
+
+    # Stop MTP if running
+    [ -r "${GADGET_MTP_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MTP_DIR}/UDC" 2>/dev/null)" ] && stop_mtp
+
+    # Force cleanup ADB first
+    killall -9 adbd 2>/dev/null || true
+    sleep 0.3
+    if grep -q " ${ADB_MOUNT} " /proc/mounts; then
+        umount -l "${ADB_MOUNT}" 2>/dev/null || true
     fi
+    rm -f "${GADGET_ADB_DIR}/configs/c.1/ffs."* 2>/dev/null || true
+    rm -rf "${GADGET_ADB_DIR}" 2>/dev/null || true
+    rm -rf "${GADGET_MTP_DIR}" 2>/dev/null || true
+    sleep 0.3
 
     set_role device
-    prepare_adb_gadget || return 1
+    prepare_gadget "${GADGET_ADB_DIR}" "adb" || { echo "Failed to prepare ADB."; return 1; }
 
+    # Mount FunctionFS
     mkdir -p "${ADB_MOUNT}"
-    if ! grep -q " ${ADB_MOUNT} " /proc/mounts; then
-        mount -t functionfs adb "${ADB_MOUNT}" || return 1
-    fi
+    grep -q " ${ADB_MOUNT} " /proc/mounts || \
+        mount -t functionfs adb "${ADB_MOUNT}" || { echo "Failed to mount."; return 1; }
 
-    if ! pidof adbd >/dev/null 2>&1; then
-        "${ADBD_BIN}" >/dev/null 2>&1 &
-    fi
+    # Start ADB daemon
+    "${ADBD_BIN}" >/dev/null 2>&1 &
 
     sleep 1
-    echo "${UDC_NAME}" > "${GADGET_ADB_DIR}/UDC"
+    [ -w "${GADGET_ADB_DIR}/UDC" ] && echo "${UDC_NAME}" > "${GADGET_ADB_DIR}/UDC" 2>/dev/null || true
     echo "USB_MODE=adb" > "${GADGETCONF}"
-    usb_trigger &
+    echo "ADB started"
 }
 
+# Stop ADB USB gadget
+# Stops adbd daemon, unmounts FunctionFS, and cleans up ConfigFS
 stop_adb() {
+    # Kill adbd with force if needed
+    killall -9 adbd 2>/dev/null || true
+    sleep 0.5
+
     UDC_NAME="$(udc_name)"
-    if [ -n "${UDC_NAME}" ] && [ -w "${GADGET_ADB_DIR}/UDC" ]; then
-        echo "" > "${GADGET_ADB_DIR}/UDC"
-    fi
+    [ -n "${UDC_NAME}" ] && [ -w "${GADGET_ADB_DIR}/UDC" ] && \
+        echo "" > "${GADGET_ADB_DIR}/UDC" 2>/dev/null || true
 
-    killall adbd 2>/dev/null || true
-
+    # Lazy unmount to avoid busy errors
     if grep -q " ${ADB_MOUNT} " /proc/mounts; then
-        umount "${ADB_MOUNT}" 2>/dev/null || true
+        umount -l "${ADB_MOUNT}" 2>/dev/null || umount "${ADB_MOUNT}" 2>/dev/null || true
     fi
     rmdir "${ADB_MOUNT}" 2>/dev/null || true
-    cleanup_adb_gadget
-    echo "USB_MODE=disabled" > "${GADGETCONF}"
+
+    # Force cleanup symlinks and directory
+    rm -f "${GADGET_ADB_DIR}/configs/c.1/ffs."* 2>/dev/null || true
+    cleanup_gadget "${GADGET_ADB_DIR}"
+    echo "USB_MODE=disabled" > "${GADGETCONF}" 2>/dev/null || true
     set_role host
+    echo "ADB stopped"
 }
 
-is_cable_connected() {
-    if [ "${IS_RK3566}" -eq 1 ]; then
-        UDC_NAME="${UDC_NAME:-$(udc_name)}"
-        if [ -n "${UDC_NAME}" ]; then
-            PHY_PATH="$(ls -d /sys/devices/platform/${UDC_NAME}/supplier:platform:*usb2phy 2>/dev/null | head -n 1)"
-            if [ -n "${PHY_PATH}" ]; then
-                found=0
-                for cable in "${PHY_PATH}"/extcon/*/cable.*; do
-                    [ -f "${cable}/state" ] || continue
-                    found=1
-                    name=""
-                    [ -f "${cable}/name" ] && name="$(cat "${cable}/name" 2>/dev/null)"
-                    case "${name}" in
-                        SDP|CDP|"")
-                            if grep -q 1 "${cable}/state"; then
-                                return 0
-                            fi
-                            ;;
-                        *)
-                            ;;
-                    esac
-                done
-                [ "${found}" -eq 1 ] && return 1
-            fi
-        fi
-    fi
-
-    found=0
-    for cable in /sys/class/extcon/*/cable.*; do
-        [ -f "${cable}/state" ] || continue
-        found=1
-        if grep -q 1 "${cable}/state"; then
-            return 0
-        fi
-    done
-    [ "${found}" -eq 0 ] && return 0
-    return 1
-}
-
-usb_trigger() {
-    [ "${IS_RK3566}" -eq 1 ] || exit 0
-    set_udc || exit 0
-    SOFT_CONNECT="/sys/class/udc/${UDC_NAME}/soft_connect"
-    [ -e "${SOFT_CONNECT}" ] || exit 0
-    if is_cable_connected; then
-        echo "connect" > "${SOFT_CONNECT}"
-    else
-        echo "disconnect" > "${SOFT_CONNECT}"
-    fi
-}
+# =============================================================================
+# Command Line Interface
+# =============================================================================
 
 case "${1:-}" in
-    --start)
-        start_auto
-        ;;
-    start|mtp|file_transfer)
-        start_mtp
-        ;;
-    mass_storage|mass|ums)
-        start_mass_storage
+    start|mtp)
+        # Start MTP mode (default: /userdata)
+        # Usage: usbgadget mtp [/path]
+        start_mtp "${2:-}"
         ;;
     adb)
+        # Start ADB debug mode
         start_adb
         ;;
-    stop|--stop|disabled)
+    stop|disabled)
+        # Stop all USB gadgets and clean up ConfigFS
         stop_mtp
         stop_adb
-        stop_mass_storage
+        rm -rf "${GADGET_MTP_DIR}" "${GADGET_ADB_DIR}" 2>/dev/null || true
+        echo "USB gadgets stopped"
         ;;
     restart|reload)
-        stop_mtp
-        stop_adb
-        stop_mass_storage
-        start_mtp
-        ;;
-    trigger)
-        usb_trigger
+        # Restart gadgets
+        if [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
+            stop_adb
+            sleep 0.5
+            start_adb
+        else
+            stop_mtp
+            sleep 0.5
+            start_mtp
+        fi
         ;;
     status)
+        # Show current USB gadget mode
         if [ -r "${GADGET_MTP_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MTP_DIR}/UDC" 2>/dev/null)" ]; then
-            echo "file_transfer"
-        elif [ -r "${GADGET_MASS_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MASS_DIR}/UDC" 2>/dev/null)" ]; then
-            echo "mass_storage"
+            echo "mtp"
         elif [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
             echo "adb"
         else
@@ -600,7 +381,24 @@ case "${1:-}" in
         fi
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|trigger|status|adb|mass_storage}"
+        # Show usage information
+        echo "Usage: $0 {start|stop|restart|status|adb}"
+        echo "       $0 mtp [/path]"
+        echo ""
+        echo "Commands:"
+        echo "  start, mtp     - Start MTP mode (default: /userdata)"
+        echo "  mtp /path      - Start MTP with custom storage path"
+        echo "  adb            - Start ADB debug mode"
+        echo "  stop           - Stop all USB gadgets"
+        echo "  restart        - Restart MTP mode"
+        echo "  status         - Show current USB mode"
+        echo ""
+        echo "Examples:"
+        echo "  $0 mtp                   # MTP with /userdata"
+        echo "  $0 mtp /                 # MTP with root filesystem"
+        echo "  $0 mtp /sdcard           # MTP with /sdcard"
+        echo "  $0 adb                   # ADB debugging"
+        echo "  $0 status                # Check current mode"
         exit 1
         ;;
 esac

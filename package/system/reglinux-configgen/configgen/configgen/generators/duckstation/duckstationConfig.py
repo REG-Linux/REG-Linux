@@ -2,7 +2,8 @@ from os import environ
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import BIOS, CHEATS, CONF, ROMS, SAVES, SCREENSHOTS
+from configgen.config.paths import BIOS, CHEATS, CONF, ROMS, SAVES, SCREENSHOTS
+from configgen.core.exceptions import BIOSNotFoundError
 
 DUCKSTATION_CONFIG_PATH = CONF / "duckstation" / "settings.ini"
 DUCKSTATION_SAVES_DIR = SAVES / "duckstation"
@@ -177,7 +178,7 @@ def setDuckstationConfig(
             biosFound = True
             break
     if not biosFound:
-        raise Exception("No PSX1 BIOS found")
+        raise BIOSNotFoundError("duckstation", "PSX1")
     if USbiosFile is not None:
         duckstatonConfig.set("BIOS", "PathNTSCU", USbiosFile)
     if EUbiosFile is not None:

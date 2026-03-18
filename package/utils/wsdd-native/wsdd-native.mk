@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-WSDD_NATIVE_VERSION = 1.22
-WSDD_NATIVE_SITE = $(call github,gershnik,wsdd-native,v$(WSDD_NATIVE_VERSION))
+WSDD_NATIVE_VERSION = v1.23
+WSDD_NATIVE_SITE = $(call github,gershnik,wsdd-native,$(WSDD_NATIVE_VERSION))
 WSDD_NATIVE_LICENSE = BSD
 
 WSDD_NATIVE_DEPENDENCIES += host-libxml2 libxml2

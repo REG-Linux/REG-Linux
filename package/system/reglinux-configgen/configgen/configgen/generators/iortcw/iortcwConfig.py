@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import ROMS
+from configgen.config.paths import ROMS
 
 IORTCW_CONFIG_PATH = str(Path(ROMS) / "iortcw" / "main" / "wolfconfig.cfg")
 IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"

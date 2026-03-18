@@ -1,0 +1,27 @@
+diff --git a/package/gcc/Config.in.host b/package/gcc/Config.in.host
+index bdf644f527..7be43b1376 100644
+--- a/package/gcc/Config.in.host
++++ b/package/gcc/Config.in.host
+@@ -48,6 +48,14 @@ config BR2_GCC_VERSION_14_X
+ 	depends on !BR2_POWERPC_CPU_HAS_SPE
+ 	select BR2_TOOLCHAIN_GCC_AT_LEAST_14
+ 
++config BR2_GCC_VERSION_15_X
++	bool "gcc 15.x"
++	depends on !BR2_ARCH_NEEDS_GCC_AT_LEAST_16
++	# powerpc spe support has been deprecated since gcc 8.x.
++	# https://gcc.gnu.org/ml/gcc/2018-04/msg00102.html
++	depends on !BR2_POWERPC_CPU_HAS_SPE
++	select BR2_TOOLCHAIN_GCC_AT_LEAST_15
++
+ endchoice
+ 
+ config BR2_GCC_SUPPORTS_DLANG
+@@ -73,6 +81,7 @@ config BR2_GCC_VERSION
+ 	default "12.4.0"    if BR2_GCC_VERSION_12_X
+ 	default "13.4.0"    if BR2_GCC_VERSION_13_X
+ 	default "14.3.0"    if BR2_GCC_VERSION_14_X
++	default "15.2.0"    if BR2_GCC_VERSION_15_X
+ 	default "arc-2023.09-release" if BR2_GCC_VERSION_ARC
+ 
+ config BR2_EXTRA_GCC_CONFIG_OPTIONS

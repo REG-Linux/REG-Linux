@@ -3,9 +3,9 @@ from configparser import ConfigParser
 from os import path
 from shutil import copyfile
 
-from configgen.command import Command
+from configgen.config.paths import CONF
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 from .flycastConfig import (

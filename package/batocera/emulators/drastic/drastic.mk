@@ -25,13 +25,9 @@ endif
 define DRASTIC_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin/
 	mkdir -p $(TARGET_DIR)/usr/share/
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 
 	install -m 0755 $(@D)/target/$(DRASTIC_BINARYFILE) $(TARGET_DIR)/usr/bin/drastic
 	cp -pr $(@D)/target/drastic $(TARGET_DIR)/usr/share/drastic
-
-	# evmap config
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/drastic/controllers/nds.drastic.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(generic-package))

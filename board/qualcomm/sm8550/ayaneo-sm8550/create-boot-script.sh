@@ -30,6 +30,10 @@ cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketds.dtb"	"${REGLINUX_BINARIES_DIR}/boot/
 cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketevo.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 
 cp -f "${BOARD_DIR}/grub.cfg"                           "${BINARIES_DIR}/efi-part/EFI/BOOT/grub.cfg"    || exit 1
+
+# Seed a 1024-byte grubenv so that load_env/save_env work on first boot
+{ printf '%s\n' '# GRUB Environment Block'; head -c 999 < /dev/zero | tr '\0' '#'; } > "${BINARIES_DIR}/efi-part/EFI/BOOT/grubenv" || exit 1
+
 cp -r "${BINARIES_DIR}/efi-part/EFI/"                   "${REGLINUX_BINARIES_DIR}/boot/"                || exit 1
 
 exit 0

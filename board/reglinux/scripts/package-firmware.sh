@@ -13,4 +13,8 @@ if [ -f  "${BINARIES_DIR}/firmware" ]; then
 fi
 
 # Package new one
-"${HOST_DIR}/bin/mksquashfs" "${TARGET_DIR}/lib/firmware/" "${BINARIES_DIR}/firmware" -comp xz
+rm -rf /tmp/firmware-squashfs
+mkdir -p /tmp/firmware-squashfs/lib
+cp -a "${TARGET_DIR}/lib/firmware" /tmp/firmware-squashfs/lib/
+"${HOST_DIR}/bin/mksquashfs" "/tmp/firmware-squashfs" "${BINARIES_DIR}/firmware" -comp xz
+rm -rf /tmp/firmware-squashfs

@@ -36,12 +36,4 @@ define AMIBERRY_LITE_INSTALL_TARGET_CMDS
 	cp -p $(@D)/data/AmigaTopaz.ttf $(TARGET_DIR)/usr/share/amiberry/data
 endef
 
-define AMIBERRY_LITE_EVMAP
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/evmapy/* \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-AMIBERRY_LITE_POST_INSTALL_TARGET_HOOKS = AMIBERRY_LITE_EVMAP
-
 $(eval $(cmake-package))

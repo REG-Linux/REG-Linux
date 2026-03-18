@@ -1,0 +1,34 @@
+#!/bin/sh
+
+BOARD=$(cat /boot/boot/system.board)
+
+case $1 in
+    start)
+      if [ "$BOARD" = "trimui-smart-pro" ]; then
+        insmod /lib/modules/4.9.191/xradio_mac_tsp.ko
+        insmod /lib/modules/4.9.191/xradio_core_tsp.ko
+        insmod /lib/modules/4.9.191/xradio_wlan_tsp.ko 
+      else
+        insmod /lib/modules/4.9.191/xradio_mac.ko
+        insmod /lib/modules/4.9.191/xradio_core.ko
+        insmod /lib/modules/4.9.191/xradio_wlan.ko
+      fi
+      for i in /lib/modules/4.9.191/xt*; do insmod $i;done
+      insmod /lib/modules/4.9.191/ipt_REJECT.ko
+      insmod /lib/modules/4.9.191/iptable_filter.ko
+      ;;
+  stop)
+      if [ "$BOARD" = "trimui-smart-pro" ]; then
+        rmmod xradio_wlan_tsp
+        rmmod xradio_core_tsp
+        rmmod xradio_mac_tsp
+      else
+        rmmod xradio_wlan
+        rmmod xradio_core
+        rmmod xradio_mac
+      fi
+      ;;
+esac
+
+exit 0
+

@@ -1,6 +1,6 @@
 from typing import Any
 
-from configgen.systemFiles import HOME
+from configgen.config.paths import HOME
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

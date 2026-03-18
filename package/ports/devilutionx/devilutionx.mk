@@ -22,11 +22,4 @@ DEVILUTIONX_CONF_OPTS += -DBUILD_TESTING=OFF -DPREFILL_PLAYER_NAME=ON
 # They should all be present in the source package.
 DEVILUTIONX_CONF_OPTS += -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 
-define DEVILUTIONX_INSTALL_TARGET_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/devilutionx/devilutionx.keys $(TARGET_DIR)/usr/share/evmapy
-endef
-
-DEVILUTIONX_POST_INSTALL_TARGET_HOOKS = DEVILUTIONX_INSTALL_TARGET_EVMAPY
-
 $(eval $(cmake-package))

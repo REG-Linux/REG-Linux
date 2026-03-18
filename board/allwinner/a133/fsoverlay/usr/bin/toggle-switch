@@ -1,0 +1,57 @@
+#!/bin/bash
+
+if ! knulli-board-capability "toggleswitch"; then
+    exit 1
+fi
+
+TOGGLE_STATE="/var/run/toggle-switch.state"
+
+MODE="$(/usr/bin/batocera-settings-get system.toggleswitch.mode)"
+if [[ -z "$MODE" || ! "$MODE" =~ ^(mute|rgboff|airplane)$ ]]; then
+    MODE="mute" # default can be mute|rgboff|airplane
+    /usr/bin/batocera-settings-set system.toggleswitch.mode "$MODE"
+fi
+
+ACTION="$1"
+case "$ACTION" in
+    enable)
+        case "$MODE" in
+            mute)
+                /usr/bin/batocera-audio setSystemVolume mute
+                echo "mute" > "$TOGGLE_STATE"
+                ;;
+            rgboff)
+                /usr/bin/batocera-settings-set led.mode 0
+                echo "rgboff" > "$TOGGLE_STATE"
+                ;;
+            airplane)
+                /usr/bin/batocera-planemode enable
+                echo "airplane" > "$TOGGLE_STATE"
+                ;;
+        esac
+        ;;
+    disable)
+        # Restore previously saved mode
+        if [ -f "$TOGGLE_STATE" ]; then
+            MODE="$(cat "$TOGGLE_STATE")"
+        fi
+        case "$MODE" in
+            mute)
+                /usr/bin/batocera-audio setSystemVolume unmute
+                ;;
+            rgboff)
+                /usr/bin/batocera-settings-set led.mode 1
+                ;;
+            airplane)
+                /usr/bin/batocera-planemode disable
+                ;;
+        esac
+        rm -f "$TOGGLE_STATE"
+        ;;
+    *)
+        echo "Usage: $0 [enable|disable]"
+        exit 1
+        ;;
+esac
+
+exit 0

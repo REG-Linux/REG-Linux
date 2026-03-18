@@ -1,0 +1,42 @@
+# rumdl configuration file for REG-Linux ConfigGen
+
+# Global configuration options
+[global]
+# List of rules to disable
+# MD013 (line length) disabled for technical documentation with code blocks and tables
+disable = ["MD013"]
+
+# Additional rules to enable on top of defaults
+extend-enable = ["MD060", "MD063"]
+
+# List of file/directory patterns to exclude from linting
+exclude = [
+    ".git",
+    ".github",
+    "node_modules",
+    "vendor",
+    "dist",
+    "build",
+    ".venv",
+    "**/__pycache__",
+    "*.egg-info",
+    "CHANGELOG.md",
+    "LICENSE.md",
+]
+
+# Respect .gitignore files when scanning directories
+respect-gitignore = true
+
+# Markdown flavor/dialect
+flavor = "standard"
+
+# Rule-specific configurations
+
+[MD004]
+style = "dash"  # Unordered list style
+
+[MD007]
+indent = 2  # Unordered list indentation
+
+[MD012]
+maximum = 1  # Maximum consecutive blank lines

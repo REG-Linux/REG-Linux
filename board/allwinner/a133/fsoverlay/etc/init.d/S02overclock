@@ -1,0 +1,42 @@
+#!/bin/bash
+
+do_overclock() {
+    echo "$1" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    echo "$1" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+    echo "$1" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+    echo "$1" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
+}
+
+
+if test "${1}" = "start"
+then
+    OVALUE=$(grep -E '^[ ]*overclocking[ ]*=[ ]*.*[ ]*$' /boot/system-boot.conf | sed -e s+"^[ ]*overclocking[ ]*=[ ]*\(.*\)[ ]*$"+"\1"+)
+
+    # ULTRALOW      LOW                    MEDIUM  HIGH    TURBO   EXTREME
+    # 408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2000000 
+	    case "${OVALUE}" in
+		"extreme")
+		    do_overclock 2000000
+		    ;;
+		"turbo")
+		    do_overclock 1800000
+		    ;;
+		"high")
+		    do_overclock 1608000
+		    ;;
+		"none")
+		    do_overclock 1416000
+		    ;;
+		"low")
+		    do_overclock 816000
+		    ;;
+		"powersave")
+		    do_overclock 408000
+		    ;;
+		*)
+		    # default
+		    do_overclock 1416000
+		    ;;
+	    esac
+fi
+

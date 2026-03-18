@@ -1,0 +1,14 @@
+config BR2_PACKAGE_TEGRA_BSP
+	bool "tegra-bsp"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	select BR2_PACKAGE_MESA3D
+	select BR2_PACKAGE_LIBGLVND
+	select BR2_PACKAGE_LIBGLVND_DISPATCH_EGL
+	select BR2_PACKAGE_LIBGLVND_DISPATCH_GLES
+
+	help
+	  NVIDIA Tegra BSP (Board Support Package) proprietary userspace
+	  libraries for L4T R32.3.1 (Tegra T210).
+	  Provides EGL, GBM, CUDA, Vulkan ICD, and multimedia libraries.
+	  Works with libglvnd to dispatch between Mesa (Nouveau) and
+	  NVIDIA proprietary implementations.

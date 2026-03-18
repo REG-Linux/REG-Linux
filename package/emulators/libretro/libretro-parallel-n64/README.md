@@ -1,10 +1,5 @@
-# Libretro Parallel N64
+# libretro-parallel-n64
 
-The `libretro-parallel-n64` core is REG-Linux’s optimized Nintendo 64 backend, maintaining the parallel-rice rework for libretro builds.
+Nintendo 64 libretro core (Parallel N64). Upstream: https://github.com/libretro/parallel-n64
 
-## Build notes
-
-- `Version`: f8605345e13c018a30c8f4ed03c05d8fc8f70be8
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `0001-REG.Linux-add-missing-targets.patch`
+Dynarec is selected per-arch (`WITH_DYNAREC=aarch64/arm/x86_64`). Desktop GL disables GLES (`FORCE_GLES=0`); otherwise `FORCE_GLES=1`. Vulkan enables `HAVE_PARALLEL=1` and, on x86_64, `HAVE_PARALLEL_RSP=1`.

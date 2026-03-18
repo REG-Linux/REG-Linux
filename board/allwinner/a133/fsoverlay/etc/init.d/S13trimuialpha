@@ -1,0 +1,11 @@
+#!/bin/sh
+
+case $1 in
+    start)
+	setalpha 0
+	;;
+    stop)
+	;;
+esac
+
+exit 0

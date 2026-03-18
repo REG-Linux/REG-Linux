@@ -22,9 +22,17 @@ case "$(/usr/bin/regmsg systemconf getconfigkey system.es.environment)" in
                QT_QPA_PLATFORM=wayland
         ;;
     *)
-        # Configure environment for legacy DRM/GL or X11 fallback
-        export XDG_SESSION_TYPE=drm \
-               QT_QPA_PLATFORM=xcb \
-               LD_PRELOAD=/usr/lib/libdrmhook.so
+        # Auto-detect virtio-gpu (QEMU/KVM) and force Wayland
+        # virtio-gpu KMSDRM pageflip fails with EINVAL, Wayland works
+        if [ -d /sys/bus/virtio/drivers/virtio_gpu ] && ls /sys/bus/virtio/drivers/virtio_gpu/virtio* >/dev/null 2>&1; then
+            export XDG_SESSION_TYPE=wayland \
+                   SDL_VIDEO_DRIVER=wayland \
+                   QT_QPA_PLATFORM=wayland
+        else
+            # Configure environment for legacy DRM/GL or X11 fallback
+            export XDG_SESSION_TYPE=drm \
+                   QT_QPA_PLATFORM=xcb \
+                   LD_PRELOAD=/usr/lib/libdrmhook.so
+        fi
         ;;
 esac

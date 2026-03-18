@@ -1,0 +1,10 @@
+config BR2_PACKAGE_SWITCH_U_BOOT
+	bool "switch-u-boot"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	depends on BR2_aarch64
+	help
+	  CTCaer's modified U-Boot for the Nintendo Switch,
+	  integrated with the Hekate bootloader.
+	  Builds bl33.bin (U-Boot payload) and mkimage host tool.
+
+	  https://github.com/CTCaer/switch-l4t-uboot

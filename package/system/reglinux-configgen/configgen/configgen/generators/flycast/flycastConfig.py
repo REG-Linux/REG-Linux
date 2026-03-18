@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import BIOS, CONF, SAVES
+from configgen.config.paths import BIOS, CONF, SAVES
 
 FLYCAST_CONFIG_DIR = str(Path(CONF) / "flycast")
 FLYCAST_CONFIG_PATH = str(Path(FLYCAST_CONFIG_DIR) / "emu.cfg")

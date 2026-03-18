@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any
 
+from configgen.config.paths import BIOS, CONF, LOGDIR, SAVES, SCREENSHOTS
 from configgen.settings import UnixSettings
-from configgen.systemFiles import BIOS, CONF, LOGDIR, SAVES, SCREENSHOTS
 
 AMIBERRY_CONFIG_DIR = str(Path(CONF) / "amiberry")
 AMIBERRY_BIOS_DIR = str(Path(BIOS) / "amiga")
@@ -15,6 +15,11 @@ AMIBERRY_BIN_PATH = Path("/usr/bin/amiberry")
 
 
 def setAmiberryConfig(system: Any) -> None:
+    # Remove existing config file to ensure clean state (no dynamic values)
+    config_path = Path(AMIBERRY_CONFIG_PATH)
+    if config_path.exists():
+        config_path.unlink()
+
     amiberryConfig = UnixSettings(AMIBERRY_CONFIG_PATH)
 
     amiberryConfig.save("default_quit_key", "Escape")

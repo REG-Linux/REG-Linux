@@ -5,7 +5,7 @@
 
 OVERLAYFILE="/boot/boot/overlay"
 OVERLAYMOUNT="/overlay/saved"
-OVERLAYRAM="/overlay/overlay"
+OVERLAYRAM="/overlay/upper"
 
 # Some systems have little free space on /boot
 if [ "$(df --output=avail /boot/ | grep -v Avail)" -lt "200000" ]; then
@@ -54,7 +54,19 @@ then
     exit 1
 fi
 
-# mount it
+# If the overlay ext4 is already mounted rw as the live upperdir, all writes
+# have gone straight to disk — nothing to copy.
+if grep -q "${OVERLAYMOUNT} " /proc/mounts 2>/dev/null; then
+    echo "Overlay is in direct RW mode, changes are already on disk."
+    mount -o remount,ro /boot
+    echo "Synchronizing..."
+    sync
+    echo "Success."
+    exit 0
+fi
+
+# First-time save: mount the ext4, rsync the current tmpfs upper into it,
+# then unmount.  On next boot the init will open it rw via the loop device.
 echo "Mounting the overlay file..."
 if ! mount -o rw "${OVERLAYFILE}" "${OVERLAYMOUNT}"
 then
@@ -62,16 +74,15 @@ then
     exit 1
 fi
 
-# save
 echo "Saving the real overlay to disk..."
-if ! rsync -av --delete "${OVERLAYRAM}/" "${OVERLAYMOUNT}"
+mkdir -p "${OVERLAYMOUNT}/upper" "${OVERLAYMOUNT}/work"
+if ! rsync -av --delete "${OVERLAYRAM}/" "${OVERLAYMOUNT}/upper"
 then
     umount "${OVERLAYMOUNT}"
     mount -o remount,ro /boot
     exit 1
 fi
 
-# umount
 echo "Umounting the overlay file..."
 if ! umount "${OVERLAYMOUNT}"
 then
@@ -79,7 +90,6 @@ then
     exit 1
 fi
 
-# put /boot in ro back
 echo "Making /boot read only..."
 if ! mount -o remount,ro /boot
 then

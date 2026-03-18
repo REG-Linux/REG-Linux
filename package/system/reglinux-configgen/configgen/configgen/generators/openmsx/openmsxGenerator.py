@@ -3,11 +3,11 @@ import shutil
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from xml.dom import minidom
 
-from configgen.command import Command
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -46,6 +46,7 @@ def copy_directory(src: str, dst: str) -> None:
 
 
 class OpenmsxGenerator(Generator):
+    @override
     def hasInternalMangoHUDCall(self):
         return True
 
@@ -55,8 +56,8 @@ class OpenmsxGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: Any,
     ) -> Command:
         share_dir = openMSX_Homedir / "share"
@@ -127,6 +128,11 @@ class OpenmsxGenerator(Generator):
             )
             f.write(formatted_xml)
 
+        # Remove existing tcl file to ensure clean state (no dynamic values)
+        settings_path = Path(settings_tcl)
+        if settings_path.exists():
+            settings_path.unlink()
+
         # setup the blank tcl file
         Path(settings_tcl).write_text("")
 
@@ -156,7 +162,9 @@ class OpenmsxGenerator(Generator):
             # setup the controller
             file.write("\n")
             file.write("# -= Controller config =-\n")
-            for nplayer, pad in enumerate(sorted(players_controllers.items()), start=1):
+            for nplayer, (_key, pad) in enumerate(
+                sorted(players_controllers.items()), start=1
+            ):
                 if nplayer <= 2:
                     if nplayer == 1:
                         file.write("plug joyporta joystick1\n")

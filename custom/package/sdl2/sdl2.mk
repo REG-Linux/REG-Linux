@@ -74,7 +74,7 @@ define SDL2_FIX_SDL2_CONFIG_CMAKE
 		$(STAGING_DIR)/usr/lib/cmake/SDL2/sdl2-config.cmake
 endef
 
-# batocera
+# reglinux
 define SDL2_FIX_WAYLAND_SCANNER_PATH
 	sed -i "s+/usr/bin/wayland-scanner+$(HOST_DIR)/usr/bin/wayland-scanner+g" $(@D)/Makefile
 endef
@@ -97,14 +97,17 @@ SDL2_POST_INSTALL_STAGING_HOOKS += SDL2_FIX_SDL2_CONFIG_CMAKE
 # We must enable static build to get compilation successful.
 SDL2_CONF_OPTS += --enable-static
 
-# batocera - Used in screen rotation (SDL and Retroarch)
-ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
-SDL2_DEPENDENCIES += rockchip-rga
-endif
-
 # reglinux - RISC-V depend on custom mesa to enable wayland properly
 ifeq ($(BR2_PACKAGE_IMG_GPU_POWERVR),y)
 SDL2_DEPENDENCIES += img-gpu-powervr img-mesa3d
+endif
+
+# reglinux - Mali fbdev driver for PowerVR GE8300 (A133 / TrimUI)
+ifeq ($(BR2_PACKAGE_SDL2_MALI),y)
+SDL2_DEPENDENCIES += powervr-ge8300-driver
+SDL2_CONF_OPTS += --enable-video-mali
+else
+SDL2_CONF_OPTS += --disable-video-mali
 endif
 
 # reglinux - depend on mesa3d for kmsdrm (gbm+egl) if enabled
@@ -112,7 +115,7 @@ ifeq ($(BR2_PACKAGE_MESA3D),y)
 SDL2_DEPENDENCIES += mesa3d
 endif
 
-# batocera - use Pipewire audio
+# reglinux - use Pipewire audio
 ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
 SDL2_CONF_OPTS += --enable-pipewire
 endif
@@ -132,11 +135,6 @@ ifeq ($(BR2_X86_CPU_HAS_SSE),y)
 SDL2_CONF_OPTS += --enable-sse
 else
 SDL2_CONF_OPTS += --disable-sse
-endif
-
-# batocera / with patch sdl2_add_video_mali_gles2.patch / mrfixit
-ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)
-SDL2_CONF_OPTS += --enable-video-mali
 endif
 
 ifeq ($(BR2_X86_CPU_HAS_3DNOW),y)
@@ -234,7 +232,7 @@ else
 SDL2_CONF_OPTS += --disable-video-kmsdrm
 endif
 
-# batocera - enable/disable Wayland video driver
+# reglinux - enable/disable Wayland video driver
 ifeq ($(BR2_PACKAGE_SDL2_WAYLAND),y)
 SDL2_DEPENDENCIES += wayland wayland-protocols libxkbcommon
 SDL2_CONF_OPTS += --enable-video-wayland
@@ -242,12 +240,12 @@ else
 SDL2_CONF_OPTS += --disable-video-wayland
 endif
 
-# batocera - libdecor
+# reglinux - libdecor
 ifeq ($(BR2_PACKAGE_LIBDECOR),y)
 SDL2_DEPENDENCIES += libdecor
 endif
 
-# batocera - enable/disable Vulkan support
+# reglinux - enable/disable Vulkan support
 ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
 SDL2_DEPENDENCIES += vulkan-headers vulkan-loader
 SDL2_CONF_OPTS += --enable-video-vulkan

@@ -1,0 +1,15 @@
+--- a/src/Shell.c
++++ b/src/Shell.c
+@@ -1002,10 +1002,10 @@
+ static void
+ _XtShellAncestorSensitive(Widget widget, int closure, XrmValue *value)
+ {
+-    static Boolean true = True;
++    static Boolean true_value = True;
+ 
+     if (widget->core.parent == NULL)
+-        value->addr = (XPointer) (&true);
++        value->addr = (XPointer) (&true_value);
+     else
+         _XtCopyFromParent(widget, closure, value);
+ }

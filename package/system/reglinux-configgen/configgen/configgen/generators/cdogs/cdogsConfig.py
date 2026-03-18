@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from configgen.systemFiles import ROMS
+from configgen.config.paths import ROMS
 
 CDOGS_BIN_PATH = "/usr/bin/cdogs"
 CDOGS_ROMS_DIR = str(Path(ROMS) / "cdogs")

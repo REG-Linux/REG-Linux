@@ -1,0 +1,62 @@
+From 9a61cbc8fbeed8e5d4c4d338b23d95041961060e Mon Sep 17 00:00:00 2001
+From: Juliano Dorigao <jdorigao@gmail.com>
+Date: Sat, 14 Mar 2026 17:28:20 -0400
+Subject: [PATCH 1/2] arm64: dts: meson-g12b-gtking: Add Mali GPU regulator
+
+The Panfrost DRM driver expects a "mali" regulator for DVFS (Dynamic
+Voltage and Frequency Scaling) support on Amlogic G12B SoCs. Without
+this regulator defined, the driver logs an error message:
+
+  panfrost ffe40000.gpu: error -ENODEV: _opp_set_regulators: no regulator (mali) found
+
+Although the driver continues to function, DVFS may not work correctly,
+potentially resulting in suboptimal performance and power consumption.
+
+Add a fixed regulator (vdd_mali) supplying 800mV to the Mali GPU,
+matching the OPP table voltage requirements defined in meson-g12-common.dtsi.
+The regulator is always-on as the GPU power is typically managed by
+the SoC's internal power management unit.
+
+Signed-off-by: Juliano Dorigao <jdorigao@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts | 4 ++++
+ arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi  | 9 +++++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts b/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
+index e20311386..c5b5481cb 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
+@@ -129,6 +129,10 @@ &frddr_c {
+ 	status = "okay";
+ };
+ 
++&mali {
++	mali-supply = <&vdd_mali>;
++};
++
+ 
+ &i2c3 {
+ 	status = "okay";
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+index 4cb6930ff..437e2a90d 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+@@ -166,6 +166,15 @@ vddao_3v3: regulator-vddao-3v3 {
+ 		regulator-always-on;
+ 	};
+ 
++	vdd_mali: regulator-vdd-mali {
++		compatible = "regulator-fixed";
++		regulator-name = "VDD_MALI";
++		regulator-min-microvolt = <800000>;
++		regulator-max-microvolt = <800000>;
++		vin-supply = <&main_12v>;
++		regulator-always-on;
++	};
++
+ 	cvbs-connector {
+ 		compatible = "composite-video-connector";
+ 
+-- 
+2.53.0

@@ -15,10 +15,6 @@ ABUSE_CONF_OPTS += -DASSETDIR=/userdata/roms/abuse
 define ABUSE_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/abuse
 	$(INSTALL) -D -m 0755 $(@D)/buildroot-build/src/abuse $(TARGET_DIR)/usr/bin/abuse
-
-	# evmapy files
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/abuse/*.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

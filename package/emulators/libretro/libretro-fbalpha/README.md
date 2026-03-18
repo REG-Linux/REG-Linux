@@ -1,10 +1,5 @@
-# Libretro FB Alpha
+# libretro-fbalpha
 
-The `libretro-fbalpha` core provides ARM-targeted arcade emulation within REG-Linux’s libretro stack.
+Arcade libretro core (FinalBurn Alpha 2012). Upstream: https://github.com/libretro/fbalpha2012
 
-## Build notes
-
-- `Version`: 77167cea72e808384c136c8c163a6b4975ce7a84
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-fix-gcc14.patch`
+On 32-bit ARM the platform is forced to `armv` (overriding the default `LIBRETRO_PLATFORM`).

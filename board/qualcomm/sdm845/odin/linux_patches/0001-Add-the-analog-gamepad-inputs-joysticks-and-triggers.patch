@@ -1,0 +1,28 @@
+From 02893a997408e223c7840256ff5edccde2031920 Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Thu, 29 Jan 2026 00:05:51 +0200
+Subject: [PATCH] Add the analog gamepad inputs (joysticks and triggers)
+
+---
+ drivers/iio/adc/qcom-spmi-adc5.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/iio/adc/qcom-spmi-adc5.c b/drivers/iio/adc/qcom-spmi-adc5.c
+index af3c2f659..7809e9b1a 100644
+--- a/drivers/iio/adc/qcom-spmi-adc5.c
++++ b/drivers/iio/adc/qcom-spmi-adc5.c
+@@ -561,6 +561,11 @@ static const struct adc5_channels adc5_chans_pmic[ADC5_MAX_CHANNEL] = {
+ 					SCALE_HW_CALIB_THERM_100K_PULLUP)
+ 	[ADC5_GPIO4_100K_PU]	= ADC5_CHAN_TEMP("gpio4_100k_pu", 0,
+ 					SCALE_HW_CALIB_THERM_100K_PULLUP)
++	[ADC5_GPIO3] = ADC5_CHAN_VOLT("gpio3", 0, SCALE_HW_CALIB_DEFAULT)
++	[ADC5_GPIO4] = ADC5_CHAN_VOLT("gpio4", 0, SCALE_HW_CALIB_DEFAULT)
++	[ADC5_GPIO5] = ADC5_CHAN_VOLT("gpio5", 0, SCALE_HW_CALIB_DEFAULT)
++	[ADC5_GPIO6] = ADC5_CHAN_VOLT("gpio6", 0, SCALE_HW_CALIB_DEFAULT)
++	[ADC5_GPIO7] = ADC5_CHAN_VOLT("gpio7", 0, SCALE_HW_CALIB_DEFAULT)
+ };
+ 
+ static const struct adc5_channels adc7_chans_pmic[ADC5_MAX_CHANNEL] = {
+-- 
+2.43.0
+

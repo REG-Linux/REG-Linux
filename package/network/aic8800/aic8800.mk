@@ -3,7 +3,7 @@
 # aic8800
 #
 ################################################################################
-# Version: Release on Dec 30, 2025
+# Latest release: 4.0+GIT20250410.B99CA8B6-5 (Dec 30, 2025)
 AIC8800_VERSION = 4.0+git20250410.b99ca8b6-5
 AIC8800_SITE = $(call github,radxa-pkg,aic8800,$(AIC8800_VERSION))
 AIC8800_LICENSE = GPL-3.0

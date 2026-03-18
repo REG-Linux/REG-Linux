@@ -2,9 +2,9 @@ from configparser import ConfigParser
 from pathlib import Path
 from shutil import copy2
 
-from configgen.command import Command
+from configgen.config.paths import CONF
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
 
 DOSBOXX_CONFIG_DIR = str(Path(CONF) / "dosbox")
 DOSBOXX_CONFIG_PATH = str(Path(DOSBOXX_CONFIG_DIR) / "dosboxx.conf")
@@ -66,7 +66,8 @@ class DosBoxxGenerator(Generator):
             "-fastlaunch",
             "-fullscreen",
             "-nogui",
-            f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}",
+            "-conf",
+            DOSBOXX_CONFIG_CUSTOM_PATH,
         ]
 
         return Command(array=command_array)

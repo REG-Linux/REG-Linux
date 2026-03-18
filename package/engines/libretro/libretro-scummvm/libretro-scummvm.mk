@@ -49,7 +49,7 @@ endef
 
 # Details from backends/platform/libretro/dependencies.mk
 define LIBRETRO_SCUMMVM_DEPS
-	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,abf5246b016569759e7d1b0ea91bb98c2e34d160)
+	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,a2a865e74f58035c416a0c63be5772fdcf35b071)
 	$(call LIBRETRO_CLONE_AND_INIT,libretro-common,70ed90c42ddea828f53dd1b984c6443ddb39dbd6)
 endef
 

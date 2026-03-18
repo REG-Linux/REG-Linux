@@ -41,12 +41,12 @@ and `UnixSettings` for managing INI/Unix-style configuration files.
 
 ## Installation
 
-This library requires external dependencies for TOML support. To use it, include the package
-in your project directory and install the required dependencies.
+This library requires external dependencies for TOML support. To use it, include
+the package in your project directory and install the required dependencies.
 
 ### Requirements
 
-- Python 3.6 or higher
+- Python 3.12 or higher
 - Standard library modules: `json`, `logging`, `pathlib`, `configparser`, `io`
 - External dependencies: `tomli`, `tomli-w`
 
@@ -138,7 +138,8 @@ settings/
 └── README.md
 ```
 
-- `__init__.py`: Exports the `JSONSettings`, `TOMLSettings`, and `UnixSettings` classes.
+- `__init__.py`: Exports the `JSONSettings`, `TOMLSettings`, and `UnixSettings`
+  classes.
 - `json_settings.py`: Contains the `JSONSettings` class for JSON-based
   configuration management.
 - `toml_settings.py`: Contains the `TOMLSettings` class for TOML-based
@@ -154,7 +155,7 @@ settings/
   a JSON file path.
 - `load(default: Optional[dict] = None) -> dict`: Load the JSON file into
   memory.
-- `write(indent: int = 4) -> bool`: Write the configuration to the file.
+- `write() -> bool`: Write the configuration to the file.
 - `save(name: str, value: Any) -> None`: Save a key-value pair.
 - `remove(name: str) -> bool`: Remove a key.
 - `exists(name: str) -> bool`: Check if a key exists.

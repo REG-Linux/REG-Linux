@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# Version: Release on Sep 8, 2025
-XONE_VERSION = v0.4.5
+# Version: Release on Mar 17, 2026
+XONE_VERSION = v0.5.8
 XONE_SITE = $(call github,dlundqvist,xone,$(XONE_VERSION))
 XONE_DEPENDENCIES = host-cabextract libusb
 

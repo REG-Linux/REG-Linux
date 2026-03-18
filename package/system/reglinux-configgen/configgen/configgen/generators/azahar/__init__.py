@@ -3,6 +3,7 @@
 This module handles the generation of azahar emulator configurations.
 """
 
+from . import azahar_keys
 from .azaharConfig import setAzaharConfig
 from .azaharControllers import (
     getMouseMode,
@@ -21,4 +22,5 @@ __all__ = [
     "setAzaharConfig",
     "setAzaharControllers",
     "setButton",
+    "azahar_keys",
 ]

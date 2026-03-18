@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# We only want to run the script if the board has no analog stick capability
+if knulli-board-capability "analogstick"; then
+    exit 1
+fi
+
+DPAD_INPUT_TEMP_FOLDER="/tmp/trimui_inputd"
+DPAD_DISABLED_FILE="/tmp/trimui_inputd/input_no_dpad"
+DPAD_AS_ANALOG_FILE="/tmp/trimui_inputd/input_dpad_to_joystick"
+
+check_ingame() {
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:1234/runningGame")
+    test $? != 0                 && return 0
+    test "${HTTP_STATUS}" != 201 && return 0 # in game
+    return 1  # 201 when not in game
+}
+
+do_notification() {
+    NOTIFICATION=$1
+    curl -s http://localhost:1234/notify -d "$NOTIFICATION" >/dev/null
+}
+
+if [[ ! -d dir ]]; then
+    mkdir "$DPAD_INPUT_TEMP_FOLDER"
+fi
+
+if [ -f "$DPAD_AS_ANALOG_FILE" ]; then
+    if ! check_ingame; then
+        do_notification "Virtual Joystick OFF"
+    fi
+
+    knulli-rumble 0.1
+    sleep 0.2
+    knulli-rumble 0.1
+    rm "$DPAD_DISABLED_FILE"
+    rm "$DPAD_AS_ANALOG_FILE"
+else
+    if ! check_ingame; then
+        do_notification "Virtual Joystick ON"
+    fi
+
+    knulli-rumble 0.1
+    touch "$DPAD_DISABLED_FILE"
+    touch "$DPAD_AS_ANALOG_FILE"
+fi
+
+exit 0

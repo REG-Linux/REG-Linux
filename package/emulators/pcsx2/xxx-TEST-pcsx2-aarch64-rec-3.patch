@@ -1,0 +1,91 @@
+--- a/pcsx2/VMManager.cpp	2026-01-21 00:36:59.623413641 +0100
++++ b/pcsx2/VMManager.cpp	2026-01-21 00:38:05.011494444 +0100
+@@ -2607,25 +2607,11 @@
+ 
+ void VMManager::InitializeCPUProviders()
+ {
+-#if defined(_M_X86) // TODO(Stenzek): Remove me once EE/VU/IOP recs are added.
+ 	recCpu.Reserve();
+ 	psxRec.Reserve();
+ 
+ 	CpuMicroVU0.Reserve();
+ 	CpuMicroVU1.Reserve();
+-#elif defined(_M_ARM64)
+-	recCpu.Reserve();
+-	psxRec.Reserve();
+-	// Needed for macro VU ops even without VU recompilers.
+-	CpuMicroVU0.Reserve();
+-	// We still need the thread alive without VU recompilers.
+-	vu1Thread.Open();
+-#else
+-	// Despite not having any VU recompilers on ARM64, therefore no MTVU,
+-	// we still need the thread alive. Otherwise the read and write positions
+-	// of the ring buffer wont match, and various systems in the emulator end up deadlocked.
+-	vu1Thread.Open();
+-#endif
+ 
+ 	VifUnpackSSE_Init();
+ }
+@@ -2638,24 +2624,11 @@
+ 		dVifRelease(0);
+ 	}
+ 
+-#if defined(_M_X86) // TODO(Stenzek): Remove me once EE/VU/IOP recs are added.
+ 	CpuMicroVU1.Shutdown();
+ 	CpuMicroVU0.Shutdown();
+ 
+ 	psxRec.Shutdown();
+ 	recCpu.Shutdown();
+-#elif defined(_M_ARM64)
+-	CpuMicroVU0.Shutdown();
+-	psxRec.Shutdown();
+-	recCpu.Shutdown();
+-	if (vu1Thread.IsOpen())
+-		vu1Thread.WaitVU();
+-#else
+-	// See the comment in the InitializeCPUProviders for an explaination why we
+-	// still need to manage the MTVU thread.
+-	if (vu1Thread.IsOpen())
+-		vu1Thread.WaitVU();
+-#endif
+ }
+ 
+ void VMManager::UpdateCPUImplementations()
+@@ -2669,25 +2642,11 @@
+ 		return;
+ 	}
+ 
+-#if defined(_M_X86) // TODO(Stenzek): Remove me once EE/VU/IOP recs are added.
+ 	Cpu = CHECK_EEREC ? &recCpu : &intCpu;
+ 	psxCpu = CHECK_IOPREC ? &psxRec : &psxInt;
+ 
+ 	CpuVU0 = EmuConfig.Cpu.Recompiler.EnableVU0 ? static_cast<BaseVUmicroCPU*>(&CpuMicroVU0) : static_cast<BaseVUmicroCPU*>(&CpuIntVU0);
+ 	CpuVU1 = EmuConfig.Cpu.Recompiler.EnableVU1 ? static_cast<BaseVUmicroCPU*>(&CpuMicroVU1) : static_cast<BaseVUmicroCPU*>(&CpuIntVU1);
+-#elif defined(_M_ARM64)
+-	Cpu = CHECK_EEREC ? &recCpu : &intCpu;
+-	psxCpu = CHECK_IOPREC ? &psxRec : &psxInt;
+-
+-	CpuVU0 = &CpuIntVU0;
+-	CpuVU1 = &CpuIntVU1;
+-#else
+-	Cpu = &intCpu;
+-	psxCpu = &psxInt;
+-
+-	CpuVU0 = &CpuIntVU0;
+-	CpuVU1 = &CpuIntVU1;
+-#endif
+ }
+ 
+ void VMManager::Internal::ClearCPUExecutionCaches()
+@@ -2695,11 +2654,9 @@
+ 	Cpu->Reset();
+ 	psxCpu->Reset();
+ 
+-//#ifdef _M_X86 // TODO(Stenzek): Remove me once EE/VU/IOP recs are added.
+ 	// mVU's VU0 needs to be properly initialized for macro mode even if it's not used for micro mode!
+ 	if (CHECK_EEREC && !EmuConfig.Cpu.Recompiler.EnableVU0)
+ 		CpuMicroVU0.Reset();
+-//#endif
+ 
+ 	CpuVU0->Reset();
+ 	CpuVU1->Reset();

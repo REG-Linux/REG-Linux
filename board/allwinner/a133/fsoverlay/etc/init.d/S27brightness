@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Check if system-brightness command exists
+if ! command -v system-brightness >/dev/null; then
+    exit 0
+fi
+
+case $1 in
+    start)
+        # Retrieve the current brightness setting
+        BRI=$(system-settings-get display.brightness)
+
+        # Check if the command was successful and handle accordingly
+        if [ $? -eq 0 ]; then
+            # If brightness is less than 1, set it to 1 // 1 is the new min brightness
+            if [ "$BRI" -lt 1 ]; then
+                BRI=1
+            fi
+        else
+            # If no value is found, set brightness to 50%
+            BRI=50
+        fi
+
+        system-brightness "$BRI"
+        ;;
+    stop)
+        # Get brightness values
+        # Determine current brightness from file or fallback to system-brightness
+        if [ -f "/var/run/system-brightness" ]; then
+            read -r CURRENT_BRI < /var/run/system-brightness
+        else
+            CURRENT_BRI=$(system-brightness)
+        fi
+
+        SAVED_BRI=$(system-settings-get display.brightness)
+
+        # Update saved brightness setting if it's different from the current brightness
+        if [ "$SAVED_BRI" != "$CURRENT_BRI" ]; then
+            if [ -e "/userdata/system/batocera.conf" ]; then
+                system-settings-set display.brightness "$CURRENT_BRI"
+            fi
+        fi
+        ;;
+esac
+
+exit 0

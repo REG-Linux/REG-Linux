@@ -1,0 +1,4 @@
+#!/bin/sh
+
+watchdog -t 5 /dev/watchdog0
+

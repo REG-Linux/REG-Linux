@@ -5,10 +5,10 @@ from shutil import copy
 from stat import S_IRGRP, S_IROTH, S_IRWXU, S_IXGRP, S_IXOTH
 from typing import Any
 
-from configgen.command import Command
+from configgen.config.paths import ROMS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import ROMS
 
 SONICMANIA_SOURCE_BIN_PATH = Path("/usr/bin/sonic-mania")
 SONICMANIA_ROMS_DIR = ROMS / "sonic-mania"
@@ -62,7 +62,7 @@ class SonicManiaGenerator(Generator):
                 X_OK,
             ):
                 Path(str(SONICAMANIA_BIN_PATH)).chmod(
-                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH
+                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
                 )
 
         # Verify the copied binary is executable

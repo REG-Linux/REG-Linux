@@ -1,0 +1,67 @@
+include toolchain-gcc14-musl.common
+include reglinux-board.common
+
+# Target definition — Cyclone V SoC HPS (dual Cortex-A9)
+BR2_arm=y
+BR2_cortex_a9=y
+BR2_ARM_EABIHF=y
+BR2_ARM_ENABLE_NEON=y
+BR2_ARM_ENABLE_VFP=y
+BR2_ARM_FPU_NEON=y
+BR2_PACKAGE_SYSTEM_TARGET_DE10NANO=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+#BR2_TARGET_GENERIC_GETTY_PORT="tty1"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/musl $(BR2_EXTERNAL_REGLINUX_PATH)/board/intel/de10nano/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/intel/de10nano/fsoverlay"
+BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
+
+# Kernel headers
+BR2_KERNEL_HEADERS_5_15=y
+
+# Kernel — use MiSTer's 5.15 fork initially, switch to mainline later
+# For now, use mainline with socfpga support
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_GIT=y
+BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/MiSTer-devel/Linux-Kernel_MiSTer.git"
+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="MiSTer-v5.15"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/intel/de10nano/linux_patches" 
+# $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/arm"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/intel/de10nano/linux-de10nano-defconfig.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config $(BR2_EXTERNAL_REGLINUX_PATH)/board/intel/de10nano/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+
+# Build the DTB from the kernel sources
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="socfpga_cyclone5_de10_nano"
+
+# DE10-Nano uses zImage loaded by U-Boot
+BR2_LINUX_KERNEL_ZIMAGE=y
+
+# Hack for LLVMpipe until better
+BR2_PACKAGE_MESA3D_LLVM=y
+
+# Bootloader — mainline U-Boot for DE10-Nano
+BR2_TARGET_UBOOT=y
+BR2_TARGET_UBOOT_BUILD_SYSTEM_KCONFIG=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION=y
+BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE="2025.04"
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="socfpga_de10_nano"
+BR2_TARGET_UBOOT_NEEDS_DTC=y
+BR2_TARGET_UBOOT_FORMAT_CUSTOM=y
+BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME="u-boot-with-spl.sfp"
+BR2_PACKAGE_UBOOT_TOOLS_MKIMAGE=y
+
+# No GPU on HPS — use Mesa software rasterizer (softpipe)
+BR2_PACKAGE_SYSTEM_SWRAST_MESA3D=y
+
+# No sway compositor — no GPU for wlroots
+# Slint will use LinuxKMS backend directly (no compositor needed)
+# BR2_PACKAGE_REGLINUX_SWAY is not set
+
+# MiSTer FPGA bridge
+BR2_PACKAGE_REGLINUX_MISTER_BRIDGE=y
+
+# Filesystem
+BR2_TARGET_ROOTFS_CPIO_LZ4=y

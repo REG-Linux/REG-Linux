@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from configgen.systemFiles import BIOS, CONF
+from configgen.config.paths import BIOS, CONF
 
 HATARI_CONFIG_DIR = str(Path(CONF) / "hatari")
 HATARI_CONFIG_PATH = str(Path(HATARI_CONFIG_DIR) / "hatari.cfg")

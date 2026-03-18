@@ -1,9 +1,9 @@
 from os import chdir
 
-from configgen.command import Command
+from configgen.config.paths import ROMS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import ROMS
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

@@ -76,22 +76,30 @@ do
     REGLINUX_POST_IMAGE_SCRIPT="${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${REGLINUX_PATHSUBTARGET}/create-boot-script.sh"
     run_with_log "create-boot-${REGLINUX_SUBTARGET}" bash "${REGLINUX_POST_IMAGE_SCRIPT}" "${HOST_DIR}" "${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${REGLINUX_PATHSUBTARGET}" "${BUILD_DIR}" "${BINARIES_DIR}" "${TARGET_DIR}" "${REGLINUX_BINARIES_DIR}"
     # add some common files
-    #nope cp -pr "${BINARIES_DIR}/tools"              "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
     cp     "${BINARIES_DIR}/system-boot.conf" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
     echo   "${REGLINUX_SUBTARGET}" > "${REGLINUX_BINARIES_DIR}/boot/boot/system.board" || exit 1
 
     #### boot-$BOARD.tar.zst ###############
     echo "creating images/${REGLINUX_SUBTARGET}/boot-${REGLINUX_SUBTARGET}.tar.zst"
     mkdir -p "${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}" || exit 1
-    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/boot-${REGLINUX_SUBTARGET}.tar.zst" *) || exit 1
+    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" --exclude='partitions' -cf "${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/boot-${REGLINUX_SUBTARGET}.tar.zst" *) || exit 1
 
     # create *.img
     if [ "${REGLINUX_LOWER_TARGET}" = "${REGLINUX_SUBTARGET}" ]; then
-        BATOCERAIMG="${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/reglinux-${REGLINUX_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
+        REGLINUXIMG="${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/reglinux-${REGLINUX_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
     else
-        BATOCERAIMG="${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/reglinux-${REGLINUX_LOWER_TARGET}-${REGLINUX_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
+        REGLINUXIMG="${REGLINUX_BINARIES_DIR}/images/${REGLINUX_SUBTARGET}/reglinux-${REGLINUX_LOWER_TARGET}-${REGLINUX_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
     fi
-    echo "creating images/${REGLINUX_SUBTARGET}/"$(basename "${BATOCERAIMG}")"..." >&2
+
+	# Change "label=REGLINUX" to "root=UUID=..." in boot files
+    echo "updating boot files with root=UUID=${VFATUUID}..."
+	find "${REGLINUX_BINARIES_DIR}/boot/" -type f \( -iname "LinuxLoader.cfg" -o -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.cmd" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/root=UUID=$VFATUUID/g" {} \+
+	if [ -f "${REGLINUX_BINARIES_DIR}/boot/boot.cmd" ]; then
+		"${HOST_DIR}/bin/mkimage" -C none -A arm64 -T script -d "${REGLINUX_BINARIES_DIR}/boot/boot.cmd" "${REGLINUX_BINARIES_DIR}/boot/boot.scr" || exit 1
+		rm "${REGLINUX_BINARIES_DIR}/boot/boot.cmd" || exit 1
+	fi
+
+    echo "creating images/${REGLINUX_SUBTARGET}/"$(basename "${REGLINUXIMG}")"..." >&2
     rm -rf "${GENIMAGE_TMP}" || exit 1
     GENIMAGEDIR="${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${REGLINUX_PATHSUBTARGET}"
     GENIMAGEFILE="${GENIMAGEDIR}/genimage.cfg"
@@ -99,8 +107,6 @@ do
     cat "${GENIMAGEFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
 	# Include the UUID of boot partition in extraargs
 	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
-	# Change "label=REGLINUX" to "uuid= ..." in boot files
-	find "${REGLINUX_BINARIES_DIR}/boot/" -type f \( -iname "LinuxLoader.cfg" -o -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" {} \+
 
     # install syslinux
     if grep -qE "^BR2_TARGET_SYSLINUX=y$" "${BR2_CONFIG}"
@@ -121,8 +127,8 @@ do
 
     rm -f "${REGLINUX_BINARIES_DIR}/boot.vfat" || exit 1
     rm -f "${REGLINUX_BINARIES_DIR}/userdata.ext4" || exit 1
-    mv "${REGLINUX_BINARIES_DIR}/reglinux.img" "${BATOCERAIMG}" || exit 1
-    "${HOST_DIR}/usr/bin/pigz" -1 -p 4 "${BATOCERAIMG}" || exit 1
+    mv "${REGLINUX_BINARIES_DIR}/reglinux.img" "${REGLINUXIMG}" || exit 1
+    "${HOST_DIR}/usr/bin/pigz" -1 -p 4 "${REGLINUXIMG}" || exit 1
 
     # delete the boot
     rm -rf "${REGLINUX_BINARIES_DIR}/boot" || exit 1

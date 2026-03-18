@@ -1,10 +1,5 @@
-# Libretro PC-88
+# libretro-pc88
 
-The `libretro-pc88` core ports QUASI88 (PC-8800 series) into REG-Linux’s libretro tree with Raspberry Pi tuning already applied.
+PC-8800 series libretro core (QUASI88). Upstream: https://github.com/libretro/quasi88-libretro
 
-## Build notes
-
-- `Version`: 42be798db5585f62b4bd34ce49dd1e8063c9d7c1
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-RPi5-tuning.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets.

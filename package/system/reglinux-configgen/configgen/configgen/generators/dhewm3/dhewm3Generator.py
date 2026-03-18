@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.config.paths import CONF, ROMS
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, ROMS
 
 DHEWM3_BIN_PATH = "/usr/bin/dhewm3"
 DHEWM3_CONFIG_DIR = str(Path(CONF) / "dhewm3")

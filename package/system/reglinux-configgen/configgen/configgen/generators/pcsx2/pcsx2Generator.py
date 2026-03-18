@@ -1,10 +1,10 @@
 from pathlib import Path
 from re import MULTILINE, search
 from shutil import copy
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
 from configgen.controllers import write_sdl_db_all_controllers
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
@@ -27,9 +27,11 @@ eslog = get_logger(__name__)
 class Pcsx2Generator(Generator):
     # PCSX2 requires wayland compositor to run
     # TODO check if it works without X (it should)
+    @override
     def requiresWayland(self):
         return True
 
+    @override
     def getInGameRatio(
         self,
         config: dict[str, Any],
@@ -67,10 +69,10 @@ class Pcsx2Generator(Generator):
             if file_path.exists():
                 file_path.unlink()
 
-        # FIXME Implement logic to determine if playing with wheel
         playingWithWheel = isPlayingWithWheel(system, wheels)
+        eslog.debug(f"PCSX2: rom={rom}, wheel={playingWithWheel}")
 
-        # FIXME Config files
+        # Config files
         setPcsx2Reg()
         setPcsx2Config(
             system,

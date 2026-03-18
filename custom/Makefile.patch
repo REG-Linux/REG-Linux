@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 872f1a3900..e07b5ab16b 100644
+index 639997d7d1..116719ab43 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -766,10 +766,14 @@ endif
+@@ -777,10 +777,14 @@ endif
  		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf.d directory"; exit 1; } || true
  	mkdir -p $(TARGET_DIR)/etc
  	( \

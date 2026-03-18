@@ -38,18 +38,12 @@ PIPEWIRE_CONF_OPTS += \
 	-Dlibcanberra=disabled \
 	-Dlibmysofa=disabled \
 	-Dlibffado=disabled \
+	-Dflatpak=disabled \
 	-Dsnap=disabled \
 	-Dsdl2=disabled
 
 # reglinux
 PIPEWIRE_CONF_OPTS += --wrap-mode=default
-
-# reglinux
-ifeq ($(BR2_PACKAGE_FLATPAK),y)
-PIPEWIRE_CONF_OPTS += -Dflatpak=enabled
-else
-PIPEWIRE_CONF_OPTS += -Dflatpak=disabled
-endif
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
 PIPEWIRE_CONF_OPTS += -Ddbus=enabled

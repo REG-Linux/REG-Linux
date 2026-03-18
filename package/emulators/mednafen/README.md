@@ -1,9 +1,5 @@
-# Mednafen Saturn
+# mednafen
 
-`mednafen` feeds REG-Linux with a portable, SDL/OpenGL-powered multi-system emulator, with the Saturn-focused recipe capturing `b04f030`’s improvements.
+Multi-system emulator, REG-Linux fork with CHD support. Upstream: https://github.com/REG-Linux/mednafen
 
-## Build notes
-
-- `Version`: b04f030165979292fcb817dd8cdc2a31b2bec2b6
-- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBPNG`, `BR2_PACKAGE_FLAC`
-- `Build helper`: Autotools (`autotools-package`)
+Built from the REG-Linux fork (not upstream mednafen.github.io). Many unused cores are disabled at configure time; PCFX, PSX, and Saturn are individually selectable via `Config.in` options.

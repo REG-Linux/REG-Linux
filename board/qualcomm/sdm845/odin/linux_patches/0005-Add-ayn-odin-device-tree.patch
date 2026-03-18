@@ -1,0 +1,1966 @@
+From 9045322432ebebb8e4d12a1257dc085d14d33832 Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Tue, 27 Jan 2026 18:44:20 +0200
+Subject: [PATCH] Add ayn-odin device tree
+
+Signed-off-by: Demetris Ierokipides <ierokipides.dem@gmail.com>
+---
+ arch/arm64/boot/dts/qcom/Makefile            |    1 +
+ arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts | 1933 ++++++++++++++++++
+ 2 files changed, 1934 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+
+diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
+index 296688f7c..18c6ff6c2 100644
+--- a/arch/arm64/boot/dts/qcom/Makefile
++++ b/arch/arm64/boot/dts/qcom/Makefile
+@@ -257,6 +257,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-sony-xperia-tama-apollo.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-xiaomi-beryllium-ebbg.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-xiaomi-beryllium-tianma.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-xiaomi-polaris.dtb
++dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-ayn-odin.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-shift-axolotl.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm850-lenovo-yoga-c630.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm850-samsung-w737.dtb
+diff --git a/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+new file mode 100644
+index 000000000..5dc6759a9
+--- /dev/null
++++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+@@ -0,0 +1,1933 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2026, AYN Odin Mainline Port
++ * Copyright (c) 2026, REG Linux Team
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
++#include <dt-bindings/input/linux-event-codes.h>
++#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
++#include <dt-bindings/leds/common.h>
++#include <dt-bindings/sound/qcom,q6afe.h>
++#include <dt-bindings/sound/qcom,q6asm.h>
++#include "sdm845.dtsi"
++#include "pm8998.dtsi"
++#include "pmi8998.dtsi"
++
++/ {
++	model = "AYN Odin";
++	compatible = "ayn,odin", "qcom,sdm845";
++	chassis-type = "handset";
++
++	aliases {
++		serial0 = &uart9;
++		serial1 = &uart6;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	/* 6600mAh Battery */
++	battery: battery {
++		compatible = "simple-battery";
++		voltage-min-design-microvolt = <3400000>;
++		voltage-max-design-microvolt = <4400000>;
++		energy-full-design-microwatt-hours = <24420000>;
++		charge-full-design-microamp-hours = <6600000>;
++	};
++
++	/* External 5V boost for USB OTG */
++	vreg_5p0_boost: vreg-5p0-boost {
++		compatible = "regulator-fixed";
++		regulator-name = "vreg_5p0_boost";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		
++		gpio = <&tlmm 129 GPIO_ACTIVE_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&usb_boost_en>;
++	};
++
++	/* 3.3V regulator for USB */
++	vreg_3p3_usb: vreg-3p3-usb {
++		compatible = "regulator-fixed";
++		regulator-name = "vreg_3p3_usb";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++		
++		gpio = <&tlmm 128 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		pinctrl-names = "default";
++		pinctrl-0 = <&usb_3v3_en>;
++	};
++
++	/* 1.2V regulator for USB */
++	vreg_1p2_usb: vreg-1p2-usb {
++		compatible = "regulator-fixed";
++		regulator-name = "vreg_1p2_usb";
++		regulator-min-microvolt = <1200000>;
++		regulator-max-microvolt = <1200000>;
++		regulator-always-on;
++		
++		gpio = <&tlmm 135 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		pinctrl-names = "default";
++		pinctrl-0 = <&usb_1v2_en>;
++	};
++
++	/* GPIO Keys */
++	gpio-keys {
++		compatible = "gpio-keys";
++		label = "gpio-keys";
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&vol_up_n>;
++
++		key-volume-up {
++			label = "Volume Up";
++			linux,code = <KEY_VOLUMEUP>;
++			gpios = <&pm8998_gpios 6 GPIO_ACTIVE_LOW>;
++			debounce-interval = <15>;
++			wakeup-source;
++		};
++	};
++
++	/* Gamepad GPIO inputs */
++	gpio-gamepad {
++		compatible = "gpio-keys-polled";
++		poll-interval = <10>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&gamepad_pins>;
++
++		/* D-pad and face buttons */
++		button-a {
++			label = "A Button";
++			linux,code = <BTN_SOUTH>;
++			gpios = <&tlmm 91 GPIO_ACTIVE_LOW>;
++		};
++
++		button-b {
++			label = "B Button";
++			linux,code = <BTN_EAST>;
++			gpios = <&tlmm 92 GPIO_ACTIVE_LOW>;
++		};
++
++		button-x {
++			label = "X Button";
++			linux,code = <BTN_WEST>;
++			gpios = <&tlmm 95 GPIO_ACTIVE_LOW>;
++		};
++
++		button-y {
++			label = "Y Button";
++			linux,code = <BTN_NORTH>;
++			gpios = <&tlmm 96 GPIO_ACTIVE_LOW>;
++		};
++
++		button-l1 {
++			label = "L1";
++			linux,code = <BTN_TL>;
++			gpios = <&tlmm 40 GPIO_ACTIVE_LOW>;
++		};
++
++		button-r1 {
++			label = "R1";
++			linux,code = <BTN_TR>;
++			gpios = <&tlmm 41 GPIO_ACTIVE_LOW>;
++		};
++
++		button-select {
++			label = "Select";
++			linux,code = <BTN_SELECT>;
++			gpios = <&tlmm 122 GPIO_ACTIVE_LOW>;
++		};
++
++		button-start {
++			label = "Start";
++			linux,code = <BTN_START>;
++			gpios = <&tlmm 124 GPIO_ACTIVE_LOW>;
++		};
++
++		button-dpad-up {
++			label = "D-Pad Up";
++			linux,code = <BTN_DPAD_UP>;
++			gpios = <&tlmm 0 GPIO_ACTIVE_LOW>;
++		};
++
++		button-dpad-down {
++			label = "D-Pad Down";
++			linux,code = <BTN_DPAD_DOWN>;
++			gpios = <&tlmm 3 GPIO_ACTIVE_LOW>;
++		};
++
++		button-dpad-left {
++			label = "D-Pad Left";
++			linux,code = <BTN_DPAD_LEFT>;
++			gpios = <&tlmm 7 GPIO_ACTIVE_LOW>;
++		};
++
++		button-dpad-right {
++			label = "D-Pad Right";
++			linux,code = <BTN_DPAD_RIGHT>;
++			gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
++		};
++
++		button-l3 {
++			label = "L3";
++			linux,code = <BTN_THUMBL>;
++			gpios = <&tlmm 24 GPIO_ACTIVE_LOW>;
++		};
++
++		button-r3 {
++			label = "R3";
++			linux,code = <BTN_THUMBR>;
++			gpios = <&tlmm 25 GPIO_ACTIVE_LOW>;
++		};
++
++		button-menu {
++			label = "Menu";
++			linux,code = <BTN_MODE>;
++			gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	/* Fan cooling with PWM control */
++	fan: pwm-fan {
++		compatible = "pwm-fan";
++		pwms = <&pmi8998_lpg 1 50000>; /* Channel 2, 20kHz */
++		cooling-min-state = <0>;
++		cooling-max-state = <255>;
++		#cooling-cells = <2>;
++		
++		/* Fan control GPIOs */
++		fan-supply = <&vreg_3p3_usb>;
++		
++		pinctrl-names = "default";
++		pinctrl-0 = <&fan_pins>;
++	};
++
++	/* WCN3990 WiFi/BT Power Sequencer */
++	wcn3990_pwrseq: wcn3990-pwrseq {
++		compatible = "qcom,wcn3990-pwrseq";
++		
++		vddio-supply = <&vreg_s3a_1p35>;
++		vddxo-supply = <&vreg_s5a_2p04>;
++		vddrf-supply = <&vreg_l17a_1p3>;
++		vddch0-supply = <&vreg_l25a_3p3>;
++		
++		clocks = <&rpmhcc RPMH_RF_CLK2>;
++		clock-names = "rf_clk";
++		
++		wlan-enable-gpios = <&tlmm 52 GPIO_ACTIVE_HIGH>;
++		bt-enable-gpios = <&tlmm 83 GPIO_ACTIVE_HIGH>;
++		
++		pinctrl-names = "default";
++		pinctrl-0 = <&wcn3990_wlan_en &wcn3990_bt_en>;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		ramoops@b0000000 {
++			compatible = "ramoops";
++			reg = <0 0xb0000000 0 0x400000>;
++			record-size = <0x40000>;
++			console-size = <0x40000>;
++			ftrace-size = <0x40000>;
++			pmsg-size = <0x200000>;
++		};
++	};
++
++	vph_pwr: vph-pwr-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "vph_pwr";
++		regulator-min-microvolt = <3700000>;
++		regulator-max-microvolt = <3700000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	hdmi-connector {
++		compatible = "hdmi-connector";
++		type = "c";  /* Type C - because it's through USB-C port */
++		label = "USB-C HDMI";
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&lt8912_out>;
++			};
++		};
++	};
++
++	micro-hdmi-connector {
++		compatible = "hdmi-connector";
++		type = "d";  /* Micro HDMI */
++		label = "Micro HDMI";
++
++		port {
++			micro_hdmi_con_in: endpoint {
++				remote-endpoint = <&lt8912_micro_out>;
++			};
++		};
++	};
++
++	/* Thermal zones with fan cooling */
++	thermal-zones {
++		cpu0-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 1>;
++
++			trips {
++				cpu0_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu0_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu0_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu0_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu0_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu1-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 2>;
++
++			trips {
++				cpu1_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu1_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu1_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu1_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu1_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu2-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 3>;
++
++			trips {
++				cpu2_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu2_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu2_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu2_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu2_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu3-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 4>;
++
++			trips {
++				cpu3_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu3_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu3_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu3_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu3_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu4-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 7>;
++
++			trips {
++				cpu4_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu4_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu4_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu4_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu4_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu5-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 8>;
++
++			trips {
++				cpu5_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu5_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu5_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu5_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu5_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu6-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 9>;
++
++			trips {
++				cpu6_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu6_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu6_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu6_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu6_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		cpu7-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 10>;
++
++			trips {
++				cpu7_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu7_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				cpu7_crit: cpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&cpu7_alert0>;
++					cooling-device = <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&cpu7_alert1>;
++					cooling-device = <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++
++		gpu-thermal {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++
++			thermal-sensors = <&tsens0 11>;
++
++			trips {
++				gpu_alert0: trip-point0 {
++					temperature = <75000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				gpu_alert1: trip-point1 {
++					temperature = <85000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				gpu_crit: gpu-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&gpu_alert0>;
++					cooling-device = <&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++							 <&fan THERMAL_NO_LIMIT 128>;
++				};
++
++				map1 {
++					trip = <&gpu_alert1>;
++					cooling-device = <&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++							 <&fan 128 THERMAL_NO_LIMIT>;
++				};
++			};
++		};
++	};
++};
++
++&adsp_pas {
++	status = "okay";
++	firmware-name = "qcom/sdm845/adsp.mbn";
++};
++
++&apps_rsc {
++	regulators-0 {
++		compatible = "qcom,pm8998-rpmh-regulators";
++		qcom,pmic-id = "a";
++
++		vdd-s1-supply = <&vph_pwr>;
++		vdd-s2-supply = <&vph_pwr>;
++		vdd-s3-supply = <&vph_pwr>;
++		vdd-s4-supply = <&vph_pwr>;
++		vdd-s5-supply = <&vph_pwr>;
++		vdd-s6-supply = <&vph_pwr>;
++		vdd-s7-supply = <&vph_pwr>;
++		vdd-s8-supply = <&vph_pwr>;
++		vdd-s9-supply = <&vph_pwr>;
++		vdd-s10-supply = <&vph_pwr>;
++		vdd-s11-supply = <&vph_pwr>;
++		vdd-s12-supply = <&vph_pwr>;
++		vdd-s13-supply = <&vph_pwr>;
++		vdd-l1-l27-supply = <&vreg_s7a_1p025>;
++		vdd-l2-l8-l17-supply = <&vreg_s3a_1p35>;
++		vdd-l3-l11-supply = <&vreg_s7a_1p025>;
++		vdd-l4-l5-supply = <&vreg_s7a_1p025>;
++		vdd-l6-supply = <&vph_pwr>;
++		vdd-l7-l12-l14-l15-supply = <&vreg_s5a_2p04>;
++		vdd-l9-supply = <&vreg_bob>;
++		vdd-l10-l23-l25-supply = <&vreg_bob>;
++		vdd-l13-l19-l21-supply = <&vreg_bob>;
++		vdd-l16-l28-supply = <&vreg_bob>;
++		vdd-l18-l22-supply = <&vreg_bob>;
++		vdd-l20-l24-supply = <&vreg_bob>;
++		vdd-l26-supply = <&vreg_s3a_1p35>;
++		vin-lvs-1-2-supply = <&vreg_s4a_1p8>;
++
++		vreg_s3a_1p35: smps3 {
++			regulator-min-microvolt = <1352000>;
++			regulator-max-microvolt = <1352000>;
++		};
++
++		vreg_s4a_1p8: smps4 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++		};
++
++		vreg_s5a_2p04: smps5 {
++			regulator-min-microvolt = <1904000>;
++			regulator-max-microvolt = <2040000>;
++		};
++
++		vreg_s7a_1p025: smps7 {
++			regulator-min-microvolt = <900000>;
++			regulator-max-microvolt = <1028000>;
++		};
++
++		vreg_l1a_0p875: ldo1 {
++			regulator-min-microvolt = <880000>;
++			regulator-max-microvolt = <880000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l2a_1p2: ldo2 {
++			regulator-min-microvolt = <1200000>;
++			regulator-max-microvolt = <1200000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++			regulator-always-on;
++		};
++
++		vreg_l5a_0p8: ldo5 {
++			regulator-min-microvolt = <800000>;
++			regulator-max-microvolt = <800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l7a_1p8: ldo7 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l12a_1p8: ldo12 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l13a_2p95: ldo13 {
++			regulator-min-microvolt = <1808000>;
++			regulator-max-microvolt = <2960000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l14a_1p88: ldo14 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++			regulator-always-on;
++		};
++
++		vreg_l17a_1p3: ldo17 {
++			regulator-min-microvolt = <1304000>;
++			regulator-max-microvolt = <1304000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l20a_2p95: ldo20 {
++			regulator-min-microvolt = <2950000>;
++			regulator-max-microvolt = <2960000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l21a_2p95: ldo21 {
++			regulator-min-microvolt = <2950000>;
++			regulator-max-microvolt = <2960000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l23a_3p3: ldo23 {
++			regulator-min-microvolt = <3300000>;
++			regulator-max-microvolt = <3312000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l24a_3p075: ldo24 {
++			regulator-min-microvolt = <3088000>;
++			regulator-max-microvolt = <3088000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l25a_3p3: ldo25 {
++			regulator-min-microvolt = <3312000>;
++			regulator-max-microvolt = <3312000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l26a_1p2: ldo26 {
++			regulator-min-microvolt = <1200000>;
++			regulator-max-microvolt = <1200000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l28a_3p0: ldo28 {
++			regulator-min-microvolt = <3008000>;
++			regulator-max-microvolt = <3008000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_lvs1a_1p8: lvs1 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++		};
++
++		vreg_lvs2a_1p8: lvs2 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++		};
++	};
++
++	regulators-1 {
++		compatible = "qcom,pmi8998-rpmh-regulators";
++		qcom,pmic-id = "b";
++
++		vdd-bob-supply = <&vph_pwr>;
++
++		vreg_bob: bob {
++			regulator-min-microvolt = <3312000>;
++			regulator-max-microvolt = <3600000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_AUTO>;
++			regulator-allow-bypass;
++		};
++	};
++
++	regulators-2 {
++		compatible = "qcom,pm8005-rpmh-regulators";
++		qcom,pmic-id = "c";
++
++		vdd-s1-supply = <&vph_pwr>;
++		vdd-s2-supply = <&vph_pwr>;
++		vdd-s3-supply = <&vph_pwr>;
++		vdd-s4-supply = <&vph_pwr>;
++
++		vreg_s3c_0p6: smps3 {
++			regulator-min-microvolt = <600000>;
++			regulator-max-microvolt = <600000>;
++		};
++	};
++};
++
++&cdsp_pas {
++	status = "okay";
++	firmware-name = "qcom/sdm845/cdsp.mbn";
++};
++
++&gcc {
++	protected-clocks = <GCC_QSPI_CORE_CLK>,
++			   <GCC_QSPI_CORE_CLK_SRC>,
++			   <GCC_QSPI_CNOC_PERIPH_AHB_CLK>,
++			   <GCC_LPASS_Q6_AXI_CLK>,
++			   <GCC_LPASS_SWAY_CLK>;
++};
++
++&gpu {
++	status = "okay";
++	
++	zap-shader {
++		memory-region = <&gpu_mem>;
++		firmware-name = "qcom/sdm845/a630_zap.mbn";
++	};
++};
++
++/* I2C5 - Touchscreen (Synaptics RMI4) */
++&i2c5 {
++	status = "okay";
++	clock-frequency = <400000>;
++
++	touchscreen@70 {
++		compatible = "syna,rmi4-i2c";
++		reg = <0x70>;
++
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		interrupt-parent = <&tlmm>;
++		interrupts = <125 IRQ_TYPE_EDGE_FALLING>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&ts_int_active &ts_reset_active>;
++
++		vdd-supply = <&vreg_l28a_3p0>;
++		vio-supply = <&vreg_l14a_1p88>;
++
++		reset-gpios = <&tlmm 104 GPIO_ACTIVE_LOW>;
++
++		syna,reset-delay-ms = <200>;
++		syna,startup-delay-ms = <200>;
++
++		rmi4-f01@1 {
++			reg = <0x01>;
++			syna,nosleep-mode = <1>;
++		};
++
++		rmi4-f12@12 {
++			reg = <0x12>;
++			syna,sensor-type = <1>;
++			touchscreen-x-mm = <135>;
++			touchscreen-y-mm = <76>;
++		};
++	};
++};
++
++/* I2C4 - HDMI Bridge (Lontium LT8912B) */
++&i2c4 {
++	status = "okay";
++	clock-frequency = <100000>;
++
++	hdmi_bridge: hdmi-bridge@48 {
++		compatible = "lontium,lt8912b";
++		reg = <0x48>;
++		#sound-dai-cells = <0>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&lt8912_pins>;
++
++		reset-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
++		power-gpios = <&tlmm 8 GPIO_ACTIVE_HIGH>;
++		enable-gpios = <&tlmm 13 GPIO_ACTIVE_HIGH>;
++		hpd-gpios = <&tlmm 121 GPIO_ACTIVE_HIGH>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++				lt8912_in: endpoint {
++					remote-endpoint = <&mdss_dsi1_out>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++				lt8912_out: endpoint {
++					remote-endpoint = <&hdmi_con_in>;
++				};
++			};
++		};
++	};
++
++	/* Micro HDMI Bridge on same I2C bus, different address */
++	micro_hdmi_bridge: hdmi-bridge@49 {
++		compatible = "lontium,lt8912b";
++		reg = <0x49>;
++		#sound-dai-cells = <0>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&lt8912_micro_pins>;
++
++		reset-gpios = <&tlmm 94 GPIO_ACTIVE_LOW>;
++		power-gpios = <&tlmm 93 GPIO_ACTIVE_HIGH>;
++		enable-gpios = <&tlmm 97 GPIO_ACTIVE_HIGH>;
++		hpd-gpios = <&tlmm 98 GPIO_ACTIVE_HIGH>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++				lt8912_micro_in: endpoint {
++					remote-endpoint = <&mdss_dp_out>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++				lt8912_micro_out: endpoint {
++					remote-endpoint = <&micro_hdmi_con_in>;
++				};
++			};
++		};
++	};
++};
++
++/* Display subsystem */
++&mdss {
++	status = "okay";
++};
++
++&mdss_dsi0 {
++	status = "okay";
++	vdda-supply = <&vreg_l26a_1p2>;
++
++	panel@0 {
++		compatible = "innolux,td4328";
++		reg = <0>;
++
++		backlight = <&pmi8998_wled>;
++
++		vddio-supply = <&vreg_l14a_1p88>;
++		vsp-supply = <&lab>;
++		vsn-supply = <&ibb>;
++
++		reset-gpios = <&tlmm 6 GPIO_ACTIVE_HIGH>;
++		enable-gpios = <&tlmm 120 GPIO_ACTIVE_HIGH>;
++		rotation = <90>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&panel_reset_pins &panel_enable_pins>;
++
++		port {
++			panel_in: endpoint {
++				remote-endpoint = <&mdss_dsi0_out>;
++			};
++		};
++	};
++};
++
++&mdss_dsi0_out {
++	remote-endpoint = <&panel_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dsi0_phy {
++	status = "okay";
++	vdds-supply = <&vreg_l1a_0p875>;
++};
++
++/* DSI1 for external HDMI output via LT8912B bridge */
++&mdss_dsi1 {
++	status = "okay";
++	vdda-supply = <&vreg_l26a_1p2>;
++};
++
++&mdss_dsi1_out {
++	remote-endpoint = <&lt8912_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dsi1_phy {
++	status = "okay";
++	vdds-supply = <&vreg_l1a_0p875>;
++};
++
++/* DisplayPort for micro HDMI output */
++&mdss_dp {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&dp_hpd_pins>;
++
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dp_out {
++	remote-endpoint = <&lt8912_micro_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mss_pil {
++	status = "okay";
++	firmware-name = "qcom/sdm845/mba.mbn", "qcom/sdm845/modem_nm.mbn";
++};
++
++&pmi8998_charger {
++	monitored-battery = <&battery>;
++	status = "okay";
++};
++
++&pmi8998_fg {
++	monitored-battery = <&battery>;
++	power-supplies = <&pmi8998_charger>;
++	status = "okay";
++};
++
++&pmi8998_lpg {
++    status = "okay";
++
++    /* Haptics / Vibrator Configuration */
++    qcom,vmax-mv = <3596>;
++    qcom,wave-play-rate-us = <6667>;
++    qcom,actuator-type = <1>; /* LRA */
++    qcom,wave-shape = "square";
++    qcom,brake-pattern = <0x3 0x3 0x2 0x1>;
++
++    /* RGB Notification LED */
++    multi-led {
++        color = <LED_COLOR_ID_RGB>;
++        function = LED_FUNCTION_STATUS;
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        led@3 {
++            reg = <3>;
++            color = <LED_COLOR_ID_BLUE>;
++        };
++
++        led@4 {
++            reg = <4>;
++            color = <LED_COLOR_ID_GREEN>;
++        };
++
++        led@5 {
++            reg = <5>;
++            color = <LED_COLOR_ID_RED>;
++        };
++    };
++};
++
++&pmi8998_rradc {
++	status = "okay";
++};
++
++&pmi8998_wled {
++	status = "okay";
++	qcom,enabled-strings = <0 1>;
++	qcom,num-strings = <2>;
++	qcom,switching-freq = <800>;
++	qcom,ovp-millivolt = <29600>;
++	qcom,current-boost-limit = <970>;
++	qcom,current-limit-microamp = <20000>;
++	qcom,fs-current-microamp = <22500>;
++};
++
++/* LAB/IBB regulators for display */
++&lab {
++	regulator-min-microvolt = <5500000>;
++	regulator-max-microvolt = <5500000>;
++	status = "okay";
++};
++
++&ibb {
++	regulator-min-microvolt = <5500000>;
++	regulator-max-microvolt = <5500000>;
++	status = "okay";
++};
++
++/* Sound - WCD9340 codec with WSA881x speakers */
++&q6afedai {
++	dai@16 {
++		reg = <SLIMBUS_0_RX>;
++		qcom,sd-lines = <0>;
++	};
++
++	dai@17 {
++		reg = <SLIMBUS_0_TX>;
++		qcom,sd-lines = <0>;
++	};
++
++	dai@22 {
++		reg = <QUATERNARY_MI2S_RX>;
++		qcom,sd-lines = <0>;
++	};
++
++	dai@23 {
++		reg = <QUATERNARY_MI2S_TX>;
++		qcom,sd-lines = <1>;
++	};
++
++	dai@20 {
++		reg = <TERTIARY_MI2S_RX>;
++		qcom,sd-lines = <0>;
++	};
++
++	dai@18 {
++		reg = <PRIMARY_MI2S_RX>;
++		qcom,sd-lines = <0>;
++	};
++};
++
++&q6asmdai {
++	dai@0 {
++		reg = <0>;
++	};
++
++	dai@1 {
++		reg = <1>;
++	};
++
++	dai@2 {
++		reg = <2>;
++	};
++};
++
++&slim {
++    status = "okay";
++
++    wcd9340: codec@1 {
++        compatible = "slimbus,wcd9340", "slim217,250";
++        reg = <1 0>;
++        
++        pinctrl-0 = <&wcd_intr_default>;
++        pinctrl-names = "default";
++        
++        clock-names = "extclk";
++        clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
++        
++        reset-gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
++        interrupt-parent = <&tlmm>;
++        interrupts = <54 IRQ_TYPE_LEVEL_HIGH>;
++        interrupt-controller;
++        #interrupt-cells = <1>;
++        
++        vdd-buck-supply = <&vreg_s4a_1p8>;
++        vdd-buck-sido-supply = <&vreg_s4a_1p8>;
++        vdd-tx-supply = <&vreg_s4a_1p8>;
++        vdd-rx-supply = <&vreg_s4a_1p8>;
++        vdd-io-supply = <&vreg_s4a_1p8>;
++        
++        #sound-dai-cells = <1>;
++
++        /* Soundwire Master Sub-node */
++        swm: soundwire@c85 {
++            #address-cells = <2>;
++            #size-cells = <0>;
++            #sound-dai-cells = <1>;
++
++            left_spkr: speaker@0,1 {
++                compatible = "sdw20217010d00";
++                reg = <0 1>;
++                powerdown-gpios = <&tlmm 89 GPIO_ACTIVE_HIGH>;
++                #thermal-sensor-cells = <0>;
++                sound-name-prefix = "SpkrLeft";
++                #sound-dai-cells = <0>;
++                vdd-supply = <&vreg_s4a_1p8>;
++                vdd-io-supply = <&vreg_s4a_1p8>;
++            };
++
++            right_spkr: speaker@0,2 {
++                compatible = "sdw20217010d00";
++                reg = <0 2>;
++                powerdown-gpios = <&tlmm 90 GPIO_ACTIVE_HIGH>;
++                #thermal-sensor-cells = <0>;
++                sound-name-prefix = "SpkrRight";
++                #sound-dai-cells = <0>;
++                vdd-supply = <&vreg_s4a_1p8>;
++                vdd-io-supply = <&vreg_s4a_1p8>;
++            };
++        };
++    };
++};
++
++/* Sound card configuration */
++/ {
++	sound: sound {
++		compatible = "ayn,odin-sndcard", "qcom,sdm845-sndcard";
++		model = "ayn-odin";
++		pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active
++			     &tert_mi2s_active &tert_mi2s_sd0_active
++			     &pri_mi2s_active &pri_mi2s_sd0_active>;
++		pinctrl-names = "default";
++		
++		audio-routing = 
++			"RX_BIAS", "MCLK",
++			"AMIC2", "MIC BIAS2",
++			"SpkrLeft IN", "SPK1 OUT",
++			"SpkrRight IN", "SPK2 OUT",
++			"HDMI Playback", "Tertiary MI2S Playback",
++			"Micro HDMI Playback", "Primary MI2S Playback";
++
++		mm1-dai-link {
++			link-name = "MultiMedia1";
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA1>;
++			};
++		};
++
++		mm2-dai-link {
++			link-name = "MultiMedia2";
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA2>;
++			};
++		};
++
++		mm3-dai-link {
++			link-name = "MultiMedia3";
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA3>;
++			};
++		};
++
++		/* SLIMbus backend for WCD9340 codec */
++		slim-dai-link {
++			link-name = "SLIM Playback";
++			cpu {
++				sound-dai = <&q6afedai SLIMBUS_0_RX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai =  <&left_spkr>, <&right_spkr>, <&swm 0>, <&wcd9340 0>;
++			};
++		};
++
++		/* SLIMbus capture */
++		slim-capture-dai-link {
++			link-name = "SLIM Capture";
++			cpu {
++				sound-dai = <&q6afedai SLIMBUS_0_TX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai = <&wcd9340 1>;
++			};
++		};
++
++		/* Quaternary MI2S for WSA881x speakers */
++		quat-mi2s-dai-link {
++			link-name = "Quaternary MI2S";
++			cpu {
++				sound-dai = <&q6afedai QUATERNARY_MI2S_RX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai = <&left_spkr>, <&right_spkr>;
++			};
++		};
++
++		/* HDMI audio output via Tertiary MI2S to LT8912B bridge */
++		hdmi-dai-link {
++			link-name = "HDMI";
++			cpu {
++				sound-dai = <&q6afedai TERTIARY_MI2S_RX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai = <&hdmi_bridge>;
++			};
++		};
++
++		/* Micro HDMI audio output via Primary MI2S */
++		micro-hdmi-dai-link {
++			link-name = "Micro HDMI";
++			cpu {
++				sound-dai = <&q6afedai PRIMARY_MI2S_RX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai = <&micro_hdmi_bridge>;
++			};
++		};
++	};
++};
++
++&qupv3_id_0 {
++	status = "okay";
++};
++
++&qupv3_id_1 {
++	status = "okay";
++};
++
++/* Debug UART */
++&uart9 {
++	status = "okay";
++};
++
++/* Bluetooth UART */
++&uart6 {
++	status = "okay";
++
++	bluetooth {
++		compatible = "qcom,wcn3990-bt";
++
++		power-domains = <&wcn3990_pwrseq>;
++
++		max-speed = <3200000>;
++	};
++};
++
++&ufs_mem_hc {
++	status = "okay";
++
++	vcc-supply = <&vreg_l20a_2p95>;
++	vcc-max-microamp = <600000>;
++	vccq-supply = <&vreg_l26a_1p2>;
++	vccq-max-microamp = <600000>;
++	vccq2-supply = <&vreg_s4a_1p8>;
++	vccq2-max-microamp = <600000>;
++};
++
++&ufs_mem_phy {
++	status = "okay";
++
++	vdda-phy-supply = <&vreg_l1a_0p875>;
++	vdda-pll-supply = <&vreg_l26a_1p2>;
++};
++
++/* Primary USB port with USB 3.1 support */
++&usb_1 {
++	status = "okay";
++};
++
++&usb_1_dwc3 {
++	dr_mode = "otg";
++	maximum-speed = "super-speed-plus";
++	
++	/* Enable USB 3.1 Gen 2 */
++	snps,hird-threshold = /bits/ 8 <0x10>;
++	snps,usb3_lpm_capable;
++	snps,dis_u2_susphy_quirk;
++	snps,dis_enblslpm_quirk;
++	
++	phys = <&usb_1_hsphy>, <&usb_1_qmpphy>;
++	phy-names = "usb2-phy", "usb3-phy";
++};
++
++&usb_1_hsphy {
++	status = "okay";
++
++	vdd-supply = <&vreg_l1a_0p875>;
++	vdda-pll-supply = <&vreg_l12a_1p8>;
++	vdda-phy-dpdm-supply = <&vreg_l24a_3p075>;
++
++	qcom,imp-res-offset-value = <8>;
++	qcom,hstx-trim-value = <QUSB2_V2_HSTX_TRIM_21_6_MA>;
++	qcom,preemphasis-level = <QUSB2_V2_PREEMPHASIS_5_PERCENT>;
++	qcom,preemphasis-width = <QUSB2_V2_PREEMPHASIS_WIDTH_HALF_BIT>;
++};
++
++&usb_1_qmpphy {
++	status = "okay";
++
++	vdda-phy-supply = <&vreg_l1a_0p875>;
++	vdda-pll-supply = <&vreg_l26a_1p2>;
++};
++
++&venus {
++	status = "okay";
++	firmware-name = "qcom/venus-5.2/venus.mbn";
++};
++
++/* WiFi - WCN3990 */
++&wifi {
++	status = "okay";
++
++	vdd-0.8-cx-mx-supply = <&vreg_l5a_0p8>;
++	vdd-1.8-xo-supply = <&vreg_l7a_1p8>;
++	vdd-1.3-rfa-supply = <&vreg_l17a_1p3>;
++	vdd-3.3-ch0-supply = <&vreg_l25a_3p3>;
++	vdd-3.3-ch1-supply = <&vreg_l23a_3p3>;
++	qcom,snoc-host-cap-8bit-quirk;
++	qcom,ath10k-calibration-variant = "AYN_Odin";
++};
++
++/* SD Card slot */
++&sdhc_2 {
++	status = "okay";
++
++	vmmc-supply = <&vreg_l21a_2p95>;
++	vqmmc-supply = <&vreg_l13a_2p95>;
++
++	cd-gpios = <&tlmm 126 GPIO_ACTIVE_LOW>;
++
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&sdc2_on &sdc2_cd>;
++	pinctrl-1 = <&sdc2_off>;
++
++	bus-width = <4>;
++	no-sdio;
++	no-mmc;
++};
++
++/* Analog input devices (sticks and triggers) via ADC */
++&pm8998_adc {
++	/* Left stick X-axis */
++	adc-chan@12 {
++		reg = <ADC5_GPIO3>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "left_stick_x";
++	};
++
++	/* Left stick Y-axis */
++	adc-chan@13 {
++		reg = <ADC5_GPIO4>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "left_stick_y";
++	};
++
++	/* Right stick X-axis */
++	adc-chan@14 {
++		reg = <ADC5_GPIO5>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "right_stick_x";
++	};
++
++	/* Right stick Y-axis */
++	adc-chan@15 {
++		reg = <ADC5_GPIO6>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "right_stick_y";
++	};
++
++	/* Left trigger (L2) */
++	adc-chan@16 {
++		reg = <ADC5_GPIO7>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "left_trigger";
++	};
++
++	/* Right trigger (R2) */
++	adc-chan@97 {
++		reg = <ADC5_AMUX_THM2>;
++		qcom,decimation = <0>;
++		qcom,pre-scaling = <1 1>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,avg-samples = <1>;
++		label = "right_trigger";
++	};
++
++	/* XO thermistor */
++	adc-chan@4c {
++		reg = <ADC5_XO_THERM_100K_PU>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,pre-scaling = <1 1>;
++	};
++
++	/* MSM thermistor */
++	adc-chan@4d {
++		reg = <ADC5_AMUX_THM1_100K_PU>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,pre-scaling = <1 1>;
++	};
++
++	/* PA thermistor */
++	adc-chan@4f {
++		reg = <ADC5_AMUX_THM3_100K_PU>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,pre-scaling = <1 1>;
++	};
++
++	/* Quiet thermistor */
++	adc-chan@51 {
++		reg = <ADC5_AMUX_THM5_100K_PU>;
++		qcom,ratiometric;
++		qcom,hw-settle-time = <200>;
++		qcom,pre-scaling = <1 1>;
++	};
++};
++
++/* TLMM Pin configurations */
++&tlmm {
++	gpio-reserved-ranges = <0 4>, <81 4>;
++
++	fan_pins: fan-state {
++		fan-en-pins {
++			pins = "gpio44";
++			function = "gpio";
++			drive-strength = <2>;
++			bias-disable;
++			output-high;
++		};
++
++		fan-fg-pins {
++			pins = "gpio30";
++			function = "gpio";
++			drive-strength = <2>;
++			bias-pull-down;
++			input-enable;
++		};
++	};
++
++	gamepad_pins: gamepad-state {
++		pins = "gpio0", "gpio3", "gpio7", "gpio22", "gpio24",
++		       "gpio25", "gpio26", "gpio40", "gpio41", "gpio49",
++		       "gpio52", "gpio87", "gpio91", "gpio92", "gpio95",
++		       "gpio96", "gpio116", "gpio122", "gpio124";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-pull-up;
++		input-enable;
++	};
++
++	lt8912_pins: lt8912-state {
++		reset-pins {
++			pins = "gpio12";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		power-pins {
++			pins = "gpio8";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		enable-pins {
++			pins = "gpio13";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		hpd-pins {
++			pins = "gpio121";
++			function = "gpio";
++			drive-strength = <2>;
++			bias-pull-down;
++			input-enable;
++		};
++	};
++
++	lt8912_micro_pins: lt8912-micro-state {
++		reset-pins {
++			pins = "gpio94";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		power-pins {
++			pins = "gpio93";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		enable-pins {
++			pins = "gpio97";
++			function = "gpio";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		hpd-pins {
++			pins = "gpio98";
++			function = "gpio";
++			drive-strength = <2>;
++			bias-pull-down;
++			input-enable;
++		};
++	};
++
++	dp_hpd_pins: dp-hpd-state {
++		pins = "gpio98";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-pull-down;
++		input-enable;
++	};
++
++	panel_reset_pins: panel-reset-state {
++		pins = "gpio6";
++		function = "gpio";
++		drive-strength = <8>;
++		bias-disable;
++		output-high;
++	};
++
++	panel_enable_pins: panel-enable-state {
++		pins = "gpio120";
++		function = "gpio";
++		drive-strength = <8>;
++		bias-disable;
++		output-high;
++	};
++
++	sdc2_on: sdc2-on-state {
++		clk-pins {
++			pins = "sdc2_clk";
++			bias-disable;
++			drive-strength = <16>;
++		};
++
++		cmd-pins {
++			pins = "sdc2_cmd";
++			bias-pull-up;
++			drive-strength = <10>;
++		};
++
++		data-pins {
++			pins = "sdc2_data";
++			bias-pull-up;
++			drive-strength = <10>;
++		};
++	};
++
++	sdc2_off: sdc2-off-state {
++		clk-pins {
++			pins = "sdc2_clk";
++			bias-disable;
++			drive-strength = <2>;
++		};
++
++		cmd-pins {
++			pins = "sdc2_cmd";
++			bias-pull-up;
++			drive-strength = <2>;
++		};
++
++		data-pins {
++			pins = "sdc2_data";
++			bias-pull-up;
++			drive-strength = <2>;
++		};
++	};
++
++	sdc2_cd: sdc2-cd-state {
++		pins = "gpio126";
++		function = "gpio";
++		bias-pull-up;
++		drive-strength = <2>;
++		input-enable;
++	};
++
++	ts_int_active: ts-int-active-state {
++		pins = "gpio125";
++		function = "gpio";
++		drive-strength = <8>;
++		bias-pull-up;
++		input-enable;
++	};
++
++	ts_reset_active: ts-reset-active-state {
++		pins = "gpio104";
++		function = "gpio";
++		drive-strength = <8>;
++		bias-disable;
++		output-high;
++	};
++
++	usb_boost_en: usb-boost-en-state {
++		pins = "gpio129";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-disable;
++		output-low;
++	};
++
++	usb_3v3_en: usb-3v3-en-state {
++		pins = "gpio128";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-disable;
++		output-high;
++	};
++
++	usb_1v2_en: usb-1v2-en-state {
++		pins = "gpio135";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-disable;
++		output-high;
++	};
++
++	/* WCN3990 WiFi/BT enable pins */
++	wcn3990_wlan_en: wcn3990-wlan-en-state {
++		pins = "gpio52";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-pull-down;
++		output-low;
++	};
++
++	wcn3990_bt_en: wcn3990-bt-en-state {
++		pins = "gpio83";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-pull-down;
++		output-low;
++	};
++
++	/* WCD9340 codec interrupt */
++	wcd_intr_default: wcd-intr-default-state {
++		pins = "gpio54";
++		function = "gpio";
++		input-enable;
++		bias-pull-down;
++		drive-strength = <2>;
++	};
++
++	/* Speaker amplifier power down pins */
++	spkr_1_sd_n: spkr-1-sd-n-state {
++		pins = "gpio89";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-disable;
++		output-low;
++	};
++
++	spkr_2_sd_n: spkr-2-sd-n-state {
++		pins = "gpio90";
++		function = "gpio";
++		drive-strength = <2>;
++		bias-disable;
++		output-low;
++	};
++
++	/* Quaternary MI2S pins */
++	quat_mi2s_active: quat-mi2s-active-state {
++		pins = "gpio58", "gpio59";
++		function = "qua_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	quat_mi2s_sd0_active: quat-mi2s-sd0-active-state {
++		pins = "gpio60";
++		function = "qua_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	quat_mi2s_sd1_active: quat-mi2s-sd1-active-state {
++		pins = "gpio61";
++		function = "qua_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	/* Tertiary MI2S for HDMI audio (LT8912B I2S input) */
++	tert_mi2s_active: tert-mi2s-active-state {
++		pins = "gpio75", "gpio76";
++		function = "ter_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	tert_mi2s_sd0_active: tert-mi2s-sd0-active-state {
++		pins = "gpio77";
++		function = "ter_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	/* Primary MI2S for micro HDMI audio */
++	pri_mi2s_active: pri-mi2s-active-state {
++		pins = "gpio65", "gpio66";
++		function = "pri_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++
++	pri_mi2s_sd0_active: pri-mi2s-sd0-active-state {
++		pins = "gpio67";
++		function = "pri_mi2s";
++		drive-strength = <8>;
++		bias-disable;
++	};
++};
++
++/* PM8998 GPIO configurations */
++&pm8998_gpios {
++	vol_up_n: vol-up-state {
++		pins = "gpio6";
++		function = "normal";
++		input-enable;
++		bias-pull-up;
++		qcom,drive-strength = <PMIC_GPIO_STRENGTH_NO>;
++	};
++
++	/* ADC input GPIOs */
++	gpio8_adc: gpio8-adc-state {
++		pins = "gpio8";
++		function = "normal";
++		bias-high-impedance;
++	};
++
++	gpio9_adc: gpio9-adc-state {
++		pins = "gpio9";
++		function = "normal";
++		bias-high-impedance;
++	};
++
++	gpio10_adc: gpio10-adc-state {
++		pins = "gpio10";
++		function = "normal";
++		bias-high-impedance;
++	};
++
++	gpio11_adc: gpio11-adc-state {
++		pins = "gpio11";
++		function = "normal";
++		bias-high-impedance;
++	};
++
++	gpio12_adc: gpio12-adc-state {
++		pins = "gpio12";
++		function = "normal";
++		bias-high-impedance;
++	};
++
++	gpio21_adc: gpio21-adc-state {
++		pins = "gpio21";
++		function = "normal";
++		bias-high-impedance;
++	};
++};
++
++/* PMI8998 GPIO configurations */
++&pmi8998_gpios {
++	/* PWM output for fan */
++	pwm_out: pwm-out-state {
++		pins = "gpio5";
++		function = "func1";
++		bias-disable;
++		power-source = <0>;
++		output-low;
++		qcom,drive-strength = <3>;
++		drive-push-pull;
++	};
++};
+-- 
+2.43.0
+

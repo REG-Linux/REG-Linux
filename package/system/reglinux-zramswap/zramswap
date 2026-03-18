@@ -248,7 +248,7 @@ case "$1" in
     stop)    stop ;;
     restart) stop; sleep 1; start ;;
     status)  status ;;
-    enabled|disabled) ;;
+    enable|enabled|disable|disabled) ;;
     *)
         printf 'Usage: %s {start|stop|restart|status}\n\n' "$0"
         printf 'Commands:\n'

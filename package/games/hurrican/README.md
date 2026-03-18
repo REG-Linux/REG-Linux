@@ -1,10 +1,5 @@
-# Hurrican
+# hurrican
 
-The `Hurrican` SDL2 fork delivers a 2D shooter/platformer with GLES2 rendering and the distro’s audio/SDL helpers.
+2D shooter (Hurrican). Upstream: https://github.com/HurricanGame/Hurrican
 
-## Build notes
-
-- `Version`: `16205675479d49f...` (Nov 2025) commit from `HurricanGame/Hurrican`.
-- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_MIXER`, `BR2_PACKAGE_SDL2_IMAGE`, `BR2_PACKAGE_LIBEPOXY`, `BR2_PACKAGE_LIBOPENMPT`, `BR2_INSTALL_LIBSTDCPP`.
-- `Build helper`: CMake-based (`cmake-package`) with `-DRENDERER=GLES2` and the `001-paths.patch` fix.
-- `Extras`: installs `/usr/bin/hurrican`, drops `hurrican.keys` into `/usr/share/evmapy`, and lays down `/usr/share/hurrican` data directories.
+Always built with `-DRENDERER=GLES2`; game data directory `/usr/share/hurrican/` is created but left empty for the content downloader to populate.

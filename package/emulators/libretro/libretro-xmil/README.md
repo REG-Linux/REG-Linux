@@ -1,10 +1,5 @@
-# Libretro XMIL
+# libretro-xmil
 
-The `libretro-xmil` core ports the Sharp X1 emulator into REG-Linux while carrying the Raspberry Pi makefile patch.
+Sharp X1 libretro core (X Millennium). Upstream: https://github.com/libretro/xmil-libretro
 
-## Build notes
-
-- `Version`: 6a52dc21a5ff106137670bb600ab2ce3fcebeb1b
-- `Dependencies`: see `Config.in`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-rpi_makefile.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets.

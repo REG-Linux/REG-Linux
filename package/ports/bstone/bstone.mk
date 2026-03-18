@@ -16,12 +16,4 @@ BSTONE_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 BSTONE_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 BSTONE_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/bin"
 
-define BSTONE_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/bstone/bstone.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-BSTONE_POST_INSTALL_TARGET_HOOKS += BSTONE_EVMAPY
-
 $(eval $(cmake-package))

@@ -29,7 +29,7 @@ class LibretroBezelManager(IBezelManager):
         """
         # Libretro-specific implementation would go here
         # For now, we use common functionality
-        from configgen.generator_importer import getGenerator
+        from configgen.factory import getGenerator
 
         generator = getGenerator("libretro")
 

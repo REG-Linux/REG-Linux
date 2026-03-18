@@ -1,7 +1,7 @@
 import pathlib
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import JSONSettings
 
@@ -27,6 +27,11 @@ class BigPEmuGenerator(Generator):
         # Create the directory if it doesn't exist
         if not pathlib.Path(BIGPEMU_CONFIG_DIR).exists():
             pathlib.Path(BIGPEMU_CONFIG_DIR).mkdir(parents=True)
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = pathlib.Path(BIGPEMU_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         # Load existing configuration or create a new one
         bigpemuConfig = JSONSettings(BIGPEMU_CONFIG_PATH)

@@ -2,8 +2,8 @@ from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
+from configgen.config.paths import CONF, HOME_INIT
 from configgen.settings import UnixSettings
-from configgen.systemFiles import CONF, HOME_INIT
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -18,6 +18,11 @@ PPSSPP_BIN_PATH = Path("/usr/bin/PPSSPP")
 
 
 def setPPSSPPConfig(system: Any) -> None:
+    # Remove existing config file to ensure clean state (no dynamic values)
+    config_path = Path(PPSSPP_CONFIG_PATH)
+    if config_path.exists():
+        config_path.unlink()
+
     ppssppConfig = UnixSettings(PPSSPP_CONFIG_PATH)
 
     # [GRAPHICS]

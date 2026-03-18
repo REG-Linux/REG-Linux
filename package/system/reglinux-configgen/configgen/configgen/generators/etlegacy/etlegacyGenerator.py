@@ -2,10 +2,10 @@ from pathlib import Path
 from shutil import copy
 from typing import Any
 
-from configgen.command import Command
+from configgen.config.paths import CONF
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
 
 
 class ETLegacyGenerator(Generator):

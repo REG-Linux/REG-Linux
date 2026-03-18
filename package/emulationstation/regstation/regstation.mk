@@ -5,17 +5,17 @@
 ################################################################################
 
 # WIP branch
-REGSTATION_VERSION = 5b99261147c1ba3469bcb43a6a626e206640fc0c
+REGSTATION_VERSION = 3a1f2568089582a0d8257030c1687a97f48cefe3
 REGSTATION_TOKEN = $(shell cat /build/gh_token)
 REGSTATION_SITE = https://$(REGSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGSTATION_SITE_METHOD = git
 REGSTATION_LICENSE = MIT
 REGSTATION_GIT_SUBMODULES = YES
 REGSTATION_LICENSE = MIT, Apache-2.0
-REGSTATION_DEPENDENCIES = sdl3 sdl3_mixer libyuv libfreeimage
+REGSTATION_DEPENDENCIES = sdl3 sdl3_mixer libyuv webp giflib
 REGSTATION_DEPENDENCIES += freetype alsa-lib libcurl rapidjson libarchive
-REGSTATION_DEPENDENCIES += lunasvg pugixml host-gettext
-REGSTATION_DEPENDENCIES += es-system gamecontrollerdb
+REGSTATION_DEPENDENCIES += lunasvg pugixml gettext host-gettext
+REGSTATION_DEPENDENCIES += es-system gamecontrollerdb jpeg host-python3
 
 REGSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 REGSTATION_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulationstation/regstation

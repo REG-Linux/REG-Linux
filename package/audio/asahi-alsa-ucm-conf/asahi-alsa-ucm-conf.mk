@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ASAHI_ALSA_UCM_CONF_VERSION = v6
+ASAHI_ALSA_UCM_CONF_VERSION = v8
 ASAHI_ALSA_UCM_CONF_SITE = $(call github,AsahiLinux,/alsa-ucm-conf-asahi,$(ASAHI_ALSA_UCM_CONF_VERSION))
 ASAHI_ALSA_UCM_CONF_LICENSE = BSD-3-Clause
 ASAHI_ALSA_UCM_CONF_LICENSE_FILES = LICENSE

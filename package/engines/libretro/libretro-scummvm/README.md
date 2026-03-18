@@ -1,8 +1,5 @@
-# libretro-scummvm core
+# libretro-scummvm
 
-Builds the ScummVM project as a libretro core using the `backends/platform/libretro` subsystem.
+ScummVM built as a libretro core via `backends/platform/libretro`. Upstream: https://github.com/scummvm/scummvm
 
-## Build details
-- **Version:** v2.9.1 branch from the ScummVM repository.
-- **Config:** depends on C++ toolchain plus `BR2_PACKAGE_HAS_LIBRETRO_SCUMMVM` (selected by downstream packages). Mirrors the full codec stack selected for the standalone ScummVM build (SDL2, libogg/vorbis or Tremor, libmad, libmpeg2, etc.).
-- **Build flow:** clones `libretro-deps` and `libretro-common` via helper macros, configures host/target flags based on the target architecture, and forces GLES2 unless the target provides desktop GL support. Builds `scummvm_libretro.so` and installs it into `/usr/lib/libretro`.
+`libretro-deps` and `libretro-common` are cloned at pinned commits during a pre-configure hook because the upstream build system requires them in-tree. The platform string is set per-board (e.g. `rpi1`, `rpi4_64`, `unix`); desktop GL is currently forced off in favour of GLES2 on all targets pending a GL fix. The output is `scummvm_libretro.so` under `/usr/lib/libretro/`.

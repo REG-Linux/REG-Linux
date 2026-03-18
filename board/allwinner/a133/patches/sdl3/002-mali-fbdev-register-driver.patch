@@ -1,0 +1,17 @@
+Add missing #cmakedefine for SDL_VIDEO_DRIVER_MALI in build config template.
+
+Without this line, the cmake variable SDL_VIDEO_DRIVER_MALI set by CheckMali()
+never gets emitted into SDL_build_config.h, so all Mali fbdev driver code
+(guarded by #ifdef SDL_VIDEO_DRIVER_MALI) compiles to nothing and the driver
+is never registered in the bootstrap list.
+
+--- a/include/build_config/SDL_build_config.h.cmake
++++ b/include/build_config/SDL_build_config.h.cmake
+@@ -375,6 +375,7 @@
+ #cmakedefine SDL_VIDEO_DRIVER_UIKIT 1
+ #cmakedefine SDL_VIDEO_DRIVER_VITA 1
+ #cmakedefine SDL_VIDEO_DRIVER_VIVANTE 1
++#cmakedefine SDL_VIDEO_DRIVER_MALI 1
+ #cmakedefine SDL_VIDEO_DRIVER_VIVANTE_VDK 1
+ #cmakedefine SDL_VIDEO_DRIVER_OPENVR 1
+ #cmakedefine SDL_VIDEO_DRIVER_WAYLAND 1

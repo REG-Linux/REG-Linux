@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import JSONSettings
 
@@ -24,6 +24,11 @@ class IkemenGenerator(Generator):
     ):
         # Convert rom to Path if it's not already
         rom_path = Path(rom) if not isinstance(rom, Path) else rom
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = rom_path / IKEMEN_CONFIG_PATH
+        if config_path.exists():
+            config_path.unlink()
 
         # Load existing config or create a new one
         config_path = rom_path / IKEMEN_CONFIG_PATH

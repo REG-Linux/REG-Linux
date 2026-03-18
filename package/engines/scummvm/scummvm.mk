@@ -132,9 +132,6 @@ define SCUMMVM_ADD_VIRTUAL_KEYBOARD
         $(TARGET_DIR)/usr/share/scummvm
     cp -f $(@D)/backends/vkeybd/packs/vkeybd_small.zip \
         $(TARGET_DIR)/usr/share/scummvm
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy/
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/scummvm/scummvm.keys \
-        $(TARGET_DIR)/usr/share/evmapy/
 endef
 
 SCUMMVM_POST_INSTALL_TARGET_HOOKS += SCUMMVM_ADD_VIRTUAL_KEYBOARD

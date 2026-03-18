@@ -64,18 +64,8 @@ endif
 AZAHAR_CONF_ENV += LDFLAGS=-lpthread
 
 define AZAHAR_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/bin
-    mkdir -p $(TARGET_DIR)/usr/lib
-	$(INSTALL) -D $(@D)/buildroot-build/bin/$(AZAHAR_BUILD_TYPE)/$(AZAHAR_BIN) \
-		$(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D $(@D)/buildroot-build/bin/$(AZAHAR_BUILD_TYPE)/$(AZAHAR_BIN) \
+    	$(TARGET_DIR)/usr/bin/
 endef
-
-define AZAHAR_EVMAP
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/azahar/3ds.azahar.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-AZAHAR_POST_INSTALL_TARGET_HOOKS = AZAHAR_EVMAP
 
 $(eval $(cmake-package))

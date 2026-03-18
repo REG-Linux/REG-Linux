@@ -1,9 +1,9 @@
 import pathlib
 
-from configgen.command import Command
+from configgen.config.paths import SAVES
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import SAVES
 
 THEXTECH_SAVES_DIR = str(SAVES / "thextech")
 THEXTECH_BIN_PATH = "/usr/bin/thextech"

@@ -35,3 +35,4 @@ gh_token
 .idea
 scripts/nvchecker/*.json
 scripts/nvchecker/*.toml
+*.log

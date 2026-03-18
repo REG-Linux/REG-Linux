@@ -1,9 +1,5 @@
-# OpenRCT2 (RollerCoaster Tycoon 2 engine)
+# OpenRCT2
 
-Open-source reimplementation of RollerCoaster Tycoon 2.
+RollerCoaster Tycoon 2 open-source reimplementation. Upstream: https://github.com/OpenRCT2/OpenRCT2
 
-## Build notes
-- **Version:** v0.4.26 (Sept 2025).
-- **Config:** selects SDL2, libcurl, libzip, speexdsp, FLAC, libvorbis, and json-for-modern-cpp, plus C++ toolchain support (`BR2_INSTALL_LIBSTDCPP`).
-- **Build system:** CMake release build that enforces static libs, disables Discord RPC, and conditionally disables OpenGL when none is available. Out-of-tree build is enforced.
-- **Extras:** no host tools yet, but the recipe leaves commented host build scaffolding for future use.
+OpenGL is disabled when the target has no desktop GL (no GLES path yet). A commented-out `host-openrct2` build for data processing is reserved for future use.

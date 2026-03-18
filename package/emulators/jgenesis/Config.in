@@ -1,0 +1,14 @@
+config BR2_PACKAGE_JGENESIS
+	bool "jgenesis"
+	depends on BR2_ARCH_IS_64
+	select BR2_PACKAGE_XLIB_LIBX11
+	select BR2_PACKAGE_XLIB_LIBXRANDR
+	select BR2_PACKAGE_HOST_RUSTC
+	select BR2_PACKAGE_HOST_CMAKE
+
+	help
+	  jgenesis is a multi-system emulator supporting Sega Genesis/Mega Drive,
+	  Sega CD, 32X, Master System, Game Gear, NES, SNES, Game Boy, Game Boy
+	  Color, and Game Boy Advance.
+
+	  https://github.com/jsgroth/jgenesis

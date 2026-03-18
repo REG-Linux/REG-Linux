@@ -22,11 +22,6 @@ endef
 define RYUJINX_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/ryujinx
 	cp -pr $(@D)/target/publish/* $(TARGET_DIR)/usr/ryujinx/
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/ryujinx/switch.ryujinx.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(generic-package))

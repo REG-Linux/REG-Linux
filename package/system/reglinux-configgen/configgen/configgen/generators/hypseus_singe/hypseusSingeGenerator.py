@@ -6,10 +6,10 @@ from typing import Any
 
 from ffmpeg import probe
 
-from configgen.command import Command
+from configgen.config.paths import CONF, ROMS, SAVES
 from configgen.controllers import generate_sdl_controller_config, guns_borders_size_name
-from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, ROMS, SAVES
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
 
 DAPHNE_ROM_DIR = str(Path(ROMS) / "daphne")
@@ -103,8 +103,8 @@ class HypseusSingeGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         bezel_to_rom = {

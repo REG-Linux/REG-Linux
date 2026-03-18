@@ -21,7 +21,7 @@ LLVM_DEPENDENCIES = host-llvm
 
 # Path to cmake modules from host-llvm-cmake
 HOST_LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
-# batocera add LLVM_COMMON_CMAKE_UTILS
+# reglinux add LLVM_COMMON_CMAKE_UTILS
 HOST_LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
 LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
 LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
@@ -399,7 +399,7 @@ LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 
 define LLVM_EXTRACT_CMDS
 	# extract host folder
-	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) host
+	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) host --exclude=host/bin/xmllint
 endef
 
 define LLVM_INSTALL_TARGET_CMDS

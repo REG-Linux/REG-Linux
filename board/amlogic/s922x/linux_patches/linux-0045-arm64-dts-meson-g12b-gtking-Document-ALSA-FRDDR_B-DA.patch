@@ -1,0 +1,44 @@
+From 208c7230d7e99eb73e18bf7bb7ad35cedf8acab5 Mon Sep 17 00:00:00 2001
+From: Juliano Dorigao <jdorigao@gmail.com>
+Date: Sat, 14 Mar 2026 18:57:26 -0400
+Subject: [PATCH 2/2] arm64: dts: meson-g12b-gtking: Document ALSA FRDDR_B DAI
+ link behavior
+
+The FRDDR_B DAI link (dai-link-1) is a capture stream used for
+multi-channel HDMI audio routing via TDMOUT_B. It does not have
+a directly connected codec - audio routing is handled by ALSA
+UCM (Use Case Manager) profiles in userspace.
+
+The kernel logs an informational message during boot:
+  ASoC: no backend DAIs enabled for fe.dai-link-1
+
+This message is expected and harmless. Similar behavior is observed
+on other G12B-based devices (Odroid N2, Ugoos AM6, etc.).
+
+Add a comment in the device tree to document this behavior and
+prevent future attempts to fix this non-issue.
+
+Signed-off-by: Juliano Dorigao <jdorigao@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts b/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
+index c5b5481cb..65031f2a1 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
+@@ -53,6 +53,11 @@ dai-link-0 {
+ 			sound-dai = <&frddr_a>;
+ 		};
+ 
++		/*
++		 * FRDDR_B is a capture stream used for HDMI multi-channel audio
++		 * via TDMOUT_B. No codec is directly connected - routing is
++		 * handled by ALSA UCM profiles.
++		 */
+ 		dai-link-1 {
+ 			sound-dai = <&frddr_b>;
+ 		};
+-- 
+2.53.0
+

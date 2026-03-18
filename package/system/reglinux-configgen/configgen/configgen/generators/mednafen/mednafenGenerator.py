@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 from .mednafenConfig import (

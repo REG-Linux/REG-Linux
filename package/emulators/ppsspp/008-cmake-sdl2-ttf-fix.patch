@@ -1,19 +1,11 @@
----
- CMakeLists.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a3553172..b07009f3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1447,7 +1447,7 @@ else()
+@@ -1496,7 +1496,7 @@
  		message(WARNING "Found SDL2_ttf <2.0.18 - this is too old, falling back to atlas")
  	endif()
  	if(SDL2_ttf_FOUND)
--		set(nativeExtraLibs ${nativeExtraLibs} SDL2_ttf::SDL2_ttf)
-+		set(nativeExtraLibs ${nativeExtraLibs} SDL2_ttf)
+-		list(APPEND nativeExtraLibs SDL2_ttf::SDL2_ttf)
++		list(APPEND nativeExtraLibs SDL2_ttf)
  	elseif(SDL2_ttf_PKGCONFIG_FOUND)
- 		set(nativeExtraLibs ${nativeExtraLibs} PkgConfig::SDL2_ttf_PKGCONFIG)
+ 		list(APPEND nativeExtraLibs PkgConfig::SDL2_ttf_PKGCONFIG)
  	endif()
--- 
-2.47.1

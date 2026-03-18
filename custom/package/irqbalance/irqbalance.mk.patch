@@ -1,0 +1,13 @@
+diff --git a/package/irqbalance/irqbalance.mk b/package/irqbalance/irqbalance.mk
+index 5d1bd48002..173c7d8df0 100644
+--- a/package/irqbalance/irqbalance.mk
++++ b/package/irqbalance/irqbalance.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-IRQBALANCE_VERSION = 1.9.3
++IRQBALANCE_VERSION = 1.9.4
+ IRQBALANCE_SITE = $(call github,irqbalance,irqbalance,v$(IRQBALANCE_VERSION))
+ IRQBALANCE_LICENSE = GPL-2.0
+ IRQBALANCE_LICENSE_FILES = COPYING

@@ -1,0 +1,11 @@
+config BR2_PACKAGE_REGLINUX_MISTER_BRIDGE
+	bool "reglinux-mister-bridge"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_DE10NANO
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	help
+	  MiSTer FPGA core bridge for DE10-Nano.
+	  Loads RBF bitstreams, transfers ROMs, and forwards
+	  USB input to FPGA cores via SPI.
+
+	  https://github.com/REG-Linux/REG-Linux

@@ -639,11 +639,13 @@ def prepSoftwareList(
     if softList in subdirSoftList:
         romPath = Path(romDirname)
         Path(str(Path(softDir) / softList)).symlink_to(
-            str(romPath.parents[0]), target_is_directory=True
+            str(romPath.parents[0]),
+            target_is_directory=True,
         )
     else:
         Path(str(Path(softDir) / softList)).symlink_to(
-            romDirname, target_is_directory=True
+            romDirname,
+            target_is_directory=True,
         )
 
 
@@ -1162,7 +1164,7 @@ def generateMAMEPadConfig(
 
     # save the config file
     # mameXml = open(configFile, "w")
-    # TODO: python 3 - workawround to encode files in utf-8
+    # TODO: python 3 - workaround to encode files in utf-8
     if overwriteMAME:
         with Path(str(configFile)).open("w", encoding="utf-8") as mameXml:
             dom_string = linesep.join(

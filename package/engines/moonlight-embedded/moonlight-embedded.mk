@@ -26,10 +26,7 @@ ifeq ($(BR2_PACKAGE_LIBVA)$(BR2_x86_64),yy)
 endif
 
 define MOONLIGHT_EMBEDDED_INSTALL_SCRIPTS
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
     mkdir -p $(TARGET_DIR)/usr/share/moonlight-embedded
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/moonlight-embedded/moonlight.moonlight.keys \
-        $(TARGET_DIR)/usr/share/evmapy
     cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/moonlight-embedded/moonlight.conf \
         $(TARGET_DIR)/usr/share/moonlight-embedded/
     install -m 0755 \

@@ -1,10 +1,5 @@
-# DOSBox Staging
+# dosbox-staging
 
-DOSBox Staging delivers the community-maintained fork of DOSBox with async audio and better SIMD support, built for REG-Linux via meson for optimized ARM/desktop hosts.
+Community DOSBox fork. Upstream: https://github.com/dosbox-staging/dosbox-staging
 
-## Build notes
-
-- `Version`: v0.82.2
-- `Dependencies`: `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_SPEEXDSP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_IMAGE`, `BR2_PACKAGE_SDL2_NET`, `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBPNG`, `BR2_PACKAGE_LIBOGG`, `BR2_PACKAGE_LIBVORBIS`, `BR2_PACKAGE_OPUS`, `BR2_PACKAGE_OPUSFILE`, `BR2_PACKAGE_LIBCURL`, `BR2_PACKAGE_SLIRP`, `BR2_PACKAGE_IIR`, `BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Meson (`meson-package`)
-- `Extras`: applies REG-Linux patches (`001-disable-pagesize-testing.patch`, `000-no_wrap.patch`, `002-disable-neon-sse2-ssse3-testing.patch`)
+Uses meson. OpenGL support requires desktop GL (`-Duse_opengl=true/false`; no GLES path exists). FluidSynth (MIDI) and mt32emu (Roland MT-32) are optional.

@@ -3,10 +3,10 @@ from pathlib import Path
 from shutil import copy
 from typing import Any
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SAVES
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SAVES
 
 SONIC3AIR_CONFIG_PATH = "/usr/bin/sonic3-air/config.json"
 SONIC3AIR_OXIGEN_PATH = "/usr/bin/sonic3-air/oxygenproject.json"
@@ -67,6 +67,11 @@ class Sonic3AIRGenerator(Generator):
             f'"WindowSize": "{current_resolution}"',
             f'"WindowSize": "{new_resolution}"',
         )
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(SONIC3AIR_DEST_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         Path(SONIC3AIR_DEST_CONFIG_PATH).write_text(json_text)
 

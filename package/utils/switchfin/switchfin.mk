@@ -3,7 +3,7 @@
 # switchfin
 #
 ################################################################################
-SWITCHFIN_VERSION = 0.8.2
+SWITCHFIN_VERSION = 0.8.3
 SWITCHFIN_SITE = https://github.com/dragonflylee/switchfin
 SWITCHFIN_SITE_METHOD = git
 SWITCHFIN_LICENSE = Apache-2.0
@@ -22,6 +22,7 @@ SWITCHFIN_CONF_ENV += LDFLAGS=-lpthread
 
 # TODO enhance by tweaking these
 SWITCHFIN_CONF_OPTS += -DUSE_SDL2=ON
+SWITCHFIN_CONF_OPTS += -DSDL_PIPEWIRE=OFF
 SWITCHFIN_CONF_OPTS += -DUSE_GLES2=ON
 SWITCHFIN_CONF_OPTS += -DUSE_GLES3=OFF
 SWITCHFIN_CONF_OPTS += -DUSE_GL2=OFF

@@ -1,10 +1,5 @@
-# Mupen64Plus core
+# mupen64plus-core
 
-The `mupen64plus-core` module is the central engine of the Mupen64Plus project and ships the same plugin-based architecture to REG-Linux.
+Nintendo 64 emulator core (Mupen64Plus). Upstream: https://github.com/mupen64plus/mupen64plus-core
 
-## Build notes
-
-- `Version`: 2.6.0
-- `Dependencies`: `BR2_PACKAGE_HOST_NASM`, `BR2_INSTALL_LIBSTDCPP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_FREETYPE`, `BR2_PACKAGE_DEJAVU`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `005-fix-gcc14.patch`, `001-allow-96MB.patch`, `003-statenameasromfilename.patch`, `000-start-message.patch`, `002-mupeninifile.patch`, `004-statesasromname.patch`
+GL flags (`MUPEN64PLUS_GL_CFLAGS`/`MUPEN64PLUS_GL_LDLIBS`) and `USE_GLES=1` are set centrally in this package and inherited by all other plugins. Vulkan support requires `BR2_PACKAGE_REGLINUX_VULKAN`. ARM NEON builds pass `VFP_HARD=1`, NEON CFLAGS, and vectorization flags.

@@ -65,9 +65,9 @@ case "$1" in
 	status)
                 status
                 ;;
-        *)
-                echo "Usage: $0 {start|stop}"
-                exit 1
+	enable|enabled|disable|disabled) ;;
+	*)
+		printf '%s\n' "Usage: $0 {start|stop|restart|enable|disable|status}" >&2
+		exit 1
+		;;
 esac
-
-exit $?

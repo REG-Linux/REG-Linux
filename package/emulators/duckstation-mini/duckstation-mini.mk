@@ -3,7 +3,7 @@
 # DuckStation Mini (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_MINI_VERSION = v0.1-10570
+DUCKSTATION_MINI_VERSION = v0.1-10861
 ifeq ($(BR2_arm),y)
 DUCKSTATION_MINI_SOURCE = DuckStation-Mini-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
@@ -21,11 +21,6 @@ endef
 
 define DUCKSTATION_MINI_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/$(DUCKSTATION_MINI_SOURCE) $(TARGET_DIR)/usr/duckstation/DuckStation.AppImage
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation-mini/psx.duckstation.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(generic-package))

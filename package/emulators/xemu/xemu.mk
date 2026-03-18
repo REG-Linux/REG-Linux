@@ -4,13 +4,13 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.133
+XEMU_VERSION = v0.8.134
 XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
 #XEMU_SITE_METHOD = git
 #XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
-XEMU_DEPENDENCIES += libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
+XEMU_DEPENDENCIES += libcurl libglib2 zlib sdl3 libsamplerate slirp host-python-pyyaml
 XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp libusb
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/xemu-project/xemu-dashboard/releases/download/v20250806-0635/xbox_hdd.qcow2
@@ -211,14 +211,6 @@ define XEMU_GET_SUBMODULES
 
 endef
 
-define XEMU_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/xemu/*.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-#XEMU_PRE_CONFIGURE_HOOKS = XEMU_VERSION_DETAILS
-XEMU_POST_INSTALL_TARGET_HOOKS += XEMU_EVMAPY
 XEMU_PRE_CONFIGURE_HOOKS += XEMU_GET_SUBMODULES
 
 $(eval $(autotools-package))

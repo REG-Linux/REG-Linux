@@ -652,13 +652,9 @@
  # CONFIG_USB_PEGASUS is not set
 
 -CONFIG_USB_RTL8150=m
-
 -CONFIG_USB_RTL8152=m
-
 +# CONFIG_USB_RTL8150 is not set
-
-+# CONFIG_USB_RTL8152 is not set
-
++CONFIG_USB_RTL8152=m
  # CONFIG_USB_LAN78XX is not set
 
 -CONFIG_USB_USBNET=m
@@ -2588,5 +2584,3 @@
  # CONFIG_RCU_CPU_STALL_CPUTIME is not set
 
  # end of RCU Debugging
-
- 

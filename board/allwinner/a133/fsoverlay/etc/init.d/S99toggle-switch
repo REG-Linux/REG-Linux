@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if ! knulli-board-capability "toggleswitch"; then
+    exit 1
+fi
+
+# Wait for emulationstation to be ready so this runs after everything else has initialized
+for i in {1..20}; do
+    [ -f /tmp/emulationstation.ready ] && break
+    sleep 0.5
+done
+
+SWITCH_STATE=$(cat /sys/class/gpio/gpio243/value)
+
+case "$1" in
+    start)
+        if [ "$SWITCH_STATE" -eq 1 ]; then
+            toggle-switch enable
+        else
+            toggle-switch disable
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start}"
+        exit 1
+        ;;
+esac
+
+exit 0

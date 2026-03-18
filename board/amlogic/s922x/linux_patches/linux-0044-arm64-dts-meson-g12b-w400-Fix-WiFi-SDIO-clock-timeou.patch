@@ -1,0 +1,56 @@
+From 6ad40b4b1c6a3722832b50425cc0e4f8456b39a1 Mon Sep 17 00:00:00 2001
+From: Juliano Dorigao <jdorigao@gmail.com>
+Date: Sat, 14 Mar 2026 18:57:18 -0400
+Subject: [PATCH 1/2] arm64: dts: meson-g12b-w400: Fix WiFi SDIO clock timeout
+
+The BCM43752 WiFi chip on Beelink GT-King experiences SDIO clock
+timeout errors during initialization:
+
+  brcmfmac: brcmf_sdio_htclk: HT Avail timeout (1000000): clkctl 0x50
+
+This is caused by the SDIO interface running at too high a frequency
+for reliable communication with the WiFi chip.
+
+Fix this by:
+- Reducing max-frequency from 100MHz to 50MHz
+- Adding enable-sdio-wakeup for proper power management
+- Adding no-sdio flag to disable SDIO mode (use SD mode only)
+
+These changes match the configuration used in other G12B devices
+with similar WiFi chips and improve initialization reliability.
+
+Signed-off-by: Juliano Dorigao <jdorigao@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+index 437e2a90d..cb54cbe03 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+@@ -345,10 +345,11 @@ &sd_emmc_a {
+ 
+ 	bus-width = <4>;
+ 	cap-sd-highspeed;
+-	max-frequency = <100000000>;
++	max-frequency = <50000000>;
+ 
+ 	/* WiFi firmware requires power to be kept while in suspend */
+ 	keep-power-in-suspend;
++	enable-sdio-wakeup;
+ 
+ 	non-removable;
+ 	disable-wp;
+@@ -358,6 +359,9 @@ &sd_emmc_a {
+ 	vmmc-supply = <&vddao_3v3>;
+ 	vqmmc-supply = <&vddao_1v8>;
+ 
++	/* Reduce SDIO clock to avoid timeout issues */
++	no-sdio;
++
+ 	brcmf: wifi@1 {
+ 		reg = <1>;
+ 		compatible = "brcm,bcm4329-fmac";
+-- 
+2.53.0
+

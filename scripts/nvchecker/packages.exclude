@@ -1,2 +1,6 @@
 # blastem: mercurial repo, not much we can do with it
 libretro-blastem
+# No tags/releases, version is branch name (master/main)
+aml-dtbtools
+powervr-ge8300-driver
+fuse-zar

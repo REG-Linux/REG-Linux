@@ -1,0 +1,268 @@
+diff --git a/3rdparty/fast_float/include/fast_float/float_common.h b/3rdparty/fast_float/include/fast_float/float_common.h
+index 62d199ca8..4052167df 100644
+--- a/3rdparty/fast_float/include/fast_float/float_common.h
++++ b/3rdparty/fast_float/include/fast_float/float_common.h
+@@ -116,8 +116,7 @@ using parse_options = parse_options_t<char>;
+ #endif
+ #endif
+ 
+-#if ((defined(_WIN32) || defined(_WIN64)) && !defined(__clang__)) ||           \
+-    (defined(_M_ARM64) && !defined(__MINGW32__))
++#if ((defined(_WIN32) || defined(_WIN64)) && !defined(__clang__))
+ #include <intrin.h>
+ #endif
+ 
+@@ -401,7 +400,7 @@ full_multiplication(uint64_t a, uint64_t b) {
+     return answer;
+   }
+   value128 answer;
+-#if defined(_M_ARM64) && !defined(__MINGW32__)
++#if defined(_M_ARM64) && defined(_WIN32) && !defined(__MINGW32__)
+   // ARM64 has native support for 64-bit multiplications, no need to emulate
+   // But MinGW on ARM64 doesn't have native support for 64-bit multiplications
+   answer.high = __umulh(a, b);
+diff --git a/cmake/BuildParameters.cmake b/cmake/BuildParameters.cmake
+index 8178d2e95..ccf25a851 100644
+--- a/cmake/BuildParameters.cmake
++++ b/cmake/BuildParameters.cmake
+@@ -76,8 +76,10 @@ mark_as_advanced(CMAKE_C_FLAGS_DEVEL CMAKE_CXX_FLAGS_DEVEL CMAKE_LINKER_FLAGS_DE
+ #-------------------------------------------------------------------------------
+ # Select the architecture
+ #-------------------------------------------------------------------------------
+-if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "amd64" OR
+-   "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "AMD64" OR "${CMAKE_OSX_ARCHITECTURES}" STREQUAL "x86_64")
++set(PCSX2_TARGET_PROCESSOR "${CMAKE_SYSTEM_PROCESSOR}")
++
++if("${PCSX2_TARGET_PROCESSOR}" STREQUAL "x86_64" OR "${PCSX2_TARGET_PROCESSOR}" STREQUAL "amd64" OR
++   "${PCSX2_TARGET_PROCESSOR}" STREQUAL "AMD64" OR "${CMAKE_OSX_ARCHITECTURES}" STREQUAL "x86_64")
+ 	# Multi-ISA only exists on x86.
+ 	option(DISABLE_ADVANCE_SIMD "Disable advance use of SIMD (SSE2+ & AVX)" OFF)
+ 
+@@ -103,25 +105,36 @@ if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_HOST_SYSTEM_PR
+ 			add_compile_options("-msse" "-msse2" "-msse4.1" "-mfxsr")
+ 		else()
+ 			# Can't use march=native on Apple Silicon.
+-			if(NOT APPLE OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
++			if(NOT CMAKE_CROSSCOMPILING AND (NOT APPLE OR "${PCSX2_TARGET_PROCESSOR}" STREQUAL "x86_64"))
+ 				add_compile_options("-march=native")
+ 			endif()
+ 		endif()
+ 	endif()
+-elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64" OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64" OR
++elseif("${PCSX2_TARGET_PROCESSOR}" STREQUAL "arm64" OR "${PCSX2_TARGET_PROCESSOR}" STREQUAL "aarch64" OR
+        "${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
+-	message(STATUS "Building for Apple Silicon (ARM64).")
++	if(APPLE)
++		message(STATUS "Building for Apple Silicon (ARM64).")
++	else()
++		message(STATUS "Building for ARM64.")
++	endif()
+ 	list(APPEND PCSX2_DEFS _M_ARM64=1)
+ 	set(_M_ARM64 TRUE)
+-	add_compile_options("-march=armv8.4-a" "-mcpu=apple-m1")
++	if(APPLE)
++		add_compile_options("-march=armv8.4-a" "-mcpu=apple-m1")
++	else()
++		add_compile_options("-march=armv8-a")
++	endif()
+ 
+ 	# If we're running on Linux, we need to detect the page/cache line size.
+ 	# It could be a virtual machine with 4K pages, or 16K with Asahi.
+-	if(LINUX)
++	if(LINUX AND NOT CMAKE_CROSSCOMPILING)
+ 		detect_page_size()
+ 		list(APPEND PCSX2_DEFS OVERRIDE_HOST_PAGE_SIZE=${HOST_PAGE_SIZE})
+ 		detect_cache_line_size()
+ 		list(APPEND PCSX2_DEFS OVERRIDE_HOST_CACHE_LINE_SIZE=${HOST_CACHE_LINE_SIZE})
++	elseif(LINUX AND CMAKE_CROSSCOMPILING)
++		list(APPEND PCSX2_DEFS OVERRIDE_HOST_PAGE_SIZE=0x1000)
++		list(APPEND PCSX2_DEFS OVERRIDE_HOST_CACHE_LINE_SIZE=64)
+ 	endif()
+ 	
+ 	# Windows page/cache line size seems to match x68-64 
+@@ -131,7 +144,7 @@ elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64" OR "${CMAKE_HOST_SYSTEM
+ 		list(APPEND PCSX2_DEFS OVERRIDE_HOST_CACHE_LINE_SIZE=64)
+ 	endif()
+ else()
+-	message(FATAL_ERROR "Unsupported architecture: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
++	message(FATAL_ERROR "Unsupported architecture: ${PCSX2_TARGET_PROCESSOR}")
+ endif()
+ 
+ # Require C++20.
+diff --git a/common/Linux/LnxMisc.cpp b/common/Linux/LnxMisc.cpp
+index a6e6d3565..0ef9ab402 100644
+--- a/common/Linux/LnxMisc.cpp
++++ b/common/Linux/LnxMisc.cpp
+@@ -19,8 +19,10 @@
+ #include <sys/time.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
++#if defined(X11_API)
+ #include <X11/Xlib.h>
+ #include <X11/extensions/XInput2.h>
++#endif
+ 
+ #include <cstdlib>
+ #include <cstring>
+@@ -226,6 +228,7 @@ bool Common::InhibitScreensaver(bool inhibit)
+ 
+ void Common::SetMousePosition(int x, int y)
+ {
++#if defined(X11_API)
+ 	Display* display = XOpenDisplay(nullptr);
+ 	if (!display)
+ 		return;
+@@ -235,8 +238,13 @@ void Common::SetMousePosition(int x, int y)
+ 	XFlush(display);
+ 
+ 	XCloseDisplay(display);
++#else
++	(void)x;
++	(void)y;
++#endif
+ }
+ 
++#if defined(X11_API)
+ static std::function<void(int, int)> fnMouseMoveCb;
+ static std::atomic<bool> trackingMouse = false;
+ static std::thread mouseThread;
+@@ -328,6 +336,17 @@ void Common::DetachMousePositionCb()
+ 		mouseThread.join();
+ 	}
+ }
++#else
++bool Common::AttachMousePositionCb(std::function<void(int, int)> cb)
++{
++	(void)cb;
++	return false;
++}
++
++void Common::DetachMousePositionCb()
++{
++}
++#endif
+ 
+ bool Common::PlaySoundAsync(const char* path)
+ {
+diff --git a/pcsx2-gsrunner/Main.cpp b/pcsx2-gsrunner/Main.cpp
+index b991537f6..b9f6230f7 100644
+--- a/pcsx2-gsrunner/Main.cpp
++++ b/pcsx2-gsrunner/Main.cpp
+@@ -48,7 +48,7 @@
+ #include "svnrev.h"
+ 
+ // Down here because X11 has a lot of defines that can conflict
+-#if defined(__linux__)
++#if defined(__linux__) && defined(X11_API)
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ #include <sys/select.h>
+@@ -1121,7 +1121,7 @@ void GSRunner::StopPlatformMessagePump()
+ 	CocoaTools::StopMainThreadEventLoop();
+ }
+ 
+-#elif defined(__linux__)
++#elif defined(__linux__) && defined(X11_API)
+ static Display* s_display = nullptr;
+ static Window s_window = None;
+ static WindowInfo s_wi;
+@@ -1231,6 +1231,42 @@ void GSRunner::PumpPlatformMessages(bool forever)
+ 	} while (forever && !s_shutdown_requested.load());
+ }
+ 
++void GSRunner::StopPlatformMessagePump()
++{
++	s_shutdown_requested.store(true);
++}
++#elif defined(__linux__)
++static WindowInfo s_wi;
++static std::atomic<bool> s_shutdown_requested{false};
++
++bool GSRunner::CreatePlatformWindow()
++{
++	// Wayland-only builds don't have an X11 window path for GSRunner yet.
++	s_wi.type = WindowInfo::Type::Surfaceless;
++	s_wi.surface_width = WINDOW_WIDTH;
++	s_wi.surface_height = WINDOW_HEIGHT;
++	s_wi.surface_scale = 1.0f;
++	return true;
++}
++
++void GSRunner::DestroyPlatformWindow()
++{
++}
++
++std::optional<WindowInfo> GSRunner::GetPlatformWindowInfo()
++{
++	return s_wi;
++}
++
++void GSRunner::PumpPlatformMessages(bool forever)
++{
++	if (!forever)
++		return;
++
++	while (!s_shutdown_requested.load())
++		std::this_thread::sleep_for(std::chrono::milliseconds(1));
++}
++
+ void GSRunner::StopPlatformMessagePump()
+ {
+ 	s_shutdown_requested.store(true);
+diff --git a/pcsx2-qt/GameList/GameListWidget.cpp b/pcsx2-qt/GameList/GameListWidget.cpp
+index 3d724bbe6..649f8cb3d 100644
+--- a/pcsx2-qt/GameList/GameListWidget.cpp
++++ b/pcsx2-qt/GameList/GameListWidget.cpp
+@@ -75,21 +75,36 @@ public:
+ 
+ 	void setFilterType(GameList::EntryType type)
+ 	{
++#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+ 		beginFilterChange();
+ 		m_filter_type = type;
+ 		endFilterChange(Direction::Rows);
++#else
++		m_filter_type = type;
++		invalidateRowsFilter();
++#endif
+ 	}
+ 	void setFilterRegion(GameList::Region region)
+ 	{
++#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+ 		beginFilterChange();
+ 		m_filter_region = region;
+ 		endFilterChange(Direction::Rows);
++#else
++		m_filter_region = region;
++		invalidateRowsFilter();
++#endif
+ 	}
+ 	void setFilterName(const QString& name)
+ 	{
++#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+ 		beginFilterChange();
+ 		m_filter_name = name;
+ 		endFilterChange(Direction::Rows);
++#else
++		m_filter_name = name;
++		invalidateRowsFilter();
++#endif
+ 	}
+ 
+ 	bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
+diff --git a/pcsx2/Interpreter.cpp b/pcsx2/Interpreter.cpp
+index 16f848a6b..e332ce508 100644
+--- a/pcsx2/Interpreter.cpp
++++ b/pcsx2/Interpreter.cpp
+@@ -211,6 +211,11 @@ static void execI()
+ 	opcode.interpret();
+ }
+ 
++void intExecuteSingleInstruction()
++{
++	execI();
++}
++
+ static __fi void _doBranch_shared(u32 tar)
+ {
+ 	branch2 = cpuRegs.branch = 1;

@@ -2,10 +2,11 @@ import pathlib
 from configparser import ConfigParser
 from os import path
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SAVES, SCREENSHOTS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
+from configgen.core.exceptions import GeneratorError
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SAVES, SCREENSHOTS
 from configgen.utils.buildargs import parse_args
 
 
@@ -81,7 +82,7 @@ class EDuke32Generator(Generator):
         else:
             result = parse_args(command_array, rom)
             if not result.okay:
-                raise Exception(result.message)
+                raise GeneratorError("eduke32", result.message)
 
         return Command(
             array=command_array,

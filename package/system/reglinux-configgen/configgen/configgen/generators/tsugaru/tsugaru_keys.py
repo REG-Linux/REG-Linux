@@ -1,0 +1,108 @@
+"""Evmapy controller mappings for Tsugaru.
+
+This module defines button mappings for Tsugaru (PC-98 emulator) games using evmapy.
+Mappings are loaded directly without file I/O for optimal performance.
+
+Example:
+    from configgen.generators.tsugaru import tsugaru_keys
+    config = tsugaru_keys.get_config()
+
+"""
+
+from typing import Any
+
+# Evmapy configuration for Tsugaru controller
+# This replaces the need for external .keys files
+CONFIG: dict[str, Any] = {
+    "actions_player1": [
+        {
+            "trigger": "up",
+            "type": "key",
+            "target": "KEY_UP",
+        },
+        {
+            "trigger": "down",
+            "type": "key",
+            "target": "KEY_DOWN",
+        },
+        {
+            "trigger": "left",
+            "type": "key",
+            "target": "KEY_LEFT",
+        },
+        {
+            "trigger": "right",
+            "type": "key",
+            "target": "KEY_RIGHT",
+        },
+        {
+            "trigger": "b",
+            "type": "key",
+            "target": "KEY_Z",
+        },
+        {
+            "trigger": "a",
+            "type": "key",
+            "target": "KEY_X",
+        },
+        {
+            "trigger": "x",
+            "type": "key",
+            "target": "KEY_S",
+        },
+        {
+            "trigger": "y",
+            "type": "key",
+            "target": "KEY_A",
+        },
+        {
+            "trigger": "joystick2",
+            "type": "mouse",
+        },
+        {
+            "trigger": "select",
+            "type": "key",
+            "target": "KEY_F10",
+        },
+        {
+            "trigger": ["hotkey", "start"],
+            "type": "key",
+            "target": ["KEY_LEFTALT", "KEY_F4"],
+        },
+        {
+            "trigger": ["hotkey", "a"],
+            "type": "key",
+            "target": "KEY_F10",
+        },
+        {
+            "trigger": "joystick1up",
+            "type": "key",
+            "target": "KEY_UP",
+        },
+        {
+            "trigger": "joystick1down",
+            "type": "key",
+            "target": "KEY_DOWN",
+        },
+        {
+            "trigger": "joystick1left",
+            "type": "key",
+            "target": "KEY_LEFT",
+        },
+        {
+            "trigger": "joystick1right",
+            "type": "key",
+            "target": "KEY_RIGHT",
+        },
+    ]
+}
+
+
+def get_config() -> dict[str, Any]:
+    """Return the evmapy configuration for Tsugaru.
+
+    Returns:
+        Configuration dictionary compatible with evmapy format.
+
+    """
+    return CONFIG

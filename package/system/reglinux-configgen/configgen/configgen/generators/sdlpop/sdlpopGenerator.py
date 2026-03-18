@@ -1,10 +1,10 @@
 from pathlib import Path
 from shutil import copyfile
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SCREENSHOTS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SCREENSHOTS
 
 SDLPOP_CONFIG_DIR = str(CONF / "SDLPoP")
 SDLPOP_SCREENSHOTS_DIR = str(SCREENSHOTS / "SDLPoP")

@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# The Powkiddy V90s uses a different set of kernel modules
+# If we are booting one up, mount bind its modules over the regular 4.9.191
+BOARD=$(cat /boot/boot/system.board)
+if [ "$BOARD" = "powkiddy-v90s" ] || [ "$BOARD" = "powkiddy-v20" ] ; then
+	mount -o bind /lib/modules/4.9.191_v90s /lib/modules/4.9.191
+fi
+
+# We need the graphics module in order to use SDL since we are
+# using the sdl-compat/SDL2 for rendering
+cd /lib/modules/4.9.191
+pvrsrvctl --start
+
+# Start the progress bar
+/usr/bin/progressbar &
+
+# Start all init scripts in /etc/init.d
+# executing them in numerical order.
+#
+for i in /etc/init.d/S??* ; do
+
+    # Ignore dangling symlinks (if any).
+    [ ! -f "$i" ] && continue
+
+    # Update status for progress bar
+    echo "$i" > /tmp/status.txt
+
+    case "$i" in
+        *.sh)
+            # Source shell script for speed.
+            (
+                trap - INT QUIT TSTP
+                set start
+                . $i
+            ) &
+            ;;
+        *)
+            case "$i" in
+                *S00bootcustom | *S01dbus | *S02resize | *S03modules | *S04populate | *S05udev | *S06audio | *S06modprobe | *S11share | *S12populateshare) # Don't run these in background
+                    $i start
+                    ;;
+                *)
+                    $i start &
+                    ;;
+            esac
+            ;;
+    esac
+
+    echo QUIT > /tmp/status.txt
+    echo $(date +"%F %T,%3N")": ${i} - started" >> /var/run/boot.log
+done
+
+exit 0

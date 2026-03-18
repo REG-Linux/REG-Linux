@@ -1,0 +1,13 @@
+--- a/src/osdep/sigsegv_handler.cpp	2026-03-16 12:00:00.000000000 +0100
++++ b/src/osdep/sigsegv_handler.cpp	2026-03-16 12:00:01.000000000 +0100
+@@ -58,9 +58,7 @@
+
+ #else /* !_WIN32 */
+
+-#if !defined(__MACH__) && !defined(CPU_AMD64) && !defined(__x86_64__) && !defined(__riscv)
+-#include <asm/sigcontext.h>
+-#elif defined(__HAIKU__)
++#if defined(__HAIKU__)
+ #include <signal.h>
+ #else
+ #include <sys/ucontext.h>

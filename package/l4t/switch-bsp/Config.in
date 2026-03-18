@@ -1,0 +1,9 @@
+config BR2_PACKAGE_SWITCH_BSP
+	bool "switch-bsp"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	depends on BR2_aarch64
+	select BR2_PACKAGE_USB_GADGET_SCRIPTS
+	help
+	  Nintendo Switch Board Support Package for REG-Linux.
+	  Provides Joy-Con pairing, dock hotplug, sysfs permissions,
+	  ALSA UCM audio configuration, and USB gadget support.

@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version.: Release 4.6.1 on Sep 16, 2025
-WARZONE2100_VERSION = 4.6.1
+WARZONE2100_VERSION = 4.6.3
 WARZONE2100_SOURCE = warzone2100_src.tar.xz
 WARZONE2100_SITE = https://github.com/Warzone2100/warzone2100/releases/download/$(WARZONE2100_VERSION)
 

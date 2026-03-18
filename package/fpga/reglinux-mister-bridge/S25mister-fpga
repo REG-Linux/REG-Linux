@@ -1,0 +1,55 @@
+#!/bin/dash
+#
+# S25mister-fpga — Set up FPGA environment on DE10-Nano boot
+#
+# Enables HPS-to-FPGA bridges and creates required directories
+# for the mister-bridge binary (called per-game by configgen).
+#
+
+FPGA_BRIDGE_DIR="/sys/class/fpga_bridge"
+FPGA_MANAGER_DIR="/sys/class/fpga_manager"
+
+start() {
+    printf 'Setting up MiSTer FPGA environment: '
+
+    # Enable HPS-to-FPGA bridges if present
+    if [ -d "$FPGA_BRIDGE_DIR" ]; then
+        for bridge in "$FPGA_BRIDGE_DIR"/*/; do
+            [ -f "$bridge/enable" ] && echo 1 > "$bridge/enable" 2>/dev/null
+        done
+    fi
+
+    # Create required directories
+    mkdir -p /userdata/bios/mister/cores
+    mkdir -p /userdata/saves/mister
+    mkdir -p /userdata/screenshots/mister
+
+    # Verify FPGA manager is accessible
+    if [ -d "$FPGA_MANAGER_DIR" ] && [ -e /dev/mem ]; then
+        printf 'done\n'
+    else
+        printf 'done (FPGA not detected)\n'
+    fi
+}
+
+stop() {
+    printf 'Stopping MiSTer FPGA environment: '
+    printf 'done\n'
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac

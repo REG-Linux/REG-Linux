@@ -1,9 +1,5 @@
-# HLSDK Xash3D DMC (Deathmatch Classic)
+# hlsdk-xash3d-dmc
 
-Deathmatch Classic-specific SDK libraries for Xash3D.
+Deathmatch Classic game libraries for Xash3D-FWGS. Upstream: https://github.com/FWGS/hlsdk-portable
 
-## Build notes
-- **Branch:** `dmc` branch snapshot `2eaaf125...` (Jan 2025).
-- **Config:** same SDL2/SDL2_mixer/image/ttf + libsodium stack.
-- **Build system:** CMake with `-DGOLDSOURCE_SUPPORT=1`, updates the server library name to `dmc`, and flags `DGAMEDIR=dmc`.
-- **Install:** copies the generated `cl_dll` and `dll` libs into `/usr/lib/xash3d/hlsdk/dmc/`.
+Built from the `dmc` branch with `-DSERVER_LIBRARY_NAME=dmc -DGAMEDIR=dmc`. Installs to `/usr/lib/xash3d/hlsdk/dmc/`.

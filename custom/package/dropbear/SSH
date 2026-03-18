@@ -5,16 +5,16 @@ case "$1" in
   status)
     { [ "$(/usr/bin/regmsg systemconf getconfigkey system.ssh.enabled)" = "0" ] && echo "SSH status: disabled"; } || echo "SSH status: enabled"
     ;;
-  enabled)
+  enable|enabled)
       /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.ssh.enabled 1
       /etc/init.d/S35securepasswd start   # In case security enforcement changed.
       /etc/init.d/S50dropbear start
     ;;
-  disabled)
+  disable|disabled)
       /etc/init.d/S50dropbear stop
       /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.ssh.enabled 0
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart|reload|enabled|disabled|status}"
+    echo "Usage: $0 {start|stop|restart|reload|enable|disable|status}"
     exit 1
 esac

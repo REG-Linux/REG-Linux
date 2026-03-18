@@ -1,5 +1,5 @@
 diff --git a/package/libglvnd/libglvnd.mk b/package/libglvnd/libglvnd.mk
-index 95ac19dd91..50e151ad4a 100644
+index 95ac19dd91..188529b2fd 100644
 --- a/package/libglvnd/libglvnd.mk
 +++ b/package/libglvnd/libglvnd.mk
 @@ -4,8 +4,13 @@
@@ -8,12 +8,12 @@ index 95ac19dd91..50e151ad4a 100644
  
 -LIBGLVND_VERSION = 1.4.0
 -LIBGLVND_SITE = https://gitlab.freedesktop.org/glvnd/libglvnd/uploads/ca5bf4295beb39bb324f692c481ac8a1
-+# batocera (update)
++# reglinux (update)
 +LIBGLVND_VERSION = v1.7.0
 +LIBGLVND_SOURCE= libglvnd-$(LIBGLVND_VERSION).gz
 +LIBGLVND_SITE = https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/$(LIBGLVND_VERSION)
 +
-+# batocera - host package
++# reglinux - host package
 +LIBGLVND_DEPENDENCIES = host-libglvnd
  
  LIBGLVND_LICENSE = \
@@ -31,5 +31,5 @@ index 95ac19dd91..50e151ad4a 100644
  endif
  
  $(eval $(meson-package))
-+# batocera - host package
++# reglinux - host package
 +$(eval $(host-meson-package))

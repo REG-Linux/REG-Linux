@@ -1,8 +1,5 @@
-# yquake2 CTF
+# yquake2-ctf
 
-Capture-the-Flag mission pack for Yamagi Quake II.
+Capture the Flag game library for Yamagi Quake II. Upstream: https://github.com/yquake2/ctf
 
-## Build notes
-- **Version:** tag `CTF_1_12`.
-- **Config:** depends on SDL2.
-- **Build system:** CMake release build installs `game.so` under `/usr/yquake2/ctf/`.
+Builds a single `game.so` installed to `/usr/yquake2/ctf/`.

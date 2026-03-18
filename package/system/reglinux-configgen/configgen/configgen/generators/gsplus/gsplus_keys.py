@@ -1,0 +1,62 @@
+"""Evmapy controller mappings for GSPLUS.
+
+This module defines button mappings for GSPLUS games using evmapy.
+Mappings are loaded directly without file I/O for optimal performance.
+
+Example:
+    from configgen.generators.gsplus import gsplus_keys
+    config = gsplus_keys.get_config()
+
+"""
+
+from typing import Any
+
+# Evmapy configuration for GSPLUS controller
+# This replaces the need for external .keys files
+CONFIG: dict[str, Any] = {
+    "actions_player1": [
+        {
+            "trigger": ["hotkey", "start"],
+            "type": "key",
+            "target": ["KEY_LEFTALT", "KEY_F4"],
+        },
+        {"trigger": "joystick2", "type": "mouse"},
+        {"trigger": "pageup", "type": "key", "target": "KEY_TAB"},
+        {"trigger": "pagedown", "type": "key", "target": "BTN_LEFT"},
+        {"trigger": "l2", "type": "key", "target": "KEY_1"},
+        {"trigger": "r2", "type": "key", "target": "KEY_2"},
+        {"trigger": "y", "type": "key", "target": "KEY_ENTER"},
+        {"trigger": "x", "type": "key", "target": "KEY_SPACE"},
+        {"trigger": "start", "type": "key", "target": "KEY_F4"},
+        {"trigger": "up", "type": "key", "target": "KEY_UP"},
+        {"trigger": "down", "type": "key", "target": "KEY_DOWN"},
+        {"trigger": "left", "type": "key", "target": "KEY_LEFT"},
+        {"trigger": "right", "type": "key", "target": "KEY_RIGHT"},
+        {"trigger": "select", "type": "key", "target": "KEY_ESC"},
+        {
+            "trigger": ["a", "hotkey"],
+            "type": "key",
+            "target": ["KEY_LEFTCTRL", "KEY_F12"],
+        },
+        {"trigger": ["b", "hotkey"], "type": "key", "target": "KEY_F4"},
+        {"trigger": ["left", "hotkey"], "type": "key", "target": "KEY_H"},
+        {"trigger": ["up", "hotkey"], "type": "key", "target": "KEY_K"},
+        {"trigger": ["down", "hotkey"], "type": "key", "target": "KEY_J"},
+        {"trigger": ["right", "hotkey"], "type": "key", "target": "KEY_L"},
+        {
+            "trigger": ["hotkey", "pageup"],
+            "type": "exec",
+            "target": "regmsg screen getscreenshot",
+        },
+    ]
+}
+
+
+def get_config() -> dict[str, Any]:
+    """Return the evmapy configuration for GSPLUS.
+
+    Returns:
+        Configuration dictionary compatible with evmapy format.
+
+    """
+    return CONFIG

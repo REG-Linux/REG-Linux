@@ -3,7 +3,7 @@
 # uMTP-responder
 #
 ################################################################################
-UMTP_RESPONDER_VERSION = umtprd-1.6.8
+UMTP_RESPONDER_VERSION = umtprd-1.8.1
 UMTP_RESPONDER_SITE = $(call github,viveris,uMTP-Responder,$(UMTP_RESPONDER_VERSION))
 UMTP_RESPONDER_DEPENDENCIES = libusb libglib2 inih
 

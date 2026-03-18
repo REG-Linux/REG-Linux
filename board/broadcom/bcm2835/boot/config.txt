@@ -26,8 +26,8 @@ disable_overscan=1
 
 # uncomment to force a console size. By default it will be display's size minus
 # overscan.
-#framebuffer_width=1280
-#framebuffer_height=720
+framebuffer_width=640
+framebuffer_height=480
 
 # uncomment if hdmi display is not detected and composite is being output
 #hdmi_force_hotplug=1
@@ -68,6 +68,11 @@ disable_overscan=1
 
 # if you plug your tv at the same time as your rpi and that the rpi switches from the hdmi or give a low resolution because tv had no enough time to initialize it
 boot_delay=3
+
+# USB workaround for Retroflag GPI Case internal hub
+# Prevents enumeration errors and improves stability
+# dwc2 overlay with host-only mode and increased DMA buffer
+dtoverlay=dwc2,dr_mode=host
 
 # uncomment to enable composite output via 4 pole TRRS ("headphone") socket.
 # note: slightly slows down the entire system on Pi 4 models.
@@ -139,5 +144,12 @@ dtoverlay=vc4-kms-v3d,cma-128
 # i.e. Official 7" DSI Raspberry Pi Touch Display for 'Full' KMS
 #ignore_lcd=1
 #dtoverlay=vc4-kms-dsi-7inch
+
+# Retroflag GPI Case overlay - uncomment the appropriate line for your model
+# GPI Case (Pi Zero/1 - 240x320 portrait)
+#dtoverlay=retroflag-gpicase
+
+# GPI Case 2W (Pi Zero 2 W - 640x480 landscape)
+#dtoverlay=retroflag-gpicase2w
 
 [all]

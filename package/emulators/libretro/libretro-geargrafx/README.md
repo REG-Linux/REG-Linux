@@ -1,10 +1,5 @@
-# Libretro Geargrafx
+# libretro-geargrafx
 
-The `libretro-geargrafx` core supplies REG-Linux with the Geargrafx Commodore 8-bit emulator, including the libc/Makefile fixes needed for Musl.
+PC Engine / TurboGrafx-16 libretro core (Geargrafx). Upstream: https://github.com/drhelius/Geargrafx
 
-## Build notes
-
-- `Version`: 1.6.4
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-fix-libchdr-musl.patch` and `000-makefile-additions.patch`
+Platform string maps Cortex-A53 to `rpi3` and Cortex-A7 to `classic_armv7_a7`. A musl compatibility patch fixes libchdr build failures.

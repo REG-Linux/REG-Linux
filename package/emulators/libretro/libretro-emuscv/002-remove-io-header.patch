@@ -1,0 +1,26 @@
+diff --git a/src/common.h b/src/common.h
+index 7bf6441..15d66c2 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -121,8 +121,6 @@
+     #include <io.h>
+ #elif defined(_OSX)
+     #include <sys/uio.h>
+-#else
+-    #include <sys/io.h>
+ #endif
+ #ifdef _MSC_VER
+ 	#include <typeinfo.h>
+diff --git a/src/vm/debugger.cpp b/src/vm/debugger.cpp
+index 222cee5..018a599 100644
+--- a/src/vm/debugger.cpp
++++ b/src/vm/debugger.cpp
+@@ -12,8 +12,6 @@
+     #include <io.h>
+ #elif defined(_OSX)
+     #include <sys/uio.h>
+-#else
+-    #include <sys/io.h>
+ #endif
+ #include <fcntl.h>
+ 

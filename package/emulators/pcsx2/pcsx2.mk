@@ -3,8 +3,8 @@
 # pcsx2
 #
 ################################################################################
-# Version v2.6.0 on Jan 4, 2025
-PCSX2_VERSION = v2.6.0
+# Version v2.6.3 on Jan 29, 2025
+PCSX2_VERSION = v2.6.3
 PCSX2_SITE = https://github.com/pcsx2/pcsx2.git
 PCSX2_SITE_METHOD = git
 PCSX2_GIT_SUBMODULES = YES
@@ -16,7 +16,8 @@ PCSX2_SUPPORTS_IN_SOURCE_BUILD = NO
 PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl3 libpcap yaml-cpp
 PCSX2_DEPENDENCIES += libsamplerate fmt reglinux-qt6 libcurl kddockwidgets
-PCSX2_DEPENDENCIES += libbacktrace jpeg-turbo webp plutosvg
+PCSX2_DEPENDENCIES += libbacktrace jpeg webp plutosvg
+PCSX2_DEPENDENCIES += xlib_libXi
 
 # Use clang for performance if available
 ifeq ($(BR2_PACKAGE_CLANG),y)
@@ -31,7 +32,9 @@ PCSX2_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 PCSX2_CONF_OPTS += -DENABLE_TESTS=OFF
 PCSX2_CONF_OPTS += -DUSE_SYSTEM_LIBS=AUTO
 # The following flag is misleading and *needed* ON to avoid doing -march=native
+ifeq ($(BR2_x86_64),y)
 PCSX2_CONF_OPTS += -DDISABLE_ADVANCE_SIMD=ON
+endif
 
 # Since v2.3.168 Wayland is ON by default, should disable X11 but does not build yet
 PCSX2_CONF_OPTS += -DWAYLAND_API=ON
@@ -59,14 +62,6 @@ define PCSX2_INSTALL_TARGET_CMDS
     # use our SDL config
     rm $(TARGET_DIR)/usr/pcsx2/bin/resources/game_controller_db.txt
 endef
-
-define PCSX2_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/pcsx2/ps2.pcsx2.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
-PCSX2_POST_INSTALL_TARGET_HOOKS += PCSX2_EVMAPY
 
 define PCSX2_TEXTURES
 	mkdir -p $(TARGET_DIR)/usr/pcsx2/bin/resources/textures

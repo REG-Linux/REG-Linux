@@ -67,13 +67,6 @@ define SONIC3_AIR_REMOVE_REMASTERED_MUSIC
 	rm -Rf $(TARGET_DIR)/usr/bin/sonic3-air/data/audio/remastered/
 endef
 
-define SONIC3_AIR_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/sonic3-air/sonic3-air.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-SONIC3_AIR_POST_INSTALL_TARGET_HOOKS += SONIC3_AIR_EVMAPY
 SONIC3_AIR_POST_INSTALL_TARGET_HOOKS += SONIC3_AIR_REMOVE_REMASTERED_MUSIC
 
 $(eval $(cmake-package))

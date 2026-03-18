@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-CGENIUS_VERSION = v3.6.1
+CGENIUS_VERSION = v3.6.2
 CGENIUS_SITE = $(call github,gerstrong,Commander-Genius,$(CGENIUS_VERSION))
 CGENIUS_CONF_LICENSE = GPL-2.0
 CGENIUS_CONF_LICENSE_FILES = LICENSE
@@ -36,13 +36,6 @@ define CGENIUS_GET_COSMOS
         cd ../../..
 endef
 
-define CGENIUS_POST_PROCESS
-        mkdir -p $(TARGET_DIR)/usr/share/evmapy
-        cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cgenius/cgenius.cgenius.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
 CGENIUS_POST_EXTRACT_HOOKS += CGENIUS_GET_COSMOS
-CGENIUS_POST_INSTALL_TARGET_HOOKS += CGENIUS_POST_PROCESS
 
 $(eval $(cmake-package))

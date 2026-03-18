@@ -3,8 +3,8 @@
 # libretro-sameboy
 #
 ################################################################################
-# Version: Release 1.0.2 on Aug 1, 2025
-LIBRETRO_SAMEBOY_VERSION = v1.0.2
+# Version: Release 1.0.3 on Mar 5, 2026
+LIBRETRO_SAMEBOY_VERSION = v1.0.3
 LIBRETRO_SAMEBOY_SITE = $(call github,LIJI32,SameBoy,$(LIBRETRO_SAMEBOY_VERSION))
 LIBRETRO_SAMEBOY_LICENSE = Expat
 LIBRETRO_SAMEBOY_DEPENDENCIES = host-rgbds host-xxd host-util-linux

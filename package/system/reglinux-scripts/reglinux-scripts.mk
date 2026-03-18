@@ -29,54 +29,58 @@ endif
 
 define REGLINUX_SCRIPTS_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/bluezutils.py              $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/ # any variable ?
+
     mkdir -p $(TARGET_DIR)/usr/bin
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/bluezutils.py            $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/ # any variable ?
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/system-bluetooth         $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/system-bluetooth-agent   $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-save-overlay                $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-usbmount                    $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-encode                      $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-padsinfo                    $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-info                        $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-install                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-format                      $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-mount                       $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-overclock                   $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-part                        $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-support                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-version                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-sync                        $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-upgrade                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-systems                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-config                      $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-thebezelproject          $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-cores                       $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-brightness                  $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-swissknife               $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-store                       $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-autologin                   $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-timezone                    $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-gameforce                   $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-shutdown                    $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-services                    $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/usbgadget                          $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-usb                          $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-planemode                   $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker       $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker-delayed     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-ikemen                      $(TARGET_DIR)/usr/bin/
-    install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-switch-screen.rules               $(TARGET_DIR)/etc/udev/rules.d
-    mkdir -p $(TARGET_DIR)/etc/udev/rules.d
-    install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-usbgadget.rules                    $(TARGET_DIR)/etc/udev/rules.d
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/system-bluetooth           $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/bluetooth/system-bluetooth-agent     $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-amd-tdp                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-autologin                     $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-brightness                    $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-config                        $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-cores                         $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-encode                        $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-swissknife                 $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-thebezelproject            $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-format                        $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-gameforce                     $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-get-nvidia-list               $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-ikemen                        $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-info                          $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-install                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-led-effects                   $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-mount                         $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-overclock                     $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-padsinfo                      $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-part                          $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-planemode                     $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-power-mode                    $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-save-overlay                  $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-services                      $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-shutdown                      $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-spinner-calibrator            $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-store                         $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-support                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker         $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker-delayed $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-sync                          $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-systems                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-timezone                      $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-upgrade                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-usb                           $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-usbmount                      $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-version                       $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-vulkan                        $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/usbgadget                            $(TARGET_DIR)/usr/bin/
+
     mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/MTP                               $(TARGET_DIR)/usr/share/reglinux/services/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/ADB                               $(TARGET_DIR)/usr/share/reglinux/services/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-amd-tdp                     $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-get-nvidia-list             $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-led-effects                 $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-spinner-calibrator          $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-vulkan                      $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-power-mode                  $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/ADB                                 $(TARGET_DIR)/usr/share/reglinux/services/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/MTP                                 $(TARGET_DIR)/usr/share/reglinux/services/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/SWAP                                 $(TARGET_DIR)/usr/share/reglinux/services/
+
+    mkdir -p $(TARGET_DIR)/etc/udev/rules.d
+    install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-switch-screen.rules                 $(TARGET_DIR)/etc/udev/rules.d
+    install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-usbgadget.rules                     $(TARGET_DIR)/etc/udev/rules.d
 endef
 
 define REGLINUX_SCRIPTS_INSTALL_MOUSE

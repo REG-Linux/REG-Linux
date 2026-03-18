@@ -1,0 +1,26 @@
+#!/bin/bash
+
+RUMBLE_FILE="/sys/class/gpio/gpio227/value"
+
+# We only want to run the script if the board has rumble capability
+if ! knulli-board-capability "rumble"; then
+    exit 1
+fi
+
+# Ensure correct number of arguments
+if [ $# -lt 1 ] || [ $(echo "$1 <= 0" | bc) -ne 0 ]; then
+  echo "Usage: $0 <duration>"
+  echo "Duration must be a positive integer or floating point number larger than 0."
+  exit 1
+fi
+
+# Enable A133 rumble function if necessary
+if [ ! -d /sys/class/gpio/gpio227 ]; then
+  echo 227 > /sys/class/gpio/export
+  echo -n out > /sys/class/gpio/gpio227/direction
+fi
+
+
+echo -n 1 > "$RUMBLE_FILE" && sleep $1 && echo -n 0 > "$RUMBLE_FILE"
+
+exit 0

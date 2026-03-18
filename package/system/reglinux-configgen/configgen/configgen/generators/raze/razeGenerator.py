@@ -2,10 +2,11 @@ from pathlib import Path
 from platform import uname
 from typing import Any
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SAVES
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
+from configgen.core.exceptions import GeneratorError
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SAVES
 from configgen.utils.buildargs import parse_args
 from configgen.utils.logger import get_logger
 
@@ -178,7 +179,7 @@ class RazeGenerator(Generator):
         command_array = ["raze"]
         result = parse_args(command_array, rom)
         if not result.okay:
-            raise Exception(result.message)
+            raise GeneratorError("raze", result.message)
 
         command_array += [
             "-exec",

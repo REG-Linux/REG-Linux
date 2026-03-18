@@ -1,11 +1,11 @@
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
+from configgen.config.paths import CONF
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 
 FORCE_CONFIG_DIR = CONF / "theforceengine"
 FORCE_MODS_DIR = FORCE_CONFIG_DIR / "Mods"
@@ -17,6 +17,7 @@ FORCE_BIN_PATH = Path("/usr/bin/theforceengine")
 
 class TheForceEngineGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -26,8 +27,8 @@ class TheForceEngineGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         # Check if the directories exist, if not create them
@@ -276,6 +277,7 @@ class TheForceEngineGenerator(Generator):
         )
 
     # Show mouse for menu actions
+    @override
     def getMouseMode(self, config, rom):
         return True
 

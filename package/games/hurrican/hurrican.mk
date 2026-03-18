@@ -20,10 +20,6 @@ define HURRICAN_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/hurrican/
 	cp -pvr $(@D)/buildroot-build/hurrican $(TARGET_DIR)/usr/bin
 	chmod 0755 $(TARGET_DIR)/usr/bin/hurrican
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/hurrican/hurrican.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

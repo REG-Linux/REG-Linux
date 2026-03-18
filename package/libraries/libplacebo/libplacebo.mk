@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBPLACEBO_VERSION = v7.351.0
+LIBPLACEBO_VERSION = v7.360.0
 LIBPLACEBO_SITE = https://github.com/haasn/libplacebo
 LIBPLACEBO_SITE_METHOD=git
 LIBPLACEBO_LICENSE = LGPL-2.1

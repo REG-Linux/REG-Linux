@@ -1,10 +1,10 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SAVES
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SAVES
 
 PLAY_CONFIG_DIR = str(CONF / "play")
 PLAY_SAVE_DIR = str(SAVES / "play")
@@ -18,6 +18,7 @@ PLAY_INPUT_FILE = str(
 
 class PlayGenerator(Generator):
     # Play is QT6 based, requires wayland compositor to run
+    @override
     def requiresWayland(self):
         return True
 

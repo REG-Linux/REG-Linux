@@ -2,7 +2,7 @@ from os import walk
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import CONF, ROMS
+from configgen.config.paths import CONF, ROMS
 
 IOQUAKE3_BIN_DIR = "/usr/ioquake3"
 IOQUAKE3_BIN_PATH = "/userdata/roms/quake3/ioquake3"

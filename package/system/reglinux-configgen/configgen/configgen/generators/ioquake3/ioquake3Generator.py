@@ -2,8 +2,8 @@ from pathlib import Path
 from shutil import copytree
 from typing import Any
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 from .ioquake3Config import (

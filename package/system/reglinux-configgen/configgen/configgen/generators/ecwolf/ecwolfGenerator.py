@@ -2,10 +2,10 @@ from codecs import open as codecs_open
 from os import chdir
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.config.paths import CONF, SAVES
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

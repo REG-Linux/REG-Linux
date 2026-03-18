@@ -1,0 +1,87 @@
+#!/bin/bash
+
+LOCKFILE="/var/run/volume-button-script.lock"
+VOLUME_BUTTON_STATE="/var/run/volume-button-state.flag"
+
+echo "1" > "$VOLUME_BUTTON_STATE"
+
+do_lock() {
+    exec 200>"$LOCKFILE"
+    flock -n 200 || exit 1
+}
+
+case "$1" in
+    volup)
+        batocera-audio setSystemVolume +5
+
+        for ((i = 0; i < 5; i++)); do
+            if [ "$(cat "$VOLUME_BUTTON_STATE")" = "0" ]; then
+                exit 0
+            fi
+            sleep 0.1
+        done
+
+        do_lock
+
+        while [ "$(cat "$VOLUME_BUTTON_STATE")" = "1" ]; do
+            batocera-audio setSystemVolume +5
+            sleep 0.1
+        done
+        ;;
+    voldown)
+        batocera-audio setSystemVolume -5
+
+        for ((i = 0; i < 5; i++)); do
+            if [ "$(cat "$VOLUME_BUTTON_STATE")" = "0" ]; then
+                exit 0
+            fi
+            sleep 0.1
+        done
+
+        do_lock
+
+        while [ "$(cat "$VOLUME_BUTTON_STATE")" = "1" ]; do
+            batocera-audio setSystemVolume -5
+            sleep 0.1
+        done
+        ;;
+    briup)
+        batocera-brightness + 5
+
+        for ((i = 0; i < 5; i++)); do
+            if [ "$(cat "$VOLUME_BUTTON_STATE")" = "0" ]; then
+                exit 0
+            fi
+            sleep 0.1
+        done
+
+        do_lock
+
+        while [ "$(cat "$VOLUME_BUTTON_STATE")" = "1" ]; do
+            batocera-brightness + 5
+            sleep 0.1
+        done
+        ;;
+    bridown)
+        batocera-brightness - 5
+
+        for ((i = 0; i < 5; i++)); do
+            if [ "$(cat "$VOLUME_BUTTON_STATE")" = "0" ]; then
+                exit 0
+            fi
+            sleep 0.1
+        done
+
+        do_lock
+
+        while [ "$(cat "$VOLUME_BUTTON_STATE")" = "1" ]; do
+            batocera-brightness - 5
+            sleep 0.1
+        done
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+
+exit 0

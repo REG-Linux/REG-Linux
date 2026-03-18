@@ -5,7 +5,7 @@
 ################################################################################
 
 # branch: main
-REGLINUX_MSG_VERSION = ab66ca5b5428be65bf232c0623d14db456245acb
+REGLINUX_MSG_VERSION = 766cc1ff494003e8d6b4d1401515f8e26806ee7f
 
 ifeq ($(BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE),y)
 

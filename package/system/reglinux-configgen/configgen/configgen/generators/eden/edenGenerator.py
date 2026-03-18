@@ -1,4 +1,7 @@
-from configgen.command import Command
+import pathlib
+from typing import override
+
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
 
@@ -8,6 +11,7 @@ from .edenController import setEdenControllers
 
 class EdenGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -21,6 +25,11 @@ class EdenGenerator(Generator):
         wheels,
         game_resolution,
     ):
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = pathlib.Path(EDEN_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
+
         # Load existing config or create a new one
         edenConfig = UnixSettings(EDEN_CONFIG_PATH)
 

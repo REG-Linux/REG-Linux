@@ -1,8 +1,5 @@
 # Sonic Mania
 
-Sonic Mania decompilation port built with SDL2 + PortAudio audio backend.
+Sonic Mania decompilation port. Upstream: https://github.com/RSDKModding/Sonic-Mania-Decompilation
 
-## Build notes
-- **Version:** v1.1.1 release from `RSDKModding/Sonic-Mania-Decompilation`.
-- **Config:** selects SDL2, PortAudio (ALSA backend), libogg, and libtheora; adds GL/GLFW/GLU when Xorg+GL is present.
-- **Build system:** CMake release build that bundles the `sonic-mania` executable under `/usr/bin`, enables static linking, and copies `sonic-mania.keys` into `/usr/share/evmapy`.
+Uses PortAudio (ALSA backend) for audio. The binary lives deep in the CMake build tree under `dependencies/RSDKv5/`.

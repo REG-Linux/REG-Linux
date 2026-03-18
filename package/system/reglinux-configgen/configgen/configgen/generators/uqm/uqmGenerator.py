@@ -1,8 +1,7 @@
 import pathlib
 
-import controllers as controllersConfig
-
-from configgen.command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 UQM_BIN_PATH = "/usr/bin/urquan"
@@ -29,7 +28,7 @@ class UqmGenerator(Generator):
             pathlib.Path(directory).mkdir(exist_ok=True, parents=True)
 
         with pathlib.Path("/userdata/roms/uqm/version").open(
-            "a"
+            "a",
         ):  # Create file if does not exist
             pass
 
@@ -42,7 +41,7 @@ class UqmGenerator(Generator):
         return Command(
             array=command_array,
             env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generate_sdl_controller_config(
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
                     players_controllers,
                 ),
             },

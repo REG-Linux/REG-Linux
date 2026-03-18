@@ -3,10 +3,10 @@ from pathlib import Path
 from re import compile as re_compile
 from shutil import copy
 
-from configgen.command import Command
+from configgen.config.paths import ROMS
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.systemFiles import ROMS
 
 XASH3D_ROMS_DIR = ROMS / "xash3d_fwgs"
 XASH3D_HLSDK_LIBS_DIR = Path("/usr/lib/xash3d/hlsdk")
@@ -135,9 +135,15 @@ class Xash3dFwgsGenerator(Generator):
     def _maybeInitConfig(self, game: str) -> None:
         rom_dir = _rom_dir(game)
         userconfig_path = rom_dir / "userconfig.cfg"
+
+        # Remove existing config files to ensure clean state (no dynamic values)
+        if userconfig_path.exists():
+            userconfig_path.unlink()
+
         if not userconfig_path.exists():
             Path(userconfig_path).write_text(
-                "exec gamepad.cfg\nexec custom.cfg\n", encoding="utf-8"
+                "exec gamepad.cfg\nexec custom.cfg\n",
+                encoding="utf-8",
             )
 
         gamepad_path = rom_dir / "gamepad.cfg"
@@ -150,6 +156,11 @@ class Xash3dFwgsGenerator(Generator):
 
         config_dir = _config_dir(game)
         custom_cfg_path = config_dir / "custom.cfg"
+
+        # Remove existing custom config to ensure clean state
+        if custom_cfg_path.exists():
+            custom_cfg_path.unlink()
+
         if not custom_cfg_path.exists():
             if not config_dir.exists():
                 config_dir.mkdir(parents=True, exist_ok=True)

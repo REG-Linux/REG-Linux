@@ -25,30 +25,10 @@ menuconfig BR2_PACKAGE_ES_FFMPEG
 
 if BR2_PACKAGE_ES_FFMPEG
 
-config BR2_PACKAGE_ES_FFMPEG_FFMPEG
-	bool "Build ffmpeg (the command line application)"
-	default y
-	help
-	  FFmpeg is a very fast video and audio converter.
-	  It can also grab from a live audio/video source.
-
-	  It is not needed if you want to link the FFmpeg libraries
-	  to your application.
-
 config BR2_PACKAGE_ES_FFMPEG_SWSCALE
 	bool "Build libswscale"
 	help
 	  Swscale is a library of video scaling routines.
-
-config BR2_PACKAGE_ES_FFMPEG_ENCODERS
-	string "Enabled encoders"
-	default "all"
-	help
-	  Space-separated list of encoders to build in FFmpeg,
-	  or "all" to build all of them.
-
-	  Run ./configure --list-encoders in the ffmpeg sources
-	  directory to know the available options.
 
 config BR2_PACKAGE_ES_FFMPEG_DECODERS
 	string "Enabled decoders"
@@ -58,16 +38,6 @@ config BR2_PACKAGE_ES_FFMPEG_DECODERS
 	  or "all" to build all of them.
 
 	  Run ./configure --list-decoders in the ffmpeg sources
-	  directory to know the available options.
-
-config BR2_PACKAGE_ES_FFMPEG_MUXERS
-	string "Enabled muxers"
-	default "all"
-	help
-	  Space-separated list of muxers to build in FFmpeg,
-	  or "all" to build all of them.
-
-	  Run ./configure --list-muxers in the ffmpeg sources
 	  directory to know the available options.
 
 config BR2_PACKAGE_ES_FFMPEG_DEMUXERS

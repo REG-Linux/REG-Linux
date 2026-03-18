@@ -35,7 +35,7 @@ def generateControllerConfig(
             rom,
             guns,
         )
-    elif system.name == "gamecube":
+    elif system.name in ["gamecube", "triforce"]:
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         used_wheels: dict[str, Any] = {}

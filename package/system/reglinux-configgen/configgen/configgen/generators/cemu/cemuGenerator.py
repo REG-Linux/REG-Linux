@@ -3,9 +3,11 @@ import xml.parsers.expat
 from codecs import open as codecs_open
 from glob import escape, iglob
 from os import linesep, path
+from pathlib import Path
+from typing import override
 from xml.dom import minidom
 
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
@@ -25,10 +27,12 @@ eslog = get_logger(__name__)
 
 class CemuGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
     # disable hud & bezels for now - causes game issues
+    @override
     def hasInternalMangoHUDCall(self):
         return True
 
@@ -82,6 +86,11 @@ class CemuGenerator(Generator):
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(CEMU_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
+
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()],
         )

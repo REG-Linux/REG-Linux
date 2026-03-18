@@ -15,21 +15,16 @@ PLYMOUTH_CONF_OPTS += -Dlogo=/usr/share/pixmaps/reglinux_logo.png
 
 define PLYMOUTH_LOGO
 	mkdir -p $(TARGET_DIR)/usr/share/pixmaps/
-	cp $(PLYMOUTH_PATH)/images/reglinux_logo.png \
-		$(TARGET_DIR)/usr/share/pixmaps/
+	cp $(PLYMOUTH_PATH)/images/reglinux_logo.png $(TARGET_DIR)/usr/share/pixmaps/
 endef
 
 define PLYMOUTH_INITD
-	$(INSTALL) -m 0755 $(PLYMOUTH_PATH)/config/S002plymouth \
-		$(TARGET_DIR)/etc/init.d/
-
-
-	$(INSTALL) -m 0755 $(PLYMOUTH_PATH)/config/plymouthd.defaults \
-		$(TARGET_DIR)/usr/share/plymouth/
+	$(INSTALL) -m 0755 $(PLYMOUTH_PATH)/config/S002plymouth $(TARGET_DIR)/etc/init.d/S002plymouth
+	$(INSTALL) -m 0644 $(PLYMOUTH_PATH)/config/plymouthd.conf $(TARGET_DIR)/etc/plymouth/plymouthd.conf
 
 	# Themes
-	cp -r $(PLYMOUTH_PATH)/themes/* \
-		$(TARGET_DIR)/usr/share/plymouth/themes/
+	rm -rf $(TARGET_DIR)/usr/share/plymouth/themes/*
+	cp -r $(PLYMOUTH_PATH)/themes/* $(TARGET_DIR)/usr/share/plymouth/themes/
 endef
 
 PLYMOUTH_PRE_CONFIGURE_HOOKS += PLYMOUTH_LOGO

@@ -3,8 +3,8 @@
 # dolphin-emu
 #
 ################################################################################
-# Version: 2512
-DOLPHIN_EMU_VERSION = 2512
+# Version: 2603
+DOLPHIN_EMU_VERSION = 2603
 DOLPHIN_EMU_SITE = https://github.com/dolphin-emu/dolphin
 DOLPHIN_EMU_SITE_METHOD = git
 DOLPHIN_EMU_LICENSE = GPLv2+
@@ -13,6 +13,7 @@ DOLPHIN_EMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
 DOLPHIN_EMU_DEPENDENCIES = libevdev ffmpeg zlib libpng lzo libusb libcurl
 DOLPHIN_EMU_DEPENDENCIES += bluez5_utils hidapi xz host-xz sdl2 sdl3
+DOLPHIN_EMU_DEPENDENCIES += xlib_libXi
 
 DOLPHIN_EMU_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 DOLPHIN_EMU_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
@@ -49,13 +50,5 @@ DOLPHIN_EMU_CONF_OPTS += -DENABLE_VULKAN=ON
 else
 DOLPHIN_EMU_CONF_OPTS += -DENABLE_VULKAN=OFF
 endif
-
-define DOLPHIN_EMU_EVMAPY
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/dolphin-emu/*.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
-DOLPHIN_EMU_POST_INSTALL_TARGET_HOOKS = DOLPHIN_EMU_EVMAPY
 
 $(eval $(cmake-package))

@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: REG-Linux <noreply@reglinux.org>
+Date: Sat, 22 Feb 2026 00:00:00 +0000
+Subject: [PATCH] Makefile: add GCC 14 compatibility flags for kernel 4.9
+
+GCC 14 is much stricter about warnings and introduces new warning
+categories that cause build failures with the 4.9 kernel codebase.
+Suppress these warnings to allow compilation with modern GCC.
+
+---
+ Makefile | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -630,6 +630,16 @@ include scripts/Makefile.extrawarn
+ KBUILD_CFLAGS	+= $(call cc-option, -fno-var-tracking-assignments)
+
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
++# GCC 14 compatibility: suppress new warnings that break old kernel code
++KBUILD_CFLAGS += $(call cc-disable-warning,stringop-truncation)
++KBUILD_CFLAGS += $(call cc-disable-warning,stringop-overflow)
++KBUILD_CFLAGS += $(call cc-disable-warning,stringop-overread)
++KBUILD_CFLAGS += $(call cc-disable-warning,maybe-uninitialized)
++KBUILD_CFLAGS += $(call cc-disable-warning,address-of-packed-member)
++KBUILD_CFLAGS += $(call cc-disable-warning,packed-not-aligned)
++KBUILD_CFLAGS += $(call cc-disable-warning,array-bounds)
++KBUILD_CFLAGS += $(call cc-disable-warning,address)
++KBUILD_CFLAGS += $(call cc-disable-warning,attribute-alias)
+ KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ KBUILD_CFLAGS	+= -O2

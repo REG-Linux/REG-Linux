@@ -2,9 +2,9 @@ from pathlib import Path
 from typing import Any
 from zipfile import ZipFile
 
-from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
 
 from .amiberryConfig import AMIBERRY_BIN_PATH, setAmiberryConfig
@@ -19,8 +19,8 @@ class AmiberryGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: Any,
     ) -> Command:
         # setting up amiberry config file

@@ -1,0 +1,10 @@
+config BR2_PACKAGE_SWITCH_BOOTLOADER
+	bool "switch-bootloader"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	depends on BR2_aarch64
+	select BR2_PACKAGE_SWITCH_ATF
+	select BR2_PACKAGE_SWITCH_U_BOOT
+	help
+	  Boot orchestration package for the Nintendo Switch.
+	  Creates Hekate boot configuration, U-Boot boot script (boot.scr),
+	  and ties together ATF (bl31), U-Boot (bl33), and device trees.

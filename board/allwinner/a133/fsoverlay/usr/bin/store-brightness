@@ -1,0 +1,6 @@
+#!/bin/sh
+
+VAL=`brightness get`
+
+echo $VAL > /userdata/system/.brightness
+

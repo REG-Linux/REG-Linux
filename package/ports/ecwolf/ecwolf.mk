@@ -5,9 +5,8 @@
 ################################################################################
 
 ECWOLF_VERSION = 1.5pre
-ECWOLF_SITE = https://bitbucket.org/ecwolf/ecwolf.git
-ECWOLF_SITE_METHOD=git
-ECWOLF_GIT_SUBMODULES=YES
+ECWOLF_SITE = https://github.com/ECWolfEngine/ECWolf.git
+ECWOLF_SITE_METHOD = git
 ECWOLF_LICENSE = Non-commercial
 ECWOLF_DEPENDENCIES = host-ecwolf sdl2 sdl2_mixer sdl2_net zlib bzip2 jpeg
 ECWOLF_SUPPORTS_IN_SOURCE_BUILD = NO
@@ -57,10 +56,6 @@ define ECWOLF_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/buildroot-build/ecwolf $(TARGET_DIR)/usr/share/ecwolf/ecwolf
 	cp -a $(@D)/buildroot-build/ecwolf.pk3 $(TARGET_DIR)/usr/share/ecwolf/
 	ln -sf /usr/share/ecwolf/ecwolf $(TARGET_DIR)/usr/bin/ecwolf
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/ecwolf/ecwolf.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

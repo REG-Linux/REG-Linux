@@ -1,10 +1,5 @@
-# Libretro Play!
+# libretro-play
 
-The `libretro-play` core packages the PlayStation 2 emulator Play! (https://purei.org/) into REG-Linux with optional GL dependencies and the distro’s GLES/EGL tweaks.
+PlayStation 2 libretro core (Play!). Upstream: https://github.com/jpd002/Play-
 
-## Build notes
-
-- `Version`: 0.71
-- `Dependencies`: `BR2_PACKAGE_LIBGLEW`, `BR2_PACKAGE_LIBGLU` when `BR2_PACKAGE_HAS_LIBGL`
-- `Build helper`: CMake-based (`cmake-package`)
-- `Extras`: applies `003-gcc13-fix.patch`, `002-aarch64-gles.patch`, `001-egl-no-x11.patch`
+Uses desktop GL + `libglew` + `libglu` when available; falls back to GLES with `-DUSE_GLEW=OFF -DUSE_GLES=ON`. AArch64 and ARM pass `-DTARGET_PLATFORM_UNIX_AARCH64=YES` / `-DTARGET_PLATFORM_UNIX_ARM=YES`.

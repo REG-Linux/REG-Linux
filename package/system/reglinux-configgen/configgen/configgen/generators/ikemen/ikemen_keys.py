@@ -1,0 +1,71 @@
+"""Evmapy controller mappings for IKEMEN (IKEMEN).
+
+This module defines button mappings for IKEMEN games using evmapy.
+Mappings are loaded directly without file I/O for optimal performance.
+
+Example:
+    from configgen.generators.ikemen import evmapy_ikemen
+    config = evmapy_ikemen.get_config()
+
+"""
+
+from typing import Any
+
+# Evmapy configuration for IKEMEN controller
+# This replaces the need for external .keys files
+CONFIG: dict[str, Any] = {
+    "actions_player1": [
+        {
+            "trigger": ["hotkey", "start"],
+            "type": "key",
+            "target": ["KEY_LEFTALT", "KEY_F4"],
+        },
+        {"trigger": "joystick2", "type": "mouse"},
+        {"trigger": "l2", "type": "key", "target": "BTN_LEFT"},
+        {"trigger": "r2", "type": "key", "target": "BTN_RIGHT"},
+        {"trigger": "up", "type": "key", "target": "KEY_UP"},
+        {"trigger": "down", "type": "key", "target": "KEY_DOWN"},
+        {"trigger": "left", "type": "key", "target": "KEY_LEFT"},
+        {"trigger": "right", "type": "key", "target": "KEY_RIGHT"},
+        {"trigger": "start", "type": "key", "target": "KEY_ENTER"},
+        {"trigger": "select", "type": "key", "target": "KEY_Q"},
+        {"trigger": "a", "type": "key", "target": "KEY_A"},
+        {"trigger": "b", "type": "key", "target": "KEY_S"},
+        {"trigger": "x", "type": "key", "target": "KEY_D"},
+        {"trigger": "y", "type": "key", "target": "KEY_Z"},
+        {"trigger": "joystick1up", "type": "key", "target": "KEY_UP"},
+        {"trigger": "joystick1down", "type": "key", "target": "KEY_DOWN"},
+        {"trigger": "joystick1left", "type": "key", "target": "KEY_LEFT"},
+        {"trigger": "joystick1right", "type": "key", "target": "KEY_RIGHT"},
+        {"trigger": "pageup", "type": "key", "target": "KEY_X"},
+        {"trigger": "pagedown", "type": "key", "target": "KEY_C"},
+    ],
+    "actions_player2": [
+        {"trigger": "up", "type": "key", "target": "KEY_KP8"},
+        {"trigger": "down", "type": "key", "target": "KEY_KP5"},
+        {"trigger": "left", "type": "key", "target": "KEY_KP4"},
+        {"trigger": "right", "type": "key", "target": "KEY_KP6"},
+        {"trigger": "a", "type": "key", "target": "KEY_P"},
+        {"trigger": "b", "type": "key", "target": "KEY_LEFTBRACE"},
+        {"trigger": "x", "type": "key", "target": "KEY_RIGHTBRACE"},
+        {"trigger": "y", "type": "key", "target": "KEY_SEMICOLON"},
+        {"trigger": "joystick1up", "type": "key", "target": "KEY_KP8"},
+        {"trigger": "joystick1down", "type": "key", "target": "KEY_KP5"},
+        {"trigger": "joystick1left", "type": "key", "target": "KEY_KP4"},
+        {"trigger": "joystick1right", "type": "key", "target": "KEY_KP6"},
+        {"trigger": "pageup", "type": "key", "target": "KEY_APOSTROPHE"},
+        {"trigger": "pagedown", "type": "key", "target": "KEY_BACKSLASH"},
+        {"trigger": "select", "type": "key", "target": "KEY_DOT"},
+        {"trigger": "start", "type": "key", "target": "KEY_SLASH"},
+    ],
+}
+
+
+def get_config() -> dict[str, Any]:
+    """Return the evmapy configuration for IKEMEN.
+
+    Returns:
+        Configuration dictionary compatible with evmapy format.
+
+    """
+    return CONFIG

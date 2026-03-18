@@ -3,8 +3,8 @@
 # applewin
 #
 ################################################################################
-# Version: Commits on Jan 18, 2026
-APPLEWIN_VERSION = 60df032b933db97e253c6f5948eea9ee895e25a0
+# Version: Commits on Feb 28, 2026
+APPLEWIN_VERSION = 84b2f8d5c41129dee587b733dd216548896ef28b
 APPLEWIN_SITE = https://github.com/audetto/AppleWin
 APPLEWIN_SITE_METHOD=git
 APPLEWIN_GIT_SUBMODULES=YES
@@ -31,11 +31,6 @@ define APPLEWIN_INSTALL_TARGET_CMDS
 
 	cp -R $(@D)/resource/* $(TARGET_DIR)/usr/share/applewin/
 	rm $(TARGET_DIR)/usr/share/applewin/resource.h
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/applewin/evmapy/* \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

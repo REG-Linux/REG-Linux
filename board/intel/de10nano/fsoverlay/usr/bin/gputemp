@@ -1,0 +1,3 @@
+#!/bin/bash
+# No GPU on DE10-Nano HPS, return CPU temp as fallback
+cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'

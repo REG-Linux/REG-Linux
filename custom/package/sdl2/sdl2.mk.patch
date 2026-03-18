@@ -1,5 +1,5 @@
 diff --git a/package/sdl2/sdl2.mk b/package/sdl2/sdl2.mk
-index 67a4978e22..065ed0119e 100644
+index 67a4978e22..b438ba5045 100644
 --- a/package/sdl2/sdl2.mk
 +++ b/package/sdl2/sdl2.mk
 @@ -4,7 +4,8 @@
@@ -55,12 +55,12 @@ index 67a4978e22..065ed0119e 100644
  	--disable-ime \
  	--disable-ibus \
  	--disable-fcitx \
-@@ -50,11 +73,50 @@ define SDL2_FIX_SDL2_CONFIG_CMAKE
+@@ -50,11 +73,53 @@ define SDL2_FIX_SDL2_CONFIG_CMAKE
  	$(SED) 's%"/usr"%$${PACKAGE_PREFIX_DIR}%' \
  		$(STAGING_DIR)/usr/lib/cmake/SDL2/sdl2-config.cmake
  endef
 +
-+# batocera
++# reglinux
 +define SDL2_FIX_WAYLAND_SCANNER_PATH
 +	sed -i "s+/usr/bin/wayland-scanner+$(HOST_DIR)/usr/bin/wayland-scanner+g" $(@D)/Makefile
 +endef
@@ -83,14 +83,17 @@ index 67a4978e22..065ed0119e 100644
  # We must enable static build to get compilation successful.
  SDL2_CONF_OPTS += --enable-static
  
-+# batocera - Used in screen rotation (SDL and Retroarch)
-+ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
-+SDL2_DEPENDENCIES += rockchip-rga
-+endif
-+
 +# reglinux - RISC-V depend on custom mesa to enable wayland properly
 +ifeq ($(BR2_PACKAGE_IMG_GPU_POWERVR),y)
 +SDL2_DEPENDENCIES += img-gpu-powervr img-mesa3d
++endif
++
++# reglinux - Mali fbdev driver for PowerVR GE8300 (A133 / TrimUI)
++ifeq ($(BR2_PACKAGE_SDL2_MALI),y)
++SDL2_DEPENDENCIES += powervr-ge8300-driver
++SDL2_CONF_OPTS += --enable-video-mali
++else
++SDL2_CONF_OPTS += --disable-video-mali
 +endif
 +
 +# reglinux - depend on mesa3d for kmsdrm (gbm+egl) if enabled
@@ -98,7 +101,7 @@ index 67a4978e22..065ed0119e 100644
 +SDL2_DEPENDENCIES += mesa3d
 +endif
 +
-+# batocera - use Pipewire audio
++# reglinux - use Pipewire audio
 +ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
 +SDL2_CONF_OPTS += --enable-pipewire
 +endif
@@ -106,18 +109,7 @@ index 67a4978e22..065ed0119e 100644
  ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
  SDL2_CONF_ENV += CFLAGS="$(TARGET_CFLAGS) -marm"
  endif
-@@ -72,19 +134,27 @@ else
- SDL2_CONF_OPTS += --disable-sse
- endif
- 
-+# batocera / with patch sdl2_add_video_mali_gles2.patch / mrfixit
-+ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)
-+SDL2_CONF_OPTS += --enable-video-mali
-+endif
-+
- ifeq ($(BR2_X86_CPU_HAS_3DNOW),y)
- SDL2_CONF_OPTS += --enable-3dnow
- else
+@@ -78,13 +143,16 @@ else
  SDL2_CONF_OPTS += --disable-3dnow
  endif
  
@@ -138,7 +130,7 @@ index 67a4978e22..065ed0119e 100644
  # x-includes and x-libraries must be set for cross-compiling
  # By default x_includes and x_libraries contains unsafe paths.
  # (/usr/X11R6/include and /usr/X11R6/lib)
-@@ -158,10 +228,32 @@ SDL2_CONF_OPTS += --disable-alsa
+@@ -158,10 +226,32 @@ SDL2_CONF_OPTS += --disable-alsa
  endif
  
  ifeq ($(BR2_PACKAGE_SDL2_KMSDRM),y)
@@ -149,7 +141,7 @@ index 67a4978e22..065ed0119e 100644
  SDL2_CONF_OPTS += --disable-video-kmsdrm
  endif
  
-+# batocera - enable/disable Wayland video driver
++# reglinux - enable/disable Wayland video driver
 +ifeq ($(BR2_PACKAGE_SDL2_WAYLAND),y)
 +SDL2_DEPENDENCIES += wayland wayland-protocols libxkbcommon
 +SDL2_CONF_OPTS += --enable-video-wayland
@@ -157,12 +149,12 @@ index 67a4978e22..065ed0119e 100644
 +SDL2_CONF_OPTS += --disable-video-wayland
 +endif
 +
-+# batocera - libdecor
++# reglinux - libdecor
 +ifeq ($(BR2_PACKAGE_LIBDECOR),y)
 +SDL2_DEPENDENCIES += libdecor
 +endif
 +
-+# batocera - enable/disable Vulkan support
++# reglinux - enable/disable Vulkan support
 +ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
 +SDL2_DEPENDENCIES += vulkan-headers vulkan-loader
 +SDL2_CONF_OPTS += --enable-video-vulkan

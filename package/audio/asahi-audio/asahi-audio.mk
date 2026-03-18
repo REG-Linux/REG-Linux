@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ASAHI_AUDIO_VERSION = v2.6
+ASAHI_AUDIO_VERSION = v3.4
 ASAHI_AUDIO_SITE = $(call github,AsahiLinux,asahi-audio,$(ASAHI_AUDIO_VERSION))
 ASAHI_AUDIO_LICENSE = BSD-3-Clause
 ASAHI_AUDIO_LICENSE_FILES = LICENSE

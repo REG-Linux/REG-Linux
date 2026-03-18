@@ -1,4 +1,7 @@
-from configgen.command import Command
+from pathlib import Path
+from typing import override
+
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
 
@@ -8,6 +11,7 @@ from .azaharControllers import setAzaharControllers
 
 class AzaharGenerator(Generator):
     # this emulator/core requires X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -21,16 +25,19 @@ class AzaharGenerator(Generator):
         wheels,
         game_resolution,
     ):
+        # Remove existing config file to ensure clean state
+        config_path = Path(AZAHAR_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
+
         # Load existing config or create a new one
         azaharConfig = UnixSettings(AZAHAR_CONFIG_PATH)
 
         # Update configuration
         setAzaharConfig(azaharConfig, system)
-        # TODO: Set controllers
         setAzaharControllers(azaharConfig, players_controllers)
 
         # Save the updated configuration
-        azaharConfig.write()  # UnixSettings method
+        azaharConfig.write()
 
-        command_array = [AZAHAR_BIN_PATH, rom]
-        return Command(array=command_array)
+        return Command(array=[AZAHAR_BIN_PATH, rom])

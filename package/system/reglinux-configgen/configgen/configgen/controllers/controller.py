@@ -3,9 +3,11 @@
 Provides functionality to generate SDL game controller configuration strings.
 """
 
+from __future__ import annotations
+
 import pathlib
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -23,7 +25,7 @@ class Input:
     code: int | None = None
 
     @classmethod
-    def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional["Input"]:
+    def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Input | None:
         """Create an Input instance from SDL controller mapping string.
 
         Handles all SDL controller mapping types (buttons, axes, and hats) according to:
@@ -146,7 +148,7 @@ class Controller:
     nbhats: int | None = 0
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Controller":
+    def from_dict(cls, data: dict[str, Any]) -> Controller:
         return cls(
             guid=data.get("guid", ""),
             name=data.get("name", ""),

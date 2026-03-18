@@ -1,8 +1,26 @@
+"""Libretro core configuration options.
+
+This module contains configuration functions for all libretro cores.
+Organized by console family for maintainability.
+
+Console Families:
+    - Commodore (Amiga, C64, VIC, PET, Plus/4)
+    - Nintendo (NES, SNES, N64, GameBoy, DS)
+    - Sega (Master System, Genesis, Saturn)
+    - Sony (PlayStation, PS2, PSP)
+    - Arcade (MAME, FB Neo, NeoCD)
+    - Other (ScummVM, DOS, etc.)
+"""
+
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
 from configgen.controllers import getGamesMetaData, gunsNeedCrosses
+
+# =============================================================================
+# MAIN ENTRY POINT
+# =============================================================================
 
 
 def generateCoreSettings(
@@ -156,6 +174,11 @@ def generateCoreSettings(
     for user_config in system.config:
         if user_config[:14] == "retroarchcore.":
             coreSettings.save(user_config[14:], '"' + system.config[user_config] + '"')
+
+
+# =============================================================================
+# COMMODORE CORES (Amiga, C64, VIC, PET, Plus/4)
+# =============================================================================
 
 
 def configure_cap32(coreSettings: Any, system: Any) -> None:
@@ -319,6 +342,7 @@ def configure_commodore_64(coreSettings: Any, system: Any, guns: Any) -> None:
             coreSettings.save("vice_crop", '"' + system.config["vice_zoom_mode"] + '"')
     else:
         coreSettings.save("vice_crop", '"auto_disable"')
+    # Set deprecated value for backward compatibility
     coreSettings.save("vice_zoom_mode", '"deprecated"')
     # External palette
     if system.isOptSet("vice_external_palette"):
@@ -409,6 +433,7 @@ def configure_commodore_128(coreSettings: Any, system: Any) -> None:
             coreSettings.save("vice_crop", '"' + system.config["vice_zoom_mode"] + '"')
     else:
         coreSettings.save("vice_crop", '"auto_disable"')
+    # Set deprecated value for backward compatibility
     coreSettings.save("vice_zoom_mode", '"deprecated"')
     # External palette
     if system.isOptSet("vice_external_palette"):
@@ -482,6 +507,7 @@ def configure_commodore_plus(coreSettings: Any, system: Any) -> None:
             coreSettings.save("vice_crop", '"' + system.config["vice_zoom_mode"] + '"')
     else:
         coreSettings.save("vice_crop", '"auto_disable"')
+    # Set deprecated value for backward compatibility
     coreSettings.save("vice_zoom_mode", '"deprecated"')
     # External palette
     if system.isOptSet("vice_plus4_external_palette"):
@@ -555,6 +581,7 @@ def configure_commodore_vic(coreSettings: Any, system: Any) -> None:
             coreSettings.save("vice_crop", '"' + system.config["vice_zoom_mode"] + '"')
     else:
         coreSettings.save("vice_crop", '"auto_disable"')
+    # Set deprecated value for backward compatibility
     coreSettings.save("vice_zoom_mode", '"deprecated"')
     # External palette
     if system.isOptSet("vice_vic20_external_palette"):
@@ -628,6 +655,7 @@ def configure_commodore_pet(coreSettings: Any, system: Any) -> None:
             coreSettings.save("vice_crop", '"' + system.config["vice_zoom_mode"] + '"')
     else:
         coreSettings.save("vice_crop", '"auto_disable"')
+    # Set deprecated value for backward compatibility
     coreSettings.save("vice_zoom_mode", '"deprecated"')
     # External palette
     if system.isOptSet("vice_pet_external_palette"):
@@ -1377,6 +1405,11 @@ def configure_pcfx(coreSettings: Any, system: Any) -> None:
         coreSettings.save("pcfx_nospritelimit", '"enabled"')
 
 
+# ===========================================================================
+# NINTENDO 64 CORES (Mupen64, Parallel N64)
+# ===========================================================================
+
+
 def configure_mupen64plus_next(
     coreSettings: Any,
     system: Any,
@@ -1750,6 +1783,11 @@ def configure_parallel_n64(
         coreSettings.save("parallel-n64-64dd-hardware", '"enabled"')
         # Boot device
         coreSettings.save("parallel-n64-boot-device", '"64DD IPL"')
+
+
+# ===========================================================================
+# NINTENDO CORES (NES, SNES, N64, GameBoy, DS)
+# ===========================================================================
 
 
 def configure_desmume(coreSettings: Any, system: Any) -> None:
@@ -2818,6 +2856,11 @@ def configure_xrick(coreSettings: Any, system: Any) -> None:
         coreSettings.save("xrick_cheat3", '"disabled"')
 
 
+# ===========================================================================
+# OTHER CORES (ScummVM, DOS, Quake, etc.)
+# ===========================================================================
+
+
 def configure_scummvm(coreSettings: Any, system: Any) -> None:
     # Analog Deadzone
     if system.isOptSet("scummvm_analog_deadzone"):
@@ -2843,6 +2886,11 @@ def configure_scummvm(coreSettings: Any, system: Any) -> None:
         )
     else:
         coreSettings.save("scummvm_speed_hack", '"enabled"')
+
+
+# ===========================================================================
+# SEGA DREAMCAST/NAOMI (Flycast)
+# ===========================================================================
 
 
 def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) -> None:
@@ -3005,6 +3053,11 @@ def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) ->
         coreSettings.save("reicast_analog_stick_deadzone", '"0%"')
     else:
         coreSettings.save("reicast_analog_stick_deadzone", '"15%"')  # default value
+
+
+# ===========================================================================
+# SEGA CORES (Master System, Genesis, Saturn)
+# ===========================================================================
 
 
 def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
@@ -3371,6 +3424,11 @@ def configure_fuse(coreSettings: Any, system: Any) -> None:
         coreSettings.save("fuse_hide_border", '"disabled"')
 
 
+# ===========================================================================
+# ARCADE CORES (MAME, FB Neo, NeoCD)
+# ===========================================================================
+
+
 def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None:
     romBase = Path(rom).stem  # filename without extension
     # Diagnostic input
@@ -3480,6 +3538,11 @@ def configure_ppsspp(coreSettings: Any, system: Any) -> None:
         )
     else:
         coreSettings.save("ppsspp_internal_resolution", '"480x272"')
+
+
+# ===========================================================================
+# SONY PLAYSTATION CORES (PS1, PS2, PSP)
+# ===========================================================================
 
 
 def configure_mednafen_psx(coreSettings: Any, system: Any) -> None:

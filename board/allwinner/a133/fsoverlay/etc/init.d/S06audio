@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Starts audio services
+#
+
+. /etc/profile.d/xdg.sh
+. /etc/profile.d/dbus.sh
+
+BOARD=$(cat /boot/boot/system.board)
+
+start_pipewire() {
+    printf "Starting pipewire: "
+    start-stop-daemon -S -b -q -m -p /var/run/pipewire.pid --exec /usr/bin/pipewire
+    echo "OK"
+
+    PULSE_SOCK=/var/run/pulse/native
+
+    printf "Waiting for pulse sink: "
+    N=0
+    until pactl -s "unix:$PULSE_SOCK" list sinks short 2>/dev/null | grep -q .; do
+    sleep 0.1
+    N=$((N+1))
+    [ $N -gt 25 ] && { echo "KO"; break; }
+    done
+    echo "OK"
+}
+
+stop_pipewire() {
+    printf "Stopping pipewire: "
+    start-stop-daemon -K -q -p /var/run/pipewire.pid
+    killall pipewire
+    echo "OK"
+}
+
+case "$1" in
+    start)
+        if [ "$BOARD" = "powkiddy-v90s" ] || [ "$BOARD" = "powkiddy-v20" ]; then
+            alsactl init
+        fi
+        start_pipewire
+    ;;
+    stop)
+        stop_pipewire
+    ;;
+    restart|reload)
+        stop_pipewire
+        start_pipewire
+    ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

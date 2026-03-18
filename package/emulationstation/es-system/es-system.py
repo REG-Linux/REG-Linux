@@ -4,15 +4,16 @@
 # - Generate the _info.txt file with the emulator information
 # - Information from the emulators are being extracted from the file es_system.yml
 #
-import yaml
-import re
 import argparse
-import os
-import shutil
-from collections import OrderedDict
 import glob
 import json
+import os
+import re
+import shutil
+from collections import OrderedDict
 from os.path import basename
+
+import yaml
 
 
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
@@ -96,7 +97,6 @@ class EsSystemConf:
         toTranslate = EsSystemConf.findTranslations(featuresYaml)
 
         # remove blacklisted words
-        backlistWords = {}
         with open(esBlacklistedWordsFile) as fp:
             line = fp.readline().rstrip("\n")
             while line:
@@ -157,7 +157,7 @@ class EsSystemConf:
         listEmulatorsTxt = EsSystemConf.listEmulators(
             data, config, defaultEmulator, defaultCore
         )
-        if listEmulatorsTxt == "" and not ("force" in data and data["force"] == True):
+        if listEmulatorsTxt == "" and not ("force" in data and data["force"]):
             return ""
 
         pathValue = EsSystemConf.systemPath(system, data)
@@ -365,7 +365,7 @@ class EsSystemConf:
             if m:
                 continue
             # skip floats (2.5)
-            m = re.search("^[0-9]+\.[0-9]+[+]?$", tr)
+            m = re.search(r"^[0-9]+\.[0-9]+[+]?$", tr)
             if m:
                 continue
             # skip ratio (4:3)
@@ -386,7 +386,7 @@ class EsSystemConf:
                 continue
             # skip resolutions (2x 640x480, 4x (640x480), x4 640x480, 3x 1080p (1920x1584), 2x 720p, 7x 2880p 5K
             m = re.search(
-                "^[xX]?[0-9]*[xX]?[ ]*\(?[0-9]+[x]?[0-9]+[pK]?\)?[ ]*\(?[0-9]+[x]?[0-9]+[pK]?\)?$",
+                r"^[xX]?[0-9]*[xX]?[ ]*\(?[0-9]+[x]?[0-9]+[pK]?\)?[ ]*\(?[0-9]+[x]?[0-9]+[pK]?\)?$",
                 tr,
             )
             if m:
@@ -746,7 +746,7 @@ class EsSystemConf:
                                         ][cfeature],
                                         toTranslate,
                                         emulator,
-                                        core,
+                                        None,
                                     )
                                 else:
                                     print(
@@ -1012,10 +1012,11 @@ class EsSystemConf:
 
         for requirement in requirements:
             if isinstance(requirement, list):
-                subreqValid = True
+                subreq = False
                 for reqitem in requirement:
-                    if reqitem not in config:
-                        subreq = False
+                    if reqitem in config:
+                        subreq = True
+                        break
                 if subreq:
                     return True
             else:

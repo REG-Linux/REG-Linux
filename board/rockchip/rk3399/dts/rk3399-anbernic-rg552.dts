@@ -12,7 +12,6 @@
 #include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/usb/pd.h>
 #include "rockchip/rk3399.dtsi"
-#include "rockchip/rk3399-opp.dtsi"
 
 / {
     model = "Anbernic RG552";
@@ -57,11 +56,8 @@
         };
     };
 
-    vibrator {
-		compatible = "pwm-vibrator";
-		pwms = <&pwm0 0 1000000 0>;
-		pwm-names = "enable";
-	};
+    /* Vibrator removed - GPIO0_PB0 is used by ES8316 hp-det */
+    /* Rumble is handled by PWM3 via the gamepad driver */
 
     adc-keys {
         compatible = "adc-keys";
@@ -700,10 +696,14 @@
 };
 
 &pwm0 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pwm0_pin>;
     status = "okay";
 };
 
 &pwm1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pwm1_pin>;
     status = "okay";
 };
 
@@ -714,6 +714,8 @@
 };
 
 &pwm3 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pwm3a_pin>;
     status = "okay";
     label = "rumble-pwm";
 };
@@ -722,10 +724,9 @@
     assigned-clock-rates = <150000000>;
 
     bus-width = <8>;
-    mmc-hs400-1_8v;
-    mmc-hs400-enhanced-strobe;
+    mmc-hs200-1_8v;
     non-removable;
-
+    keep-power-in-suspend;
     status = "okay";
 };
 
@@ -741,6 +742,17 @@
     clock-master;
 
     ports {
+        mipi_in: port@0 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <0>;
+
+            mipi_in_vopb: endpoint@0 {
+                reg = <0>;
+                remote-endpoint = <&vopb_out_mipi>;
+            };
+        };
+
         mipi_out: port@1 {
             #address-cells = <1>;
             #size-cells = <0>;
@@ -875,7 +887,8 @@
                 regulator-min-microvolt = <1800000>;
                 regulator-max-microvolt = <3300000>;
                 regulator-state-mem {
-                    regulator-off-in-suspend;
+                    regulator-on-in-suspend;
+                    regulator-suspend-microvolt = <3000000>;
                 };
             };
 
@@ -1029,6 +1042,8 @@
     clock-frequency = <100000>;
     i2c-scl-falling-time-ns = <4>;
     i2c-scl-rising-time-ns = <168>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c1_xfer>;
     status = "okay";
 
     es8316: es8316@11 {
@@ -1037,20 +1052,28 @@
         clocks = <&cru SCLK_I2S_8CH_OUT>;
         clock-names = "mclk";
         #sound-dai-cells = <0>;
+        AVDD-supply = <&vcca3v0_codec>;
+        DVDD-supply = <&vcca1v8_codec>;
+        HPVDD-supply = <&vcca3v0_codec>;
     };
 };
 
 &i2c3 {
     i2c-scl-rising-time-ns = <450>;
     i2c-scl-falling-time-ns = <15>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c3_xfer>;
     status = "okay";
 };
 
 &i2c4 {
     i2c-scl-rising-time-ns = <600>;
     i2c-scl-falling-time-ns = <20>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c4_xfer>;
     status = "okay";
 
+    /* Goodix GT927 capacitive touchscreen controller */
     touchscreen@14 {
         compatible = "goodix,gt927";
         reg = <0x14>;
@@ -1058,11 +1081,12 @@
         interrupts = <RK_PD7 IRQ_TYPE_EDGE_FALLING>;
         irq-gpios = <&gpio3 RK_PD7 GPIO_ACTIVE_HIGH>;
         reset-gpios = <&gpio3 RK_PD6 GPIO_ACTIVE_HIGH>;
-        pinctrl-names = "default";
+        AVDD28-supply = <&vcc3v0_touch>;
+        VDDIO-supply = <&vcc3v0_touch>;
         touchscreen-inverted-x;
+        touchscreen-inverted-y;
         touchscreen-size-x = <1152>;
         touchscreen-size-y = <1920>;
-        touchscreen-swapped-x-y;
     };
 
     fusb0: typec-portc@22 {
@@ -1279,6 +1303,12 @@
     rockchip,hw-tshut-mode = <1>;
     /* tshut polarity 0:LOW 1:HIGH */
     rockchip,hw-tshut-polarity = <1>;
+    rockchip,grf = <&grf>;
+    rockchip,hw-tshut-temp = <95000>;
+    pinctrl-names = "init", "default", "sleep";
+    pinctrl-0 = <&otp_pin>;
+    pinctrl-1 = <&otp_out>;
+    pinctrl-2 = <&otp_pin>;
     status = "okay";
 };
 
@@ -1321,6 +1351,8 @@
 };
 
 &uart2 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&uart2c_xfer>;
     status = "okay";
 };
 
@@ -1360,6 +1392,16 @@
 
 &vopb {
     status = "okay";
+
+    vopb_out: port {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        vopb_out_mipi: endpoint@1 {
+            reg = <1>;
+            remote-endpoint = <&mipi_in_vopb>;
+        };
+    };
 };
 
 &vopb_mmu {

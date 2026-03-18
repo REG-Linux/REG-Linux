@@ -1,0 +1,43 @@
+include toolchain-gcc13-glibc.common
+include reglinux-board.common
+
+# Target definition
+BR2_aarch64=y
+BR2_cortex_a53=y
+BR2_ARM_FPU_NEON_FP_ARMV8=y
+BR2_PACKAGE_SYSTEM_TARGET_A133=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mcpu=cortex-a53 -mtune=cortex-a53"
+#BR2_TARGET_GENERIC_GETTY_PORT="tty1"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/a133/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/a133/fsoverlay"
+# Kernel 4.9 BSP: only zlib+xz squashfs supported — use gzip (zlib)
+BR2_TARGET_ROOTFS_SQUASHFS4_GZIP=y
+
+# BSP kernel — cannot use mainline (no PowerVR GE8300 driver upstream)
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.9.191"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/a133/linux-sunxi64-legacy.config"
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_9=y
+BR2_KERNEL_HEADERS_AS_KERNEL=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST="4.9"
+
+# GPU — PowerVR GE8300 binary driver (glibc-linked)
+BR2_PACKAGE_POWERVR_GE8300_DRIVER=y
+
+# No wayland
+BR2_PACKAGE_WAYLAND=n
+
+# No ARM Trusted Firmware — bootloaders are prebuilt Allwinner binary blobs
+# No BR2_TARGET_ARM_TRUSTED_FIRMWARE
+
+# Filesystem tools
+BR2_PACKAGE_HOST_ABOOTIMG=y
+BR2_PACKAGE_HOST_DOSFSTOOLS=y
+BR2_PACKAGE_HOST_GENIMAGE=y
+BR2_PACKAGE_HOST_MTOOLS=y
+BR2_PACKAGE_HOST_UBOOT_TOOLS=y
+
+BR2_TARGET_ROOTFS_CPIO_LZ4=y

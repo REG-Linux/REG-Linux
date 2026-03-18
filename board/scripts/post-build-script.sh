@@ -78,10 +78,10 @@ then
     mv "${TARGET_DIR}/etc/init.d/S10udev"    "${TARGET_DIR}/etc/init.d/S001udev"    || exit 1 # Plymouth depends on initialized udev.
 fi
 
-# dbus - move really before for network (connman prerequisite) and pipewire
-if test -e "${TARGET_DIR}/etc/init.d/S30dbus"
+# dbus - run early for network (iwd prerequisite) and pipewire
+if test -e "${TARGET_DIR}/etc/init.d/S30dbus-daemon"
 then
-    mv "${TARGET_DIR}/etc/init.d/S30dbus"    "${TARGET_DIR}/etc/init.d/S01dbus"    || exit 1
+    mv "${TARGET_DIR}/etc/init.d/S30dbus-daemon"    "${TARGET_DIR}/etc/init.d/S01dbus-daemon"    || exit 1
 fi
 
 # network - move to make ifaces up sooner, mainly mountable/unmountable before/after share

@@ -1,0 +1,1 @@
+../common/create-boot-script.sh

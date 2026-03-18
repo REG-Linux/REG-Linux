@@ -1,8 +1,9 @@
 from pathlib import Path
+from typing import override
 
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
-from configgen.settings import UnixSettings
+from configgen.settings import TOMLSettings
 
 from .melondsConfig import (
     MELONDS_BIN_PATH,
@@ -16,6 +17,7 @@ from .melondsControllers import setMelondsControllers
 
 class MelonDSGenerator(Generator):
     # this emulator/core requires wayland compositor to run
+    @override
     def requiresWayland(self):
         return True
 
@@ -39,12 +41,20 @@ class MelonDSGenerator(Generator):
         if not cheats_dir_path.exists():
             cheats_dir_path.mkdir(parents=True, exist_ok=True)
 
-        melondsConfig = UnixSettings(MELONDS_CONFIG_PATH)
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(MELONDS_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
+        melondsConfig = TOMLSettings(MELONDS_CONFIG_PATH)
+
+        # First set config to initialize all sections
         setMelonDSConfig(melondsConfig, system, game_resolution)
+
+        # Then set controllers (after config to ensure Joystick section is preserved)
         setMelondsControllers(melondsConfig, players_controllers)
 
-        # Now write the ini file
+        # Now write the toml file
         melondsConfig.write()
 
         command_array = [MELONDS_BIN_PATH, "-f", rom]

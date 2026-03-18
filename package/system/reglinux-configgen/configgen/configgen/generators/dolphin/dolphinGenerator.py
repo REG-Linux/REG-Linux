@@ -3,11 +3,11 @@ from contextlib import suppress
 from os import environ
 from pathlib import Path
 from subprocess import CalledProcessError, check_output
-from typing import Any
+from typing import Any, override
 
-from configgen.command import Command
 from configgen.controllers import gunsNeedCrosses
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 from configgen.utils.logger import get_logger
 
 from .dolphinConfig import (
@@ -27,6 +27,7 @@ eslog = get_logger(__name__)
 class DolphinGenerator(Generator):
     # this emulator/core requires X server to run
     # TODO I think this is wrong and it can runs on wayland...
+    @override
     def requiresX11(self) -> bool:
         return True
 
@@ -36,8 +37,8 @@ class DolphinGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         """Generate the Dolphin emulator configuration.
@@ -207,7 +208,7 @@ class DolphinGenerator(Generator):
                 dolphin_settings.set("Core", "SIDevice" + str(i - 1), value)
             # if the pad is a wheel and on gamecube, use it
             elif (
-                system.name == "gamecube"
+                system.name in ["gamecube", "triforce"]
                 and system.isOptSet("use_wheels")
                 and system.getOptBoolean("use_wheels")
                 and len(wheels) > 0
@@ -297,72 +298,47 @@ class DolphinGenerator(Generator):
                 text=True,
             ).strip()
             if have_vulkan == "true":
-                eslog.debug("Vulkan driver is available on the system.")
+                eslog.debug("Vulkan driver available")
                 try:
                     have_discrete = check_output(
                         ["/usr/bin/system-vulkan", "hasDiscrete"],
                         text=True,
                     ).strip()
                     if have_discrete == "true":
-                        eslog.debug(
-                            "A discrete GPU is available on the system. We will use that for performance",
-                        )
-                        try:
-                            discrete_index = check_output(
-                                ["/usr/bin/system-vulkan", "discreteIndex"],
-                                text=True,
-                            ).strip()
-                            if discrete_index != "":
-                                eslog.debug(
-                                    f"Using Discrete GPU Index: {discrete_index} for Dolphin",
-                                )
-                                dolphin_gfx_settings.set(
-                                    "Hardware",
-                                    "Adapter",
-                                    discrete_index,
-                                )
-                            else:
-                                eslog.debug("Couldn't get discrete GPU index")
-                        except CalledProcessError:
-                            eslog.debug("Error getting discrete GPU index")
+                        discrete_index = check_output(
+                            ["/usr/bin/system-vulkan", "discreteIndex"],
+                            text=True,
+                        ).strip()
+                        if discrete_index:
+                            eslog.debug(f"Using discrete GPU (index: {discrete_index})")
+                            dolphin_gfx_settings.set(
+                                "Hardware",
+                                "Adapter",
+                                discrete_index,
+                            )
                     else:
-                        eslog.debug(
-                            "Discrete GPU is not available on the system. Trying integrated.",
-                        )
                         have_integrated = check_output(
                             ["/usr/bin/system-vulkan", "hasIntegrated"],
                             text=True,
                         ).strip()
                         if have_integrated == "true":
-                            eslog.debug(
-                                "Using integrated GPU to provide Vulkan. Beware of performance",
-                            )
-                            try:
-                                integrated_index = check_output(
-                                    ["/usr/bin/system-vulkan", "integratedIndex"],
-                                    text=True,
-                                ).strip()
-                                if integrated_index != "":
-                                    eslog.debug(
-                                        f"Using Integrated GPU Index: {integrated_index} for Dolphin",
-                                    )
-                                    dolphin_gfx_settings.set(
-                                        "Hardware",
-                                        "Adapter",
-                                        integrated_index,
-                                    )
-                                else:
-                                    eslog.debug("Couldn't get integrated GPU index")
-                            except CalledProcessError:
-                                eslog.debug("Error getting integrated GPU index")
-                        else:
-                            eslog.debug(
-                                "Integrated GPU is not available on the system. Cannot enable Vulkan.",
-                            )
+                            integrated_index = check_output(
+                                ["/usr/bin/system-vulkan", "integratedIndex"],
+                                text=True,
+                            ).strip()
+                            if integrated_index:
+                                eslog.debug(
+                                    f"Using integrated GPU (index: {integrated_index})"
+                                )
+                                dolphin_gfx_settings.set(
+                                    "Hardware",
+                                    "Adapter",
+                                    integrated_index,
+                                )
                 except CalledProcessError:
-                    eslog.debug("Error checking for discrete GPU.")
+                    eslog.debug("GPU detection error")
         except CalledProcessError:
-            eslog.debug("Error executing system-vulkan script.")
+            eslog.debug("Vulkan detection error")
 
         # Graphics setting Aspect Ratio
         if system.isOptSet("dolphin_aspect_ratio"):

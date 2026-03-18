@@ -1,7 +1,8 @@
 from os import listdir
 from pathlib import Path
+from typing import override
 
-from configgen.command import Command
+from configgen.core import Command
 from configgen.generators.generator import Generator
 
 try:
@@ -12,10 +13,10 @@ except ImportError:
     )
     raise
 from shutil import move
-from typing import Any
+from typing import Any, override
 
+from configgen.config.paths import CONF, SAVES
 from configgen.controllers import generate_sdl_controller_config
-from configgen.systemFiles import CONF, SAVES
 
 try:
     from ruamel.yaml.util import load_yaml_guess_indent
@@ -30,6 +31,7 @@ VITA3K_BIN_PATH = "/usr/bin/vita3k/Vita3K"
 
 class Vita3kGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -184,6 +186,7 @@ class Vita3kGenerator(Generator):
         )
 
     # Show mouse for touchscreen actions
+    @override
     def getMouseMode(self, config, rom):
         return not (
             "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0"

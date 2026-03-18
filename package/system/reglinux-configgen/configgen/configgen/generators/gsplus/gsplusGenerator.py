@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from configgen.command import Command
+from configgen.config.paths import BIOS, CONF
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
-from configgen.systemFiles import BIOS, CONF
 
 GSPLUS_CONFIG_DIR = str(Path(CONF) / "GSplus")
 GSPLUS_CONFIG_PATH = str(Path(GSPLUS_CONFIG_DIR) / "config.txt")
@@ -26,6 +26,11 @@ class GSplusGenerator(Generator):
         config_dir_path = Path(GSPLUS_CONFIG_DIR)
         if not config_dir_path.exists():
             config_dir_path.mkdir(parents=True, exist_ok=True)
+
+        # Remove existing config file to ensure clean state (no dynamic values)
+        config_path = Path(GSPLUS_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         config = UnixSettings(GSPLUS_CONFIG_PATH, separator=" ")
         rombase = Path(rom).name

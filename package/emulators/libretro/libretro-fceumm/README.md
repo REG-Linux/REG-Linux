@@ -1,10 +1,5 @@
-# Libretro FCEUmm
+# libretro-fceumm
 
-The `libretro-fceumm` core lets REG-Linux run the FCEUmm NES emulator with the Raspberry Pi tuning already in place.
+NES libretro core (FCEUmm). Upstream: https://github.com/libretro/libretro-fceumm
 
-## Build notes
-
-- `Version`: 5cd4a43e16a7f3cd35628d481c347a0a98cfdfa2
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-RPi5-tuning.patch` and `002-enable-lto.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets, Cortex-A7 to `classic_armv7_a7`, and S812 to `armv`; other AArch64 boards fall back to `unix`.

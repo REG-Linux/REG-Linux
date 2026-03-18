@@ -1,12 +1,12 @@
 diff --git a/package/qt6/qt6tools/qt6tools.hash b/package/qt6/qt6tools/qt6tools.hash
-index ede1608ec4..5f373a884f 100644
+index ede1608ec4..c436835628 100644
 --- a/package/qt6/qt6tools/qt6tools.hash
 +++ b/package/qt6/qt6tools/qt6tools.hash
 @@ -1,5 +1,5 @@
 -# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qttools-everywhere-src-6.8.1.tar.xz.sha256
 -sha256  9d43d409be08b8681a0155a9c65114b69c9a3fc11aef6487bb7fdc5b283c432d  qttools-everywhere-src-6.8.1.tar.xz
-+# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qttools-everywhere-src-6.10.1.tar.xz.sha256
-+sha256  8148408380ffea03101a26305c812b612ea30dbc07121e58707601522404d49b  qttools-everywhere-src-6.10.1.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.2/submodules/qttools-everywhere-src-6.10.2.tar.xz.sha256
++sha256  1e3d2c07c1fd76d2425c6eaeeaa62ffaff5f79210c4e1a5bc2a6a9db668d5b24  qttools-everywhere-src-6.10.2.tar.xz
  
  # Hashes for license files:
  sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt

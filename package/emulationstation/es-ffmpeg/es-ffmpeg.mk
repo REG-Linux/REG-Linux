@@ -51,9 +51,9 @@ ES_FFMPEG_CONF_OPTS = \
 	--disable-symver \
 	--disable-doc \
 
-ES_FFMPEG_LOCAL_ONLY_DECODERS = h264 hevc vp9 vp8 av1 theora mpeg4 mpegvideo mpeg2video mpeg1video aac ac3 mp3 opus vorbis flac pcm_s16le pcm_s16be pcm_u8 mjpeg vc1
-ES_FFMPEG_LOCAL_ONLY_DEMUXERS = mov matroska mpegts avi asf ogg wav flac mp3
-ES_FFMPEG_LOCAL_ONLY_PARSERS = h264 hevc vp9 vp8 av1 mpeg4video mpegvideo aac ac3 mpegaudio opus vorbis flac
+ES_FFMPEG_LOCAL_ONLY_DECODERS = h264 hevc vp9 vp8 av1 mpeg4 mpeg2video aac mp3 opus vorbis flac pcm_s16le pcm_u8 mjpeg
+ES_FFMPEG_LOCAL_ONLY_DEMUXERS = mov matroska avi ogg wav flac mp3
+ES_FFMPEG_LOCAL_ONLY_PARSERS = h264 hevc vp9 vp8 av1 mpeg4video aac mpegaudio opus vorbis flac
 ES_FFMPEG_LOCAL_ONLY_PROTOCOLS = file
 ES_FFMPEG_LOCAL_ONLY_FILTERS = format aresample aformat asetnsamples
 
@@ -153,12 +153,7 @@ ES_FFMPEG_CONF_OPTS += --disable-bzlib
 endif
 
 
-ifeq ($(BR2_PACKAGE_ES_FFMPEG_GPL)$(BR2_PACKAGE_LIBCDIO_PARANOIA),yy)
-ES_FFMPEG_CONF_OPTS += --enable-libcdio
-ES_FFMPEG_DEPENDENCIES += libcdio-paranoia
-else
 ES_FFMPEG_CONF_OPTS += --disable-libcdio
-endif
 
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
 ES_FFMPEG_CONF_OPTS += --enable-libdrm
@@ -167,23 +162,11 @@ else
 ES_FFMPEG_CONF_OPTS += --disable-libdrm
 endif
 
-ifeq ($(BR2_PACKAGE_LIBOPENH264),y)
-ES_FFMPEG_CONF_OPTS += --enable-libopenh264
-ES_FFMPEG_DEPENDENCIES += libopenh264
-else
 ES_FFMPEG_CONF_OPTS += --disable-libopenh264
-endif
+ES_FFMPEG_CONF_OPTS += --disable-libvorbis
 
-ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
-ES_FFMPEG_DEPENDENCIES += libvorbis
-ES_FFMPEG_CONF_OPTS += \
-	--enable-libvorbis \
-	--enable-muxer=ogg \
-	--enable-encoder=libvorbis
-endif
-
-# REG
-ifeq ($(BR2_PACKAGE_LIBV4L),y)
+# REG - v4l2-request requires kernel headers >= 4.20 (v4l2_timeval_to_ns, media request API)
+ifeq ($(BR2_PACKAGE_LIBDRM)$(BR2_PACKAGE_LIBV4L)$(BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_20),yyy)
 ES_FFMPEG_CONF_OPTS += --enable-v4l2-request
 ES_FFMPEG_DEPENDENCIES += libv4l
 else
@@ -231,19 +214,8 @@ else
 ES_FFMPEG_CONF_OPTS += --disable-libvpx
 endif
 
-ifeq ($(BR2_PACKAGE_LIBASS),y)
-ES_FFMPEG_CONF_OPTS += --enable-libass
-ES_FFMPEG_DEPENDENCIES += libass
-else
 ES_FFMPEG_CONF_OPTS += --disable-libass
-endif
-
-ifeq ($(BR2_PACKAGE_LIBBLURAY),y)
-ES_FFMPEG_CONF_OPTS += --enable-libbluray
-ES_FFMPEG_DEPENDENCIES += libbluray
-else
 ES_FFMPEG_CONF_OPTS += --disable-libbluray
-endif
 
 ifeq ($(BR2_PACKAGE_LIBVPL),y)
 ES_FFMPEG_CONF_OPTS += --enable-libvpl --disable-libmfx
@@ -257,99 +229,19 @@ endif
 
 ES_FFMPEG_CONF_OPTS += --disable-librtmp
 
-ifeq ($(BR2_PACKAGE_LAME),y)
-ES_FFMPEG_CONF_OPTS += --enable-libmp3lame
-ES_FFMPEG_DEPENDENCIES += lame
-else
 ES_FFMPEG_CONF_OPTS += --disable-libmp3lame
-endif
-
-ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
-ES_FFMPEG_CONF_OPTS += --enable-libmodplug
-ES_FFMPEG_DEPENDENCIES += libmodplug
-else
 ES_FFMPEG_CONF_OPTS += --disable-libmodplug
-endif
-
-ifeq ($(BR2_PACKAGE_LIBOPENMPT),y)
-ES_FFMPEG_CONF_OPTS += --enable-libopenmpt
-ES_FFMPEG_DEPENDENCIES += libopenmpt
-else
 ES_FFMPEG_CONF_OPTS += --disable-libopenmpt
-endif
-
-ifeq ($(BR2_PACKAGE_LIBSOXR),y)
-ES_FFMPEG_CONF_OPTS += --enable-libsoxr
-ES_FFMPEG_DEPENDENCIES += libsoxr
-else
 ES_FFMPEG_CONF_OPTS += --disable-libsoxr
-endif
-
-ifeq ($(BR2_PACKAGE_SPEEX),y)
-ES_FFMPEG_CONF_OPTS += --enable-libspeex
-ES_FFMPEG_DEPENDENCIES += speex
-else
 ES_FFMPEG_CONF_OPTS += --disable-libspeex
-endif
-
-ifeq ($(BR2_PACKAGE_LIBTHEORA),y)
-ES_FFMPEG_CONF_OPTS += --enable-libtheora
-ES_FFMPEG_DEPENDENCIES += libtheora
-else
 ES_FFMPEG_CONF_OPTS += --disable-libtheora
-endif
-
-ifeq ($(BR2_PACKAGE_LIBICONV),y)
-ES_FFMPEG_CONF_OPTS += --enable-iconv
-ES_FFMPEG_DEPENDENCIES += libiconv
-else
 ES_FFMPEG_CONF_OPTS += --disable-iconv
-endif
-
-ifeq ($(BR2_PACKAGE_LIBXML2),y)
-ES_FFMPEG_CONF_OPTS += --enable-libxml2
-ES_FFMPEG_DEPENDENCIES += libxml2
-else
 ES_FFMPEG_CONF_OPTS += --disable-libxml2
-endif
-
-# ffmpeg freetype support require fenv.h which is only
-# available/working on glibc.
-# The microblaze variant doesn't provide the needed exceptions
-ifeq ($(BR2_PACKAGE_FREETYPE)$(BR2_TOOLCHAIN_USES_GLIBC)x$(BR2_microblaze),yyx)
-ES_FFMPEG_CONF_OPTS += --enable-libfreetype
-ES_FFMPEG_DEPENDENCIES += freetype
-else
 ES_FFMPEG_CONF_OPTS += --disable-libfreetype
-endif
-
-ifeq ($(BR2_PACKAGE_FONTCONFIG),y)
-ES_FFMPEG_CONF_OPTS += --enable-fontconfig
-ES_FFMPEG_DEPENDENCIES += fontconfig
-else
 ES_FFMPEG_CONF_OPTS += --disable-fontconfig
-endif
-
-ifeq ($(BR2_PACKAGE_HARFBUZZ),y)
-ES_FFMPEG_CONF_OPTS += --enable-libharfbuzz
-ES_FFMPEG_DEPENDENCIES += harfbuzz
-else
 ES_FFMPEG_CONF_OPTS += --disable-libharfbuzz
-endif
-
-ifeq ($(BR2_PACKAGE_LIBFRIBIDI),y)
-ES_FFMPEG_CONF_OPTS += --enable-libfribidi
-ES_FFMPEG_DEPENDENCIES += libfribidi
-else
 ES_FFMPEG_CONF_OPTS += --disable-libfribidi
-endif
-
-ifeq ($(BR2_PACKAGE_OPENJPEG),y)
-ES_FFMPEG_CONF_OPTS += --enable-libopenjpeg
-ES_FFMPEG_DEPENDENCIES += openjpeg
-else
 ES_FFMPEG_CONF_OPTS += --disable-libopenjpeg
-endif
 
 ES_FFMPEG_CONF_OPTS += --disable-libx264
 ES_FFMPEG_CONF_OPTS += --disable-libx265

@@ -1,0 +1,23 @@
+From: REG-Linux <reg@reglinux.org>
+Subject: [PATCH] Makefile: select epoll event loop backend on Linux
+
+The upstream project only ships a kqueue-based event loop which does
+not compile on Linux (no sys/event.h).  Conditionally pick
+event_loop_epoll.c on Linux instead of event_loop_kqueue.c.
+
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -244,7 +244,11 @@ endif
+ ifeq ($(ENABLE_ZHTTPD),1)
+     CFLAGS += -DENABLE_ZHTTPD=1
+     CFLAGS += -DENABLE_WEB_UPLOAD=1
+-    SOURCES += src/event_loop_kqueue.c
++ifeq ($(TARGET),linux)
++    SOURCES += src/event_loop_epoll.c
++else
++    SOURCES += src/event_loop_kqueue.c
++endif
+     SOURCES += src/http_server.c
+     SOURCES += src/http_parser.c
+     SOURCES += src/http_response.c

@@ -1,10 +1,5 @@
-# Libretro MAME2010
+# libretro-mame2010
 
-The `libretro-mame2010` core keeps REG-Linux’s ARM arcade catalog aligned with the 2010-era MAME release plus the Raspberry Pi patch set.
+MAME 2010 arcade libretro core. Upstream: https://github.com/libretro/mame2010-libretro
 
-## Build notes
-
-- `Version`: c5b413b71e0a290c57fc351562cd47ba75bac105
-- `Dependencies`: `BR2_PACKAGE_ZLIB`, supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-rpi_makefile.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets.

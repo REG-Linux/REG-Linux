@@ -1,0 +1,125 @@
+use mister_fpga::keyboard::Ps2Scancode;
+
+/// Convert a Linux evdev KEY_* code to a MiSTer PS/2 scancode.
+///
+/// Returns None for unmapped keys. The mapping is derived from the
+/// Ps2Scancode enum comments which list the corresponding Linux KEY_* values.
+pub fn linux_key_to_ps2(code: u16) -> Option<Ps2Scancode> {
+    match code {
+        1 => Some(Ps2Scancode::Esc),           // KEY_ESC
+        2 => Some(Ps2Scancode::Key1),          // KEY_1
+        3 => Some(Ps2Scancode::Key2),          // KEY_2
+        4 => Some(Ps2Scancode::Key3),          // KEY_3
+        5 => Some(Ps2Scancode::Key4),          // KEY_4
+        6 => Some(Ps2Scancode::Key5),          // KEY_5
+        7 => Some(Ps2Scancode::Key6),          // KEY_6
+        8 => Some(Ps2Scancode::Key7),          // KEY_7
+        9 => Some(Ps2Scancode::Key8),          // KEY_8
+        10 => Some(Ps2Scancode::Key9),         // KEY_9
+        11 => Some(Ps2Scancode::Key0),         // KEY_0
+        12 => Some(Ps2Scancode::Minus),        // KEY_MINUS
+        13 => Some(Ps2Scancode::Equal),        // KEY_EQUAL
+        14 => Some(Ps2Scancode::Backspace),    // KEY_BACKSPACE
+        15 => Some(Ps2Scancode::Tab),          // KEY_TAB
+        16 => Some(Ps2Scancode::Q),            // KEY_Q
+        17 => Some(Ps2Scancode::W),            // KEY_W
+        18 => Some(Ps2Scancode::E),            // KEY_E
+        19 => Some(Ps2Scancode::R),            // KEY_R
+        20 => Some(Ps2Scancode::T),            // KEY_T
+        21 => Some(Ps2Scancode::Y),            // KEY_Y
+        22 => Some(Ps2Scancode::U),            // KEY_U
+        23 => Some(Ps2Scancode::I),            // KEY_I
+        24 => Some(Ps2Scancode::O),            // KEY_O
+        25 => Some(Ps2Scancode::P),            // KEY_P
+        26 => Some(Ps2Scancode::LeftBrace),    // KEY_LEFTBRACE
+        27 => Some(Ps2Scancode::RightBrace),   // KEY_RIGHTBRACE
+        28 => Some(Ps2Scancode::Enter),        // KEY_ENTER
+        29 => Some(Ps2Scancode::LeftCtrl),     // KEY_LEFTCTRL
+        30 => Some(Ps2Scancode::A),            // KEY_A
+        31 => Some(Ps2Scancode::S),            // KEY_S
+        32 => Some(Ps2Scancode::D),            // KEY_D
+        33 => Some(Ps2Scancode::F),            // KEY_F
+        34 => Some(Ps2Scancode::G),            // KEY_G
+        35 => Some(Ps2Scancode::H),            // KEY_H
+        36 => Some(Ps2Scancode::J),            // KEY_J
+        37 => Some(Ps2Scancode::K),            // KEY_K
+        38 => Some(Ps2Scancode::L),            // KEY_L
+        39 => Some(Ps2Scancode::SemiColon),    // KEY_SEMICOLON
+        40 => Some(Ps2Scancode::Apostrophe),   // KEY_APOSTROPHE
+        41 => Some(Ps2Scancode::Grave),        // KEY_GRAVE
+        42 => Some(Ps2Scancode::LeftShift),    // KEY_LEFTSHIFT
+        43 => Some(Ps2Scancode::Backslash),    // KEY_BACKSLASH
+        44 => Some(Ps2Scancode::Z),            // KEY_Z
+        45 => Some(Ps2Scancode::X),            // KEY_X
+        46 => Some(Ps2Scancode::C),            // KEY_C
+        47 => Some(Ps2Scancode::V),            // KEY_V
+        48 => Some(Ps2Scancode::B),            // KEY_B
+        49 => Some(Ps2Scancode::N),            // KEY_N
+        50 => Some(Ps2Scancode::M),            // KEY_M
+        51 => Some(Ps2Scancode::Comma),        // KEY_COMMA
+        52 => Some(Ps2Scancode::Dot),          // KEY_DOT
+        53 => Some(Ps2Scancode::Slash),        // KEY_SLASH
+        54 => Some(Ps2Scancode::RightShift),   // KEY_RIGHTSHIFT
+        55 => Some(Ps2Scancode::KpAsterisk),   // KEY_KPASTERISK
+        56 => Some(Ps2Scancode::LeftAlt),      // KEY_LEFTALT
+        57 => Some(Ps2Scancode::Space),        // KEY_SPACE
+        58 => Some(Ps2Scancode::CapsLock),     // KEY_CAPSLOCK
+        59 => Some(Ps2Scancode::F1),           // KEY_F1
+        60 => Some(Ps2Scancode::F2),           // KEY_F2
+        61 => Some(Ps2Scancode::F3),           // KEY_F3
+        62 => Some(Ps2Scancode::F4),           // KEY_F4
+        63 => Some(Ps2Scancode::F5),           // KEY_F5
+        64 => Some(Ps2Scancode::F6),           // KEY_F6
+        65 => Some(Ps2Scancode::F7),           // KEY_F7
+        66 => Some(Ps2Scancode::F8),           // KEY_F8
+        67 => Some(Ps2Scancode::F9),           // KEY_F9
+        68 => Some(Ps2Scancode::F10),          // KEY_F10
+        69 => Some(Ps2Scancode::NumLock),      // KEY_NUMLOCK
+        70 => Some(Ps2Scancode::ScrollLock),   // KEY_SCROLLLOCK
+        71 => Some(Ps2Scancode::Kp7),          // KEY_KP7
+        72 => Some(Ps2Scancode::Kp8),          // KEY_KP8
+        73 => Some(Ps2Scancode::Kp9),          // KEY_KP9
+        74 => Some(Ps2Scancode::KpMinus),      // KEY_KPMINUS
+        75 => Some(Ps2Scancode::Kp4),          // KEY_KP4
+        76 => Some(Ps2Scancode::Kp5),          // KEY_KP5
+        77 => Some(Ps2Scancode::Kp6),          // KEY_KP6
+        78 => Some(Ps2Scancode::KpPlus),       // KEY_KPPLUS
+        79 => Some(Ps2Scancode::Kp1),          // KEY_KP1
+        80 => Some(Ps2Scancode::Kp2),          // KEY_KP2
+        81 => Some(Ps2Scancode::Kp3),          // KEY_KP3
+        82 => Some(Ps2Scancode::Kp0),          // KEY_KP0
+        83 => Some(Ps2Scancode::KpDot),        // KEY_KPDOT
+        86 => Some(Ps2Scancode::Key102Nd),     // KEY_102ND
+        87 => Some(Ps2Scancode::F11),          // KEY_F11
+        88 => Some(Ps2Scancode::F12),          // KEY_F12
+        // F13-F16 have no PS/2 scancode mapping
+        89 => Some(Ps2Scancode::RO),           // KEY_RO
+        92 => Some(Ps2Scancode::Henkan),       // KEY_HENKAN
+        94 => Some(Ps2Scancode::Muhenkan),     // KEY_MUHENKAN
+        96 => Some(Ps2Scancode::KpEnter),      // KEY_KPENTER
+        97 => Some(Ps2Scancode::RightCtrl),    // KEY_RIGHTCTRL
+        98 => Some(Ps2Scancode::KpSlash),      // KEY_KPSLASH
+        99 => Some(Ps2Scancode::SysReq),       // KEY_SYSRQ
+        100 => Some(Ps2Scancode::RightAlt),    // KEY_RIGHTALT
+        102 => Some(Ps2Scancode::Home),        // KEY_HOME
+        103 => Some(Ps2Scancode::Up),          // KEY_UP
+        104 => Some(Ps2Scancode::PageUp),      // KEY_PAGEUP
+        105 => Some(Ps2Scancode::Left),        // KEY_LEFT
+        106 => Some(Ps2Scancode::Right),       // KEY_RIGHT
+        107 => Some(Ps2Scancode::End),         // KEY_END
+        108 => Some(Ps2Scancode::Down),        // KEY_DOWN
+        109 => Some(Ps2Scancode::PageDown),    // KEY_PAGEDOWN
+        110 => Some(Ps2Scancode::Insert),      // KEY_INSERT
+        111 => Some(Ps2Scancode::Delete),      // KEY_DELETE
+        119 => Some(Ps2Scancode::Pause),       // KEY_PAUSE
+        124 => Some(Ps2Scancode::Yen),         // KEY_YEN
+        125 => Some(Ps2Scancode::LeftMeta),    // KEY_LEFTMETA
+        126 => Some(Ps2Scancode::RightMeta),   // KEY_RIGHTMETA
+        127 => Some(Ps2Scancode::Compose),     // KEY_COMPOSE
+        187 => Some(Ps2Scancode::F17),         // KEY_F17
+        188 => Some(Ps2Scancode::F18),         // KEY_F18
+        189 => Some(Ps2Scancode::F19),         // KEY_F19
+        190 => Some(Ps2Scancode::F20),         // KEY_F20
+        _ => None,
+    }
+}

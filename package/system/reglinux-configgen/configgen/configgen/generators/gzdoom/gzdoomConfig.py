@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import CONF, LOGDIR
+from configgen.config.paths import CONF, LOGDIR
 from configgen.utils.logger import get_logger
 
 GZDOOM_CONFIG_DIR = str(Path(CONF) / "gzdoom")
@@ -60,7 +60,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
             "[SoundfontSearch.Directories]\n"
             "Path=" + GZDOOM_SOUND_FONT_PATH + "\n"
             "Path=" + GZDOOM_FM_BANKS_PATH + "\n"
-            "[GlobalSettings]\n"
+            "[GlobalSettings]\n",
         )
     else:
         # configparser wasn't working on the default ini file (non-compliant)

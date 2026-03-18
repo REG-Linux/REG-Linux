@@ -1,0 +1,42 @@
+From 382e09367c37376c8389b36e076a41e09e7e977a Mon Sep 17 00:00:00 2001
+From: Juliano Dorigao <jdorigao@gmail.com>
+Date: Sat, 14 Mar 2026 17:28:26 -0400
+Subject: [PATCH 2/2] drm/meson: Change DSI disabled message to debug level
+
+The DSI (Display Serial Interface) encoder probe function currently logs
+an error message when no DSI transceiver device is found in the device
+tree:
+
+  meson-drm ff900000.vpu: DSI transceiver device is disabled
+
+However, this is expected behavior for devices that do not use DSI
+displays, such as TV boxes (Beelink GT-King, Odroid N2, etc.) that
+only use HDMI and/or CVBS outputs. The function returns 0 (success)
+after logging this message, indicating it is not an actual error
+condition.
+
+Change the log level from dev_err() to dev_dbg() to avoid confusing
+users and reduce noise in the kernel log for devices without DSI
+displays. The message will still be available for debugging purposes
+when CONFIG_DYNAMIC_DEBUG is enabled.
+
+Signed-off-by: Juliano Dorigao <jdorigao@gmail.com>
+---
+ drivers/gpu/drm/meson/meson_encoder_dsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/meson/meson_encoder_dsi.c b/drivers/gpu/drm/meson/meson_encoder_dsi.c
+index 7816902f5..666a380dd 100644
+--- a/drivers/gpu/drm/meson/meson_encoder_dsi.c
++++ b/drivers/gpu/drm/meson/meson_encoder_dsi.c
+@@ -113,7 +113,7 @@ int meson_encoder_dsi_probe(struct meson_drm *priv)
+ 	/* DSI Transceiver Bridge */
+ 	remote = of_graph_get_remote_node(priv->dev->of_node, 2, 0);
+ 	if (!remote) {
+-		dev_err(priv->dev, "DSI transceiver device is disabled");
++		dev_dbg(priv->dev, "DSI transceiver device is disabled");
+ 		return 0;
+ 	}
+ 
+-- 
+2.53.0

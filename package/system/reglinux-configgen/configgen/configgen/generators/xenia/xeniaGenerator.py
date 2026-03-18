@@ -4,11 +4,12 @@ from pathlib import Path
 from shutil import copy2
 from subprocess import CalledProcessError, check_output
 from sys import exit as sys_exit
+from typing import override
 
-from configgen.command import Command
+from configgen.config.paths import CONF, HOME, SAVES
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.generator import Generator
-from configgen.systemFiles import CONF, HOME, SAVES
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 
 try:
     from toml import dump, load
@@ -17,7 +18,7 @@ except ImportError:
     raise
 from glob import glob
 from re import IGNORECASE, search, sub
-from typing import Any
+from typing import Any, override
 
 from configgen.utils.logger import get_logger
 
@@ -31,6 +32,7 @@ XENIA_CANARY_BIN_PATH = Path("/usr/bin/xenia_canary")
 
 class XeniaGenerator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -51,8 +53,8 @@ class XeniaGenerator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: Any,
     ) -> Command:
         core = system.config["core"]
@@ -354,5 +356,6 @@ class XeniaGenerator(Generator):
 
     # Show mouse on screen when needed
     # xenia auto-hides
+    @override
     def getMouseMode(self, config, rom):
         return True

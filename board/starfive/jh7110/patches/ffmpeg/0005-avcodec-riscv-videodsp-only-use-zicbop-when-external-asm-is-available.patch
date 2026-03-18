@@ -1,0 +1,62 @@
+From 6f8f2188f9dfd86ec1f497f9f7a48f0d5f44f167 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Wed, 25 Feb 2026 14:20:00 +0000
+Subject: [PATCH] avcodec/riscv: videodsp: only use zicbop when external asm is
+ available
+
+`videodsp_init.c` wires `ctx->prefetch` to `ff_prefetch_rv_zicbop` when
+`HAVE_RV_ZICBOP` is set. On rv64gc toolchains where configure reports:
+
+  HAVE_RV_ZICBOP=yes
+  HAVE_RV_ZICBOP_EXTERNAL=no
+
+the C side can still emit a reference to `ff_prefetch_rv_zicbop`, but the
+external-asm path is not guaranteed to provide the symbol. This leads to
+link failures such as:
+
+  undefined reference to `ff_prefetch_rv_zicbop'
+
+Gate both the asm implementation and the C-side hook behind
+`HAVE_RV_ZICBOP_EXTERNAL` so the prefetch hook is only enabled when the
+external asm symbol is available.
+
+Signed-off-by: Codex <codex@openai.com>
+---
+ libavcodec/riscv/videodsp.S      | 2 +-
+ libavcodec/riscv/videodsp_init.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libavcodec/riscv/videodsp.S b/libavcodec/riscv/videodsp.S
+index e74a65f9f0..34cc9ac350 100644
+--- a/libavcodec/riscv/videodsp.S
++++ b/libavcodec/riscv/videodsp.S
+@@ -21,7 +21,7 @@
+ #include "config.h"
+ #include "libavutil/riscv/asm.S"
+ 
+-#if HAVE_RV_ZICBOP
++#if HAVE_RV_ZICBOP_EXTERNAL
+ func ff_prefetch_rv_zicbop, zicbop
+ 1:
+         addi    a2, a2, -1
+diff --git a/libavcodec/riscv/videodsp_init.c b/libavcodec/riscv/videodsp_init.c
+index 15995d10f7..1a1c620c57 100644
+--- a/libavcodec/riscv/videodsp_init.c
++++ b/libavcodec/riscv/videodsp_init.c
+@@ -21,11 +21,11 @@
+ #include "libavutil/cpu.h"
+ #include "libavcodec/videodsp.h"
+ 
+-void ff_prefetch_rv_zicbop(const uint8_t *mem, ptrdiff_t stride, int h);
++void ff_prefetch_rv_zicbop(const uint8_t *mem, ptrdiff_t stride, int h);
+ 
+ av_cold void ff_videodsp_init_riscv(VideoDSPContext *ctx, int bpc)
+ {
+-#if HAVE_RV_ZICBOP
++#if HAVE_RV_ZICBOP_EXTERNAL
+     /* TODO: Since we pay for the indirect function call anyway, we should
+      * only set this if Cache-Block Operation Prefetch (Zicbop) is actually
+      * supported and otherwise save a few cycles of NOPs.
+-- 
+2.34.1
+

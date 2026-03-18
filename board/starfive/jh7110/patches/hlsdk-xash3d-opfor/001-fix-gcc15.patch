@@ -1,0 +1,28 @@
+From 87e222aaa74ca6656bb93ef3e83ba5693d2ec90b Mon Sep 17 00:00:00 2001
+From: harveyhans <32636532+kairusds@users.noreply.github.com>
+Date: Thu, 5 Jun 2025 03:56:29 +0800
+Subject: [PATCH] common: const: avoid defining true and false in C23 (#538)
+
+---
+ common/const.h | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/common/const.h b/common/const.h
+index 3e2989f5f5..7f73effa49 100644
+--- a/common/const.h
++++ b/common/const.h
+@@ -743,11 +743,10 @@ typedef unsigned short	word;
+ #undef true
+ #undef false
+ 
+-#if !__cplusplus
+-typedef enum { false, true }	qboolean;
+-#else 
+-typedef int qboolean;
++#if !__cplusplus &&  __STDC_VERSION__ < 202311L
++enum { false, true };
+ #endif
++typedef int qboolean;
+ 
+ typedef struct
+ {

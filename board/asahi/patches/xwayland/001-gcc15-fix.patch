@@ -1,0 +1,10 @@
+--- a/meson.build	2026-02-25 12:29:15.505788793 +0100
++++ b/meson.build	2026-02-25 12:29:22.864115890 +0100
+@@ -41,7 +41,6 @@
+         '-Werror=sequence-point',
+         '-Werror=return-type',
+         '-Werror=trigraphs',
+-        '-Werror=array-bounds',
+         '-Werror=write-strings',
+         '-Werror=address',
+         '-Werror=int-to-pointer-cast',

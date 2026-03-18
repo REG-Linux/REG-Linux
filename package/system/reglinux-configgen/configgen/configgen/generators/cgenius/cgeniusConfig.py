@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.systemFiles import CONF, ROMS
+from configgen.config.paths import CONF, ROMS
 
 CGENIUS_CONFIG_DIR = str(Path(CONF) / "cgenius")
 CGENIUS_ROMS_DIR = str(Path(ROMS) / "cgenius" / "")

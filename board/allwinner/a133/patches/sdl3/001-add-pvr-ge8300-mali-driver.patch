@@ -1,0 +1,497 @@
+diff -urN a/cmake/sdlchecks.cmake b/cmake/sdlchecks.cmake
+--- a/cmake/sdlchecks.cmake
++++ b/cmake/sdlchecks.cmake
+@@ -634,6 +634,28 @@ endmacro()
+
+ # Requires:
+ # - n/a
++macro(CheckMali)
++  if(SDL_MALI)
++    check_c_source_compiles("
++        #define LINUX
++        #define EGL_API_FB
++        #include <EGL/egl.h>
++        int main(int argc, char** argv) { return 0; }" HAVE_MALI_EGL_FB)
++    if(HAVE_MALI_EGL_FB)
++      set(HAVE_MALI TRUE)
++      set(HAVE_SDL_VIDEO TRUE)
++
++      sdl_glob_sources("${SDL3_SOURCE_DIR}/src/video/mali-fbdev/*.c")
++      set(SDL_VIDEO_DRIVER_MALI 1)
++      # These defines are needed when including the system EGL headers
++      sdl_compile_definitions(PUBLIC "LINUX" "EGL_API_FB")
++      sdl_link_dependency(mali LIBS EGL)
++    endif()
++  endif()
++endmacro()
++
++# Requires:
++# - n/a
+ macro(CheckVivante)
+   if(SDL_VIVANTE)
+     check_c_source_compiles("
+diff -urN a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -361,6 +361,7 @@ dep_option(SDL_VIVANTE             "Use Vivante EGL video driver" ON "${UNIX_SYS
+ dep_option(SDL_VULKAN              "Enable Vulkan support" ON "SDL_VIDEO;ANDROID OR APPLE OR LINUX OR FREEBSD OR WINDOWS" OFF)
+ dep_option(SDL_RENDER_VULKAN       "Enable the Vulkan render driver" ON "SDL_RENDER;SDL_VULKAN" OFF)
+ dep_option(SDL_METAL               "Enable Metal support" ON "APPLE" OFF)
++set_option(SDL_MALI                "Use Mali fbdev EGL video driver" OFF)
+ set_option(SDL_OPENVR              "Use OpenVR video driver" OFF)
+ dep_option(SDL_KMSDRM              "Use KMS DRM video driver" ${UNIX_SYS} "SDL_VIDEO" OFF)
+ dep_option(SDL_KMSDRM_SHARED       "Dynamically load KMS DRM support" ON "SDL_KMSDRM;SDL_DEPS_SHARED" OFF)
+@@ -1615,6 +1615,7 @@ endmacro()
+     CheckOpenGLES()
+     CheckWayland()
+     CheckOpenVR()
++    CheckMali()
+     CheckVivante()
+     CheckVulkan()
+     CheckQNXScreen()
+diff -urN a/src/video/mali-fbdev/SDL_maliopengles.h b/src/video/mali-fbdev/SDL_maliopengles.h
+--- a/src/video/mali-fbdev/SDL_maliopengles.h	1970-01-01 00:00:00.000000000 +0000
++++ b/src/video/mali-fbdev/SDL_maliopengles.h
+@@ -0,0 +1,37 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied warranty.
++  In no event will the authors be held liable for any damages arising from
++  the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it freely.
++*/
++#include "SDL_internal.h"
++
++#ifndef SDL_maliopengles_h_
++#define SDL_maliopengles_h_
++
++#if defined(SDL_VIDEO_DRIVER_MALI) && defined(SDL_VIDEO_OPENGL_EGL)
++
++#include "../SDL_sysvideo.h"
++#include "../SDL_egl_c.h"
++
++/* OpenGLES functions */
++#define MALI_GLES_GetAttribute    SDL_EGL_GetAttribute
++#define MALI_GLES_GetProcAddress  SDL_EGL_GetProcAddressInternal
++#define MALI_GLES_UnloadLibrary   SDL_EGL_UnloadLibrary
++#define MALI_GLES_SetSwapInterval SDL_EGL_SetSwapInterval
++#define MALI_GLES_GetSwapInterval SDL_EGL_GetSwapInterval
++#define MALI_GLES_DestroyContext  SDL_EGL_DestroyContext
++
++extern bool MALI_GLES_LoadLibrary(SDL_VideoDevice *_this, const char *path);
++extern SDL_GLContext MALI_GLES_CreateContext(SDL_VideoDevice *_this, SDL_Window *window);
++extern bool MALI_GLES_SwapWindow(SDL_VideoDevice *_this, SDL_Window *window);
++extern bool MALI_GLES_MakeCurrent(SDL_VideoDevice *_this, SDL_Window *window, SDL_GLContext context);
++
++#endif /* SDL_VIDEO_DRIVER_MALI && SDL_VIDEO_OPENGL_EGL */
++
++#endif /* SDL_maliopengles_h_ */
+diff -urN a/src/video/mali-fbdev/SDL_maliopengles.c b/src/video/mali-fbdev/SDL_maliopengles.c
+--- a/src/video/mali-fbdev/SDL_maliopengles.c	1970-01-01 00:00:00.000000000 +0000
++++ b/src/video/mali-fbdev/SDL_maliopengles.c
+@@ -0,0 +1,30 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied warranty.
++  In no event will the authors be held liable for any damages arising from
++  the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it freely.
++*/
++#include "SDL_internal.h"
++
++#if defined(SDL_VIDEO_DRIVER_MALI) && defined(SDL_VIDEO_OPENGL_EGL)
++
++#include "SDL_maliopengles.h"
++#include "SDL_malivideo.h"
++
++/* EGL implementation of SDL OpenGL support */
++
++bool MALI_GLES_LoadLibrary(SDL_VideoDevice *_this, const char *path)
++{
++    return SDL_EGL_LoadLibrary(_this, path, EGL_DEFAULT_DISPLAY, 0);
++}
++
++SDL_EGL_CreateContext_impl(MALI)
++SDL_EGL_SwapWindow_impl(MALI)
++SDL_EGL_MakeCurrent_impl(MALI)
++
++#endif /* SDL_VIDEO_DRIVER_MALI && SDL_VIDEO_OPENGL_EGL */
+diff -urN a/src/video/mali-fbdev/SDL_malivideo.h b/src/video/mali-fbdev/SDL_malivideo.h
+--- a/src/video/mali-fbdev/SDL_malivideo.h	1970-01-01 00:00:00.000000000 +0000
++++ b/src/video/mali-fbdev/SDL_malivideo.h
+@@ -0,0 +1,64 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied warranty.
++  In no event will the authors be held liable for any damages arising from
++  the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it freely.
++*/
++#include "SDL_internal.h"
++
++#ifndef SDL_malivideo_h_
++#define SDL_malivideo_h_
++
++#include "../SDL_sysvideo.h"
++#include "../SDL_egl_c.h"
++
++#include <SDL3/SDL_egl.h>
++#include <EGL/egl.h>
++#include <linux/vt.h>
++#include <linux/fb.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/ioctl.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdlib.h>
++
++/* PowerVR GE8300 (TrimUI): uses EGLNativeWindowType (NULL) for fbdev surface */
++#define SDL3_POWERVR_GE8300 1
++
++struct SDL_DisplayData
++{
++#ifdef SDL3_POWERVR_GE8300
++    EGLNativeWindowType native_display;
++#else
++    struct fbdev_window native_display;
++#endif
++};
++
++struct SDL_WindowData
++{
++    EGLSurface egl_surface;
++};
++
++/* Display and window functions */
++bool MALI_VideoInit(SDL_VideoDevice *_this);
++void MALI_VideoQuit(SDL_VideoDevice *_this);
++bool MALI_GetDisplayModes(SDL_VideoDevice *_this, SDL_VideoDisplay *display);
++bool MALI_SetDisplayMode(SDL_VideoDevice *_this, SDL_VideoDisplay *display, SDL_DisplayMode *mode);
++bool MALI_CreateWindow(SDL_VideoDevice *_this, SDL_Window *window, SDL_PropertiesID create_props);
++void MALI_SetWindowTitle(SDL_VideoDevice *_this, SDL_Window *window);
++bool MALI_SetWindowPosition(SDL_VideoDevice *_this, SDL_Window *window);
++void MALI_SetWindowSize(SDL_VideoDevice *_this, SDL_Window *window);
++void MALI_ShowWindow(SDL_VideoDevice *_this, SDL_Window *window);
++void MALI_HideWindow(SDL_VideoDevice *_this, SDL_Window *window);
++void MALI_DestroyWindow(SDL_VideoDevice *_this, SDL_Window *window);
++
++/* Event functions */
++void MALI_PumpEvents(SDL_VideoDevice *_this);
++
++#endif /* SDL_malivideo_h_ */
+diff -urN a/src/video/mali-fbdev/SDL_malivideo.c b/src/video/mali-fbdev/SDL_malivideo.c
+--- a/src/video/mali-fbdev/SDL_malivideo.c	1970-01-01 00:00:00.000000000 +0000
++++ b/src/video/mali-fbdev/SDL_malivideo.c
+@@ -0,0 +1,260 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied warranty.
++  In no event will the authors be held liable for any damages arising from
++  the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it freely.
++*/
++#include "SDL_internal.h"
++
++#ifdef SDL_VIDEO_DRIVER_MALI
++
++/* SDL internals */
++#include "../SDL_sysvideo.h"
++#include "../../events/SDL_events_c.h"
++
++#ifdef SDL_INPUT_LINUXEV
++#include "../../core/linux/SDL_evdev.h"
++#endif
++
++#include "SDL_malivideo.h"
++#include "SDL_maliopengles.h"
++
++static void MALI_Destroy(SDL_VideoDevice *device)
++{
++    SDL_free(device->internal);
++    SDL_free(device);
++}
++
++static SDL_VideoDevice *MALI_Create(void)
++{
++    SDL_VideoDevice *device;
++
++    /* Initialize SDL_VideoDevice structure */
++    device = (SDL_VideoDevice *)SDL_calloc(1, sizeof(SDL_VideoDevice));
++    if (!device) {
++        return NULL;
++    }
++
++    device->internal = NULL;
++
++    /* Setup amount of available displays */
++    device->num_displays = 0;
++
++    /* Set device free function */
++    device->free = MALI_Destroy;
++
++    /* Setup all functions which we can handle */
++    device->VideoInit = MALI_VideoInit;
++    device->VideoQuit = MALI_VideoQuit;
++    device->GetDisplayModes = MALI_GetDisplayModes;
++    device->SetDisplayMode = MALI_SetDisplayMode;
++    device->CreateSDLWindow = MALI_CreateWindow;
++    device->SetWindowTitle = MALI_SetWindowTitle;
++    device->SetWindowPosition = MALI_SetWindowPosition;
++    device->SetWindowSize = MALI_SetWindowSize;
++    device->ShowWindow = MALI_ShowWindow;
++    device->HideWindow = MALI_HideWindow;
++    device->DestroyWindow = MALI_DestroyWindow;
++
++#ifdef SDL_VIDEO_OPENGL_EGL
++    device->GL_LoadLibrary = MALI_GLES_LoadLibrary;
++    device->GL_GetProcAddress = MALI_GLES_GetProcAddress;
++    device->GL_UnloadLibrary = MALI_GLES_UnloadLibrary;
++    device->GL_CreateContext = MALI_GLES_CreateContext;
++    device->GL_MakeCurrent = MALI_GLES_MakeCurrent;
++    device->GL_SetSwapInterval = MALI_GLES_SetSwapInterval;
++    device->GL_GetSwapInterval = MALI_GLES_GetSwapInterval;
++    device->GL_SwapWindow = MALI_GLES_SwapWindow;
++    device->GL_DestroyContext = MALI_GLES_DestroyContext;
++#endif
++
++    device->PumpEvents = MALI_PumpEvents;
++
++    return device;
++}
++
++VideoBootStrap MALI_bootstrap = {
++    "mali",
++    "Mali fbdev EGL Video Driver",
++    MALI_Create,
++    NULL, /* no ShowMessageBox */
++    false
++};
++
++/*****************************************************************************/
++/* SDL Video and Display initialization/handling functions                   */
++/*****************************************************************************/
++
++bool MALI_VideoInit(SDL_VideoDevice *_this)
++{
++    struct fb_var_screeninfo vinfo;
++    int fd;
++    SDL_VideoDisplay display;
++    SDL_DisplayMode current_mode;
++    SDL_DisplayData *data;
++
++    data = (SDL_DisplayData *)SDL_calloc(1, sizeof(SDL_DisplayData));
++    if (!data) {
++        return false;
++    }
++
++    fd = open("/dev/fb0", O_RDWR, 0);
++    if (fd < 0) {
++        SDL_free(data);
++        return SDL_SetError("mali-fbdev: Could not open framebuffer device");
++    }
++
++    if (ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0) {
++        close(fd);
++        SDL_free(data);
++        return SDL_SetError("mali-fbdev: Could not get framebuffer information");
++    }
++    close(fd);
++
++    SDL_zero(current_mode);
++    current_mode.w = vinfo.xres;
++    current_mode.h = vinfo.yres;
++    current_mode.refresh_rate = 60.0f;
++    current_mode.format = SDL_PIXELFORMAT_RGBX8888;
++
++    SDL_zero(display);
++    display.name = "mali-fbdev";
++    display.desktop_mode = current_mode;
++    display.internal = data;
++
++    if (SDL_AddVideoDisplay(&display, false) == 0) {
++        return SDL_SetError("mali-fbdev: Failed to add video display");
++    }
++
++#ifdef SDL_INPUT_LINUXEV
++    if (!SDL_EVDEV_Init()) {
++        return false;
++    }
++#endif
++
++    return true;
++}
++
++void MALI_VideoQuit(SDL_VideoDevice *_this)
++{
++#ifdef SDL_INPUT_LINUXEV
++    SDL_EVDEV_Quit();
++#endif
++}
++
++bool MALI_GetDisplayModes(SDL_VideoDevice *_this, SDL_VideoDisplay *display)
++{
++    /* Only one display mode available — the current one */
++    return SDL_AddFullscreenDisplayMode(display, &display->current_mode);
++}
++
++bool MALI_SetDisplayMode(SDL_VideoDevice *_this, SDL_VideoDisplay *display, SDL_DisplayMode *mode)
++{
++    return true;
++}
++
++bool MALI_CreateWindow(SDL_VideoDevice *_this, SDL_Window *window, SDL_PropertiesID create_props)
++{
++    SDL_WindowData *windowdata;
++    SDL_DisplayData *displaydata;
++
++    displaydata = SDL_GetDisplayDriverData(SDL_GetPrimaryDisplay());
++
++    /* Allocate window internal data */
++    windowdata = (SDL_WindowData *)SDL_calloc(1, sizeof(SDL_WindowData));
++    if (!windowdata) {
++        return false;
++    }
++
++    /* Set up the window for OpenGL/EGL */
++    if ((window->flags & SDL_WINDOW_OPENGL) && _this->GL_LoadLibrary) {
++        if (_this->GL_LoadLibrary(_this, NULL) < 0) {
++            SDL_free(windowdata);
++            return false;
++        }
++    }
++
++#ifdef SDL_VIDEO_OPENGL_EGL
++    if (window->flags & SDL_WINDOW_OPENGL) {
++#ifdef SDL3_POWERVR_GE8300
++        /* PowerVR GE8300: pass NULL as native window — driver uses fbdev internally */
++        windowdata->egl_surface = SDL_EGL_CreateSurface(_this, window,
++                                      (NativeWindowType)displaydata->native_display);
++#else
++        windowdata->egl_surface = SDL_EGL_CreateSurface(_this, window,
++                                      (NativeWindowType)&displaydata->native_display);
++#endif
++        if (windowdata->egl_surface == EGL_NO_SURFACE) {
++            SDL_free(windowdata);
++            return SDL_SetError("mali-fbdev: Can't create EGL window surface");
++        }
++    } else {
++        windowdata->egl_surface = EGL_NO_SURFACE;
++    }
++#endif
++
++    /* Setup driver data for this window */
++    window->internal = windowdata;
++
++    /* One window — it always has focus */
++    SDL_SetMouseFocus(window);
++    SDL_SetKeyboardFocus(window);
++
++    return true;
++}
++
++void MALI_DestroyWindow(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    SDL_WindowData *data = window->internal;
++    if (data) {
++#ifdef SDL_VIDEO_OPENGL_EGL
++        if (data->egl_surface != EGL_NO_SURFACE) {
++            SDL_EGL_DestroySurface(_this, data->egl_surface);
++        }
++#endif
++        SDL_free(data);
++    }
++    window->internal = NULL;
++}
++
++void MALI_SetWindowTitle(SDL_VideoDevice *_this, SDL_Window *window)
++{
++}
++
++bool MALI_SetWindowPosition(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    return SDL_Unsupported();
++}
++
++void MALI_SetWindowSize(SDL_VideoDevice *_this, SDL_Window *window)
++{
++}
++
++void MALI_ShowWindow(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    SDL_SetMouseFocus(window);
++    SDL_SetKeyboardFocus(window);
++}
++
++void MALI_HideWindow(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    SDL_SetMouseFocus(NULL);
++    SDL_SetKeyboardFocus(NULL);
++}
++
++/*****************************************************************************/
++/* SDL event functions                                                       */
++/*****************************************************************************/
++void MALI_PumpEvents(SDL_VideoDevice *_this)
++{
++#ifdef SDL_INPUT_LINUXEV
++    SDL_EVDEV_Poll();
++#endif
++}
++
++#endif /* SDL_VIDEO_DRIVER_MALI */
+diff -urN a/src/video/SDL_sysvideo.h b/src/video/SDL_sysvideo.h
+--- a/src/video/SDL_sysvideo.h
++++ b/src/video/SDL_sysvideo.h
+@@ -531,6 +531,7 @@ extern VideoBootStrap Wayland_preferred_bootstrap;
+ extern VideoBootStrap Wayland_bootstrap;
+ extern VideoBootStrap VIVANTE_bootstrap;
+ extern VideoBootStrap Emscripten_bootstrap;
++extern VideoBootStrap MALI_bootstrap;
+ extern VideoBootStrap OFFSCREEN_bootstrap;
+ extern VideoBootStrap QNX_bootstrap;
+ extern VideoBootStrap OPENVR_bootstrap;
+diff -urN a/src/video/SDL_egl.c b/src/video/SDL_egl.c
+--- a/src/video/SDL_egl.c
++++ b/src/video/SDL_egl.c
+@@ -68,8 +68,8 @@ static bool vc4 = false;
+ #define DEFAULT_OGL_ES_PVR (vc4 ? "libGLES_CM.so.1" : "libbrcmGLESv2.so")
+ #define DEFAULT_OGL_ES     (vc4 ? "libGLESv1_CM.so.1" : "libbrcmGLESv2.so")
+
+-#elif defined(SDL_VIDEO_DRIVER_ANDROID) || defined(SDL_VIDEO_DRIVER_VIVANTE)
+-// Android
++#elif defined(SDL_VIDEO_DRIVER_ANDROID) || defined(SDL_VIDEO_DRIVER_VIVANTE) || defined(SDL_VIDEO_DRIVER_MALI)
++// Android / Vivante / Mali fbdev
+ #define DEFAULT_EGL        "libEGL.so"
+ #define DEFAULT_OGL_ES2    "libGLESv2.so"
+ #define DEFAULT_OGL_ES_PVR "libGLES_CM.so"
+ #define DEFAULT_OGL_ES     "libGLESv1_CM.so"
+diff -urN a/src/video/SDL_video.c b/src/video/SDL_video.c
+--- a/src/video/SDL_video.c
++++ b/src/video/SDL_video.c
+@@ -93,6 +93,9 @@ static VideoBootStrap *bootstrap[] = {
+ #ifdef SDL_VIDEO_DRIVER_VIVANTE
+     &VIVANTE_bootstrap,
+ #endif
++#ifdef SDL_VIDEO_DRIVER_MALI
++    &MALI_bootstrap,
++#endif
+ #ifdef SDL_VIDEO_DRIVER_WINDOWS
+     &WINDOWS_bootstrap,
+ #endif

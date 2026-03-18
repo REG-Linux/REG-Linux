@@ -1,6 +1,6 @@
 from typing import Any
 
-from configgen.systemFiles import CONF
+from configgen.config.paths import CONF
 
 VPINBALL_CONFIG_DIR = str(CONF / "vpinball")
 VPINBALL_CONFIG_PATH = str(CONF / "vpinball" / "VPinballX.ini")
@@ -13,7 +13,7 @@ VPINBALL_BIN_PATH = "/usr/bin/vpinball/VPinballX_GL"
 
 def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Tables are organised by folders containing the vpx file, and sub-folders with the roms, altcolor, altsound,...
-    # We keep a switch to allow users with the old unique pinmame to be able to continue using vpinball (switchon)
+    # Switch to support legacy PinMAME configuration structure
     if system.isOptSet("vpinball_folders") and not system.getOptBoolean(
         "vpinball_folders",
     ):

@@ -3,8 +3,8 @@
 # libretro-genesisplusgx
 #
 ################################################################################
-# Version: Commits on Dec 17, 2025
-LIBRETRO_GENESISPLUSGX_VERSION = 4d033fc9cf306d6a7c3ca9508cb05d2662826c59
+# Version: Commits on Feb 26, 2026
+LIBRETRO_GENESISPLUSGX_VERSION = c3df2d2b439c84d4ab4d2c58fb65101853485305
 LIBRETRO_GENESISPLUSGX_SITE = $(call github,ekeeke,Genesis-Plus-GX,$(LIBRETRO_GENESISPLUSGX_VERSION))
 LIBRETRO_GENESISPLUSGX_LICENSE = Non-commercial
 
@@ -39,6 +39,9 @@ LIBRETRO_GENESISPLUSGX_PLATFORM += rk3588
 
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SDM845),y)
 LIBRETRO_GENESISPLUSGX_PLATFORM += sdm845
+
+else ifeq ($(BR2_riscv),y)
+LIBRETRO_GENESISPLUSGX_PLATFORM += riscv64
 endif
 
 define LIBRETRO_GENESISPLUSGX_BUILD_CMDS

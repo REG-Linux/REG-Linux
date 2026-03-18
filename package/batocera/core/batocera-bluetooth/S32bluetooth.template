@@ -64,6 +64,13 @@ case "$1" in
                     /usr/bin/hciattach_opi -s 1500000 /dev/ttyBT0 sprd & # specific for certain orangepi boards
                     sleep 2
                 ;;
+                k1bt)
+                    # SpaceMiT K1: hci_uart is blacklisted to prevent early
+                    # loading by eudev. Load it now after rfkill unblock so
+                    # the RTL8852BS firmware downloads with the chip powered on.
+                    modprobe hci_uart
+                    sleep 3
+                ;;
             esac
         done
 

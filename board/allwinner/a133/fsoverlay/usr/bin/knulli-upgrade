@@ -1,0 +1,534 @@
+#!/usr/bin/env python3
+"""
+Knulli Upgrade Script
+Handles OTA updates by communicating with the update server REST API
+"""
+
+import os
+import sys
+import json
+import hashlib
+import subprocess
+import requests
+import tarfile
+import shutil
+import time
+from pathlib import Path
+from datetime import datetime
+
+sys.stdout = sys.__stdout__
+sys.stdout.reconfigure(line_buffering=True)
+
+class KnulliUpgrader:
+    def __init__(self):
+        self.board_name = self.get_board_name()
+        self.arch_name = self.get_arch_name()
+        self.living_sig = Path("/boot/boot/firmware.sig")
+        self.update_dir = Path("/userdata/system/upgrade")
+        self.update_server = "https://updates.knulli.org"
+        self.upgrade_channel = "stable"  # Default to stable
+        self.access_key = None
+        
+        # Create update directory if it doesn't exist
+        self.update_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Load access key if available
+        self.load_access_key()
+        
+    def get_board_name(self):
+        """Get board name from system"""
+        try:
+            with open('/boot/boot/system.board', 'r') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            print("ERROR: Cannot determine board name")
+            sys.exit(1)
+    
+    def get_arch_name(self):
+        """Get architecture name from system"""
+        try:
+            with open('/usr/share/batocera/batocera.arch', 'r') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            print("ERROR: Cannot determine architecture")
+            sys.exit(1)
+    
+    def load_access_key(self):
+        """Load access key for protected channels"""
+        access_key_file = Path("/userdata/system/.access_key")
+        if access_key_file.exists():
+            try:
+                with open(access_key_file, 'r') as f:
+                    self.access_key = f.read().strip()
+                    print(f"Loaded access key for protected channels")
+            except Exception as e:
+                print(f"WARNING: Error loading access key: {e}")
+    
+    def get_ini_value(self, file_path, section, key):
+        """Extract value from INI-style file"""
+        try:
+            with open(file_path, 'r') as f:
+                current_section = ""
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    
+                    # Check for section headers
+                    if line.startswith('[') and line.endswith(']'):
+                        current_section = line[1:-1]
+                        continue
+                    
+                    # Look for key=value pairs in the correct section
+                    if current_section == section and '=' in line:
+                        k, v = line.split('=', 1)
+                        if k.strip() == key:
+                            return v.strip().strip('"')
+        except FileNotFoundError:
+            return None
+        return None
+    
+    def parse_partitions(self, sig_file):
+        """Parse partition information from signature file"""
+        partitions = {}
+        try:
+            with open(sig_file, 'r') as f:
+                in_partitions = False
+                for line in f:
+                    line = line.strip()
+                    if line == '[partitions]':
+                        in_partitions = True
+                        continue
+                    elif line.startswith('[') and line.endswith(']'):
+                        in_partitions = False
+                        continue
+                    
+                    if in_partitions and '=' in line:
+                        key, value = line.split('=', 1)
+                        partitions[key.strip()] = value.strip()
+        except FileNotFoundError:
+            pass
+        return partitions
+    
+    def calculate_md5(self, file_path):
+        """Calculate MD5 hash of a file"""
+        hash_md5 = hashlib.md5()
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+    
+    def verify_checksum(self, file_path, expected_md5):
+        """Verify file checksum"""
+        actual_md5 = self.calculate_md5(file_path)
+        return actual_md5 == expected_md5
+    
+    def check_for_updates(self):
+        """Check for updates using the REST API"""
+        print("Checking for updates...")
+        
+        # Determine current version and rootfs MD5
+        current_version = "unknown"
+        rootfs_md5 = None
+        
+        if self.living_sig.exists():
+            current_version = self.get_ini_value(self.living_sig, "metadata", "version") or "unknown"
+            rootfs_md5 = self.get_ini_value(self.living_sig, "partitions", "rootfs.squashfs_md5")
+        
+        if not rootfs_md5:
+            # Calculate MD5 of existing rootfs for older installations
+            print("Calculating MD5 of existing rootfs...")
+            rootfs_md5 = self.calculate_md5("/boot/boot/batocera")
+        
+        # Get partition information
+        partitions = {}
+        if self.living_sig.exists():
+            partitions_data = self.parse_partitions(self.living_sig)
+            for key, value in partitions_data.items():
+                if key.endswith('_md5'):
+                    partition_name = key[:-4]  # Remove '_md5' suffix
+                    partitions[key] = value
+        
+        # Prepare API request
+        payload = {
+            "board": self.board_name,
+            "version": current_version,
+            "channel": self.upgrade_channel,
+            "partitions": partitions,
+            "rootfs_md5": rootfs_md5
+        }
+        
+        # Add access key for protected channels
+        if self.upgrade_channel in ["dev", "alpha"] and self.access_key:
+            payload["access_key"] = self.access_key
+            print(f"Using access key for {self.upgrade_channel} channel")
+        
+        try:
+            response = requests.post(
+                f"{self.update_server}/ota/check",
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=30
+            )
+            
+            if response.status_code == 403:
+                print("ERROR: Access denied. Valid access key required for this channel.")
+                return None
+            elif response.status_code != 200:
+                print(f"ERROR: Server returned status {response.status_code}")
+                return None
+            
+            return response.json()
+            
+        except requests.exceptions.RequestException as e:
+            print(f"ERROR: Failed to check for updates: {e}")
+            return None
+    
+    def download_file(self, url, output_path):
+        """Download file with progress"""
+        try:
+            response = requests.get(url, stream=True, timeout=300)
+            response.raise_for_status()
+            
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded = 0
+            
+            with open(output_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        if total_size > 0:
+                            percent = (downloaded / total_size) * 100
+                            print(f"\rDownloading: {percent:.1f}%")#, end='', flush=True)
+            
+            #print()  # New line after progress
+            return True
+            
+        except requests.exceptions.RequestException as e:
+            print(f"ERROR: Failed to download {url}: {e}")
+            return False
+    
+    def apply_rootfs_update(self, rootfs_update):
+        """Apply rootfs update (full or patch)"""
+        print("Applying rootfs update...")
+        
+        # Mount /boot as read-write
+        subprocess.run(["mount", "-o", "rw,remount", "/boot"], check=True)
+        
+        try:
+            if rootfs_update.get("patch_available"):
+                # Apply patch
+                patch_url = rootfs_update["patch_url"]
+                patch_file = self.update_dir / "rootfs.patch"
+                
+                print(f"Downloading patch from {patch_url}")
+                if not self.download_file(patch_url, patch_file):
+                    return False
+                
+                #print("Applying patch to rootfs...")
+                
+                # Get expected output size from rootfs_update info
+                expected_size = rootfs_update.get("size", 0)
+                output_file = "/boot/boot/batocera.update"
+                
+                # Start xdelta3 process without capturing output so GUI can see progress
+                process = subprocess.Popen([
+                    "xdelta3", "-d", "-s", "/boot/boot/batocera", 
+                    str(patch_file), output_file
+                ])
+                
+                # Monitor progress by checking output file size
+                last_percent = -1
+                while process.poll() is None:
+                    try:
+                        if os.path.exists(output_file):
+                            current_size = os.path.getsize(output_file)
+                            if expected_size > 0:
+                                percent = min((current_size / expected_size) * 100, 100)
+                                # Only print when percentage changes to avoid spam
+                                if int(percent) != last_percent:
+                                    print(f"\rPatching: {percent:.1f}%")#, end='', flush=True)
+                                    last_percent = int(percent)
+                            else:
+                                # If no expected size, just show file size in MB
+                                mb_written = current_size // (1024*1024)
+                                print(f"\rPatching: {mb_written}MB written")#, end='', flush=True)
+                        time.sleep(0.5)
+                    except (OSError, ZeroDivisionError):
+                        pass
+                
+                # Wait for process to complete and get return code
+                process.wait()
+                print()  # New line after progress
+                
+                if process.returncode != 0:
+                    print(f"ERROR: Failed to apply patch (exit code: {process.returncode})")
+                    return False
+                
+                # Clean up patch file
+                patch_file.unlink()
+                
+            else:
+                # Full download
+                full_url = rootfs_update["full_url"]
+                rootfs_file = self.update_dir / "rootfs.squashfs"
+                
+                print(f"Downloading full rootfs from {full_url}")
+                if not self.download_file(full_url, rootfs_file):
+                    return False
+                
+                # Verify checksum
+                if not self.verify_checksum(rootfs_file, rootfs_update["target_md5"]):
+                    print("ERROR: Rootfs checksum verification failed")
+                    return False
+                
+                # Copy to final location
+                shutil.copy2(rootfs_file, "/boot/boot/batocera.update")
+                rootfs_file.unlink()
+            
+            print("Rootfs update applied successfully")
+            return True
+            
+        finally:
+            # Always remount /boot as read-only
+            subprocess.run(["mount", "-o", "ro,remount", "/boot"], check=False)
+    
+    def apply_partition_updates(self, partition_updates):
+        """Apply partition updates"""
+        for partition_update in partition_updates:
+            partition_name = partition_update["partition"]
+            download_url = partition_update["url"]
+            expected_md5 = partition_update["target_md5"]  
+            
+            print(f"Updating partition: {partition_name}")
+            
+            # Download partition file
+            partition_file = self.update_dir / partition_name
+            if not self.download_file(download_url, partition_file):
+                return False
+            
+            # Verify checksum
+            if not self.verify_checksum(partition_file, expected_md5):
+                print(f"ERROR: Checksum verification failed for {partition_name}")
+                return False
+            
+            # Apply partition update based on type
+            if not self.update_partition(partition_name, partition_file):
+                return False
+            
+            # Clean up downloaded file
+            partition_file.unlink()
+        
+        return True
+    
+    def update_partition(self, partition_name, partition_file):
+        """Update specific partition"""
+        print(f"Writing {partition_name}...")
+        
+        try:
+            if partition_name == "boot0.img":
+                subprocess.run([
+                    "dd", f"if={partition_file}", "of=/dev/mmcblk0",
+                    "seek=8", "bs=1024", "conv=fsync"
+                ], check=True)
+            elif partition_name == "boot_package.fex":
+                subprocess.run([
+                    "dd", f"if={partition_file}", "of=/dev/mmcblk0",
+                    "seek=16400", "bs=1024", "conv=fsync"
+                ], check=True)
+            elif partition_name == "boot.img":
+                subprocess.run([
+                    "dd", f"if={partition_file}", "of=/dev/mmcblk0p1", "conv=fsync"
+                ], check=True)
+            elif partition_name == "env.img":
+                subprocess.run([
+                    "dd", f"if={partition_file}", "of=/dev/mmcblk0p2", "conv=fsync"
+                ], check=True)
+            else:
+                print(f"ERROR: Unknown partition type: {partition_name}")
+                return False
+            
+            print(f"  {partition_name} updated successfully")
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            print(f"ERROR: Failed to update {partition_name}: {e}")
+            return False
+    
+    def update_signature_file(self, new_version=None, rootfs_target_md5=None, partition_updates=None):
+        """Update firmware signature file"""
+        print("Updating firmware signature file...")
+        
+        # Mount /boot as read-write
+        subprocess.run(["mount", "-o", "rw,remount", "/boot"], check=True)
+        
+        # Create backup
+        backup_file = self.living_sig.with_suffix('.sig.backup')
+        if self.living_sig.exists():
+            shutil.copy2(self.living_sig, backup_file)
+        
+        try:
+            # Create new signature file content
+            current_partitions = self.parse_partitions(self.living_sig) if self.living_sig.exists() else {}
+            
+            # Update rootfs MD5 if provided
+            if rootfs_target_md5:
+                current_partitions["rootfs.squashfs_md5"] = rootfs_target_md5
+            
+            # Update partition MD5s if provided
+            if partition_updates:
+                for partition_update in partition_updates:
+                    partition_name = partition_update["partition"]
+                    target_md5 = partition_update["target_md5"]
+                    # Update the MD5 for this partition in the signature file
+                    current_partitions[f"{partition_name}_md5"] = target_md5
+                    print(f"  Updated {partition_name}_md5 to {target_md5}")
+            
+            # Determine version to use
+            version_to_use = new_version
+            if not version_to_use and self.living_sig.exists():
+                version_to_use = self.get_ini_value(self.living_sig, "metadata", "version") or "unknown"
+            if not version_to_use:
+                version_to_use = "unknown"
+            
+            # Write new signature file
+            with open(self.living_sig, 'w') as f:
+                f.write("[metadata]\n")
+                f.write(f"version={version_to_use}\n")
+                f.write(f"board={self.board_name}\n")
+                f.write(f"build_date={datetime.now().isoformat()}\n")
+                f.write("\n[partitions]\n")
+                
+                for key, value in current_partitions.items():
+                    f.write(f"{key}={value}\n")
+            
+            print("Signature file updated successfully")
+            return True
+            
+        except Exception as e:
+            print(f"ERROR: Failed to update signature file: {e}")
+            # Restore backup
+            if backup_file.exists():
+                shutil.copy2(backup_file, self.living_sig)
+            return False
+            
+        finally:
+            subprocess.run(["mount", "-o", "ro,remount", "/boot"], check=False)
+    
+    def run_update(self):
+        """Main update process"""
+        print("Knulli Upgrade Tool")
+        print("==================")
+        print(f"Board: {self.board_name}")
+        print(f"Architecture: {self.arch_name}")
+        print(f"Channel: {self.upgrade_channel}")
+        print()
+        
+        # Check for updates
+        update_response = self.check_for_updates()
+        if not update_response:
+            print("Failed to check for updates")
+            return 1
+        
+        if not update_response.get("updates_available"):
+            print("No updates available")
+            return 0
+        
+        print("Updates available:")
+        
+        # Handle rootfs update
+        rootfs_update = update_response.get("rootfs_update")
+        if rootfs_update:
+            print(f"  Rootfs: {rootfs_update['version']}")
+            print(f"  Size: {rootfs_update['size']} bytes")
+            if rootfs_update.get("patch_available"):
+                print(f"  Patch available: Yes")
+            
+            if not self.apply_rootfs_update(rootfs_update):
+                print("ERROR: Failed to apply rootfs update")
+                return 1
+        
+        # Handle partition updates
+        partition_updates = update_response.get("partition_updates", [])
+        if partition_updates:
+            print(f"  Partitions: {len(partition_updates)} updates")
+            
+            if not self.apply_partition_updates(partition_updates):
+                print("ERROR: Failed to apply partition updates")
+                return 1
+        
+        # Update signature file with both rootfs and partition updates
+        signature_updated = False
+        if rootfs_update and partition_updates:
+            # Both rootfs and partition updates
+            if not self.update_signature_file(
+                new_version=rootfs_update["version"],
+                rootfs_target_md5=rootfs_update["target_md5"],
+                partition_updates=partition_updates
+            ):
+                print("ERROR: Failed to update signature file")
+                return 1
+            signature_updated = True
+        elif rootfs_update:
+            # Only rootfs update
+            if not self.update_signature_file(
+                new_version=rootfs_update["version"], 
+                rootfs_target_md5=rootfs_update["target_md5"]
+            ):
+                print("ERROR: Failed to update signature file")
+                return 1
+            signature_updated = True
+        elif partition_updates:
+            # Only partition updates
+            if not self.update_signature_file(partition_updates=partition_updates):
+                print("ERROR: Failed to update signature file")
+                return 1
+            signature_updated = True
+        
+        print()
+        print("Update completed successfully!")
+        print("Rebooting system...")
+        
+        # Sync and reboot
+        subprocess.run(["sync"])
+        subprocess.run(["sleep", "2"])
+        subprocess.run(["reboot"])
+        
+        return 0
+
+def main():
+    """Main entry point"""
+    if len(sys.argv) > 1:
+        channel = sys.argv[1]
+        if channel not in ["stable", "dev", "alpha"]:
+            print("ERROR: Invalid channel. Use: stable, dev, or alpha")
+            return 1
+    else:
+        # Get default channel from batocera settings
+        try:
+            result = subprocess.run(
+                ["batocera-settings-get", "updates.type"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if result.returncode == 0:
+                channel = result.stdout.strip()
+                if channel not in ["stable", "dev", "alpha"]:
+                    print(f"WARNING: Invalid channel '{channel}' from batocera settings, using 'stable'")
+                    channel = "stable"
+            else:
+                print("WARNING: Failed to get channel from batocera settings, using 'stable'")
+                channel = "stable"
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            print("WARNING: batocera-settings-get not available, using 'stable'")
+            channel = "stable"
+    
+    upgrader = KnulliUpgrader()
+    upgrader.upgrade_channel = channel
+    
+    return upgrader.run_update()
+
+if __name__ == "__main__":
+    sys.exit(main())

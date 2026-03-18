@@ -4,9 +4,7 @@
 #
 ################################################################################
 
-# Stable broken by developer
-#LIBRETRO_MELONDS_DS_VERSION = v1.2.0
-#LIBRETRO_MELONDS_DS_SITE = $(call github,JesseTG,melonds-ds,$(LIBRETRO_MELONDS_DS_VERSION))
+# Using specific commit - stable releases have issues
 LIBRETRO_MELONDS_DS_SITE = https://github.com/JesseTG/melonds-ds.git
 LIBRETRO_MELONDS_DS_VERSION = e1391cc10a53b205963b7d1bd2b1f8d87d0d2cc7
 LIBRETRO_MELONDS_DS_SITE_METHOD = git

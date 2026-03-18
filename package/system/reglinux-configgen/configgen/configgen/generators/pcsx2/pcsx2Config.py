@@ -7,7 +7,7 @@ from typing import Any
 
 from requests import get
 
-from configgen.systemFiles import BIOS, CONF
+from configgen.config.paths import BIOS, CONF
 from configgen.utils.logger import get_logger
 
 from .pcsx2Controllers import (
@@ -210,7 +210,7 @@ def setPcsx2Config(
     else:
         pcsx2INIConfig.set("EmuCore", "EnableFastBoot", "false")
 
-    # Outras configurações
+    # Other settings
     set_option_with_default(
         pcsx2INIConfig,
         system,
@@ -367,7 +367,7 @@ def setPcsx2Config(
     except CalledProcessError as e:
         eslog.debug(f"Error checking for Vulkan driver: {e}")
 
-    # Configurações de vídeo
+    # Video settings
     set_option_with_default(
         pcsx2INIConfig,
         system,
@@ -958,7 +958,7 @@ def setPcsx2Config(
     }
 
     # Now add Controllers
-    for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
+    for nplayer, (_key, pad) in enumerate(sorted(controllers.items()), start=1):
         # only configure the number of controllers set
         if nplayer <= multiTap:
             pad_index = nplayer

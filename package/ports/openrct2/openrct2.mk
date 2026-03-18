@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version.: Release 0.4.26 on Sep 16, 2025
-OPENRCT2_VERSION = v0.4.26
+OPENRCT2_VERSION = v0.4.32
 OPENRCT2_SITE = $(call github,OpenRCT2,OpenRCT2,$(OPENRCT2_VERSION))
 
 OPENRCT2_DEPENDENCIES  = sdl2 libcurl libzip speexdsp flac libvorbis

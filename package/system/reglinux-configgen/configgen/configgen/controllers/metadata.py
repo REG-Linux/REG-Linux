@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from typing import Any
 
-from configgen.systemFiles import ES_GAMES_METADATA
+from configgen.config.paths import ES_GAMES_METADATA
 from configgen.utils.logger import get_logger
 
 from .utils import shortNameFromPath
@@ -28,7 +28,6 @@ def getGamesMetaData(system: Any, rom: str) -> dict[str, Any]:
         "fbneo",
         "mame",
         "neogeo",
-        "triforce",
         "hypseus-singe",
         "model3",
         "hikaru",

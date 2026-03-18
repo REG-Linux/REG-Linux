@@ -1,0 +1,60 @@
+diff -rupbN a/sound/soc/qcom/qdsp6/q6afe.c b/sound/soc/qcom/qdsp6/q6afe.c
+--- a/sound/soc/qcom/qdsp6/q6afe.c
++++ b/sound/soc/qcom/qdsp6/q6afe.c
+@@ -368,6 +368,8 @@
+ 
+ #define TIMEOUT_MS 3000
+ #define AFE_CMD_RESP_AVAIL	0
++#define AFE_VOTE_MAX_RETRIES	5
++#define AFE_VOTE_RETRY_DELAY_MS	100
+ #define AFE_CMD_RESP_NONE	1
+ #define AFE_CLK_TOKEN		1024
+ 
+@@ -993,6 +995,13 @@
+ 				wake_up(&afe->wait);
+ 			}
+ 			break;
++
++		case AFE_CMD_REMOTE_LPASS_CORE_HW_VOTE_REQUEST:
++		case AFE_CMD_REMOTE_LPASS_CORE_HW_DEVOTE_REQUEST:
++			afe->result = *res;
++			wake_up(&afe->wait);
++			break;
++
+ 		default:
+ 			dev_err(afe->dev, "Unknown cmd 0x%x\n",	res->opcode);
+ 			break;
+@@ -1884,6 +1892,7 @@
+ 	struct afe_cmd_remote_lpass_core_hw_vote_request *vote_cfg;
+ 	struct apr_pkt *pkt;
+ 	int ret = 0;
++	int retry;
+ 	int pkt_size;
+ 	void *p;
+ 
+@@ -1907,9 +1916,22 @@
+ 	strscpy(vote_cfg->client_name, client_name,
+ 			sizeof(vote_cfg->client_name));
+ 
+-	ret = afe_apr_send_pkt(afe, pkt, NULL,
+-			       AFE_CMD_RSP_REMOTE_LPASS_CORE_HW_VOTE_REQUEST);
+-	if (ret)
++	for (retry = 0; retry < AFE_VOTE_MAX_RETRIES; retry++) {
++		ret = afe_apr_send_pkt(afe, pkt, NULL,
++				       AFE_CMD_RSP_REMOTE_LPASS_CORE_HW_VOTE_REQUEST);
++		if (!ret)
++			break;
++
++		if (retry < AFE_VOTE_MAX_RETRIES - 1) {
++			dev_warn(afe->dev,
++				 "AFE vote (%d) failed, retrying %d/%d...\n",
++				 hw_block_id, retry + 1,
++				 AFE_VOTE_MAX_RETRIES);
++			msleep(AFE_VOTE_RETRY_DELAY_MS);
++		}
++	}
++
++	if (ret)
+ 		dev_err(afe->dev, "AFE failed to vote (%d)\n", hw_block_id);
+ 
+ 

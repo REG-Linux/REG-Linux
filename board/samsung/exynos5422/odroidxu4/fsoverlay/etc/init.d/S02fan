@@ -2,27 +2,44 @@
 
 if test $1 = start
 then
+    # Optimized fan curve for retro-gaming on Odroid XU4
+    # Balances cooling performance with noise levels
 
-    # Target fan speed (PWM): 0, 102 (40%), 127 (50%), 242 (95%)
-    echo "0 102 127 242" > /sys/devices/platform/pwm-fan/hwmon/hwmon0/fan_speed
+    # Fan speed curve (PWM values: 0-255)
+    # Format: "temp1_pwm temp2_pwm temp3_pwm temp4_pwm"
+    # 4 PWM points corresponding to temperature thresholds
 
-    # Target temperature: 60°C, 70°C, 80°C
-    TRIP_POINT_0=60000
-    TRIP_POINT_1=70000
-    TRIP_POINT_2=80000
-     
-    echo $TRIP_POINT_0 > /sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp
-    echo $TRIP_POINT_0 > /sys/devices/virtual/thermal/thermal_zone1/trip_point_0_temp
-    echo $TRIP_POINT_0 > /sys/devices/virtual/thermal/thermal_zone2/trip_point_0_temp
-    echo $TRIP_POINT_0 > /sys/devices/virtual/thermal/thermal_zone3/trip_point_0_temp
-     
-    echo $TRIP_POINT_1 > /sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp
-    echo $TRIP_POINT_1 > /sys/devices/virtual/thermal/thermal_zone1/trip_point_1_temp
-    echo $TRIP_POINT_1 > /sys/devices/virtual/thermal/thermal_zone2/trip_point_1_temp
-    echo $TRIP_POINT_1 > /sys/devices/virtual/thermal/thermal_zone3/trip_point_1_temp
-     
-    echo $TRIP_POINT_2 > /sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp
-    echo $TRIP_POINT_2 > /sys/devices/virtual/thermal/thermal_zone1/trip_point_2_temp
-    echo $TRIP_POINT_2 > /sys/devices/virtual/thermal/thermal_zone2/trip_point_2_temp
-    echo $TRIP_POINT_2 > /sys/devices/virtual/thermal/thermal_zone3/trip_point_2_temp
+    # Aggressive cooling for gaming:
+    # - Idle/low load: 40% (102) - quiet
+    # - Medium load: 60% (153) - balanced
+    # - High load: 80% (204) - performance
+    # - Critical: 100% (255) - maximum cooling
+    echo "0 102 153 204 255" > /sys/devices/platform/pwm-fan/hwmon/hwmon0/fan_speed
+
+    # Thermal trip points (in millidegrees Celsius)
+    # Trip point 0: 50°C - Start active cooling (lower than default for proactive cooling)
+    # Trip point 1: 65°C - Increase cooling (before thermal throttling)
+    # Trip point 2: 75°C - Maximum cooling (critical threshold)
+
+    TRIP_POINT_0=50000
+    TRIP_POINT_1=65000
+    TRIP_POINT_2=75000
+
+    # Apply trip points to all thermal zones
+    # Zone 0: CPU big cluster (A15)
+    # Zone 1: CPU little cluster (A7)
+    # Zone 2: GPU (Mali)
+    # Zone 3: SoC general
+
+    for zone in 0 1 2 3; do
+        if [ -f /sys/devices/virtual/thermal/thermal_zone${zone}/trip_point_0_temp ]; then
+            echo $TRIP_POINT_0 > /sys/devices/virtual/thermal/thermal_zone${zone}/trip_point_0_temp
+            echo $TRIP_POINT_1 > /sys/devices/virtual/thermal/thermal_zone${zone}/trip_point_1_temp
+            echo $TRIP_POINT_2 > /sys/devices/virtual/thermal/thermal_zone${zone}/trip_point_2_temp
+        fi
+    done
+
+    # Log configuration
+    echo "Fan configured for retro-gaming optimization"
+    echo "Trip points: ${TRIP_POINT_0} ${TRIP_POINT_1} ${TRIP_POINT_2}"
 fi

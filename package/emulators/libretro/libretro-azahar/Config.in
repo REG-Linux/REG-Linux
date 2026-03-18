@@ -1,0 +1,11 @@
+config BR2_PACKAGE_LIBRETRO_AZAHAR
+    bool "libretro-azahar"
+    select BR2_PACKAGE_FMT
+    select BR2_PACKAGE_BOOST
+    select BR2_PACKAGE_FFMPEG  
+    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_FDK_AAC
+
+    help
+      Azahar is an open-source 3DS emulator project based Citra.
+      https://github.com/azahar-emu/azahar

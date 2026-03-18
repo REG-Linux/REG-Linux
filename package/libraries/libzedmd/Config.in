@@ -2,6 +2,7 @@ config BR2_PACKAGE_LIBZEDMD
     bool "libzedmd"
     select BR2_PACKAGE_LIBSERIALPORT
     select BR2_PACKAGE_SOCKPP
+    select BR2_PACKAGE_CARGS
     help
       ZeDMD communication library.
       

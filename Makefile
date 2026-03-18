@@ -18,8 +18,15 @@ PARALLEL_BUILD ?= y
 DEBUG_BUILD    ?= y
 MINI_BUILD     ?= n
 DOCKER         ?= docker
+BUILD_PROGRESS ?= y
 
 -include $(LOCAL_MK)
+
+# =============================================================================
+# Build Scripts
+# =============================================================================
+BUILD_INSTRUMENTATION := /build/scripts/build-instrumentation.sh
+BUILD_LOGGER          := $(PROJECT_DIR)/scripts/build-logger.sh
 
 # =============================================================================
 # Build Options
@@ -29,6 +36,10 @@ ifeq ($(PARALLEL_BUILD), y)
 	MAKE_OPTS += -j$(MAKE_JLEVEL)
 	MAKE_OPTS += -l$(MAKE_LLEVEL)
 	DOCKER_OPTS += -e MAKEFLAGS="$(MAKEFLAGS)"
+endif
+
+ifeq ($(BUILD_PROGRESS), y)
+	BUILD_MAKE_OPTS += BR2_INSTRUMENTATION_SCRIPTS=$(BUILD_INSTRUMENTATION)
 endif
 
 ifeq ($(DEBUG_BUILD), y)
@@ -94,6 +105,9 @@ help:
 	@echo "  <target>-shell          - Open shell in build container"
 	@echo "  <target>-webserver      - Start HTTP server for images"
 	@echo "  <target>-flash DEV=...  - Flash image to device"
+	@echo "  <target>-build-errors   - Show build failures and log paths"
+	@echo "  <target>-build-log PKG= - Show per-package build log"
+	@echo "  <target>-monitor        - Live build progress (in another terminal)"
 	@echo "  build-docker-image      - Build Docker image locally"
 	@echo "  update-docker-image     - Update Docker image from registry"
 	@echo "  merge                   - Merge custom configurations to Buildroot"
@@ -117,6 +131,7 @@ vars:
 	@echo "Extra options:      $(EXTRA_OPTS)"
 	@echo "Docker options:     $(DOCKER_OPTS)"
 	@echo "Make options:       $(MAKE_OPTS)"
+	@echo "Build progress:     $(BUILD_PROGRESS)"
 	@echo "Parallel build:     $(PARALLEL_BUILD)"
 	@echo "Debug build:        $(DEBUG_BUILD)"
 	@echo "Mini build:         $(MINI_BUILD)"
@@ -174,7 +189,7 @@ dl-dir:
 # =============================================================================
 # Build Targets
 # =============================================================================
-.PHONY: %-clean %-config %-build %-source %-cleanbuild
+.PHONY: %-clean %-config %-build %-source %-cleanbuild %-pkg
 
 %-clean: reglinux-docker-image output-dir-%
 	@echo "Cleaning $*..."
@@ -202,7 +217,25 @@ dl-dir:
 		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
 	@echo "Configuration completed for $*"
 
-%-build: reglinux-docker-image %-config %-ccache-dir dl-dir
+%-build: reglinux-docker-image %-config %-ccache-dir dl-dir %-log-dir
+ifeq ($(BUILD_PROGRESS), y)
+	@echo "Building $* (progress tracking enabled)..."
+	@total=$$(awk -F: '/^[0-9].*:end  :install-target/ || /^[0-9].*:end  :install-host/ || /^[0-9].*:end  :install-images/' \
+		$(OUTPUT_DIR)/$*/build/build-time.log 2>/dev/null \
+		| awk -F: '{print $$NF}' | sort -u | wc -l) ; \
+	[ "$$total" -eq 0 ] 2>/dev/null && total="?" ; \
+	$(DOCKER) run --init --rm \
+		$(DOCKER_VOLUMES) \
+		-v $(OUTPUT_DIR)/$*:/$* \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
+		-u $(UID):$(GID) \
+		-e REG_BUILD_TOTAL=$$total \
+		-e REG_BUILD_DIR=/$*/build \
+		$(DOCKER_OPTS) \
+		$(DOCKER_REPO)/$(IMAGE_NAME) \
+		$(MAKE) $(MAKE_OPTS) $(BUILD_MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD) 2>&1 \
+		| $(BUILD_LOGGER) $(OUTPUT_DIR)/$*
+else
 	@echo "Building $*..."
 	@$(DOCKER) run --init --rm \
 		$(DOCKER_VOLUMES) \
@@ -212,6 +245,7 @@ dl-dir:
 		$(DOCKER_OPTS) \
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
+endif
 	@echo "Build completed for $*"
 
 %-source: reglinux-docker-image %-config %-ccache-dir dl-dir
@@ -235,9 +269,9 @@ dl-dir:
 # =============================================================================
 # Development and Debug Targets
 # =============================================================================
-.PHONY: %-shell %-kernel %-show-build-order %-ccache-stats %-tail
+.PHONY: %-shell %-kernel %-show-build-order %-ccache-stats %-tail %-log-dir %-count-packages %-build-errors %-build-log %-monitor
 
-%-shell: reglinux-docker-image output-dir-%
+%-shell: reglinux-docker-image %-config output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "Not supported in BATCH_MODE if CMD not specified!")),)
 	@$(DOCKER) run -it --init --rm \
 		$(DOCKER_VOLUMES) \
@@ -283,6 +317,50 @@ dl-dir:
 %-tail: output-dir-%
 	@echo "Tailing build log for $*..."
 	@tail -F $(OUTPUT_DIR)/$*/build/build-time.log
+
+%-log-dir: output-dir-%
+	@mkdir -p $(OUTPUT_DIR)/$*/build/logs
+
+%-count-packages: reglinux-docker-image %-config
+	@$(DOCKER) run --init --rm \
+		$(DOCKER_VOLUMES) \
+		-v $(OUTPUT_DIR)/$*:/$* \
+		-u $(UID):$(GID) \
+		$(DOCKER_REPO)/$(IMAGE_NAME) \
+		$(MAKE) --no-print-directory O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order 2>/dev/null \
+		| wc -l
+
+%-build-errors: output-dir-%
+	@if [ -s $(OUTPUT_DIR)/$*/build/build-errors.log ]; then \
+		echo "" ; \
+		echo "======================================================================" ; \
+		echo " Build failures for $*:" ; \
+		echo "======================================================================" ; \
+		while IFS='|' read -r pkg step ts logfile; do \
+			echo "  - $$pkg (step: $$step)" ; \
+			echo "    Log: $$logfile" ; \
+			echo "    Rebuild: make $*-pkg PKG=$$pkg-dirclean && make $*-pkg PKG=$$pkg" ; \
+			echo "" ; \
+		done < $(OUTPUT_DIR)/$*/build/build-errors.log ; \
+		echo " Full build log: $(OUTPUT_DIR)/$*/build/full-build.log" ; \
+		echo "======================================================================" ; \
+	else \
+		echo "No build errors recorded for $*." ; \
+	fi
+
+%-build-log: output-dir-%
+	$(if $(PKG),,$(error "PKG not specified! Use: make <target>-build-log PKG=<package>"))
+	@if [ -f $(OUTPUT_DIR)/$*/build/logs/$(PKG).log ]; then \
+		cat $(OUTPUT_DIR)/$*/build/logs/$(PKG).log ; \
+	else \
+		echo "No log found for $(PKG). Available logs:" ; \
+		ls $(OUTPUT_DIR)/$*/build/logs/*.log 2>/dev/null | sed 's/.*\///;s/\.log$$//' | column ; \
+	fi
+
+%-monitor: output-dir-%
+	@echo "Monitoring build progress for $*..."
+	@echo "(Press Ctrl+C to stop)"
+	@watch -n2 'cat $(OUTPUT_DIR)/$*/build/.build-progress/status.json 2>/dev/null || echo "No build in progress"'
 
 # =============================================================================
 # Graph Generation Targets
@@ -456,11 +534,11 @@ uart:
 
 merge:
 	@echo "Merging custom configuration to Buildroot..."
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/mergeToBR.sh $(MERGE_ARGS)
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/mergeToBR.sh $(MERGE_ARGS)
 
 generate:
 	@echo "Generating custom configuration..."
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/generateCustom.sh
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/generateCustom.sh
 
 # =============================================================================
 # Default Target

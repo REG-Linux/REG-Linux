@@ -1,11 +1,11 @@
 from pathlib import Path
 from shutil import copy
 
-from configgen.command import Command
+from configgen.config.paths import CONF
 from configgen.controllers import generate_sdl_controller_config
+from configgen.core import Command
 from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
-from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 from .moonlightConfig import (
@@ -44,6 +44,11 @@ class MoonlightGenerator(Generator):
         config_path = Path(MOONLIGHT_CONFIG_PATH)
         if config_path.exists():
             copy(MOONLIGHT_CONFIG_PATH, MOONLIGHT_STAGING_CONFIG_PATH)
+
+        # Remove existing staging config file to ensure clean state (no dynamic values)
+        staging_config_path = Path(MOONLIGHT_STAGING_CONFIG_PATH)
+        if staging_config_path.exists():
+            staging_config_path.unlink()
 
         # Load the config file
         moonlightConfig = UnixSettings(MOONLIGHT_STAGING_CONFIG_PATH, separator=" ")
@@ -88,7 +93,7 @@ class MoonlightGenerator(Generator):
                     if gfeRom == romName:
                         # return it
                         return [gfeGame, confFile]
-                # If nothing is found (old gamelist file format ?)
+                # Fallback if no matching ROM is found
                 return [gfeGame, MOONLIGHT_STAGING_CONFIG_PATH]
         except FileNotFoundError:
             eslog.error(f"Moonlight gamelist file not found: {MOONLIGHT_GAMELIST_PATH}")

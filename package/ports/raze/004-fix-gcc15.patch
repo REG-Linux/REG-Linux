@@ -1,0 +1,9 @@
+--- a/libraries/ZWidget/include/zwidget/window/window.h	2026-02-23 03:04:39.076000682 +0100
++++ b/libraries/ZWidget/include/zwidget/window/window.h	2026-02-23 03:04:46.577519512 +0100
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <functional>

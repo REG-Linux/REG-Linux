@@ -3,8 +3,9 @@
 # supermodel
 #
 ################################################################################
-# Version: Commits on Jan 30, 2026
-SUPERMODEL_VERSION = e3a6b05ab1db5020436bae886ec925c01cd63ed4
+# Latest release: v0.3a-20260228-git-d6dec3d (Feb 28, 2026)
+# Project uses automated date-based builds (alpha stage)
+SUPERMODEL_VERSION = v0.3a-20260228-git-d6dec3d
 SUPERMODEL_SITE = $(call github,trzy,Supermodel,$(SUPERMODEL_VERSION))
 SUPERMODEL_DEPENDENCIES = sdl2 zlib libzip sdl2_net
 SUPERMODEL_LICENSE = GPLv3
@@ -54,9 +55,7 @@ define SUPERMODEL_LINE_ENDINGS_FIXUP
 endef
 
 define SUPERMODEL_POST_PROCESS
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy $(TARGET_DIR)/usr/share/supermodel
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/supermodel/model3.supermodel.keys $(TARGET_DIR)/usr/share/evmapy
-    cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/supermodel/NVRAM $(TARGET_DIR)/usr/share/supermodel
+	cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/supermodel/NVRAM $(TARGET_DIR)/usr/share/supermodel
 endef
 
 SUPERMODEL_PRE_PATCH_HOOKS += SUPERMODEL_LINE_ENDINGS_FIXUP

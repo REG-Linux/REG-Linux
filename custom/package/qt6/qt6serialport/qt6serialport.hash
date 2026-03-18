@@ -1,5 +1,5 @@
-# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtserialport-everywhere-src-6.8.3.tar.xz.sha256
-sha256  c164a0392dc7cab3d072fa8fdcacc8fc4f3e685234b021b3128020719cdf5fa5  qtserialport-everywhere-src-6.8.3.tar.xz
+# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.2/submodules/qtserialport-everywhere-src-6.10.2.tar.xz.sha256
+sha256  b40cbf29da111ffa8fee7e7cb44b9097042782cd17a10448a83ff3156cdebd6b  qtserialport-everywhere-src-6.10.2.tar.xz
 
 # Hashes for license files:
 sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt

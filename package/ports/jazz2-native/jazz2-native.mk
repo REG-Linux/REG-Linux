@@ -28,12 +28,9 @@ else
     JAZZ2_NATIVE_CONF_OPTS += -DNCINE_WITH_OPENGLES=ON
 endif
 
-define JAZZ2_NATIVE_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/jazz2-native/jazz2.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-JAZZ2_NATIVE_POST_INSTALL_TARGET_HOOKS += JAZZ2_NATIVE_EVMAPY
+ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
+    JAZZ2_NATIVE_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS=-lmali
+    JAZZ2_NATIVE_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS=-lmali
+endif
 
 $(eval $(cmake-package))

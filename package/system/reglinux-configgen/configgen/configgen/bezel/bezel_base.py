@@ -10,14 +10,15 @@ from PIL import Image, ImageDraw
 if TYPE_CHECKING:
     from PIL.Image import Image as ImageType
 
-    from configgen.emulator import Emulator
+    from configgen.core import Emulator
 import hashlib
 import shutil
 import struct
 
-from configgen.systemFiles import OVERLAY_SYSTEM, OVERLAY_USER
+from configgen.config.paths import OVERLAY_SYSTEM, OVERLAY_USER
+from configgen.core.exceptions import BezelImageError, TattooImageError
 from configgen.utils.logger import get_logger
-from configgen.utils.videoMode import getAltDecoration
+from configgen.video.videoMode import getAltDecoration
 
 eslog = get_logger(__name__)
 
@@ -589,7 +590,7 @@ class BezelUtils:
 
         if not tattoo:
             eslog.error("Tattoo image could not be loaded, skipping tattoo overlay.")
-            raise Exception("Tattoo image could not be loaded")
+            raise TattooImageError("Tattoo image could not be loaded")
 
         w, h = BezelUtils.fast_image_size(input_png)
         tw, th = BezelUtils.fast_image_size(tattoo_file)
@@ -607,7 +608,8 @@ class BezelUtils:
             tw = twtemp
 
         margin = int((20 / 1080) * h)
-        corner = system.config.get("bezel.tattoo_corner", "NW").upper()
+        corner_val = system.config.get("bezel.tattoo_corner") or "NW"
+        corner = corner_val.upper()
 
         tattoo_canvas = Image.new("RGBA", back.size)  # type: ignore
         if corner == "NE":
@@ -691,7 +693,7 @@ class BezelUtils:
 
         if "transparency" not in imgin.info:
             eslog.error(f"Input image {input_png} has no transparency channel")
-            raise Exception("no transparent pixels in the image, abort")
+            raise BezelImageError("no transparent pixels in the image, abort")
 
         alpha = imgin.split()[-1]
         ix, iy = BezelUtils.fast_image_size(input_png)

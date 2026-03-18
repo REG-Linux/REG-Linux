@@ -1,0 +1,392 @@
+#!/bin/sh
+
+f_usage() {
+	echo "$0 list" >&2
+	echo "$0 set <VALUE>" >&2
+}
+
+ARCH="$(cat /usr/share/batocera/batocera.arch)"
+GRPICONFFILE="/boot/config.txt"
+GODROIDCONFFILE="/boot/batocera-boot.conf"
+
+if test "${ARCH}" = "bcm2836" || test "${ARCH}" = "bcm2837"
+then
+	RPIMODEL="/proc/device-tree/model"
+
+	if grep -q "^Raspberry Pi 2" ${RPIMODEL}
+	then
+		ARCH="bcm2836"
+	elif grep -q "^Raspberry Pi 3 Model [A-Z] Plus" ${RPIMODEL}
+	then
+		ARCH="rpi3+"
+	elif grep -q "^Raspberry Pi 3" ${RPIMODEL}
+	then
+		ARCH="rpi3"
+	elif grep -q "^Raspberry Pi Zero 2" ${RPIMODEL}
+	then
+		ARCH="rpizero2"
+    fi
+fi
+
+preBootRWConfig() {
+    mount -o remount,rw /boot
+}
+
+postBootRWConfig() {
+    mount -o remount,ro /boot
+}
+
+doList() {
+    case "${ARCH}" in
+    "bcm2835")
+	    echo "none NONE"
+	    echo "high HIGH (950Mhz)"
+	    echo "turbo TURBO (1000Mhz)"
+	    echo "extreme EXTREME (1100Mhz)"
+	;;
+	"bcm2836")
+	    echo "none NONE (900Mhz)"
+	    echo "high HIGH (1050Mhz)"
+	;;
+	"rpi3")
+	    echo "none NONE (1200Mhz)"
+	    echo "high HIGH (1300Mhz)"
+	    echo "turbo TURBO (1325Mhz)"
+	    echo "extreme EXTREME (1350Mhz)"
+	    ;;
+	"rpi3+")
+	    echo "none NONE (1400Mhz)"
+	    echo "high HIGH (1425Mhz)"
+	    echo "turbo TURBO (1450Mhz)"
+	    echo "extreme EXTREME (1500Mhz)"
+	    ;;
+	"bcm2711")
+	    echo "none NONE (B0 - 1500Mhz or C0 - 1800MHz)"
+	    echo "high HIGH (B0 HEATSINK - 1700Mhz)"
+	    echo "turbo TURBO (B0 HEATSINK - 1800Mhz)"
+		echo "extreme EXTREME (HEATSINK & FAN 1950Mhz)"
+		echo "ruinsane INSANE (HEATSINK & FAN 2100Mhz)"
+		echo "cm4 CAUTION (C0 stepping only - HEATSINK & FAN 2275Mhz)"
+	    ;;
+    "rpizero2")
+	    echo "none NONE (1000Mhz)"
+	;;
+	"s922x")
+	    MODEL=$(cat /sys/firmware/devicetree/base/model)
+	    if test "${MODEL}" = "Hardkernel ODROID-N2Plus" -o "${MODEL}" = "Khadas VIM3" -o "${MODEL}" = "Beelink GT-King Pro"
+	    then
+		echo "none NONE (2200Mhz)"
+		echo "high HIGH (2300Mhz)"
+		echo "extreme EXTREME (2400Mhz)"
+	    fi
+	    ;;
+          "rg35xx")
+		  # 240000 504000 720000 840000 1008000 1104000 1200000 1296000 1392000 1488000 
+
+                echo "powersave POWERSAVE (240 MHz)"
+                echo "low LOW (720 MHz)"
+		echo "medium MEDIUM (1008 MHz)"
+                echo "high HIGH (1200 MHz)"
+                echo "turbo TURBO (1392 MHz)"
+                echo "extreme EXTREME (1488 MHz)"
+          ;;
+          "h700")
+		  # 480000 720000 1032000 1104000 1200000 1296000 1416000 1512000 
+                echo "powersave POWERSAVE (480 MHz)"
+                echo "low LOW (720 MHz)"
+                echo "none NONE (1200 MHz)"
+                echo "medium MEDIUM (1032 MHz)"
+                echo "high HIGH (1296 MHz)"
+                echo "turbo TURBO (1416 MHz)"
+                echo "extreme EXTREME (1512 MHz)"
+          ;;
+          "a133")
+		# 408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2000000  
+                echo "powersave POWERSAVE (480 MHz)"
+                echo "low LOW (816 MHz)"
+                echo "none NONE (1200 MHz)"
+                echo "medium MEDIUM (1416 MHz)"
+                echo "high HIGH (1608 MHz)"
+                echo "turbo TURBO (1800 MHz)"
+                echo "extreme EXTREME (2000 MHz)"
+          ;;
+	*)
+	    echo "none NONE"
+    esac
+}
+
+setValue_rpiNone() {
+    preBootRWConfig || return 1
+    for entry in arm_freq core_freq sdram_freq force_turbo over_voltage over_voltage_sdram gpu_freq
+    do
+	sed -i "/^${entry}/d" "${GRPICONFFILE}"
+    done
+    postBootRWConfig || return 1
+}
+
+setValue_rpi4None() {
+    preBootRWConfig || return 1
+    for entry in over_voltage arm_freq gpu_freq
+    do
+	sed -i "/^${entry}/d" "${GRPICONFFILE}"
+    done
+    postBootRWConfig || return 1
+}
+
+setValue_rpiPutVars() {
+    arm_freq=$1
+    core_freq=$2
+    sdram_freq=$3
+    force_turbo=$4
+    over_voltage=$5
+    over_voltage_sdram=$6
+    gpu_freq=$7
+
+    preBootRWConfig || return 1
+
+    # put variable lines if not existing
+	if ! grep -q "Overclock" "${GRPICONFFILE}"
+    then
+        echo >> "${GRPICONFFILE}"
+		echo "[Overclock]" >> "${GRPICONFFILE}"
+    fi
+    for entry in arm_freq core_freq sdram_freq force_turbo over_voltage over_voltage_sdram gpu_freq
+    do
+	if ! grep -q "${entry}" "${GRPICONFFILE}"
+	then
+	    if ! echo "${entry}=" >> "${GRPICONFFILE}"
+	    then
+		return 1
+	    fi
+	fi
+    done
+
+    # put values
+    sed -i "s/#\?arm_freq=.*/arm_freq=${arm_freq}/g"                               "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?core_freq=.*/core_freq=${core_freq}/g"                            "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?sdram_freq=.*/sdram_freq=${sdram_freq}/g"                         "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?force_turbo=.*/force_turbo=${force_turbo}/g"                      "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?over_voltage=.*/over_voltage=${over_voltage}/g"                   "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?over_voltage_sdram=.*/over_voltage_sdram=${over_voltage_sdram}/g" "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?gpu_freq=.*/gpu_freq=${gpu_freq}/g"                               "${GRPICONFFILE}" || return 1
+
+    postBootRWConfig || return 1
+}
+
+setValue_rpi4PutVars() {
+    over_voltage=$1
+    arm_freq=$2
+    gpu_freq=$3
+
+    preBootRWConfig || return 1
+
+    # put variable lines if not existing
+    if ! grep -q "Overclock" "${GRPICONFFILE}"
+    then
+        echo >> "${GRPICONFFILE}"
+        echo "[Overclock]" >> "${GRPICONFFILE}"
+    fi
+    for entry in over_voltage arm_freq gpu_freq
+    do
+	if ! grep -q "${entry}" "${GRPICONFFILE}"
+	then
+	    if ! echo "${entry}=" >> "${GRPICONFFILE}"
+	    then
+		return 1
+	    fi
+	fi
+    done
+
+    # put values
+    sed -i "s/#\?over_voltage=.*/over_voltage=${over_voltage}/g" "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?arm_freq=.*/arm_freq=${arm_freq}/g"       "${GRPICONFFILE}" || return 1
+    sed -i "s/#\?gpu_freq=.*/gpu_freq=${gpu_freq}/g"       "${GRPICONFFILE}" || return 1
+
+    postBootRWConfig || return 1
+}
+
+setValue_odroidn2() {
+    VALUE=$1
+
+    preBootRWConfig || return 1
+
+    # put variable lines if not existing
+    for entry in overclocking
+    do
+	if ! grep -q "${entry}" "${GODROIDCONFFILE}"
+	then
+	    if ! echo "${entry}=" >> "${GODROIDCONFFILE}"
+	    then
+		return 1
+	    fi
+	fi
+    done
+
+    # put values
+    sed -i "s/#\?overclocking=.*/overclocking=${VALUE}/g" "${GODROIDCONFFILE}" || return 1
+
+    postBootRWConfig || return 1
+}
+
+setValue_rg35xx() {
+    VALUE=$1
+    preBootRWConfig || return 1
+
+    # put variable lines if not existing
+    for entry in overclocking
+    do
+	if ! grep -q "${entry}" "${GODROIDCONFFILE}"
+	then
+	    if ! echo "${entry}=" >> "${GODROIDCONFFILE}"
+	    then
+		return 1
+	    fi
+	fi
+
+    done
+    # put values
+    sed -i "s/#\?overclocking=.*/overclocking=${VALUE}/g" "${GODROIDCONFFILE}" || return 1
+
+    /etc/init.d/S02overclock start
+    postBootRWConfig || return 1
+}
+
+setValue() {
+    VALUE=$1
+
+    case "${ARCH}" in
+    "bcm2835")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpiNone
+		    ;;
+		"high")
+		    # arm_freq core_freq sdram_freq force_turbo over_voltage over_voltage_sdram gpu_freq
+		    setValue_rpiPutVars  950 250 450 0 6 0 250
+		    ;;
+		"turbo")
+		    setValue_rpiPutVars 1000 500 600 0 6 0 250
+		    ;;
+		"extreme")
+		    setValue_rpiPutVars 1100 550 600 1 8 6 250
+		    ;;
+	    esac
+	    ;;
+	"bcm2836")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpiNone
+		    ;;
+		"high")
+		    setValue_rpiPutVars 1050 525 450 0 4 2 350
+		    ;;
+	    esac
+	    ;;
+	"rpi3")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpiNone
+		    ;;
+		"high")
+		    setValue_rpiPutVars 1300 525 500 0 4 4 500
+		    ;;
+		"turbo")
+		    setValue_rpiPutVars 1325 525 520 0 4 4 500
+		    ;;
+		"extreme")
+		    setValue_rpiPutVars 1350 550 550 1 4 5 525
+		    ;;
+	    esac
+	    ;;
+	"rpi3+")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpiNone
+		    ;;
+		"high")
+		    setValue_rpiPutVars 1425 525 500 0 4 4 500
+		    ;;
+		"turbo")
+		    setValue_rpiPutVars 1450 525 520 0 4 4 500
+		    ;;
+		"extreme")
+		    setValue_rpiPutVars 1500 550 550 1 4 5 525
+		    ;;
+	    esac
+	    ;;
+	"bcm2711")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpi4None
+		    ;;
+		"high")
+		    setValue_rpi4PutVars 2 1700 500
+		    ;;
+		"turbo")
+		    setValue_rpi4PutVars 3 1800 600
+		    ;;
+		"extreme")
+		    setValue_rpi4PutVars 5 1950 700
+            ;;
+		"ruinsane")
+		    setValue_rpi4PutVars 6 2100 750
+            ;;
+		"cm4")
+		    setValue_rpi4PutVars 8 2275 750
+	    esac
+	    ;;
+    "rpizero2")
+	    case "${VALUE}" in
+		"none")
+		    setValue_rpiNone
+		    ;;
+	    esac
+	    ;;
+	"s922x")
+	    MODEL=$(cat /sys/firmware/devicetree/base/model)
+	    if test "${MODEL}" = "Hardkernel ODROID-N2Plus" -o "${MODEL}" = "Khadas VIM3" -o "${MODEL}" = "Beelink GT-King Pro"
+	    then
+		setValue_odroidn2 "${VALUE}"
+	    fi
+	    ;;
+	"rg35xx")
+		setValue_rg35xx "${VALUE}"
+	    ;;
+        "h700")
+                setValue_rg35xx "${VALUE}"
+            ;;
+	"a133")
+		setValue_rg35xx "${VALUE}"
+	    ;;
+    esac
+}
+
+if [ $# -eq 0 ]; then
+	f_usage
+	exit 1
+fi
+
+ACTION=$1
+shift
+
+case "${ACTION}" in
+    "list")
+	if ! doList
+	then
+	    exit 1
+	fi
+	;;
+    "set")
+	VALUE=$1
+	if ! setValue "${VALUE}"
+	then
+	    exit 1
+	fi
+	;;
+	*)
+		f_usage
+		>&2 echo "error: invalid command ${ACTION}"
+		exit 1
+esac
+
+exit 0

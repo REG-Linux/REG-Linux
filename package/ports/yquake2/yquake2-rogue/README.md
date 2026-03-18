@@ -1,8 +1,5 @@
-# yquake2 Rogue
+# yquake2-rogue
 
-Mission pack library for the Rogue expansion.
+Ground Zero expansion game library for Yamagi Quake II. Upstream: https://github.com/yquake2/rogue
 
-## Build notes
-- **Version:** tag `ROGUE_2_15`.
-- **Config:** depends on SDL2.
-- **Build system:** CMake release build that installs `game.so` under `/usr/yquake2/rogue/`.
+Builds a single `game.so` installed to `/usr/yquake2/rogue/`.

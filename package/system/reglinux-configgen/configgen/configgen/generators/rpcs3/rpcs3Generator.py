@@ -2,9 +2,10 @@ from configparser import ConfigParser
 from os import path
 from re import match
 from shutil import copy2, copytree
+from typing import override
 
-from configgen.command import Command
-from configgen.generators.generator import Generator
+from configgen.core import Command
+from configgen.generators.generator import DeviceConfig, Generator
 
 try:
     from ruamel.yaml import YAML
@@ -15,7 +16,7 @@ except ImportError:
     raise
 import pathlib
 from subprocess import CalledProcessError, check_output
-from typing import Any
+from typing import Any, override
 
 from configgen.utils.logger import get_logger
 
@@ -33,6 +34,7 @@ eslog = get_logger(__name__)
 
 class Rpcs3Generator(Generator):
     # this emulator/core requires a X server to run
+    @override
     def requiresX11(self):
         return True
 
@@ -42,8 +44,8 @@ class Rpcs3Generator(Generator):
         rom: str,
         players_controllers: Any,
         metadata: Any,
-        guns: Any,
-        wheels: Any,
+        guns: DeviceConfig,
+        wheels: DeviceConfig,
         game_resolution: dict[str, int],
     ) -> Command:
         generateControllerConfig(system, players_controllers, rom)
@@ -169,7 +171,6 @@ class Rpcs3Generator(Generator):
                 text=True,
             ).strip()
             if have_vulkan == "true":
-                eslog.debug("Vulkan driver is available on the system.")
                 if (
                     system.isOptSet("rpcs3_gfxbackend")
                     and system.config["rpcs3_gfxbackend"] == "OpenGL"
@@ -178,76 +179,49 @@ class Rpcs3Generator(Generator):
                     rpcs3ymlconfig["Video"]["Renderer"] = "OpenGL"
                 else:
                     rpcs3ymlconfig["Video"]["Renderer"] = "Vulkan"
-                try:
-                    have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"],
-                        text=True,
-                    ).strip()
-                    if have_discrete == "true":
-                        eslog.debug(
-                            "A discrete GPU is available on the system. We will use that for performance",
-                        )
-                        try:
+                    try:
+                        have_discrete = check_output(
+                            ["/usr/bin/system-vulkan", "hasDiscrete"],
+                            text=True,
+                        ).strip()
+                        if have_discrete == "true":
                             discrete_name = check_output(
                                 ["/usr/bin/system-vulkan", "discreteName"],
                                 text=True,
                             ).strip()
-                            if discrete_name != "":
-                                eslog.debug(
-                                    f"Using Discrete GPU Name: {discrete_name} for RPCS3",
-                                )
+                            if discrete_name:
+                                eslog.debug(f"Using discrete GPU: {discrete_name}")
                                 if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                     rpcs3ymlconfig["Video"]["Vulkan"] = {}
                                 rpcs3ymlconfig["Video"]["Vulkan"]["Adapter"] = (
                                     discrete_name
                                 )
-                            else:
-                                eslog.debug("Couldn't get discrete GPU Name")
-                        except CalledProcessError:
-                            eslog.debug("Error getting discrete GPU Name")
-                    else:
-                        eslog.debug(
-                            "Discrete GPU is not available on the system. Trying integrated.",
-                        )
-                        have_integrated = check_output(
-                            ["/usr/bin/system-vulkan", "hasIntegrated"],
-                            text=True,
-                        ).strip()
-                        if have_integrated == "true":
-                            eslog.debug(
-                                "Using integrated GPU to provide Vulkan. Beware of performance",
-                            )
-                            try:
+                        else:
+                            have_integrated = check_output(
+                                ["/usr/bin/system-vulkan", "hasIntegrated"],
+                                text=True,
+                            ).strip()
+                            if have_integrated == "true":
                                 integrated_name = check_output(
                                     ["/usr/bin/system-vulkan", "integratedName"],
                                     text=True,
                                 ).strip()
-                                if integrated_name != "":
+                                if integrated_name:
                                     eslog.debug(
-                                        f"Using Integrated GPU Name: {integrated_name} for RPCS3",
+                                        f"Using integrated GPU: {integrated_name}"
                                     )
                                     if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                         rpcs3ymlconfig["Video"]["Vulkan"] = {}
                                     rpcs3ymlconfig["Video"]["Vulkan"]["Adapter"] = (
                                         integrated_name
                                     )
-                                else:
-                                    eslog.debug("Couldn't get integrated GPU name")
-                            except CalledProcessError:
-                                eslog.debug("Error getting integrated GPU index")
-                        else:
-                            eslog.debug(
-                                "Integrated GPU is not available on the system. Cannot enable Vulkan.",
-                            )
-                except CalledProcessError:
-                    eslog.debug("Error checking for discrete GPU.")
+                    except CalledProcessError:
+                        eslog.debug("GPU detection error")
             else:
-                eslog.debug(
-                    "Vulkan driver is not available on the system. Falling back to OpenGL",
-                )
+                eslog.debug("Vulkan not available, using OpenGL")
                 rpcs3ymlconfig["Video"]["Renderer"] = "OpenGL"
         except CalledProcessError:
-            eslog.debug("Error checking for discrete GPU.")
+            eslog.debug("Vulkan detection error")
 
         # System aspect ratio (the setting in the PS3 system itself, not the displayed ratio) a.k.a. TV mode.
         if system.isOptSet("rpcs3_ratio"):
@@ -505,7 +479,7 @@ def get_in_game_ratio(config: Any, game_resolution: dict[str, int], rom: str) ->
 def getFirmwareVersion():
     try:
         with pathlib.Path(
-            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt"
+            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt",
         ).open() as stream:
             lines = stream.readlines()
         for line in lines:

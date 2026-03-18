@@ -3,7 +3,7 @@
 # libserum
 #
 ################################################################################
-LIBSERUM_VERSION = v2.0.2
+LIBSERUM_VERSION = v2.3.1
 LIBSERUM_SITE = $(call github,zesinger,libserum,$(LIBSERUM_VERSION))
 LIBSERUM_LICENSE = GPLv2+
 LIBSERUM_LICENSE_FILES = LICENSE.md

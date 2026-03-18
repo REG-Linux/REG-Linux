@@ -1,0 +1,125 @@
+#!/bin/sh
+
+# Stored brightness value when the display is turned off.
+VALPATH=/var/run/$(basename "$0")
+
+XMAX=255
+XMIN=3
+
+CYCLESTEP=20 # % additional brightbess at each step
+
+get_percent() {
+    local VAL=$1
+    local PERCENT
+    PERCENT=$(echo "scale=2;${VAL}" "*" "100" / "${XMAX}" | bc -l)
+    LC_ALL=C printf '%.*f\n' 0 "${PERCENT}" # round
+}
+
+setValue() {
+    NEWVAL=$1
+
+    test "${NEWVAL}" -lt 0         && NEWVAL=0
+    test "${NEWVAL}" -gt "${XMAX}" && NEWVAL="${XMAX}"
+
+    brightness set "${NEWVAL}"
+}
+
+cycle() {
+    X=$(brightness get)
+    FVALUE=$(get_percent "$X")
+    LC_ALL=C FVALUE=$(printf '%.*f\n' 0 "${FVALUE}") # round
+    NEWVAL=$(echo "${FVALUE} + ${CYCLESTEP}" | bc)
+    [ "${NEWVAL}" -gt 100 ] && NEWVAL=0
+    echo "Brightness cycling to ${NEWVAL}%"
+    NEWVAL=$(expr "${NEWVAL}" "*" "${XMAX}" / 100)
+    setValue "${NEWVAL}" "${XMAX}"
+    exit 0
+}
+
+display_off() {
+    if [ ! -e "${VALPATH}" ]; then
+        ABS=$(brightness get)
+        PERCENT=$(get_percent "$ABS")
+
+        echo "${PERCENT}" > "${VALPATH}"
+        brightness set 0
+    fi
+    exit 0
+}
+
+display_on() {
+    if [ -e "${VALPATH}" ]; then
+        PERCENT=$(cat "${VALPATH}")
+        if [ "$PERCENT" -eq 1 ]; then
+            NEWVAL=$XMIN
+        else
+            NEWVAL=$(expr "$PERCENT" "*" "$XMAX" / 100)
+        fi
+        setValue "$NEWVAL"
+        rm -f "${VALPATH}"
+    fi
+    exit 0
+}
+
+# get
+if test $# = 0
+then
+    X=$(brightness get)
+    get_percent "$X"
+    exit 0
+fi
+
+# set
+if test $# = 1
+then
+    if [ "${1}" = "cycle" ]; then
+        cycle
+    elif [ "${1}" = "dispoff" ]; then
+        display_off
+    elif [ "${1}" = "dispon" ]; then
+        display_on
+    else
+        if [ "$1" -eq 1 ]; then
+            NEWVAL=$XMIN
+        else
+            NEWVAL=$(expr "$1" "*" "$XMAX" / 100)
+        fi
+       setValue "${NEWVAL}"
+       exit 0
+    fi
+fi
+
+# set +/-
+if test $# = 2
+then
+    X=$(brightness get)
+    DELTA=$(expr "${2}" '*' ${XMAX} / 100)
+
+    if [ "${1}" = "+" ]; then
+
+        if [ "${X}" -eq 0 ]; then
+            NEWVAL=${XMIN}
+        else
+            NEWVAL=$(expr "${X}" "+" "${DELTA}")
+        fi
+
+    elif [ "${1}" = "-" ]; then
+
+        NEWVAL=$(expr "${X}" "-" "${DELTA}")
+
+        if [ "${NEWVAL}" -lt "${XMIN}" ] && [ "${X}" -ne "${XMIN}" ] && [ "${X}" -ne 0 ]; then
+            NEWVAL=${XMIN}
+        fi
+    fi
+
+    [ "$NEWVAL" -eq "$X" ] && exit 0
+    setValue "${NEWVAL}"
+    exit 0
+fi
+
+# help
+echo "${0}"      >&2
+echo "${0} + 10" >&2
+echo "${0} - 20" >&2
+echo "${0} cycle" >&2
+exit 1

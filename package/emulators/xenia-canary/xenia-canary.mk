@@ -57,10 +57,6 @@ define XENIA_CANARY_POST_PROCESS
 
 	# Clean up the temporary directory
 	rm -rf $(@D)/temp
-
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/xenia-canary/xbox360.xenia-canary.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 XENIA_CANARY_POST_INSTALL_TARGET_HOOKS = XENIA_CANARY_POST_PROCESS

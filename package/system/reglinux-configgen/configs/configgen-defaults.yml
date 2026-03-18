@@ -538,9 +538,6 @@ sonicretro:
 spectravideo:
   emulator: openmsx
   core: openmsx
-steam:
-  emulator: steam
-  core: steam
 superbroswar:
   emulator: libretro
   core: superbroswar
@@ -588,8 +585,8 @@ ti99:
   emulator: libretro
   core: mame
 triforce:
-  emulator: dolphin_triforce
-  core: dolphin_triforce
+  emulator: dolphin
+  core: dolphin
 tutor:
   emulator: libretro
   core: mame

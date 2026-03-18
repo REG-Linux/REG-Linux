@@ -137,7 +137,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
     if not pathlib.Path(profilesDir).is_dir():
         pathlib.Path(profilesDir).mkdir()
 
-    # Purge old controller files
+    # Remove all existing controller profile files
     for counter in range(8):
         configFileName = getConfigFileName(counter)
         if pathlib.Path(configFileName).is_file():

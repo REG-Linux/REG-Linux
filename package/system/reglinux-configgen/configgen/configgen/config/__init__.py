@@ -1,0 +1,58 @@
+"""Config module for REG-Linux ConfigGen.
+
+This module provides configuration paths and settings loading functionality.
+"""
+
+from configgen.config.paths import (
+    BIOS,
+    CHEATS,
+    CONF,
+    CONF_INIT,
+    EMULATORLAUNCHER_PERF,
+    EMULATORLAUNCHER_PROF,
+    ES_GAMES_METADATA,
+    ES_GUNS_METADATA,
+    ES_SETTINGS,
+    ES_WHEELS_METADATA,
+    HOME,
+    HOME_INIT,
+    HUD_CONFIG,
+    LOGDIR,
+    OVERLAY_CONFIG_FILE,
+    OVERLAY_SYSTEM,
+    OVERLAY_USER,
+    OVERLAYS,
+    RECORDINGS,
+    ROMS,
+    RUN_DIR,
+    SAVES,
+    SCREENSHOTS,
+    SYSTEM_CONF,
+)
+
+__all__ = [
+    "BIOS",
+    "CHEATS",
+    "CONF",
+    "CONF_INIT",
+    "ES_GAMES_METADATA",
+    "ES_GUNS_METADATA",
+    "ES_SETTINGS",
+    "ES_WHEELS_METADATA",
+    "EMULATORLAUNCHER_PERF",
+    "EMULATORLAUNCHER_PROF",
+    "HOME",
+    "HOME_INIT",
+    "HUD_CONFIG",
+    "LOGDIR",
+    "OVERLAY_CONFIG_FILE",
+    "OVERLAY_SYSTEM",
+    "OVERLAY_USER",
+    "OVERLAYS",
+    "RECORDINGS",
+    "ROMS",
+    "RUN_DIR",
+    "SAVES",
+    "SCREENSHOTS",
+    "SYSTEM_CONF",
+]

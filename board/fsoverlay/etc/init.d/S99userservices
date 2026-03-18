@@ -49,4 +49,9 @@ process_services() {
 
 process_services User /userdata/system/services "$1"
 process_services System /usr/share/reglinux/services "$1"
-[ "$1" = "stop" ] && wait    # wait for spawned scripts to finish on stop condition
+if [ "$1" = "stop" ]; then
+    wait    # wait for spawned scripts to finish on stop condition
+    # Change scren to "GAME OVER"
+    /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
+    /usr/bin/plymouth --show-splash
+fi

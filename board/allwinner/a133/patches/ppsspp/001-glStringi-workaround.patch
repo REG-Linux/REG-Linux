@@ -1,0 +1,56 @@
+--- a/Common/GPU/OpenGL/GLFeatures.cpp	2024-11-08 08:56:47.366458994 -0500
++++ b/Common/GPU/OpenGL/GLFeatures.cpp	2024-11-08 09:05:11.578531144 -0500
+@@ -317,17 +317,43 @@
+ 
+ 	const char *extString = nullptr;
+ 	if (gl_extensions.ver[0] >= 3) {
+-		// Let's use the new way for OpenGL 3.x+, required in the core profile.
+-		GLint numExtensions = 0;
+-		glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+-		g_all_gl_extensions.clear();
+-		g_set_gl_extensions.clear();
+-		for (GLint i = 0; i < numExtensions; ++i) {
+-			const char *ext = (const char *)glGetStringi(GL_EXTENSIONS, i);
+-			g_set_gl_extensions.insert(ext);
+-			g_all_gl_extensions += ext;
+-			g_all_gl_extensions += " ";
++	    // Use the alternative method since glGetStringi is unavailable.
++
++	    GLint numExtensions = 0;
++	    glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
++
++	    // Clear previous extension lists
++	    g_all_gl_extensions.clear();
++	    g_set_gl_extensions.clear();
++
++	    // Obtain the entire extension string at once
++	    extString = (const char *)glGetString(GL_EXTENSIONS);
++
++	    if (extString != nullptr) {
++		printf("numExtensions=%d\n", numExtensions);  // Debugging purpose
++
++		// Create a temporary buffer to copy extensions
++		char extBuffer[0x2000] = {0};
++		strncpy(extBuffer, extString, sizeof(extBuffer) - 1);  // Copy to a mutable buffer
++
++		// Tokenize the extension string by spaces (each extension is separated by a space)
++		char *ext = strtok(extBuffer, " ");
++		while (ext != nullptr) {
++		    // Add each extension to the set and concatenate for all extensions string
++		    g_set_gl_extensions.insert(ext);
++		    g_all_gl_extensions += ext;
++		    g_all_gl_extensions += " ";
++
++		    // Move to the next extension in the string
++		    ext = strtok(nullptr, " ");
+ 		}
++
++		// Debug output for the full extension string
++		//puts("===================== ext string ===================");
++		//printf("extString: %s\n", g_all_gl_extensions.c_str());
++		//puts("====================================================");
++	    }
++
+ 	} else {
+ 		extString = (const char *)glGetString(GL_EXTENSIONS);
+ 		g_all_gl_extensions = extString ? extString : "";

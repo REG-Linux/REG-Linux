@@ -8,6 +8,7 @@ from typing import Any
 from PIL import Image
 
 from configgen.bezel.bezel_base import BezelUtils, IBezelManager
+from configgen.generators.generator import DeviceConfig
 from configgen.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,12 +20,12 @@ TATTOO_VERTICAL_MARGIN = 20  # Vertical margin for tattoo placement
 DEFAULT_RESOLUTION = (1920, 1080)  # Fallback resolution
 
 
-def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> tuple[int, int, int]:
+def getMameMachineSize(_rom_base: str, _tmp_zip_dir: str) -> tuple[int, int, int]:
     """Get machine size information for MAME ROM.
 
     Args:
-        rom_base: Base name of the ROM file
-        tmp_zip_dir: Temporary directory for artwork files
+        _rom_base: Base name of the ROM file (currently unused)
+        _tmp_zip_dir: Temporary directory for artwork files (currently unused)
 
     Returns:
         Tuple of (width, height, rotation) for the MAME machine
@@ -48,7 +49,7 @@ def setup_mame_bezels(
     rom: str,
     messSys: str,
     game_resolution: dict[str, int],
-    guns: list[Any],
+    guns: DeviceConfig,
 ) -> None:
     """Set up bezels for MAME games, including handling gun borders and tattoos.
 
@@ -57,7 +58,7 @@ def setup_mame_bezels(
         rom: Path to the ROM file
         messSys: MESS system name if applicable
         game_resolution: Dictionary containing game resolution (width, height)
-        guns: Guns configuration
+        guns: Guns configuration (dict or list)
 
     """
     bezel_set = _extract_bezel_set(system)
@@ -97,13 +98,13 @@ def _extract_bezel_set(system: Any) -> str | None:
 
 
 def _get_guns_borders_size(
-    guns: list[Any],
+    guns: DeviceConfig,
     system_config: dict[str, Any],
 ) -> str | None:
     """Get guns borders size from config if guns are available.
 
     Args:
-        guns: Guns configuration object
+        guns: Guns configuration object (dict or list)
         system_config: System configuration dictionary
 
     Returns:
@@ -465,7 +466,7 @@ def _create_standard_layout(
 
 def _write_layout_file(
     tmp_zip_dir: str,
-    png_file: str,
+    _png_file: str,
     bz_x: int,
     bz_y: int,
     bz_width: int,
@@ -478,7 +479,7 @@ def _write_layout_file(
 
     Args:
         tmp_zip_dir: Temporary directory for artwork files
-        png_file: Name of the PNG file
+        _png_file: Name of the PNG file (currently unused)
         bz_x: X coordinate for bezel position
         bz_y: Y coordinate for bezel position
         bz_width: Width of the bezel area
@@ -556,7 +557,8 @@ def _apply_tattoo(
         tattoo = tattoo.resize((tat_width, tat_height), Image.Resampling.BICUBIC)
 
         # Determine position based on config
-        corner = system.config.get("bezel.tattoo_corner", "NW").upper()
+        corner_val = system.config.get("bezel.tattoo_corner") or "NW"
+        corner = corner_val.upper()
         margin = int(TATTOO_VERTICAL_MARGIN / DEFAULT_RESOLUTION[1] * img_height)
 
         tattoo_canvas = Image.new("RGBA", back.size)

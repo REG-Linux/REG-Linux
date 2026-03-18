@@ -1,5 +1,6 @@
 include toolchain-gcc14-glibc.common
 include reglinux-board.common
+include reglinux-grub2.conf
 
 # Target definition
 BR2_x86_64=y
@@ -17,7 +18,7 @@ BR2_KERNEL_HEADERS_6_18=y
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.8"
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.17"
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/x86_64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/linux_kernel_15khz/linux-6.18 $(BR2_EXTERNAL_REGLINUX_PATH)/board/x86_64/linux_patches"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/x86_64/linux_x86_64-defconfig.config"
@@ -47,9 +48,7 @@ BR2_PACKAGE_BATOCERA_SHIM_SIGNED_EFI_IA32=y
 BR2_PACKAGE_BATOCERA_SHIM_SIGNED_EFI_HELPERS_IA32=y
 
 # required for ia32 uefi mixed mode 64 bit kernel loading
-BR2_TARGET_GRUB2=y
 BR2_TARGET_GRUB2_I386_EFI=y
-BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop echo"
 
 # buildroot shim
 BR2_TARGET_SHIM=y

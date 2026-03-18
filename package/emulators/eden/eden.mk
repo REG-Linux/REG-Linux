@@ -53,10 +53,6 @@ define EDEN_INSTALL_TARGET_CMDS
     $(INSTALL) -D $(@D)/buildroot-build/bin/eden $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D $(@D)/buildroot-build/bin/eden-cli $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D $(@D)/buildroot-build/bin/eden-room $(TARGET_DIR)/usr/bin/
-    #evmap config
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/eden/switch.eden.keys \
-        $(TARGET_DIR)/usr/share/evmapy
 endef
 
 # Ugly hack because lz4 is not installed with CMake and pkgconfig returns
