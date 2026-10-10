@@ -3,7 +3,7 @@
 # DuckStation Qt (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_VERSION = v0.1-10570
+DUCKSTATION_VERSION = v0.1-11894
 ifeq ($(BR2_arm),y)
 DUCKSTATION_SOURCE = DuckStation-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
@@ -24,11 +24,11 @@ endef
 
 define DUCKSTATION_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/$(DUCKSTATION_SOURCE) $(TARGET_DIR)/usr/duckstation/DuckStation.AppImage
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation/psx.duckstation.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
+	# Expose the AppImage under its emulator name in /usr/bin so regmsgd's
+	# capability scan detects it (it only scans /usr/bin) and the launcher
+	# resolver honours psx.emulator=duckstation instead of falling back to
+	# libretro. The generator's BIN still points at the real AppImage path.
+	ln -sf /usr/duckstation/DuckStation.AppImage $(TARGET_DIR)/usr/bin/duckstation
 endef
 
 $(eval $(generic-package))
