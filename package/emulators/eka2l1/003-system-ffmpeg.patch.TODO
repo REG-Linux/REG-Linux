@@ -1,0 +1,225 @@
+Add CMake option to build against system-wide FFmpeg instead of the vendored submodule
+
+REG-Linux already builds a shared system ffmpeg package (see
+EKA2L1_DEPENDENCIES = reglinux-qt6 ffmpeg in eka2l1.mk, and
+-DEKA2L1_USE_SYSTEM_FFMPEG=ON in EKA2L1_CONF_OPTS); building EKA2L1's own
+vendored FFmpeg submodule copy on top of that is unnecessary weight,
+mismatched with whatever version REG-Linux otherwise ships, and slower
+to build. This adds an off-by-default CMake option to swap it out for
+the system copy, located via a small FindFFmpeg.cmake module (no
+system-wide Find module ships one).
+
+Wraps the system libraries as the same `ffmpeg` INTERFACE target
+upstream's own iOS and Apple Silicon macOS branches already use for
+their own non-vendored FFmpeg cases (see the surrounding elseif/else
+chain in this same file) - drivers/CMakeLists.txt's
+`target_link_libraries(drivers PRIVATE ffmpeg)` and the final eka2l1_qt
+executable's link both already resolve `ffmpeg` as a target rather than
+a raw library list, so nothing outside this file needs to change: no
+drivers/CMakeLists.txt or qt/CMakeLists.txt edits, and no separate
+re-link workaround for eka2l1_qt (a real CMake target's usage
+requirements propagate correctly through a static library's private
+link, unlike a raw ${VARIABLE} library list would).
+
+Rebased against upstream continuous @ f7a2750a0af8ba1e68851fe7ed7c9fbd528d67bd
+(2026-09-02), replacing the previous version of this patch (2023-era,
+against a ~3-year-old tree). Everything else that old version carried is
+gone because upstream has since covered it or it never mattered:
+
+- EKA2L1_UNIX_USE_X11 / EKA2L1_UNIX_USE_WAYLAND options, the X11-optional
+  guards in drivers/CMakeLists.txt, and the EKA2L1_PLATFORM(X11)/
+  EKA2L1_PLATFORM(WAYLAND) #ifdef wrapping in context.cpp are gone:
+  upstream now builds GLX and Wayland unconditionally side by side
+  (find_package(Wayland REQUIRED EGL), context_wayland.cpp always
+  compiled, window_system_type picked at runtime) with its own
+  cmake/FindWayland.cmake - REG-Linux no longer needs to carry this at
+  all.
+- The near-duplicate hunk against src/emu/drivers/include/drivers/
+  CMakeLists.txt is gone: that file is dead code, last touched
+  2022-09-27, never add_subdirectory()'d by the real
+  src/emu/drivers/CMakeLists.txt (which has commits from today) - patching
+  it never had any effect on any actual build, then or now.
+- The mem_stress.cpp PAGE_SIZE include fix is gone: eka2l1.mk already
+  sets -DEKA2L1_BUILD_TESTS=OFF, so that file is never compiled by this
+  package regardless of upstream's state.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,6 +25,7 @@
+ option(EKA2L1_BUILD_PATCH "Enable building Symbian's DLL patches using Symbian SDK" OFF)
+ option(EKA2L1_ENABLE_DISCORD_RICH_PRESENCE "Enable support for Discord Rich Presence" OFF)
+ option(EKA2L1_ENABLE_QT_CAMERA "Build the desktop camera backend on Qt Multimedia" ON)
++option(EKA2L1_USE_SYSTEM_FFMPEG "Use system-wide FFmpeg instead of the vendored submodule" OFF)
+
+ # Runtime sanitizer for debugging builds: "address" (ASan, memory errors) or
+ # "thread" (TSan, data races and lock-order inversions). Empty disables both.
+--- a/src/external/CMakeLists.txt
++++ b/src/external/CMakeLists.txt
+@@ -332,6 +332,11 @@
+                 "${FFMPEG_ARM64_LIB_DIR}/libavutil.a"
+                 "${FFMPEG_ARM64_LIB_DIR}/libswresample.a"
+                 "z" "-framework CoreVideo" "iconv")
++    elseif (EKA2L1_USE_SYSTEM_FFMPEG)
++        find_package(FFmpeg REQUIRED)
++        add_library(ffmpeg INTERFACE)
++        target_include_directories(ffmpeg INTERFACE ${FFMPEG_INCLUDE_DIRS})
++        target_link_libraries(ffmpeg INTERFACE ${FFMPEG_LIBRARIES})
+     else()
+         add_subdirectory(ffmpeg)
+         if (APPLE)
+--- /dev/null
++++ b/cmake/FindFFmpeg.cmake
+@@ -0,0 +1,151 @@
++# vim: ts=2 sw=2
++# - Try to find the required ffmpeg components(default: AVFORMAT, AVUTIL, AVCODEC)
++#
++# Once done this will define
++#  FFMPEG_FOUND         - System has the all required components.
++#  FFMPEG_INCLUDE_DIRS  - Include directory necessary for using the required components headers.
++#  FFMPEG_LIBRARIES     - Link these to use the required ffmpeg components.
++#  FFMPEG_DEFINITIONS   - Compiler switches required for using the required ffmpeg components.
++#
++# For each of the components it will additionally set.
++#   - AVCODEC
++#   - AVDEVICE
++#   - AVFORMAT
++#   - AVFILTER
++#   - AVUTIL
++#   - POSTPROC
++#   - SWSCALE
++# the following variables will be defined
++#  <component>_FOUND        - System has <component>
++#  <component>_INCLUDE_DIRS - Include directory necessary for using the <component> headers
++#  <component>_LIBRARIES    - Link these to use <component>
++#  <component>_DEFINITIONS  - Compiler switches required for using <component>
++#  <component>_VERSION      - The components version
++#
++# Copyright (c) 2006, Matthias Kretz, <kretz@kde.org>
++# Copyright (c) 2008, Alexander Neundorf, <neundorf@kde.org>
++# Copyright (c) 2011, Michael Jansen, <kde@michael-jansen.biz>
++#
++# Redistribution and use is allowed according to the terms of the BSD license.
++# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
++
++include(FindPackageHandleStandardArgs)
++
++# The default components were taken from a survey over other FindFFMPEG.cmake files
++if (NOT FFmpeg_FIND_COMPONENTS)
++  set(FFmpeg_FIND_COMPONENTS AVCODEC AVFORMAT AVUTIL)
++endif ()
++
++#
++### Macro: set_component_found
++#
++# Marks the given component as found if both *_LIBRARIES AND *_INCLUDE_DIRS is present.
++#
++macro(set_component_found _component )
++  if (${_component}_LIBRARIES AND ${_component}_INCLUDE_DIRS)
++    # message(STATUS "  - ${_component} found.")
++    set(${_component}_FOUND TRUE)
++  else ()
++    # message(STATUS "  - ${_component} not found.")
++  endif ()
++endmacro()
++
++#
++### Macro: find_component
++#
++# Checks for the given component by invoking pkgconfig and then looking up the libraries and
++# include directories.
++#
++macro(find_component _component _pkgconfig _library _header)
++
++  if (NOT WIN32)
++     # use pkg-config to get the directories and then use these values
++     # in the FIND_PATH() and FIND_LIBRARY() calls
++     find_package(PkgConfig)
++     if (PKG_CONFIG_FOUND)
++       pkg_check_modules(PC_${_component} ${_pkgconfig})
++     endif ()
++  endif (NOT WIN32)
++
++  find_path(${_component}_INCLUDE_DIRS ${_header}
++    HINTS
++      ${PC_${_component}_INCLUDEDIR}
++      ${PC_${_component}_INCLUDE_DIRS}
++    PATH_SUFFIXES
++      ffmpeg
++  )
++
++  find_library(${_component}_LIBRARIES NAMES ${_library}
++      HINTS
++      ${PC_${_component}_LIBDIR}
++      ${PC_${_component}_LIBRARY_DIRS}
++  )
++
++  set(${_component}_DEFINITIONS  ${PC_${_component}_CFLAGS_OTHER} CACHE STRING "The ${_component} CFLAGS.")
++  set(${_component}_VERSION      ${PC_${_component}_VERSION}      CACHE STRING "The ${_component} version number.")
++
++  set_component_found(${_component})
++
++  mark_as_advanced(
++    ${_component}_INCLUDE_DIRS
++    ${_component}_LIBRARIES
++    ${_component}_DEFINITIONS
++    ${_component}_VERSION)
++
++endmacro()
++
++
++# Check for cached results. If there are skip the costly part.
++if (NOT FFMPEG_LIBRARIES)
++
++  # Check for all possible component.
++  find_component(AVCODEC    libavcodec    avcodec  libavcodec/avcodec.h)
++  find_component(AVFORMAT   libavformat   avformat libavformat/avformat.h)
++  find_component(AVDEVICE   libavdevice   avdevice libavdevice/avdevice.h)
++  find_component(AVUTIL     libavutil     avutil   libavutil/avutil.h)
++  find_component(AVFILTER   libavfilter   avfilter libavfilter/avfilter.h)
++  find_component(SWSCALE    libswscale    swscale  libswscale/swscale.h)
++  find_component(POSTPROC   libpostproc   postproc libpostproc/postprocess.h)
++  find_component(SWRESAMPLE libswresample swresample libswresample/swresample.h)
++
++  # Check if the required components were found and add their stuff to the FFMPEG_* vars.
++  foreach (_component ${FFmpeg_FIND_COMPONENTS})
++    if (${_component}_FOUND)
++      # message(STATUS "Required component ${_component} present.")
++      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES})
++      set(FFMPEG_DEFINITIONS ${FFMPEG_DEFINITIONS} ${${_component}_DEFINITIONS})
++      list(APPEND FFMPEG_INCLUDE_DIRS ${${_component}_INCLUDE_DIRS})
++    else ()
++      # message(STATUS "Required component ${_component} missing.")
++    endif ()
++  endforeach ()
++
++  # Build the include path with duplicates removed.
++  if (FFMPEG_INCLUDE_DIRS)
++    list(REMOVE_DUPLICATES FFMPEG_INCLUDE_DIRS)
++  endif ()
++
++  # cache the vars.
++  set(FFMPEG_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS} CACHE STRING "The FFmpeg include directories." FORCE)
++  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries." FORCE)
++  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg cflags." FORCE)
++
++  mark_as_advanced(FFMPEG_INCLUDE_DIRS
++                   FFMPEG_LIBRARIES
++                   FFMPEG_DEFINITIONS)
++
++endif ()
++
++# Now set the noncached _FOUND vars for the components.
++foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
++  set_component_found(${_component})
++endforeach ()
++
++# Compile the list of required vars
++set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
++foreach (_component ${FFmpeg_FIND_COMPONENTS})
++  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
++endforeach ()
++
++# Give a nice error message if some of the required vars are missing.
++find_package_handle_standard_args(FFmpeg DEFAULT_MSG ${_FFmpeg_REQUIRED_VARS})
