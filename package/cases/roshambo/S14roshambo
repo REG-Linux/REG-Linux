@@ -1,6 +1,6 @@
 #!/bin/sh
 
-enabled="$(/usr/bin/system-settings-get roshambo.enabled)"
+enabled="$(/usr/bin/regmsg systemconf getconfigkey roshambo.enabled)"
 
 case "$1" in
 	start)
