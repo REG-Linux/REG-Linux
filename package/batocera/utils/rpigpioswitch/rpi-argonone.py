@@ -29,7 +29,7 @@ In this script, put the following parameter
 FORCE_REBOOT=1
 In order to force a reboot on double click (by default
 double click kills the current emulator and returns to
-EmulationStation menu)
+REG-Station menu)
 """
 
 import smbus
