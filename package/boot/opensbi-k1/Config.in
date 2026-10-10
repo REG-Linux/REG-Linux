@@ -1,0 +1,8 @@
+config BR2_PACKAGE_OPENSBI_K1
+    bool "opensbi-k1"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_K1
+    depends on BR2_TARGET_OPENSBI
+    help
+        Wraps the mainline OpenSBI fw_dynamic.bin into a FIT image
+        (fw_dynamic.itb) for SpacemiT K1 platforms where SPL expects
+        OpenSBI in FIT format.
