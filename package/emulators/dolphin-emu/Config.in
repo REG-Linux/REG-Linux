@@ -11,12 +11,19 @@ config BR2_PACKAGE_DOLPHIN_EMU
 	select BR2_PACKAGE_LIBCURL
 	select BR2_PACKAGE_BLUEZ5_UTILS
 	select BR2_PACKAGE_HIDAPI
-	select BR2_PACKAGE_REGLINUX_QT6
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL3
+	select BR2_PACKAGE_CUBEB
+	select BR2_PACKAGE_LIBDRM
 
 	help
 	  Gamecube/Wii emulator
 
+	  Dolphin is an emulator for two recent video game consoles:
+	  the Nintendo GameCube and the Wii. It allows PC gamers to
+	  enjoy games from these two consoles in full HD (1080p) with
+	  several enhancements: compatibility with all PC controllers,
+	  turbo speed, networked multiplayer, and even more.
+
 comment "DOLPHIN_EMU needs a toolchain w/ C++, OpenGL"
-    depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_HAS_LIBGL
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_HAS_LIBGL

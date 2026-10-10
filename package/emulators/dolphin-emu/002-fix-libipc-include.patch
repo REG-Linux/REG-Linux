@@ -19,14 +19,3 @@
    target_link_libraries(core PRIVATE cpp-ipc::ipc)
  endif()
  
---- a/CMakeLists.txt	2025-12-23 01:03:15.443417446 +0100
-+++ b/CMakeLists.txt	2025-12-23 01:00:05.681234719 +0100
-@@ -30,7 +30,7 @@
- 
- project(dolphin-emu)
- 
--if (CMAKE_VERSION VERSION_LESS "3.25" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
-+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-   set(LINUX TRUE)
- endif()
- 
