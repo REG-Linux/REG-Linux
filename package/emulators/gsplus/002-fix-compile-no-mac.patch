@@ -1,0 +1,11 @@
+--- a/gsplus/src/joystick_driver.c	2026-08-14 02:45:34.152344752 +0200
++++ b/gsplus/src/joystick_driver.c	2026-08-14 02:45:56.323651255 +0200
+@@ -234,7 +234,7 @@
+ #endif
+ #endif
+ 
+-#ifdef MAC
++#if 0
+ # define JOYSTICK_DEFINED
+ 
+ #include <IOKit/IOKitLib.h>
