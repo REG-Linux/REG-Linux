@@ -1,10 +1,63 @@
-# Eden
+# eden
 
-Eden ships the Nintendo Switch emulator to REG-Linux with Boost/Qt6 tooling and additional patches so modern titles behave on both x86_64 and ARM hosts.
+Nintendo Switch emulator (Yuzu/Citra fork). Upstream: https://git.eden-emu.dev/eden-emu/eden
 
-## Build notes
+## Build Configuration
 
-- `Version`: v0.0.4-rc3
-- `Dependencies`: `BR2_PACKAGE_JSON_FOR_MODERN_CPP`, `BR2_PACKAGE_REGLINUX_QT6`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_FMT`, `BR2_PACKAGE_BOOST`, `BR2_PACKAGE_BOOST_CONTEXT`, `BR2_PACKAGE_BOOST_FILESYSTEM`, `BR2_PACKAGE_ZSTD`, `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBZIP`, `BR2_PACKAGE_LIBUSB`, `BR2_PACKAGE_LZ4`, `BR2_PACKAGE_CATCH2`, `BR2_PACKAGE_OPUS`, `BR2_PACKAGE_ENET`, `BR2_PACKAGE_GAMEMODE`, `BR2_PACKAGE_LIBVA`, `BR2_PACKAGE_REGLINUX_XWAYLAND`, `BR2_PACKAGE_FFMPEG`, `BR2_PACKAGE_HOST_YASM` (when `BR2_x86_64`), `BR2_PACKAGE_MBEDTLS`, plus `BR2_x86_64 || BR2_aarch64`
-- `Build helper`: CMake-based (`cmake-package`)
-- `Extras`: copies `switch.eden.keys` into `/usr/share/evmapy` (or equivalent) and applies REG-Linux patches (`001-fix-sse2neon.patch`, `004-format_custom.patch`, `002-adjust-paths.patch`, `003-external-nx-tzdb-prebuilt.patch`)
+Requires Qt6 and SDL2. Architecture-specific options are set for ARM64 and x86_64.
+`host-yasm` is added on x86_64 for ASM optimizations.
+
+## Audio Backend
+
+This package uses **cubeb** as the default audio backend for low-latency audio playback.
+
+## Dependencies
+
+### Required
+
+- `cubeb` - Audio I/O library (Mozilla)
+- `libdrm` - Direct Rendering Manager support
+- `wayland` / `libxkbcommon` - Wayland input support
+- `reglinux-qt6` - Qt6 GUI frontend
+- `sdl2` - Input and audio support
+- `fmt` - Formatting library
+- `boost` - C++ libraries
+- `zstd` / `zlib` / `lz4` / `libzip` - Compression libraries
+- `catch2` - Testing framework
+- `opus` - Audio codec
+- `enet` - Network library
+- `json-for-modern-cpp` - JSON library
+- `libva` - Video acceleration
+- `libusb` - USB device access
+- `ffmpeg` - Video/audio decoding
+- `mbedtls` - Cryptography library
+- `gamemode` - Game mode support
+
+### Optional
+
+- `xwayland` - X11 compatibility layer (when `BR2_PACKAGE_XWAYLAND=y`)
+- `vulkan-headers` / `vulkan-loader` / `host-glslang` - Vulkan renderer (when `BR2_PACKAGE_REGLINUX_VULKAN=y`)
+- `host-yasm` - YASM assembler (x86_64 only)
+
+## Disabled Features
+
+The following features are disabled to reduce build size and dependencies:
+
+- Discord Rich Presence
+- Tests (EDEN_TESTS)
+- Sanitizers
+- Bundled FFmpeg (uses system version)
+- External SDL2 (uses system version)
+- CPM package manager (uses system libraries)
+
+## Patches
+
+This package includes several REG-Linux specific patches:
+
+- **001-fix-sse2neon.patch**: Fixes SSE2NEON conversion warnings on ARM
+- **002-adjust-paths.patch**: Changes data paths to REG-Linux locations:
+    - Keys: `/userdata/bios/switch`
+    - Logs: `/userdata/system/logs`
+    - Screenshots: `/userdata/screenshots/switch/eden`
+- **003-external-nx-tzdb-prebuilt.patch**: Uses external timezone database
+- **004-format_custom.patch**: Custom format fixes

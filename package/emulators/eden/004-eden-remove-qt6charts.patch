@@ -1,0 +1,189 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4ab08739f7..881191fd1d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -575,7 +575,7 @@ if (ENABLE_QT)
+         list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}")
+     endif()
+ 
+-    find_package(Qt6 CONFIG REQUIRED COMPONENTS Widgets Charts Concurrent)
++    find_package(Qt6 CONFIG REQUIRED COMPONENTS Widgets Concurrent)
+ 
+     if (YUZU_USE_QT_MULTIMEDIA)
+         find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+@@ -614,7 +614,7 @@ if (ENABLE_QT)
+     ## Components ##
+ 
+     # Best practice is to ask for all components at once, so they are from the same version
+-    set(YUZU_QT_COMPONENTS Core Widgets Charts Concurrent)
++    set(YUZU_QT_COMPONENTS Core Widgets Concurrent)
+     if (PLATFORM_LINUX)
+         list(APPEND YUZU_QT_COMPONENTS DBus)
+     endif()
+diff --git a/src/yuzu/CMakeLists.txt b/src/yuzu/CMakeLists.txt
+index 982c0eb196..9ee55ccae8 100644
+--- a/src/yuzu/CMakeLists.txt
++++ b/src/yuzu/CMakeLists.txt
+@@ -411,7 +411,8 @@
+ 
+ target_link_libraries(yuzu PRIVATE nlohmann_json::nlohmann_json)
+ target_link_libraries(yuzu PRIVATE common core input_common frontend_common network video_core qt_common)
+-target_link_libraries(yuzu PRIVATE Boost::headers Qt6::Widgets Qt6::Charts Qt6::Concurrent)
++# REG HACK : Remove Qt6::Charts
++target_link_libraries(yuzu PRIVATE Boost::headers Qt6::Widgets Qt6::Concurrent)
+ target_link_libraries(yuzu PRIVATE ${PLATFORM_LIBRARIES} Threads::Threads)
+ if (ENABLE_OPENGL)
+     target_link_libraries(yuzu PRIVATE glad)
+diff --git a/src/yuzu/render/performance_overlay.cpp b/src/yuzu/render/performance_overlay.cpp
+index 13003dce7b..8dc1eeba7e 100644
+--- a/src/yuzu/render/performance_overlay.cpp
++++ b/src/yuzu/render/performance_overlay.cpp
+@@ -7,13 +7,12 @@
+ 
+ #include "main_window.h"
+ 
+-#include <QChart>
+-#include <QChartView>
+-#include <QGraphicsLayout>
+-#include <QLineSeries>
++#include <algorithm>
++#include <cmath>
++#include <numeric>
++
+ #include <QMouseEvent>
+ #include <QPainter>
+-#include <QValueAxis>
+ 
+ // TODO(crueter): Reset samples when user changes turbo, slow, etc.
+ PerformanceOverlay::PerformanceOverlay(MainWindow* parent)
+@@ -24,53 +23,6 @@ PerformanceOverlay::PerformanceOverlay(MainWindow* parent)
+     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+     raise();
+ 
+-    // chart setup
+-    m_fpsSeries = new QLineSeries(this);
+-
+-    QPen pen(Qt::red);
+-    pen.setWidth(2);
+-    m_fpsSeries->setPen(pen);
+-
+-    m_fpsChart = new QChart;
+-    m_fpsChart->addSeries(m_fpsSeries);
+-    m_fpsChart->legend()->hide();
+-    m_fpsChart->setBackgroundBrush(Qt::black);
+-    m_fpsChart->setBackgroundVisible(true);
+-    m_fpsChart->layout()->setContentsMargins(2, 2, 2, 2);
+-    m_fpsChart->setMargins(QMargins{4, 4, 4, 4});
+-
+-    // axes
+-    m_fpsX = new QValueAxis(this);
+-    m_fpsX->setRange(0, NUM_FPS_SAMPLES);
+-    m_fpsX->setVisible(false);
+-
+-    m_fpsY = new QValueAxis(this);
+-    m_fpsY->setRange(0, 60);
+-    m_fpsY->setLabelFormat(QStringLiteral("%d"));
+-    m_fpsY->setLabelsColor(Qt::white);
+-
+-    QFont axisFont = m_fpsY->labelsFont();
+-    axisFont.setPixelSize(10);
+-    m_fpsY->setLabelsFont(axisFont);
+-    m_fpsY->setTickCount(3);
+-
+-    // gray-ish label w/ white lines
+-    m_fpsY->setLabelsVisible(true);
+-    m_fpsY->setGridLineColor(QColor(50, 50, 50));
+-    m_fpsY->setLinePenColor(Qt::white);
+-
+-    m_fpsChart->addAxis(m_fpsX, Qt::AlignBottom);
+-    m_fpsChart->addAxis(m_fpsY, Qt::AlignLeft);
+-    m_fpsSeries->attachAxis(m_fpsX);
+-    m_fpsSeries->attachAxis(m_fpsY);
+-
+-    // chart view
+-    m_fpsChartView = new QChartView(m_fpsChart, this);
+-    m_fpsChartView->setRenderHint(QPainter::Antialiasing);
+-    m_fpsChartView->setMinimumHeight(100);
+-
+-    ui->verticalLayout->addWidget(m_fpsChartView, 1);
+-
+     // thanks Debian.
+     QFont font = ui->fps->font();
+     font.setWeight(QFont::DemiBold);
+@@ -107,12 +59,10 @@ void PerformanceOverlay::updateStats(const Core::PerfStatsResults& results,
+         // sampling
+         if (fps > FPS_SAMPLE_THRESHOLD) {
+             m_fpsSamples.push_back(fps);
+-            m_fpsPoints.push_back(QPointF{m_xPos++, fps});
+         }
+ 
+         if (m_fpsSamples.size() > NUM_FPS_SAMPLES) {
+             m_fpsSamples.pop_front();
+-            m_fpsPoints.pop_front();
+         }
+ 
+         // For the average only go back 10 samples max
+@@ -124,21 +74,12 @@ void PerformanceOverlay::updateStats(const Core::PerfStatsResults& results,
+             ui->fps_avg->setText(tr("Avg: %1").arg(avg, 0, 'f', 0));
+         }
+ 
+-        // chart it :)
+-        if (!m_fpsPoints.empty()) {
+-            auto [min_it, max_it] = std::minmax_element(m_fpsSamples.begin(), m_fpsSamples.end());
+-            double min_fps = *min_it;
+-            double max_fps = *max_it;
+-
+-            ui->fps_min->setText(tr("Min: %1").arg(min_fps, 0, 'f', 0));
+-            ui->fps_max->setText(tr("Max: %1").arg(max_fps, 0, 'f', 0));
+-
+-            m_fpsSeries->replace(QList<QPointF>(m_fpsPoints.begin(), m_fpsPoints.end()));
+-
+-            qreal x_min = std::max(0.0, m_xPos - NUM_FPS_SAMPLES);
+-            qreal x_max = std::max(qreal(10), m_xPos);
+-            m_fpsX->setRange(x_min, x_max);
+-            m_fpsY->setRange(0.0, max_fps);
++        // min/max from samples
++        if (!m_fpsSamples.empty()) {
++            auto [min_it, max_it] =
++                std::minmax_element(m_fpsSamples.begin(), m_fpsSamples.end());
++            ui->fps_min->setText(tr("Min: %1").arg(*min_it, 0, 'f', 0));
++            ui->fps_max->setText(tr("Max: %1").arg(*max_it, 0, 'f', 0));
+         }
+     }
+ 
+diff --git a/src/yuzu/render/performance_overlay.h b/src/yuzu/render/performance_overlay.h
+index a0325a10a3..8804c1a004 100644
+--- a/src/yuzu/render/performance_overlay.h
++++ b/src/yuzu/render/performance_overlay.h
+@@ -16,10 +16,6 @@ namespace Ui {
+ class PerformanceOverlay;
+ }
+ 
+-class QLineSeries;
+-class QChart;
+-class QChartView;
+-class QValueAxis;
+ class MainWindow;
+ 
+ class PerformanceOverlay : public QWidget {
+@@ -54,20 +50,11 @@ private:
+ 
+     // fps
+     const size_t NUM_FPS_SAMPLES = 120;
+-    qreal m_xPos = 0;
+     std::deque<double> m_fpsSamples;
+-    std::deque<QPointF> m_fpsPoints;
+ 
+     // drag
+     QPoint m_drag_start_pos;
+ 
+-    // fps chart
+-    QLineSeries* m_fpsSeries = nullptr;
+-    QChart* m_fpsChart = nullptr;
+-    QChartView* m_fpsChartView = nullptr;
+-    QValueAxis* m_fpsX = nullptr;
+-    QValueAxis* m_fpsY = nullptr;
+-
+ signals:
+     void closed();
+ };

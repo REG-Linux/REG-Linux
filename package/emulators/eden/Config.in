@@ -1,30 +1,37 @@
 config BR2_PACKAGE_EDEN
-    bool "eden"
-    depends on BR2_x86_64 || BR2_aarch64
-    select BR2_PACKAGE_JSON_FOR_MODERN_CPP
-    select BR2_PACKAGE_REGLINUX_QT6
-    select BR2_PACKAGE_SDL2
-    select BR2_PACKAGE_FMT
-    select BR2_PACKAGE_BOOST
-    select BR2_PACKAGE_BOOST_CONTEXT
-    select BR2_PACKAGE_BOOST_FILESYSTEM
-    select BR2_PACKAGE_ZSTD
-    select BR2_PACKAGE_ZLIB
-    select BR2_PACKAGE_LIBZIP
-    select BR2_PACKAGE_LIBUSB
-    select BR2_PACKAGE_LZ4
-    select BR2_PACKAGE_CATCH2
-    select BR2_PACKAGE_OPUS
-    select BR2_PACKAGE_ENET
-    select BR2_PACKAGE_GAMEMODE
-    select BR2_PACKAGE_LIBVA
-    select BR2_PACKAGE_REGLINUX_XWAYLAND
-    select BR2_PACKAGE_FFMPEG
-    # Need yasm on x86_64 to compile bundled ffmpeg
-    select BR2_PACKAGE_HOST_YASM		if BR2_x86_64
-    select BR2_PACKAGE_MBEDTLS
+	bool "eden"
+	depends on BR2_x86_64 || BR2_aarch64
+	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+	select BR2_PACKAGE_REGLINUX_QT6
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_FMT
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_ZSTD
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBZIP
+	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_LZ4
+	select BR2_PACKAGE_CATCH2
+	select BR2_PACKAGE_OPUS
+	select BR2_PACKAGE_ENET
+	select BR2_PACKAGE_GAMEMODE
+	select BR2_PACKAGE_LIBVA
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_CUBEB
+	select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_LIBXKBCOMMON
+	# Need yasm on x86_64 to compile bundled ffmpeg
+	select BR2_PACKAGE_HOST_YASM		if BR2_x86_64
+	select BR2_PACKAGE_MBEDTLS
+	select BR2_PACKAGE_VULKAN_UTILITY_LIBRARIES	if BR2_PACKAGE_REGLINUX_VULKAN
 
-    help
-      Eden: Nintendo Switch Emulator
+	help
+	  Eden: Nintendo Switch Emulator
 
-	    https://eden-emu.dev/
+	  Eden is a Nintendo Switch emulator forked from Yuzu/Citra,
+	  focusing on performance and accuracy. It supports both
+	  desktop and handheld gaming with enhanced graphics up to
+	  4K resolution.
+
+	  https://eden-emu.dev/
