@@ -1,0 +1,7 @@
+# All four from Debian bookworm, shim 16.1 - keep x64 and ia32 on one generation
+# x64 shim + helpers:
+sha256	c2acf5e559664bbadb7ce5789f9a321f39754a34854d3097b8cc0369df513b3b  shim-signed_1.51~1+deb12u1+16.1-2~deb12u1_amd64.deb
+sha256	26acac35133946c1642a09f3fda353ee3b849e5fc643fadb97a8dfec9e2b55fb  shim-helpers-amd64-signed_1+16.1+2~deb12u1_amd64.deb
+# ia32 shim + helpers:
+sha256	c3497d2a2527e04e074c668cf4a524f6c05b6a05b150c8c888547d4e438dbca9  shim-signed_1.51~1+deb12u1+16.1-2~deb12u1_i386.deb
+sha256	6b357e11e55871bd27d7f55d8c0384039597fa033b8ddd32d432129391d1d5b7  shim-helpers-i386-signed_1+16.1+2~deb12u1_i386.deb
