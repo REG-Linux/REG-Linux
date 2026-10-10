@@ -1,0 +1,61 @@
+From ba5a6a6cd4e459acf36f807c854b498b2920b2d1 Mon Sep 17 00:00:00 2001
+From: Carlos Santos <casantos@datacom.com.br>
+Date: Wed, 4 Jul 2018 11:07:31 -0300
+Subject: [PATCH] fileio: improve error handling in __fileio_read_file
+
+Signed-off-by: Carlos Santos <casantos@datacom.com.br>
+---
+ src/fileio.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/fileio.c b/src/fileio.c
+index 032eb1e..5a109a7 100644
+--- a/src/fileio.c
++++ b/src/fileio.c
+@@ -154,30 +154,30 @@ static int __fileio_read_file(void *ctx, const char *filename,
+ 
+ 	rc = fstat(fd, &statbuf);
+ 	if (rc)
+-		goto out;
++		goto close_fd;
+ 
+ 	len = statbuf.st_size;
+ 
+ 	buf = talloc_array(ctx, uint8_t, len);
+ 	if (!buf)
+-		goto out;
++		goto close_fd;
+ 
+ 	if (!read_all(fd, buf, len))
+-		goto out;
++		goto read_error;
+ 
++	*out_buf = buf;
++	*out_len = len;
+ 	rc = 0;
+-
++	goto close_fd;
++
++read_error:
++	if (!(flags & FLAG_NOERROR))
++		fprintf(stderr, "Error reading file %s: %s\n", filename,
++				strerror(errno));
++	talloc_free(ctx);
++close_fd:
++	close(fd);
+ out:
+-	if (fd >= 0)
+-		close(fd);
+-	if (rc) {
+-		if (!(flags & FLAG_NOERROR))
+-			fprintf(stderr, "Error reading file %s: %s\n",
+-					filename, strerror(errno));
+-	} else {
+-		*out_buf = buf;
+-		*out_len = len;
+-	}
+ 	return rc;
+ 
+ }
+-- 
+2.43.0
