@@ -1,9 +1,5 @@
-# Box86
+# box86
 
-Box86 brings x86 compatibility to 32-bit ARM REG-Linux targets, courtesy of https://github.com/ptitseb/box86, so legacy binaries keep running.
+x86 userspace emulator for 32-bit ARM hosts. Upstream: https://github.com/ptitseb/box86
 
-## Build notes
-
-- `Version`: v0.3.8
-- `Dependencies`: `BR2_arm`, `BR2_PACKAGE_HOST_PYTHON3`
-- `Build helper`: CMake-based (`cmake-package`)
+ARM dynarec is always enabled (`-DARM_DYNAREC=ON`). Requires `host-python3` for the build scripts.
