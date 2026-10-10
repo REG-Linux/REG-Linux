@@ -1,12 +1,19 @@
 #!/bin/dash
 case "$1" in
     start)
+        # Unbind the framebuffer console so the kernel stops drawing text into the framebuffer.
+        for vtcon in /sys/class/vtconsole/vtcon*; do
+            [ -r "$vtcon/name" ] || continue
+            case "$(cat "$vtcon/name")" in
+                *"frame buffer device"*) echo 0 > "$vtcon/bind" ;;
+            esac
+        done
         # Boot splash with "insert coin"
         /usr/sbin/plymouthd --mode=boot --graphical-boot --attach-to-session
         /usr/bin/plymouth --show-splash
     ;;
     stop)
-        # Shutdown splash with "game over" set by S12populateshare
-        /usr/bin/plymouth --wait quit --retain-splash
+        # Shutdown splash with "game over" set by S99services
+        /usr/bin/plymouth quit --retain-splash
     ;;
 esac
