@@ -1,0 +1,8 @@
+config BR2_PACKAGE_UBOOT_K3
+    bool "uboot for SpacemiT K3 - built from source"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_K3
+    select BR2_PACKAGE_OPENSBI
+    help
+        U-Boot bootloader for SpacemiT K3 platforms (CoM260, Pico-ITX, ...),
+        built from source with sysboot/extlinux support. A single k3_defconfig
+        covers all K3 boards; the board DTB is chosen at runtime.
