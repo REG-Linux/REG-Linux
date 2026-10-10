@@ -1,0 +1,34 @@
+Avoid f64::algebraic_add/algebraic_mul (unstable, feature `float_algebraic`,
+stabilizes in Rust 1.98.0 - see rust-lang/rust#136469 and #157029). Our
+pinned rust-bin toolchain is older, so stable rustc rejects these calls.
+
+Replace with f64::mul_add(), which is stable and, on the avx2+fma/avx512f
+multiversion targets this function already dispatches to, compiles to a
+single fused multiply-add instruction - same op count as the algebraic
+form, just without the cross-iteration reassociation hint that would let
+LLVM auto-vectorize the reduction. Negligible cost here (FIR resample is
+a tiny fraction of jgenesis's per-frame budget).
+
+TODO: drop this patch once RUST_BIN_VERSION >= 1.98.0.
+
+--- a/common/jgenesis-common/src/audio/fir_resampler.rs
++++ b/common/jgenesis-common/src/audio/fir_resampler.rs
+@@ -144,7 +144,7 @@
+         for (i, coefficient) in coefficients.iter().copied().enumerate() {
+             let input_idx = samples[0].idx + i;
+             for (ch, sum) in sums.iter_mut().enumerate() {
+-                *sum = sum.algebraic_add(coefficient.algebraic_mul(samples[ch].buffer[input_idx]));
++                *sum = coefficient.mul_add(samples[ch].buffer[input_idx], *sum);
+             }
+         }
+         sums
+@@ -153,8 +153,7 @@
+         for i in N - samples[0].len..N {
+             let input_idx = samples[0].idx + i - (N - samples[0].len);
+             for (ch, sum) in sums.iter_mut().enumerate() {
+-                *sum =
+-                    sum.algebraic_add(coefficients[i].algebraic_mul(samples[ch].buffer[input_idx]));
++                *sum = coefficients[i].mul_add(samples[ch].buffer[input_idx], *sum);
+             }
+         }
+         sums
