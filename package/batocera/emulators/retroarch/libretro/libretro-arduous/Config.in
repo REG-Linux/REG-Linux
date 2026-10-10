@@ -1,7 +1,0 @@
-config BR2_PACKAGE_LIBRETRO_ARDUOUS
-    bool "libretro-arduous"
-    
-      help
-        A libretro Arduboy core
-
-        http://www.libretro.com
