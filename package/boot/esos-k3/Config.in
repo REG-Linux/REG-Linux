@@ -1,0 +1,8 @@
+config BR2_PACKAGE_ESOS_K3
+    bool "esos-k3"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_K3
+    help
+        SpacemiT ESOS (Energy Service OS) firmware for the K3 RT24
+        real-time coprocessor cores. Produces esos.itb for the boot
+        image. Not required to boot Linux on the X100 application cores;
+        brings up the RT cores (power-mgmt offload, audio DSP).
