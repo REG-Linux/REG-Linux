@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WIIMOTEMODE=$(/usr/bin/system-settings-get controllers.wiimote.mode)
+WIIMOTEMODE=$(/usr/bin/regmsg systemconf getconfigkey controllers.wiimote.mode)
 
 if test "${WIIMOTEMODE}" != 'gun' -a "${WIIMOTEMODE}" != ""
 then
