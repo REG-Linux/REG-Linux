@@ -1,0 +1,10 @@
+--- a/hid-xpadneo/src/Makefile
++++ b/hid-xpadneo/src/Makefile
+@@ -2,6 +2,7 @@
+ # Makefile for the HID driver
+ #
+ ccflags-y += -DVERSION=$(VERSION)
++ccflags-y += -std=gnu99
+ obj-m += hid-xpadneo.o
+
+ hid-xpadneo-y += \

@@ -3,13 +3,13 @@
 # xpadneo
 #
 ################################################################################
-# Version: Release on Dec 23, 2024
-XPADNEO_VERSION = v0.9.7
+# Version: Release on Jul 10, 2026
+XPADNEO_VERSION = v0.10.4
 XPADNEO_SITE = $(call github,atar-axis,xpadneo,$(XPADNEO_VERSION))
-XPADNEO_DEPENDENCIES = host-cabextract bluez5_utils
+XPADNEO_DEPENDENCIES = bluez5_utils linux
 XPADNEO_MODULE_SUBDIRS = hid-xpadneo/src
 
-XPADNEO_USER_EXTRA_CFLAGS = -w -Wno-error=unused-function
+XPADNEO_USER_EXTRA_CFLAGS = -w
 
 XPADNEO_MODULE_MAKE_OPTS = \
 	KCFLAGS="$$KCFLAGS $(XPADNEO_USER_EXTRA_CFLAGS)"

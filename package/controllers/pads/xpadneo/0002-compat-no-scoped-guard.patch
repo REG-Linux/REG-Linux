@@ -1,0 +1,62 @@
+--- a/hid-xpadneo/src/xpadneo/rumble.c	2026-04-10 07:59:07.833371030 +0200
++++ b/hid-xpadneo/src/xpadneo/rumble.c	2026-04-10 07:59:42.909978641 +0200
+@@ -66,10 +66,15 @@
+ reschedule:
+ 	r->data.enable = XBOX_RUMBLE_ALL;
+ 
+-	scoped_guard(spinlock_irqsave, &xdata->rumble.lock) {
++	{
++		unsigned long _flags;
++		spin_lock_irqsave(&xdata->rumble.lock, _flags);
++
+ 		/* only proceed once initialization data is globally visible */
+-		if (unlikely(!xpadneo_rumble_streaming_get(xdata)))
++		if (unlikely(!xpadneo_rumble_streaming_get(xdata))) {
++			spin_unlock_irqrestore(&xdata->rumble.lock, _flags);
+ 			goto check_pending;
++		}
+ 
+ 		if (unlikely(xdata->quirks & XPADNEO_QUIRK_NO_TRIGGER_RUMBLE)) {
+ 			/* do not send these bits if not supported */
+@@ -95,8 +100,10 @@
+ 			r->data.enable &= ~XBOX_RUMBLE_RIGHT;
+ 
+ 		/* do not send a report if nothing changed */
+-		if (unlikely(r->data.enable == XBOX_RUMBLE_NONE))
++		if (unlikely(r->data.enable == XBOX_RUMBLE_NONE)) {
++			spin_unlock_irqrestore(&xdata->rumble.lock, _flags);
+ 			goto check_pending;
++		}
+ 
+ 		/* shadow our current rumble values for the next cycle */
+ 		memcpy(&xdata->rumble.shadow, &xdata->rumble.data, sizeof(xdata->rumble.data));
+@@ -112,6 +119,8 @@
+ 		/* swap the bits of trigger and main motors */
+ 		if (unlikely(xdata->quirks & XPADNEO_QUIRK_SWAPPED_MASK))
+ 			r->data.enable = SWAP_BITS(SWAP_BITS(r->data.enable, 0, 2), 1, 3);
++
++		spin_unlock_irqrestore(&xdata->rumble.lock, _flags);
+ 	}
+ 
+ 	ret = xpadneo_device_output_report(hdev, (__u8 *) r, sizeof(*r), xdata->uses_hogp);
+@@ -178,7 +187,10 @@
+ 	 */
+ 	max_main = max(weak, strong);
+ 
+-	scoped_guard(spinlock_irqsave, &xdata->rumble.lock) {
++	{
++		unsigned long _flags;
++		spin_lock_irqsave(&xdata->rumble.lock, _flags);
++
+ 		/* calculate the physical magnitudes, scale from 16 bit to 0..100 */
+ 		xdata->rumble.data.magnitude_strong = calculate_magnitude(strong, fraction_MAIN);
+ 		xdata->rumble.data.magnitude_weak = calculate_magnitude(weak, fraction_MAIN);
+@@ -193,6 +205,8 @@
+ 			smp_store_release(&xdata->rumble.pending, true);
+ 			hid_notice_once(hdev, "throttled rumble reprogramming\n");
+ 		}
++
++		spin_unlock_irqrestore(&xdata->rumble.lock, _flags);
+ 	}
+ 
+ 	return 0;
