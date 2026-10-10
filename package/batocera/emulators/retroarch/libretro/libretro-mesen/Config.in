@@ -1,7 +1,0 @@
-config BR2_PACKAGE_LIBRETRO_MESEN
-    bool "libretro-mesen"
-    
-      help
-        A libretro NES/Famicom emulator core.
-        
-        http://www.libretro.com
