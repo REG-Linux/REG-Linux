@@ -1,0 +1,8 @@
+config BR2_PACKAGE_TH1520_VENDOR_FIRMWARE
+	bool "th1520-vendor-firmware"
+	help
+	  Proprietary T-Head TH1520 vendor firmware files loaded by
+	  vendor U-Boot before kernel boot:
+	    - light_aon_fpga.bin (AON subsystem - poweroff/reboot)
+	    - light_c906_audio.bin (C906 audio DSP)
+	    - str.bin (Suspend-to-RAM)
