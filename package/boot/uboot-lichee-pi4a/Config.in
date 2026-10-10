@@ -1,0 +1,7 @@
+config BR2_PACKAGE_UBOOT_LICHEE_PI4A
+    bool "uboot for Lichee Pi 4A / TH1520 - built from mainline"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_TH1520
+    select BR2_TARGET_OPENSBI
+    help
+        Mainline U-Boot bootloader with SPL for Sipeed Lichee Pi 4A
+        (T-Head TH1520 SoC). Supports 8GB and 16GB memory variants.
