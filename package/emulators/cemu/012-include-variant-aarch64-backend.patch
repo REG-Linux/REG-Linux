@@ -1,0 +1,10 @@
+--- a/src/Cafe/HW/Espresso/Recompiler/BackendAArch64/BackendAArch64.cpp
++++ b/src/Cafe/HW/Espresso/Recompiler/BackendAArch64/BackendAArch64.cpp
+@@ -7,6 +7,7 @@
+ #include <xbyak_aarch64_util.h>
+ 
+ #include <cstddef>
++#include <variant>
+ 
+ #include "../PPCRecompiler.h"
+ #include "Common/precompiled.h"

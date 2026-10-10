@@ -7,10 +7,6 @@ config BR2_PACKAGE_CEMU
     select BR2_PACKAGE_PUGIXML
     select BR2_PACKAGE_RAPIDJSON
     select BR2_PACKAGE_BOOST
-    select BR2_PACKAGE_BOOST_CONTEXT
-    select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
-    select BR2_PACKAGE_BOOST_FILESYSTEM
-    select BR2_PACKAGE_BOOST_NOWIDE
     select BR2_PACKAGE_LIBZIP
     select BR2_PACKAGE_GLSLANG
     select BR2_PACKAGE_ZLIB
@@ -20,12 +16,21 @@ config BR2_PACKAGE_CEMU
     select BR2_PACKAGE_LIBUSB
     select BR2_PACKAGE_WXWIDGETS
     select BR2_PACKAGE_UPOWER                   # required by some cemuhook servers
-    select BR2_PACKAGE_HIDAPI
-    select BR2_PACKAGE_BLUEZ5_UTILS
+    select BR2_PACKAGE_HIDAPI                   # required for Wiimote support
+    select BR2_PACKAGE_BLUEZ5_UTILS             # required for Wiimote support
     select BR2_PACKAGE_WEBP
     select BR2_PACKAGE_WEBP_DEMUX
-
+    select BR2_PACKAGE_CUBEB                    # Audio backend
     help
       Cemu is a Wii U emulator that now runs natively on Linux.
+
+      Features:
+      - Wii U emulation (x86_64 and aarch64)
+      - OpenGL and Vulkan graphics backends
+      - SDL2 controller support
+      - Wiimote support via HIDAPI + BlueZ
+      - Cubeb audio backend
+      - GameProfile support
+      - CemuHook controller support
 
       https://cemu.info/
