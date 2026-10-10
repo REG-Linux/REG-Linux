@@ -1,9 +1,5 @@
-# BigPEmu
+# bigpemu
 
-BigPEmu provides REG-Linux with a Jaguar emulator capable of running the full retail cartridge catalog; the project homepage at https://www.richwhitehouse.com/jaguar/index.php covers more specs.
+Atari Jaguar emulator (pre-built binary). Upstream: https://www.richwhitehouse.com/jaguar/
 
-## Build notes
-
-- `Version`: v119
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: configuration driven entirely by the recipe `Config.in`
+Ships as a pre-built tarball: `LinuxARM64` for AArch64, `Linux64` for x86_64 and (via box64) RISC-V. The entire archive is installed to `/usr/bigpemu/`.
