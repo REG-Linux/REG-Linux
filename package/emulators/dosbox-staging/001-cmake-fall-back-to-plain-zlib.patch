@@ -1,0 +1,39 @@
+From: Carlos Martins <cjom@reglinux.org>
+Subject: [PATCH] cmake: fall back to zlib when zlib-ng.pc is absent
+
+zmbv's CMakeLists hard-requires the zlib-ng pkg-config module, but
+distributions (Buildroot among them) commonly build zlib-ng in
+ZLIB_COMPAT mode, where it takes over as *the* zlib provider and installs
+zlib.pc -- never zlib-ng.pc. Configure then dies with
+
+    No package 'zlib-ng' found
+
+even though zlib-ng is exactly what is installed.
+
+The meson build already handles this, picking the system zlib-ng when it
+declares itself and plain zlib otherwise:
+
+    zlib_or_ng_dep = system_zlib_ng_dep.found() ? system_zlib_ng_dep : zlib_dep
+
+Mirror that in CMake. The compat headers/ABI are drop-in, and zmbv.cpp
+uses only the classic zlib API, so nothing else needs to change.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+---
+diff --git a/src/libs/zmbv/CMakeLists.txt b/src/libs/zmbv/CMakeLists.txt
+index f3fce37..743fcfa 100644
+--- a/src/libs/zmbv/CMakeLists.txt
++++ b/src/libs/zmbv/CMakeLists.txt
+@@ -1,6 +1,11 @@
+ add_library(zmbv STATIC zmbv.cpp)
+ 
+-pkg_check_modules(ZLIB_NG REQUIRED IMPORTED_TARGET zlib-ng)
++# zlib-ng in ZLIB_COMPAT mode installs zlib.pc and no zlib-ng.pc, so probe
++# for the native name first and fall back to zlib, as the meson build does.
++pkg_check_modules(ZLIB_NG IMPORTED_TARGET zlib-ng)
++if(NOT ZLIB_NG_FOUND)
++  pkg_check_modules(ZLIB_NG REQUIRED IMPORTED_TARGET zlib)
++endif()
+ 
+ target_include_directories(zmbv PUBLIC ..)
+ target_link_libraries(zmbv PRIVATE PkgConfig::ZLIB_NG)
