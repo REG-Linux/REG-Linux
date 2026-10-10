@@ -1,0 +1,6 @@
+config BR2_PACKAGE_UBOOT_MILKV_MELES
+    bool "uboot for Milk-V Meles - vendor pre-built"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_TH1520
+    help
+        Vendor U-Boot with SPL for Milk-V Meles (T-Head TH1520 SoC).
+        Pre-built binaries for 4GB, 8GB, and 16GB memory variants.
