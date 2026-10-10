@@ -1,0 +1,34 @@
+From: REG-Linux <cjom@reglinux.org>
+Subject: [PATCH] Acorn/Archimedes: delete ConcreteMachine's copy operations
+
+GCC 16.1 recurses forever in its C++ front end when std::make_unique
+<ConcreteMachine>() makes it implicitly declare ConcreteMachine's copy
+constructor: walking the self-referential CRTP member
+
+    InstructionSet::ARM::Executor<arm_model,
+        MemoryController<ConcreteMachine, ConcreteMachine>, ConcreteMachine>
+
+leads straight back to declaring the same constructor, until cc1plus runs
+out of stack and dies with a SIGSEGV "internal compiler error" on every
+architecture (it is not RISC-V specific, and not affected by -O or -std).
+
+ConcreteMachine is never copied - it holds pointers to itself - so declare
+the copy operations deleted. GCC then never synthesizes them, and the
+Archimedes machine builds everywhere again.
+
+Signed-off-by: REG-Linux <cjom@reglinux.org>
+---
+--- a/Machines/Acorn/Archimedes/Archimedes.cpp
++++ b/Machines/Acorn/Archimedes/Archimedes.cpp
+@@ -111,6 +111,11 @@
+ 	}
+ 
+ public:
++	// Never copied (it holds pointers to itself); declaring these also keeps
++	// GCC 16 from recursing forever synthesizing them for the Executor member.
++	ConcreteMachine(const ConcreteMachine &) = delete;
++	ConcreteMachine &operator=(const ConcreteMachine &) = delete;
++
+ 	ConcreteMachine(
+ 		const Analyser::Static::Acorn::ArchimedesTarget &target,
+ 		const ROMMachine::ROMFetcher &rom_fetcher

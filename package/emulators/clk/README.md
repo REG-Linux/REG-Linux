@@ -1,9 +1,5 @@
-# CLK
+# clk
 
-CLK (Clock Signal) is a multi-system emulator that targets classic home computers (BBC Micro, Acorn, etc.) and ships here for REG-Linux with SDL2-based I/O.
+Clock Signal multi-system emulator. Upstream: https://github.com/TomHarte/CLK
 
-## Build notes
-
-- `Version`: 2025-11-26
-- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ZLIB`, plus `BR2_PACKAGE_HAS_LIBGL` for optional OpenGL rendering
-- `Build helper`: CMake-based (`cmake-package`)
+Both `libgl` and `libgles` are added as dependencies when present; the CMake build auto-detects which to use at runtime.
