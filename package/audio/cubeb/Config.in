@@ -1,0 +1,55 @@
+config BR2_PACKAGE_CUBEB
+	bool "cubeb"
+	select BR2_PACKAGE_ALSA_LIB
+	select BR2_PACKAGE_SPEEXDSP
+	help
+	  Cubeb is a cross-platform audio library.
+
+	  It provides a consistent API for playing and recording audio
+	  across different platforms and audio systems. Cubeb supports
+	  multiple backends including ALSA, PulseAudio, JACK, and more.
+
+	  Features:
+	  - Cross-platform audio I/O
+	  - Multiple backend support (ALSA, PulseAudio, JACK, etc.)
+	  - Low-latency audio playback
+	  - Audio stream mixing
+	  - Device enumeration and selection
+	  - Volume control
+
+	  This package includes the ALSA backend (Tier-3 support).
+	  For PulseAudio backend, enable BR2_PACKAGE_PULSEAUDIO.
+	  For JACK backend, enable BR2_PACKAGE_JACK2.
+
+	  https://github.com/mozilla/cubeb
+
+if BR2_PACKAGE_CUBEB
+
+config BR2_PACKAGE_CUBEB_BACKEND_ALSA
+	bool "ALSA backend"
+	default y
+	help
+	  Enable ALSA backend for cubeb.
+
+	  This is the recommended backend for embedded systems without
+	  a sound server (PulseAudio/PipeWire).
+
+config BR2_PACKAGE_CUBEB_BACKEND_PULSEAUDIO
+	bool "PulseAudio backend"
+	select BR2_PACKAGE_PULSEAUDIO
+	help
+	  Enable PulseAudio backend for cubeb.
+
+	  This provides better integration with desktop Linux systems
+	  running PulseAudio or PipeWire.
+
+config BR2_PACKAGE_CUBEB_BACKEND_JACK
+	bool "JACK backend"
+	select BR2_PACKAGE_JACK2
+	help
+	  Enable JACK backend for cubeb.
+
+	  JACK is a professional audio server for low-latency audio
+	  routing. Recommended for professional audio applications.
+
+endif
