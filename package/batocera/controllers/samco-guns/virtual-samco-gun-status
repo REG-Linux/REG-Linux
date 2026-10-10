@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SAMCOGUNMODE=$(/usr/bin/system-settings-get controllers.samco-guns.mode)
+SAMCOGUNMODE=$(/usr/bin/regmsg systemconf getconfigkey controllers.samco-guns.mode)
 
 if test "${SAMCOGUN}" = 'gun'
 then
