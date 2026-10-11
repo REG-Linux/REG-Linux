@@ -1,0 +1,87 @@
+From: REG-Linux <noreply@reg-linux.org>
+Date: Sat, 2 May 2026 00:00:00 +0000
+Subject: [PATCH] vulkan: skip VK_LAYER_KHRONOS_validation when not installed
+
+VULKAN_DEBUG builds (auto-enabled by --enable-debug + HAVE_VULKAN in
+qb/config.libs.sh) unconditionally request VK_LAYER_KHRONOS_validation.
+Without the ~150 MB validation-layers package installed, instance
+creation fails with VK_ERROR_LAYER_NOT_PRESENT (-6) and Vulkan is
+unusable on DEBUG_BUILD=y images.
+
+Two fixes:
+
+1. vulkan_context_create_instance_wrapper(): enumerate available
+   instance layers first; only add the validation layer (and its
+   VK_EXT_debug_utils companion) when present.
+
+2. vulkan_context_init(): the debug-utils messenger setup is guarded
+   only by `vk->context.instance`. With VK_EXT_debug_utils not enabled,
+   vkGetInstanceProcAddr returns NULL for vkCreateDebugUtilsMessengerEXT
+   and the call segfaults. Also gate on the fn pointer.
+
+After the patch:
+  DEBUG_BUILD=y + layers installed -> unchanged.
+  DEBUG_BUILD=y + no layers        -> RARCH_WARN, no debug messenger.
+  DEBUG_BUILD=n                    -> unchanged (VULKAN_DEBUG undefined).
+
+Reproduces on ODROID C5 (libmali r44p0-wayland-drm-g310-dmaheap):
+SIGSEGV at vulkan_common.c:2582 because the fn pointer is NULL.
+
+---
+ gfx/common/vulkan_common.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
+
+--- a/gfx/common/vulkan_common.c
++++ b/gfx/common/vulkan_common.c
+@@ -915,14 +915,31 @@
+          break;
+    }
+
+-#ifdef VULKAN_DEBUG
+-   instance_layers[info.enabledLayerCount++]         = "VK_LAYER_KHRONOS_validation";
+-   required_extensions[required_extension_count++] = "VK_EXT_debug_utils";
+-#endif
+-
+    layer_count = ARRAY_SIZE(properties);
+    vkEnumerateInstanceLayerProperties(&layer_count, properties);
+
++#ifdef VULKAN_DEBUG
++   {
++      uint32_t j;
++      int have_validation = 0;
++      for (j = 0; j < layer_count; j++)
++      {
++         if (string_is_equal(properties[j].layerName, "VK_LAYER_KHRONOS_validation"))
++         {
++            have_validation = 1;
++            break;
++         }
++      }
++      if (have_validation)
++      {
++         instance_layers[info.enabledLayerCount++]       = "VK_LAYER_KHRONOS_validation";
++         required_extensions[required_extension_count++] = "VK_EXT_debug_utils";
++      }
++      else
++         RARCH_WARN("[Vulkan] VULKAN_DEBUG build, but VK_LAYER_KHRONOS_validation is not installed; skipping.\n");
++   }
++#endif
++
+    if (!(vulkan_find_instance_extensions(
+             instance_extensions, &info.enabledExtensionCount,
+             required_extensions, required_extension_count,
+@@ -2561,11 +2578,12 @@
+          | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+       info.pfnUserCallback = vulkan_debug_cb;
+
+-      if (vk->context.instance)
++      if (vk->context.instance && vkCreateDebugUtilsMessengerEXT)
+          vkCreateDebugUtilsMessengerEXT(vk->context.instance, &info, NULL,
+                &vk->context.debug_callback);
+    }
+-   RARCH_LOG("[Vulkan] Enabling Vulkan debug layers.\n");
++   if (vk->context.debug_callback)
++      RARCH_LOG("[Vulkan] Enabling Vulkan debug layers.\n");
+ #endif
+
+    if (!vulkan_load_instance_symbols(vk))
