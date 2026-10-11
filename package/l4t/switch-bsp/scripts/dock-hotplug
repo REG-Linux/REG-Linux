@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Dock hotplug handler for Nintendo Switch
+# Detects dock insertion/removal and reconfigures display + audio
+
+dock_hotplug_handle() {
+    export DISPLAY=
+    export DP_SETTINGS=
+
+    # Let display server parse connected display info.
+    sleep 0.2
+
+    # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
+    if [ -e "/userdata/system/dock-hotplug.conf" ]; then
+        export DP_SETTINGS=$(cat /userdata/system/dock-hotplug.conf)
+    fi
+    if [ "$DP_SETTINGS" == "" ]; then
+        export DP_SETTINGS="--primary --auto"
+    else
+        export DP_SETTINGS="--primary --mode "$DP_SETTINGS" --panning "$DP_SETTINGS"+0+0 --pos 0x0"
+    fi
+
+    # Find active display
+    cd /tmp/.X11-unix 2>/dev/null && for x in X*; do
+        if [ ! -e "$x" ]; then continue; fi
+        export DISPLAY=":${x#X}"
+
+        if [[ "$1" -eq 1 ]]; then
+            # Docked: enable HDMI/DP, disable internal display
+            xrandr --output DP-0 $DP_SETTINGS --output DSI-0 --off 2>/dev/null
+            sleep 0.2
+            xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS 2>/dev/null
+        else
+            # Undocked: enable internal display, disable HDMI/DP
+            xrandr --output DSI-0 --primary --mode 720x1280 --rotate left --panning 1280x720+0+0 --pos 0x0 --dpi 237 --output DP-0 --off 2>/dev/null
+            sleep 0.2
+            xrandr --output DP-0 --off --output DSI-0 --primary --mode 720x1280 --rotate left --panning 1280x720+0+0 --pos 0x0 --dpi 237 2>/dev/null
+        fi
+    done
+}
+
+# Main call.
+DP_ENABLED=1
+if grep -q 1 "/sys/class/switch/dp/state" 2>/dev/null; then
+    DP_ENABLED=1
+else
+    DP_ENABLED=0
+fi
+
+dock_hotplug_handle $DP_ENABLED
