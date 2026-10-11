@@ -1,0 +1,48 @@
+--- a/cmake/ncine_options.cmake
++++ b/cmake/ncine_options.cmake
+@@ -41,9 +41,17 @@
+ 		message(FATAL_ERROR "Invalid NCINE_PREFERRED_RHI \"${NCINE_PREFERRED_RHI}\" for the libretro core (expected Software or OpenGL)")
+ 	endif()
+ 	if(NCINE_PREFERRED_RHI STREQUAL "OpenGL")
+-		# The hardware core targets OpenGL|ES 3.0 only - the common denominator of RetroArch's
+-		# GPU platforms (KMS/GLES boards like Recalbox on Pi, desktop Mesa via EGL)
+-		set(_NCINE_RHI_GL_PROFILE_FORCED "ES3")
++		# The hardware core targets OpenGL|ES 3.0 by default - the common denominator of
++		# RetroArch's GPU platforms (KMS/GLES boards like Recalbox on Pi, desktop Mesa via EGL).
++		# Forcing it, however, also compiled out the ES 2.0 path that retro_load_game() already
++		# implements: it asks for RETRO_HW_CONTEXT_OPENGLES3 and, under RHI_GL_PROFILE_ES2,
++		# retries with RETRO_HW_CONTEXT_OPENGLES2 "when the frontend has no ES 3.0 support".
++		# The engine ships that profile in full (ESSL 100 variants of every shader, no UBOs),
++		# so let a caller that knows its GPU is ES 2.0 only ask for it; leaving
++		# NCINE_RHI_GL_PROFILE unset keeps the previous behaviour exactly.
++		if(NOT DEFINED NCINE_RHI_GL_PROFILE)
++			set(_NCINE_RHI_GL_PROFILE_FORCED "ES3")
++		endif()
+ 	endif()
+ endif()
+ 
+--- a/Sources/libretro.cpp
++++ b/Sources/libretro.cpp
+@@ -299,9 +299,20 @@
+ 	}
+ 
+ #if defined(WITH_RHI_GL)
+-	// Hardware rendering: ask the frontend for an OpenGL|ES 3.0 context (the engine's ES target);
+-	// the engine initializes in context_reset, once that context actually exists
++	// Hardware rendering: ask the frontend for the context the engine was actually built for;
++	// the engine initializes in context_reset, once that context actually exists.
++	//
++	// The ES2 profile must ask for ES 2.0 up front rather than relying on the fallback below.
++	// SET_HW_RENDER is not a capability query: RetroArch accepts an OpenGLES3 request even on a
++	// driver that cannot provide one (lima/Mali-400 is GLES 2.0 only), returning true and then
++	// failing much later in video_driver_init_internal() with EGL_BAD_CONFIG -- by which point
++	// the core has no way to renegotiate and the launch just dies. The fallback stays for
++	// frontends that do reject it honestly.
++#if defined(RHI_GL_PROFILE_ES2)
++	_hwRender.context_type = RETRO_HW_CONTEXT_OPENGLES2;
++#else
+ 	_hwRender.context_type = RETRO_HW_CONTEXT_OPENGLES3;
++#endif
+ 	_hwRender.depth = true;
+ 	_hwRender.stencil = true;
+ 	_hwRender.bottom_left_origin = true;

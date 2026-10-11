@@ -1,0 +1,12 @@
+config BR2_PACKAGE_LIBRETRO_JAZZ2_NATIVE
+	bool "libretro-jazz2-native"
+	#select BR2_PACKAGE_SDL2
+	#select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_LIBOPENMPT
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_ZLIB
+	help
+	  Jazz² Resurrection: Native C++ reimplementation of Jazz Jackrabbit 2.
+	  Libretro core variant.
+
+	  https://github.com/deathkiller/jazz2-native
