@@ -1,0 +1,5 @@
+config BR2_PACKAGE_RS_BACKGROUND_MUSICS
+        bool "rs-background-musics"
+
+        help
+         REG-Station background musics
