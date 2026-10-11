@@ -1,0 +1,14 @@
+config BR2_PACKAGE_SERIOUSSAM
+	bool "serioussam"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	help
+	  Serious Engine 1 source port (ptitSeb ARM fork).
+	  Builds both TFE (The First Encounter) and TSE
+	  (The Second Encounter). Requires retail game data.
+
+	  https://github.com/ptitSeb/Serious-Engine
