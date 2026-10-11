@@ -1,9 +1,5 @@
-# Raze (Build Engine front end)
+# Raze
 
-GZDoom-based port for classic Build Engine games (Duke Nukem 3D, Shadow Warrior, Blood, etc.).
+Build Engine front-end (Duke Nukem 3D, Blood, Shadow Warrior). Upstream: https://github.com/coelckers/Raze
 
-## Build notes
-- **Version:** 1.11.0 release built with host/target CMake builds.
-- **Config:** selects SDL2, SDL2_net/mixer, libjpeg, OpenAL, ZMusic, WebP, libvpx, optional Vulkan, and musl helpers; also depends on `host-sdl2` to build `ImportExecutables.cmake`.
-- **Build system:** CMake release build with `FORCE_CROSSCOMPILE`, toggled Vulkan (depending on `vulkan-*` packages), and GLES2 fallback when desktop GL is absent. The host build is added to satisfy `IMPORT_EXECUTABLES`.
-- **Extras:** installs the binary, PK3s, soundfonts, and `raze.keys` for evmapy; included build removes GUI dependencies by disabling Vulkan when not available.
+Requires a `host-raze` build to produce `ImportExecutables.cmake`; note that `TOOLS_ONLY=ON` is set but not yet implemented upstream so the host build compiles the full engine. Vulkan is enabled via Wayland when `vulkan-headers`/`vulkan-loader` are present. Falls back to GLES2 when no desktop GL is available. On musl, `libbacktrace`, `musl-fts`, and LZMA/affinity defines are needed.
