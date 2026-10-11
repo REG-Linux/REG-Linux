@@ -1,0 +1,9 @@
+config BR2_PACKAGE_ES_SYSTEM
+	bool "es-system"
+	select BR2_PACKAGE_HOST_RUSTC
+	select BR2_PACKAGE_REGLINUX_LAUNCHER_DEFAULTS
+	help
+	  Generates rs_systems.cfg, rs_features.json, and default ROMs.
+	  Installs es-system binary for on-device config regeneration.
+
+	  https://github.com/REG-Linux/es-system

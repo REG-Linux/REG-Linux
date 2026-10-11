@@ -1,0 +1,49 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/doom1_shareware-box.png",
+          "desc": "In Doom, a nameless space marine is posted to a Martian base where secret teleportation experiments are being conducted. One of these experiments goes horribly wrong and \"something fragging evil\" starts pouring out of the gateways, killing or possessing all the base personnel!\n\nResponding to a frantic distress call from the overrun scientists, the Martian marine unit is quickly sent to Phobos to investigate, where you, the space marine, are left to guard the hangar with only a pistol while the rest of the group proceed inside to discover their worst nightmare. As you advance further, terrifying screams echo through the vast halls, followed by a disturbing silence ... it seems, all your buddies are dead and you're all on your own now - fight back, exterminate every evil creature and get your ticket back home to earth!",
+          "developer": "id Software",
+          "genre": "Shooter / 1st person",
+          "hidden": "true",
+          "image": "./images/doom1_shareware-image.png",
+          "lang": "en",
+          "marquee": "./images/doom1_shareware-marquee.png",
+          "name": "Doom",
+          "players": "1-4",
+          "publisher": "GT Interactive",
+          "rating": "0.85",
+          "releasedate": "19931210T000000",
+          "thumbnail": "./images/doom1_shareware-thumb.png",
+          "video": "./videos/doom1_shareware-video.mp4",
+          "wheel": "./images/doom1_shareware-wheel.png"
+        },
+        "path": "./prboom.wad",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "boxart": "./images/doom1_shareware-box.png",
+          "desc": "In Doom, a nameless space marine is posted to a Martian base where secret teleportation experiments are being conducted. One of these experiments goes horribly wrong and \"something fragging evil\" starts pouring out of the gateways, killing or possessing all the base personnel!\n\nResponding to a frantic distress call from the overrun scientists, the Martian marine unit is quickly sent to Phobos to investigate, where you, the space marine, are left to guard the hangar with only a pistol while the rest of the group proceed inside to discover their worst nightmare. As you advance further, terrifying screams echo through the vast halls, followed by a disturbing silence ... it seems, all your buddies are dead and you're all on your own now - fight back, exterminate every evil creature and get your ticket back home to earth!",
+          "developer": "id Software",
+          "genre": "Shooter / 1st person",
+          "image": "./images/doom1_shareware-image.png",
+          "lang": "en",
+          "marquee": "./images/doom1_shareware-marquee.png",
+          "name": "Doom",
+          "players": "1-4",
+          "publisher": "GT Interactive",
+          "rating": "0.85",
+          "releasedate": "19930101T000000",
+          "thumbnail": "./images/doom1_shareware-thumb.png",
+          "video": "./videos/doom1_shareware-video.mp4",
+          "wheel": "./images/doom1_shareware-wheel.png"
+        },
+        "path": "./doom1_shareware.wad",
+        "type": "game"
+      }
+    ]
+  }
+}

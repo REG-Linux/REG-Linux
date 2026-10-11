@@ -1,0 +1,74 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "desc": "Slash Action RPG",
+          "developer": "Blizzard North",
+          "genre": "Action RPG",
+          "image": "./images/devilutionx-image.png",
+          "name": "Diablo 1",
+          "players": "1",
+          "releasedate": "19970103T000000"
+        },
+        "path": "./diabdat.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "desc": "Slash Action RPG Expansion Pack",
+          "developer": "Synergistic Software",
+          "genre": "Action RPG",
+          "image": "./images/devilutionx-image.png",
+          "name": "Diablo 1: Hellfire",
+          "players": "1",
+          "releasedate": "19971125T000000"
+        },
+        "path": "./hellfire.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./fonts.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./hfmonk.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./hfmusic.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./hfvoice.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./pl.mpq",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "hidden": "true"
+        },
+        "path": "./ru.mpq",
+        "type": "game"
+      }
+    ]
+  }
+}

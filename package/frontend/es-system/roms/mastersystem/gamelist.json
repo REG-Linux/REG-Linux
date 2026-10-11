@@ -1,0 +1,26 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Mai Nurse (v1.00)-box.png",
+          "desc": "Help Mai get rid of viruses with pills, line up 4 slots of the same color horizontally or vertically to destroy them and progress through the levels in this classic puzzle game!",
+          "developer": "lunoka",
+          "genre": "Puzzle",
+          "image": "./images/Mai Nurse (v1.00)-image.png",
+          "lang": "en",
+          "marquee": "./images/Mai Nurse (v1.00)-marquee.png",
+          "name": "Mai Nurse",
+          "players": "1",
+          "publisher": "https://lunoka.itch.io/mai-nurse",
+          "releasedate": "20240327T000000",
+          "thumbnail": "./images/Mai Nurse (v1.00)-thumb.png",
+          "video": "./videos/Mai Nurse (v1.00)-video.mp4",
+          "wheel": "./images/Mai Nurse (v1.00)-wheel.png"
+        },
+        "path": "./Mai Nurse (v1.00).sms",
+        "type": "game"
+      }
+    ]
+  }
+}

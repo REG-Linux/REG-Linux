@@ -1,0 +1,28 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Alter Ego-box.png",
+          "desc": "Freeware puzzle game for NES, a port of the original (by Denis Grachev for the ZX Spectrum). Swap positions with your 'alter ego' to move about the level and obtain all the bouncing pixels.",
+          "developer": "Shiru",
+          "genre": "Puzzle",
+          "image": "./images/Alter Ego-image.png",
+          "lang": "en",
+          "manual": "./manuals/Alter Ego-manual.pdf",
+          "marquee": "./images/Alter Ego-marquee.png",
+          "name": "Alter Ego",
+          "players": "1",
+          "publisher": "https://shiru.untergrund.net/",
+          "rating": "0.6",
+          "releasedate": "20110724T000000",
+          "thumbnail": "./images/Alter Ego-thumb.png",
+          "video": "./videos/Alter Ego-video.mp4",
+          "wheel": "./images/Alter Ego-wheel.png"
+        },
+        "path": "./Alter Ego.nes",
+        "type": "game"
+      }
+    ]
+  }
+}

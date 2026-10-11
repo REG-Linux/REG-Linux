@@ -1,0 +1,26 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Anguna-box.png",
+          "desc": "Anguna is a short top-down fantasy action adventure game, reminiscent of the original Legend of Zelda. Featuring art by Chris Hildenbrand, it has 5 dungeons to explore.\n\nControls:\nA - Attack\nB - Secondary item\nX/Y - Switch secondary item (if you have more then one)\nStart - Pause, View subscreen\nSelect - Save menu\nL/R - Switch between subscreen pages",
+          "developer": "Bite The Chili",
+          "genre": "Adventure",
+          "image": "./images/Anguna-image.png",
+          "lang": "en",
+          "marquee": "./images/Anguna-marquee.png",
+          "name": "Anguna - Warriors of Virtue",
+          "players": "1",
+          "publisher": "http://www.tolberts.net/anguna/",
+          "releasedate": "20080101T000000",
+          "thumbnail": "./images/Anguna-thumb.png",
+          "video": "./videos/Anguna-video.mp4",
+          "wheel": "./images/Anguna-wheel.png"
+        },
+        "path": "./Anguna.gba",
+        "type": "game"
+      }
+    ]
+  }
+}

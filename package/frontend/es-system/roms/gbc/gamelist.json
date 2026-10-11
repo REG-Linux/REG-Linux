@@ -1,0 +1,26 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Petris-box.png",
+          "desc": "Build your favorite pets in all shapes and sizes, keep ahead of dropping pieces and make it to the next level.\n\nThere are several game play types to choose from:\n\n- Long Pet - Complete progressively longer pets to reach the next level\n- Tails Cleanup - Clear all tails off the screen per level\n- Crunch-up - Keep ahead as the screen crunches upward and new pets appear\n- Level Up - Classic level-up style\n-  Marathon - For the long distance player\n\nDifficulty levels for all players.",
+          "developer": "bbbbbr",
+          "genre": "Puzzle",
+          "image": "./images/Petris-image.png",
+          "lang": "en",
+          "marquee": "./images/Petris-marquee.png",
+          "name": "Petris",
+          "players": "1-2",
+          "publisher": "https://bbbbbr.itch.io/petris",
+          "releasedate": "20201209T000000",
+          "thumbnail": "./images/Petris-thumb.png",
+          "video": "./videos/Petris-video.mp4",
+          "wheel": "./images/Petris-wheel.png"
+        },
+        "path": "./Petris.gbc",
+        "type": "game"
+      }
+    ]
+  }
+}
