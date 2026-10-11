@@ -1,0 +1,42 @@
+genie: bound LTO parallelism and keep ld's memory low
+
+MAME links ~300 static archives with 14680 drivers in one --start-group, and
+genie.lua's own comment notes LTO "doesn't work with anything <9 on linux with
+< 12G RAM". Our self-hosted builders run make at -j4 with less than that.
+
+Upstream pins -flto=1 and leaves -Wl,-no-keep-memory commented out. Enabling
+-no-keep-memory keeps ld's footprint down, but going to -flto=auto on top of it
+fans LTRANS out across every core, and peak memory becomes N x lto1: the sdm845
+(cortex_a75_a55) build was OOM-killed at the final link, taking both ld and lto1
+with signal 9, after 2h25m.
+
+-flto=2 keeps some link parallelism at roughly half the peak of the -j4
+fan-out. Drop to -flto=1 if a builder still runs out of memory.
+
+Signed-off-by: Carlos Manuel Oliveira Martins <cjom@reglinux.org>
+
+--- a/scripts/genie.lua	2025-01-05 18:14:01.318406387 +0100
++++ b/scripts/genie.lua	2025-01-05 18:14:51.924618711 +0100
+@@ -836,9 +836,9 @@
+ 	if _OPTIONS["LTO"]=="1" then
+ 		buildoptions {
+ -- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this commit
+-			"-flto=1",
++			"-flto=2",
+ -- if ld fails, just buy more RAM or uncomment this!
+---          "-Wl,-no-keep-memory",
++                        "-Wl,-no-keep-memory",
+ 			"-Wl,-v",
+ -- silence redefine warnings from discrete.c.
+ 			"-Wl,-allow-multiple-definition",
+@@ -859,8 +859,8 @@
+ 		}
+ -- same flags are needed by linker
+ 		linkoptions {
+-			"-flto=1",
+---          "-Wl,-no-keep-memory",
++			"-flto=2",
++                        "-Wl,-no-keep-memory",
+ 			"-Wl,-v",
+ 			"-Wl,-allow-multiple-definition",
+ 			"-fuse-linker-plugin",
