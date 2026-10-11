@@ -1,9 +1,5 @@
-# OpenMW (Morrowind engine)
+# OpenMW
 
-Cross-compiles the OpenMW project with a heavily trimmed CMake profile for REG-Linux.
+Morrowind engine reimplementation. Upstream: https://github.com/OpenMW/openmw
 
-## Build notes
-- **Version:** `stable` from `OpenMW/openmw` (git).
-- **Config:** requires desktop GL (`BR2_PACKAGE_HAS_LIBGL`) and X11 (`BR2_PACKAGE_XORG7`), plus dependencies like Cairo, SDL2, Boost, Bullet, ffmpeg, YAML-CPP, Lua, Fontconfig, FreeType, and optionally LuaJIT.
-- **Build system:** CMake release build that disables docs, tools, launcher, OpenCS, wizards, and exports, enables LTO, forces mono install prefix, and uses custom `OSG_WINDOWING_SYSTEM` (X11 when available).
-- **Extras:** none beyond the default CMake install target.
+Requires desktop GL (`libgl`). Bundles OSG and MyGUI in-tree (`USE_SYSTEM_OSG/MYGUI=OFF`). `OSG_WINDOWING_SYSTEM` is set to `X11` when Xorg is present, otherwise `None`. A cross-compile hack sets `DRUN_RESULT_VAR=1` to skip the LuaJIT custom-allocator runtime test. All non-game tools (launcher, OpenCS, navmesh tool, etc.) are disabled.
