@@ -1,0 +1,48 @@
+From: ROCKNIX
+Subject: [PATCH] usb_intf: hook usb_driver.shutdown so rtw_dev_shutdown() runs on 6.8+
+
+usb_register_driver() assigns driver.shutdown = usb_shutdown_interface()
+unconditionally, so the driver's own .usbdrv.driver.shutdown assignment is
+discarded before any device is registered. rtw_dev_shutdown() therefore never
+runs at poweroff or reboot on kernels 6.8 and newer, leaving the firmware live
+and the chip powered as the rails drop.
+
+usb_shutdown_interface() forwards to usb_driver.shutdown(intf), so hook that
+member instead. It takes a usb_interface rather than a device, hence the
+wrapper.
+
+The existing guard lumps kernels older than 2.6.19 together with 6.8 and newer,
+so it has to be split three ways rather than simply retargeted.
+
+--- a/os_dep/linux/usb_intf.c
++++ b/os_dep/linux/usb_intf.c
+@@ -103,6 +103,18 @@
+ 	}
+ }
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0))
++/* usb_register_driver() overwrites driver.shutdown with usb_shutdown_interface(),
++ * which forwards to usb_driver.shutdown(intf). Hooking driver.shutdown directly
++ * has no effect on these kernels.
++ */
++static void rtw_usb_intf_shutdown(struct usb_interface *intf)
++{
++	if (intf)
++		rtw_dev_shutdown(&intf->dev);
++}
++#endif
++
+ #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 23))
+ /* Some useful macros to use to create struct usb_device_id */
+ #define USB_DEVICE_ID_MATCH_VENDOR			 0x0001
+@@ -361,7 +373,9 @@
+ 	.usbdrv.reset_resume   = rtw_resume,
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0)) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0))
++	.usbdrv.shutdown = rtw_usb_intf_shutdown,
++#elif (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
+ 	.usbdrv.driver.shutdown = rtw_dev_shutdown,
+ #else
+ 	.usbdrv.drvwrap.driver.shutdown = rtw_dev_shutdown,

@@ -1,0 +1,106 @@
+From: ROCKNIX
+Subject: [PATCH] bound the IPS wait in suspend, and force full reinit on bus reset
+
+Two independent problems on the suspend/resume path.
+
+1. rtw_suspend_common() waits on pwrpriv->bips_processing with no timeout. If
+   IPS never reports completion the kernel's suspend thread blocks there
+   forever: the display stays off, the LED stays lit, the device keeps drawing
+   full awake current, and only a hard reset recovers it. Bound the wait at
+   500 ms, warn, clear the flag and carry on. A suspend that completes with IPS
+   in an odd state is recoverable; one that never returns is not.
+
+2. reset_resume was aliased straight to rtw_resume. reset_resume means the bus
+   was reset underneath the driver, so the chip has lost its state, but
+   rtw_resume() takes a WoWLAN fast path when wowlan_mode or wowlan_ap_mode is
+   set and skips reinitialisation. CONFIG_WOWLAN is enabled in this build
+   (-DCONFIG_WOWLAN in ccflags), so that path is reachable and leaves the
+   interface up but deaf. Give reset_resume its own handler that clears both
+   flags before delegating.
+
+Note on scope: os_intfs.c has a second unbounded bips_processing wait in
+netdev_close() at line 4517, but it sits in the CONFIG_PLATFORM_INTEL_BYT
+branch alongside rtw_sdio_set_power(). That symbol is absent from the built
+module and CONFIG_PLATFORM_INTEL_BYT is not set anywhere in the Makefile, so
+the code is not compiled for this USB device and is deliberately left alone.
+
+--- a/os_dep/linux/os_intfs.c
++++ b/os_dep/linux/os_intfs.c
+@@ -5319,6 +5319,7 @@
+ 
+ 	int ret = 0;
+ 	systime start_time = rtw_get_current_time();
++	systime bips_start;
+ 
+ 	RTW_PRINT(" suspend start\n");
+ 	RTW_INFO("==> %s (%s:%d)\n", __FUNCTION__, current->comm, current->pid);
+@@ -5327,8 +5328,20 @@
+ 
+ 	pwrpriv->bInSuspend = _TRUE;
+ 
+-	while (pwrpriv->bips_processing == _TRUE)
++	/* Bound this wait. If IPS never reports completion the suspend thread
++	 * blocks here forever, the machine never reaches resume, and the only
++	 * way out is a hard reset.
++	 */
++	bips_start = rtw_get_current_time();
++	while (pwrpriv->bips_processing == _TRUE) {
++		if (rtw_get_passing_time_ms(bips_start) > 500) {
++			RTW_WARN("%s: bips_processing stuck for 500ms, continuing anyway\n",
++				 __func__);
++			pwrpriv->bips_processing = _FALSE;
++			break;
++		}
+ 		rtw_msleep_os(1);
++	}
+ 
+ #ifdef CONFIG_IOL_READ_EFUSE_MAP
+ 	if (!padapter->bup) {
+--- a/os_dep/linux/usb_intf.c
++++ b/os_dep/linux/usb_intf.c
+@@ -38,6 +38,9 @@
+ extern int pm_netdev_open(struct net_device *pnetdev, u8 bnormal);
+ static int rtw_suspend(struct usb_interface *intf, pm_message_t message);
+ static int rtw_resume(struct usb_interface *intf);
++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 22))
++static int rtw_reset_resume(struct usb_interface *intf);
++#endif
+ 
+ 
+ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *pdid);
+@@ -370,7 +373,7 @@
+ 	.usbdrv.suspend =  rtw_suspend,
+ 	.usbdrv.resume = rtw_resume,
+ #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 22))
+-	.usbdrv.reset_resume   = rtw_resume,
++	.usbdrv.reset_resume   = rtw_reset_resume,
+ #endif
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0))
+@@ -1151,6 +1154,26 @@
+ 	return ret;
+ }
+ 
++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 22))
++/* reset_resume() means the bus was reset underneath us, so the chip has lost
++ * its state. Taking the WoWLAN path in rtw_resume_process() would skip
++ * reinitialisation and leave the interface up but deaf, so clear the flags
++ * first and force the full resume.
++ */
++static int rtw_reset_resume(struct usb_interface *pusb_intf)
++{
++	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
++	struct pwrctrl_priv *pwrpriv = dvobj_to_pwrctl(dvobj);
++
++	RTW_INFO("==> %s\n", __func__);
++
++	pwrpriv->wowlan_mode = _FALSE;
++	pwrpriv->wowlan_ap_mode = _FALSE;
++
++	return rtw_resume(pusb_intf);
++}
++#endif
++
+ 
+ #ifdef CONFIG_PLATFORM_RTD2880B
+ extern void rtd2885_wlan_netlink_sendMsg(char *action_string, char *name);

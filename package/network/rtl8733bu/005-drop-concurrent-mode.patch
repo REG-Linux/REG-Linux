@@ -1,0 +1,48 @@
+From: ROCKNIX
+Subject: [PATCH] build: drop CONFIG_CONCURRENT_MODE, one wlan interface is enough
+
+Concurrent mode makes the driver register a second, virtual net_device, so the
+Miyoo Flip comes up with both wlan0 and wlan1 for a single radio. Nothing in
+ROCKNIX wants that. Netplay's access point switches the one interface into AP
+mode via iwctl and hands it back afterwards, which is mutually exclusive with
+station mode by construction; no script runs AP and station together, and
+nothing uses P2P. The other out-of-tree Realtek driver in the tree, RTW88 on
+S922X, does not set the flag either.
+
+What the second interface does do is break things.
+
+Userspace picks its device with
+
+  WIFI_DEV="$(ls /sys/class/net | grep -m1 ^wlan)"
+
+in both wifictl and rocknix-info, which is always wlan0. NetworkManager is under
+no such constraint and will happily associate on wlan1. When it does, every
+wifictl operation is aimed at the wrong device. The one that hurts is `wifictl
+pin`, run from sleep.sh before suspend to raise the autoconnect priority of the
+network in use: pin_wifi asks wlan0 for its active connection, gets nothing back
+and returns without pinning anything. On resume NM then autoconnects to whatever
+saved profile it likes, on whichever interface, and the device silently changes
+network and DHCP lease. Observed exactly that across suspend cycles -- wlan1 at
+one address before, wlan0 at another after, and by the third cycle no link at
+all until a reboot.
+
+It is also implicated in the crashes that patches 003 and 004 fix. Both traces
+are on wlan1's wdev: 003 notes that suppressing the disconnect on the primary
+adapter alone was not enough "because CONFIG_CONCURRENT_MODE gives wlan1 its own
+wdev and that is the one in the trace", and 004's reproducer is a plain `nmcli
+device disconnect wlan1`. Those patches are still correct and still needed --
+the same paths exist for a single interface -- but there is no reason to keep
+handing the driver a second wdev to get wrong.
+
+The flag lives in the fork's ccflags-y rather than in a make variable, so it has
+to come out here.
+
+--- a/Makefile
++++ b/Makefile
+@@ -201,5 +201,5 @@
+ platform/platform_ops.o \
+ core/rtw_mp.o
+ 
+-ccflags-y += -O1 -Wno-unused-variable -Wno-date-time -I$(src)/include -I$(src)/platform -I$(src)/hal/btc -DCONFIG_AP_MODE -DCONFIG_ECSA -DCONFIG_P2P -DCONFIG_MP_INCLUDED -DRTW_IPS_MODE=0 -DRTW_LPS_MODE=0 -DCONFIG_POWER_SAVING -DDBG_CONFIG_ERROR_RESET -DCONFIG_BT_COEXIST -DCONFIG_EFUSE_CONFIG_FILE -DEFUSE_MAP_PATH=\"/system/etc/wifi/wifi_efuse_8733bu.map\" -DWIFIMAC_PATH=\"/data/wifimac.txt\" -DCONFIG_LOAD_PHY_PARA_FROM_FILE -DREALTEK_CONFIG_PATH=\"/lib/firmware/\" -DCONFIG_TXPWR_BY_RATE=1 -DCONFIG_TXPWR_BY_RATE_EN=1 -DCONFIG_TXPWR_LIMIT=1 -DCONFIG_TXPWR_LIMIT_EN=0 -DCONFIG_RTW_EDCCA_MODE_SEL=0 -DCONFIG_RTW_ADAPTIVITY_EN=0 -DCONFIG_RTW_ADAPTIVITY_MODE=0 -DCONFIG_80211D -DCONFIG_RTW_COUNTRY_IE_SLAVE_EN_MODE=0 -DCONFIG_RTW_COUNTRY_IE_SLAVE_FLAGS=0x01 -DCONFIG_IEEE80211W -DCONFIG_WOWLAN -DRTW_WAKEUP_EVENT=0xf -DRTW_SUSPEND_TYPE=0 -DCONFIG_BCN_CNT_CONFIRM_HDL -DRTW_BCN_NEW_MAX_CNT=3 -DCONFIG_LAYER2_ROAMING -DCONFIG_ROAMING_FLAG=0x3 -DCONFIG_ROAM_SCAN_ORDER=52 -DHIGH_ACTIVE_HST2DEV=0 -DCONFIG_WIFI_MONITOR -DCONFIG_RTW_NAPI -DCONFIG_RTW_GRO -DCONFIG_RTW_NETIF_SG -DCONFIG_RTW_DEBUG -DRTW_LOG_LEVEL=4 -DCONFIG_PROC_DEBUG -DCONFIG_RTW_UP_MAPPING_RULE=0 -DDM_ODM_SUPPORT_TYPE=0x04 -DCONFIG_LITTLE_ENDIAN -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT -DCONFIG_CONCURRENT_MODE -DCONFIG_RADIO_WORK -DCONFIG_WAKE_ON_BT -DCONFIG_BCN_CNT_CONFIRM_HDL -I$(src)/hal/phydm -DCONFIG_RTL8733B -DCONFIG_HALMAC_RS -I$(src)/core/crypto
++ccflags-y += -O1 -Wno-unused-variable -Wno-date-time -I$(src)/include -I$(src)/platform -I$(src)/hal/btc -DCONFIG_AP_MODE -DCONFIG_ECSA -DCONFIG_P2P -DCONFIG_MP_INCLUDED -DRTW_IPS_MODE=0 -DRTW_LPS_MODE=0 -DCONFIG_POWER_SAVING -DDBG_CONFIG_ERROR_RESET -DCONFIG_BT_COEXIST -DCONFIG_EFUSE_CONFIG_FILE -DEFUSE_MAP_PATH=\"/system/etc/wifi/wifi_efuse_8733bu.map\" -DWIFIMAC_PATH=\"/data/wifimac.txt\" -DCONFIG_LOAD_PHY_PARA_FROM_FILE -DREALTEK_CONFIG_PATH=\"/lib/firmware/\" -DCONFIG_TXPWR_BY_RATE=1 -DCONFIG_TXPWR_BY_RATE_EN=1 -DCONFIG_TXPWR_LIMIT=1 -DCONFIG_TXPWR_LIMIT_EN=0 -DCONFIG_RTW_EDCCA_MODE_SEL=0 -DCONFIG_RTW_ADAPTIVITY_EN=0 -DCONFIG_RTW_ADAPTIVITY_MODE=0 -DCONFIG_80211D -DCONFIG_RTW_COUNTRY_IE_SLAVE_EN_MODE=0 -DCONFIG_RTW_COUNTRY_IE_SLAVE_FLAGS=0x01 -DCONFIG_IEEE80211W -DCONFIG_WOWLAN -DRTW_WAKEUP_EVENT=0xf -DRTW_SUSPEND_TYPE=0 -DCONFIG_BCN_CNT_CONFIRM_HDL -DRTW_BCN_NEW_MAX_CNT=3 -DCONFIG_LAYER2_ROAMING -DCONFIG_ROAMING_FLAG=0x3 -DCONFIG_ROAM_SCAN_ORDER=52 -DHIGH_ACTIVE_HST2DEV=0 -DCONFIG_WIFI_MONITOR -DCONFIG_RTW_NAPI -DCONFIG_RTW_GRO -DCONFIG_RTW_NETIF_SG -DCONFIG_RTW_DEBUG -DRTW_LOG_LEVEL=4 -DCONFIG_PROC_DEBUG -DCONFIG_RTW_UP_MAPPING_RULE=0 -DDM_ODM_SUPPORT_TYPE=0x04 -DCONFIG_LITTLE_ENDIAN -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT -DCONFIG_RADIO_WORK -DCONFIG_WAKE_ON_BT -DCONFIG_BCN_CNT_CONFIRM_HDL -I$(src)/hal/phydm -DCONFIG_RTL8733B -DCONFIG_HALMAC_RS -I$(src)/core/crypto
+ ldflags-y += --strip-debug

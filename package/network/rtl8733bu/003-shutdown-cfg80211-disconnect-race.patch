@@ -1,0 +1,67 @@
+From: ROCKNIX
+Subject: [PATCH] usb_intf: stop rtw_dev_shutdown() double-releasing the cfg80211 BSS
+
+With 001 in place rtw_dev_shutdown() finally runs on 6.8+, and that exposed a
+latent use-after-free that panics the board on every poweroff, so it reboots
+instead of shutting down:
+
+  Internal error: Oops: 0000000096000006 [#1] SMP
+  RTW: netdev_vir_if_close(wlan1) , bup=1
+  Workqueue: cfg80211 cfg80211_event_work
+  pc : cfg80211_put_bss+0x34/0xe4
+  Call trace:
+   cfg80211_put_bss+0x34/0xe4
+   cfg80211_wdev_release_bsses+0x4c/0xc0
+   __cfg80211_disconnected+0x5c/0x1cc
+   cfg80211_process_wdev_events+0x164/0x180
+   cfg80211_event_work+0x2c/0x50
+  Kernel panic - not syncing: Oops: Fatal exception in interrupt
+
+Userspace disconnects the interface as the system goes down, queueing one
+disconnect event. rtw_hal_deinit() then drops the link and the driver indicates
+a second one for the same interface. cfg80211_event_work runs both, each calls
+cfg80211_wdev_release_bsses(), and the second cfg80211_put_bss() dereferences a
+BSS the first already freed.
+
+rtw_wdev_set_not_indic_disco() is the driver's existing mechanism for exactly
+this: it gates only the driver-side indication and leaves the userspace path
+alone. Set it on every interface before the teardown starts. The primary
+adapter is not enough, because CONFIG_CONCURRENT_MODE gives wlan1 its own wdev
+and that is the one in the trace.
+
+The teardown itself is left intact so rtl8733bu-power still finds a quiesced
+chip when its own .shutdown drops the enable GPIO.
+
+--- a/os_dep/linux/usb_intf.c
++++ b/os_dep/linux/usb_intf.c
+@@ -52,12 +52,30 @@
+ 	struct dvobj_priv *dvobj = NULL;
+ 	_adapter *adapter = NULL;
+ 	struct cmd_priv *pcmdpriv;
++	int i;
+ 
+ 	RTW_INFO("%s\n", __func__);
+ 
+ 	if (usb_intf) {
+ 		dvobj = usb_get_intfdata(usb_intf);
+ 		if (dvobj) {
++			/* rtw_hal_deinit() below drops the link, which makes the driver
++			 * indicate a disconnect for an interface userspace has usually
++			 * already disconnected. Both events queue on cfg80211_event_work
++			 * and each one runs cfg80211_wdev_release_bsses(), so the same
++			 * BSS is released twice and cfg80211_put_bss() faults on the
++			 * freed pointer. The resulting panic reboots the board instead
++			 * of powering it off. Suppressing the driver-side indication
++			 * leaves the userspace one intact. Every interface needs it,
++			 * not just the primary: CONFIG_CONCURRENT_MODE means wlan1 has
++			 * its own wdev and that is the one that faulted.
++			 */
++			for (i = 0; i < dvobj->iface_nums; i++) {
++				if (dvobj->padapters[i])
++					rtw_wdev_set_not_indic_disco(
++						adapter_wdev_data(dvobj->padapters[i]), 1);
++			}
++
+ 			adapter = dvobj_get_primary_adapter(dvobj);
+ 			if (adapter) {
+ 				if (!rtw_is_surprise_removed(adapter)) {
