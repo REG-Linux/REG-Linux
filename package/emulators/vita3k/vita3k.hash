@@ -1,0 +1,3 @@
+# Locally computed, from the ffmpeg-core release that 004-hack-ffmpeg-git-sha.patch pins
+sha256  c9e062af7b5148951353425f006cca40cf2ed7cb7605f3aa6edb233c5583a3d1  ffmpeg-linux-arm64.zip
+sha256  49909807e4b13ba39f9a109d823c978d5d4918ad0b4a469e41798f5bb5b38a33  ffmpeg-linux-x64.zip
