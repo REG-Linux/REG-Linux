@@ -3,8 +3,11 @@ config BR2_PACKAGE_PLAY
     select BR2_PACKAGE_PCRE2
     select BR2_PACKAGE_LIBCURL
     select BR2_PACKAGE_LIBCURL_OPENSSL
-    select BR2_PACKAGE_LIBGLEW		               if BR2_PACKAGE_REGLINUX_XWAYLAND
-    select BR2_PACKAGE_LIBGLU		               if BR2_PACKAGE_REGLINUX_XWAYLAND
+    # GLEW/GLU are only needed for the desktop-GL build. Keep this condition
+    # identical to the one in play.mk: gating on XWayland pulled them in on
+    # panfrost boards, whose driver caps at GL 3.1 and cannot run that build.
+    select BR2_PACKAGE_LIBGLEW		               if BR2_PACKAGE_HAS_DESKTOP_OPENGL
+    select BR2_PACKAGE_LIBGLU		               if BR2_PACKAGE_HAS_DESKTOP_OPENGL
     select BR2_PACKAGE_OPENAL
     select BR2_PACKAGE_REGLINUX_QT6
     select BR2_PACKAGE_SQLITE
