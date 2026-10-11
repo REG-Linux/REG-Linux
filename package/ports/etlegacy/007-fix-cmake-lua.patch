@@ -1,0 +1,12 @@
+--- a/cmake/FindLua.cmake	2026-05-22 04:40:31.901332989 +0200
++++ b/cmake/FindLua.cmake	2026-05-22 04:40:44.447036047 +0200
+@@ -4,7 +4,8 @@
+ 
+ cmake_policy(PUSH)	# Policies apply to functions at definition-time
+ cmake_policy(SET CMP0140 NEW)
+-cmake_policy(SET CMP0159 NEW)  # file(STRINGS) with REGEX updates CMAKE_MATCH_<n>
++# REG HACK
++# cmake_policy(SET CMP0159 NEW)  # file(STRINGS) with REGEX updates CMAKE_MATCH_<n>
+ 
+ unset(_lua_include_subdirs)
+ unset(_lua_library_names)
