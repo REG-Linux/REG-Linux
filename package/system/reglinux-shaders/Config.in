@@ -1,6 +1,104 @@
 config BR2_PACKAGE_REGLINUX_SHADERS
-        bool "REG-Linux shaders"
-	depends on BR2_PACKAGE_RETROARCH
-        select BR2_PACKAGE_GLSL_SHADERS
-        help
-          REG-Linux shaders for retroarch
+	bool "reglinux-shaders"
+	help
+	  Curated shortlist of RetroArch shader presets installed into
+	  /usr/share/reglinux/shaders. Up to 10 presets per GPU tier picked
+	  for popularity and visual diversity. T0-T3 install .glslp presets
+	  (RetroArch `gl` backend); T4 installs .slangp presets (`glcore`
+	  or `vulkan` backend). See shaders-per-tier.json for the exact list.
+
+	  https://github.com/libretro/glsl-shaders
+	  https://github.com/libretro/slang-shaders
+
+if BR2_PACKAGE_REGLINUX_SHADERS
+
+choice
+	prompt "GPU shader tier"
+	help
+	  Select the shader tier matching the target's GPU capability.
+	  The default is auto-selected from BR2_PACKAGE_SYSTEM_TARGET_*.
+	  Each tier installs its own curated ~10-preset shortlist — tiers
+	  are NOT cumulative.
+
+	  T0 — 1-pass GLES 2.0 (Mali-400/450, VideoCore IV) — .glslp
+	  T1 — 1-2 pass GLES 3.0+, sRGB fb (Mali-T720/T760/T860, K1) — .glslp
+	  T2 — up to 4-pass GLES 3.2, float fb (Mali-G31, RK3326, H616, H700) — .glslp
+	  T3 — up to 8-pass GLES 3.2, feedback/history (Mali-G52/G57,
+	        RK3566/3568/3576, S922X, A311D, A523/T527, RPi4) — .glslp
+	  T4 — slang presets, GL3.1+/Vulkan (RK3588 Panthor, x86_64,
+	        ODROID C5 Panthor, Adreno) — .slangp
+
+	# --- T4: full GL + Vulkan ---
+	default BR2_PACKAGE_REGLINUX_SHADERS_TIER_T4 if \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3588	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_X86_64	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_L4T		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_ASAHI		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_SDM845	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_SM6115	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_SM8550
+
+	# --- T3: GLES 3.2 with feedback/history (Mali-G52/G57, v3d) ---
+	default BR2_PACKAGE_REGLINUX_SHADERS_TIER_T3 if \
+		BR2_PACKAGE_SYSTEM_TARGET_T527		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3568	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3576	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_S922X		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_BCM2711	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_BCM2712	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	# --- T2: GLES 3.2 moderate (Mali-G31) ---
+	default BR2_PACKAGE_REGLINUX_SHADERS_TIER_T2 if \
+		BR2_PACKAGE_SYSTEM_TARGET_H616		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_H700		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3326	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_S905GEN2	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_S905GEN3	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
+
+	# --- T1: GLES 3.0+ basic (Mali-T720/T760/T860, PowerVR, Zink) ---
+	default BR2_PACKAGE_REGLINUX_SHADERS_TIER_T1 if \
+		BR2_PACKAGE_SYSTEM_TARGET_SUN50I	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3399	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_RK3288	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_XU4		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_K1		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_K3		|| \
+		BR2_PACKAGE_SYSTEM_TARGET_TH1520	|| \
+		BR2_PACKAGE_SYSTEM_TARGET_JH7110
+
+	# --- T0: fallback for GLES 2.0 only (Mali-400/450, VC IV, etc.) ---
+	default BR2_PACKAGE_REGLINUX_SHADERS_TIER_T0
+
+config BR2_PACKAGE_REGLINUX_SHADERS_TIER_T0
+	bool "T0 — trivial 1-pass GLSL (GLES 2.0)"
+
+config BR2_PACKAGE_REGLINUX_SHADERS_TIER_T1
+	bool "T1 — basic GLSL (GLES 3.0+)"
+
+config BR2_PACKAGE_REGLINUX_SHADERS_TIER_T2
+	bool "T2 — moderate GLSL (GLES 3.2, no feedback)"
+
+config BR2_PACKAGE_REGLINUX_SHADERS_TIER_T3
+	bool "T3 — full GLSL (GLES 3.2, feedback/history)"
+
+config BR2_PACKAGE_REGLINUX_SHADERS_TIER_T4
+	bool "T4 — full GLSL + slangp (Vulkan)"
+
+endchoice
+
+config BR2_PACKAGE_REGLINUX_SHADERS_GPU_TIER
+	string
+	default "T0" if BR2_PACKAGE_REGLINUX_SHADERS_TIER_T0
+	default "T1" if BR2_PACKAGE_REGLINUX_SHADERS_TIER_T1
+	default "T2" if BR2_PACKAGE_REGLINUX_SHADERS_TIER_T2
+	default "T3" if BR2_PACKAGE_REGLINUX_SHADERS_TIER_T3
+	default "T4" if BR2_PACKAGE_REGLINUX_SHADERS_TIER_T4
+
+endif

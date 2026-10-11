@@ -1,0 +1,83 @@
+#!/bin/sh
+# reglinux-shaderlist — emit a RetroArch-compatible shader list filtered by GPU tier
+#
+# Usage:
+#   reglinux-shaderlist [--tier T0|T1|T2|T3|T4] [--type glslp|slangp|all] [--category crt|handheld|...]
+#
+# Output: one absolute path per line, suitable for piping into a shader picker.
+#
+# The GPU tier is read from /etc/reglinux/gpu-tier if not overridden on cmdline.
+# Example /etc/reglinux/gpu-tier content:  T3
+
+SHADER_BASE="/usr/share/reglinux/shaders"
+MANIFEST="$SHADER_BASE/shader-tiers.json"
+TIER_FILE="/etc/reglinux/gpu-tier"
+
+TIER=""
+TYPE="all"
+CATEGORY=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --tier)     TIER="$2";     shift 2 ;;
+        --type)     TYPE="$2";     shift 2 ;;
+        --category) CATEGORY="$2"; shift 2 ;;
+        *) echo "Unknown option: $1" >&2; exit 1 ;;
+    esac
+done
+
+# Resolve tier
+if [ -z "$TIER" ]; then
+    if [ -f "$TIER_FILE" ]; then
+        TIER=$(cat "$TIER_FILE" | tr -d '[:space:]')
+    else
+        TIER="T2"
+    fi
+fi
+
+TIER_ORDER="T0 T1 T2 T3 T4"
+tier_index() {
+    local i=0
+    for t in $TIER_ORDER; do
+        [ "$t" = "$1" ] && echo $i && return
+        i=$((i+1))
+    done
+    echo 99
+}
+MAX_IDX=$(tier_index "$TIER")
+
+# Use Python if available for JSON parsing, otherwise fall back to find
+if command -v python3 >/dev/null 2>&1 && [ -f "$MANIFEST" ]; then
+    python3 - "$SHADER_BASE" "$MAX_IDX" "$TYPE" "$CATEGORY" <<'PYEOF'
+import sys, json, os
+
+base     = sys.argv[1]
+max_idx  = int(sys.argv[2])
+ftype    = sys.argv[3]   # glslp | slangp | all
+category = sys.argv[4]   # "" = all categories
+
+TIER_ORDER = ["T0","T1","T2","T3","T4"]
+
+manifest = json.load(open(os.path.join(base, "shader-tiers.json")))["presets"]
+
+for rel, info in sorted(manifest.items()):
+    tier_idx = TIER_ORDER.index(info["tier"])
+    if tier_idx > max_idx:
+        continue
+    if ftype != "all" and info["type"] != ftype:
+        continue
+    if category and info.get("category","") != category:
+        continue
+    if info["type"] == "slangp":
+        print(os.path.join(base, "slang-shaders", rel))
+    else:
+        print(os.path.join(base, rel))
+PYEOF
+else
+    # Fallback: just list all installed presets up to max tier directory
+    case "$TYPE" in
+        glslp)  find "$SHADER_BASE" -name "*.glslp" ! -path "*/slang-shaders/*" | sort ;;
+        slangp) find "$SHADER_BASE/slang-shaders" -name "*.slangp" 2>/dev/null | sort ;;
+        *)      find "$SHADER_BASE" -name "*.glslp" -o -name "*.slangp" | sort ;;
+    esac
+fi

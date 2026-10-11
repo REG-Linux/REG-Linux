@@ -1,0 +1,78 @@
+{
+  "_comment": "Curated per-tier shader shortlist for REG-Linux. Tiers are CUMULATIVE: each tier installs its own list plus all lower tiers. T0-T3 install from libretro/glsl-shaders as .glslp. T4 installs from libretro/slang-shaders as .slangp — lower-tier glsl paths are translated via `glslp_to_slangp` where slang-shaders uses a different path (null → no slang equivalent, skipped). Consumed by curate-install.py.",
+  "T0": [
+    "interpolation/sharp-bilinear-simple",
+    "interpolation/pixellate",
+    "interpolation/quilez",
+    "crt/crt-pi",
+    "crt/zfast-crt",
+    "crt/crt-lottes-fast",
+    "crt/crt-hyllian-fast",
+    "handheld/lcd3x",
+    "handheld/zfast-lcd",
+    "xbr/xbr-lv2"
+  ],
+  "T1": [
+    "crt/crt-geom",
+    "crt/crt-aperture",
+    "crt/crt-easymode",
+    "crt/crt-mattias",
+    "crt/crt-caligari",
+    "crt/crt-nes-mini",
+    "handheld/lcd-grid",
+    "handheld/sameboy-lcd",
+    "anti-aliasing/aa-shader-4.0",
+    "xbr/2xBR-lv1-multipass"
+  ],
+  "T2": [
+    "crt/crt-hyllian",
+    "crt/crt-lottes",
+    "crt/crt-geom-mini",
+    "handheld/lcd-grid-v2",
+    "handheld/simpletex_lcd",
+    "xbr/super-xbr-2p",
+    "hqx/hq4x",
+    "ddt/ddt",
+    "misc/image-adjustment",
+    "anti-aliasing/fxaa"
+  ],
+  "T3": [
+    "crt/crt-easymode-halation",
+    "crt/crt-guest-dr-venom-fast",
+    "crt/crt-consumer",
+    "crt/phosphorlut",
+    "crt/crt-hyllian-multipass",
+    "crt/crt-lottes-multipass",
+    "crt/gizmo-slotmask-crt",
+    "xbr/super-xbr-3p-smoother",
+    "xbr/xbr-lv3-multipass",
+    "anti-aliasing/advanced-aa"
+  ],
+  "T4": [
+    "crt/crt-guest-advanced",
+    "crt/crt-guest-advanced-fast",
+    "crt/crt-royale",
+    "crt/crt-maximus-royale",
+    "crt/crt-lottes-multipass-glow",
+    "bezel/Mega_Bezel/Presets/MBZ__3__STD",
+    "bezel/Mega_Bezel/Presets/MBZ__5__POTATO",
+    "handheld/lcd-grid-v2",
+    "edge-smoothing/xbr/super-xbr",
+    "anti-aliasing/smaa"
+  ],
+  "glslp_to_slangp": {
+    "_comment": "Maps glsl-shaders paths (used in T0-T3 lists) to their slang-shaders equivalents when T4 inherits them. Omit keys whose slangp path is identical (script tries same path first). A null value means no usable slang equivalent — skip that entry for T4.",
+    "interpolation/sharp-bilinear-simple": "pixel-art-scaling/sharp-bilinear-simple",
+    "interpolation/pixellate":             "pixel-art-scaling/pixellate",
+    "xbr/xbr-lv2":                         "edge-smoothing/xbr/xbr-lv2",
+    "xbr/2xBR-lv1-multipass":              "edge-smoothing/xbr/other presets/2xBR-lv1-multipass",
+    "xbr/super-xbr-2p":                    "edge-smoothing/xbr/super-xbr",
+    "xbr/super-xbr-3p-smoother":           "edge-smoothing/xbr/super-xbr-fast",
+    "xbr/xbr-lv3-multipass":               "edge-smoothing/xbr/other presets/xbr-lv3-multipass",
+    "hqx/hq4x":                            "edge-smoothing/hqx/hq4x",
+    "ddt/ddt":                             "edge-smoothing/ddt/ddt",
+    "crt/phosphorlut":                     "crt/crt-effects/phosphorlut",
+    "crt/crt-guest-dr-venom-fast":         "crt/crt-guest-advanced-fast",
+    "crt/crt-hyllian-multipass":           null
+  }
+}

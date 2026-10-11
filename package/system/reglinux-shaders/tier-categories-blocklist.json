@@ -1,0 +1,34 @@
+{
+  "_comment": [
+    "Category blocklist per tier. A preset is only installed if its classified tier",
+    "is <= max_tier AND its category is not in the blocklist for max_tier.",
+    "",
+    "Categories dropped at every tier are demo/test/post-effect shaders that are",
+    "not useful for retro-gaming (procedural, cut, vhs, etc.).",
+    "",
+    "At T0-T1 (storage-constrained weak GPUs) we additionally drop heavy or",
+    "decorative categories (borders, windowed, reshade, motionblur, etc.).",
+    "",
+    "At T4 (full GPU + desktop storage) we install everything the user might want."
+  ],
+
+  "blocklist": {
+    "T0": [
+      "procedural", "cut", "vhs", "root", "misc", "stereoscopic-3d",
+      "borders", "windowed", "reshade", "motionblur", "denoisers",
+      "bezel", "cel", "blurs", "gpu", "nes_raw_palette"
+    ],
+    "T1": [
+      "procedural", "cut", "vhs", "root", "misc", "stereoscopic-3d",
+      "borders", "windowed", "reshade", "motionblur", "denoisers",
+      "bezel", "cel", "blurs", "gpu", "nes_raw_palette"
+    ],
+    "T2": [
+      "procedural", "cut", "vhs", "root", "misc", "stereoscopic-3d"
+    ],
+    "T3": [
+      "procedural", "cut", "vhs", "root", "misc", "stereoscopic-3d"
+    ],
+    "T4": []
+  }
+}
