@@ -3,14 +3,18 @@
 # libretro-mame
 #
 ################################################################################
-# Version lrmame0285 : Jan 31, 2026
-LIBRETRO_MAME_VERSION = lrmame0285
+# Version 0.289 : Jul 31, 2026
+LIBRETRO_MAME_VERSION = lrmame0289
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
-LIBRETRO_MAME_LICENSE = MAME
+LIBRETRO_MAME_LICENSE = GPL-2.0+, BSD-3-Clause
+LIBRETRO_MAME_LICENSE_FILES = COPYING
 
+# Note: libretro build uses bundled audio backends
+# ALSA dependency is optional for direct hardware access
+# Most users will use RetroArch's audio drivers instead
 LIBRETRO_MAME_DEPENDENCIES = alsa-lib
 
-# Disable pulseaudio if not built
+# Disable pulseaudio if not built (libretro frontend handles audio)
 ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
 LIBRETRO_MAME_DEPENDENCIES += pulseaudio
 else
@@ -33,6 +37,12 @@ endif
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	LIBRETRO_MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
+	# The whole driver set at -O0 -g2 pushes the linked .debug_info past 4GB.
+	# The relocations that then overflow (R_AARCH64_ABS32 against .debug_info)
+	# live in the toolchain's own prebuilt objects - crtn.o and libstdc++.a are
+	# 32-bit DWARF - so -gdwarf64 on our sources cannot fix it. Keep the debug
+	# info but move it out of the link into .dwo files beside the objects.
+	LIBRETRO_MAME_ARCHOPTS += -gsplit-dwarf
 # Stick with O2 or Os, too much bloat with O3 !!
 else
 	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1

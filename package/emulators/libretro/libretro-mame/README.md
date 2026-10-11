@@ -1,10 +1,5 @@
-# Libretro MAME
+# libretro-mame
 
-The `libretro-mame` core keeps REG-Linux’s arcade catalog aligned with upstream MAME (`lrmame0280`) while adding the Batocera-focused INI tweaks and joystick fixes already in the recipe.
+MAME arcade libretro core. Upstream: https://github.com/libretro/mame
 
-## Build notes
-
-- `Version`: lrmame0280
-- `Dependencies`: `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_HAS_LIBRETRO_MAME`, and both `BR2_INSTALL_LIBSTDCPP`/`!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies REG-Linux patches (`004-batocera-ini.patch`, `005-flto-auto-genie.patch`, `007-libretro-fix-joystick-4-way-option.patch`, `003-nopch.patch`, `006-libretro-mame-0277-buildfix.patch`, `010-add-prepare-script.patch`, `001-mame-cross-compilation.patch`)
+Build jobs are capped at 32 to limit RAM usage. A `prepare.py` script (invoked via `host-python3`) strips unwanted drivers before compilation. PulseAudio is disabled with `NO_USE_PULSEAUDIO=1` when not present.

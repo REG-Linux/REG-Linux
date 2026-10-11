@@ -1,0 +1,400 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: REG-Linux <cjom@reglinux.org>
+Date: Sun, 16 Aug 2026 00:00:00 +0000
+Subject: [PATCH] libretro: support loading a second game in the same process
+
+The libretro build assumes the core image is reloaded between games, so a
+great deal of its state is initialised exactly once and never again:
+retro_deinit() is the only place that tears MAME down, and several file-scope
+buffers are only correct while they still hold the zero-filled BSS they start
+life as.
+
+A frontend that keeps the core resident in its own process - REG-Station's
+in-process player does - calls retro_unload_game() and then retro_load_game()
+again with no retro_deinit()/retro_init() in between. Every one of those
+assumptions then breaks, in the order you meet them:
+
+  * ARGUC is file scope and only ever incremented, so parse_cmdline() appends
+    the second game's tokens to the first game's and MAME is handed the
+    command line twice. The second unadorned argument needs <UNADORNED1>,
+    which an arcade driver without a software list does not expose:
+      Error: unknown option: pacman
+
+  * parse_cmdline() copies each word into ARGUV[] byte by byte and stops at
+    the word's length, and parseSystemName()/parseParentPath() strncpy() an
+    exact count; none of them terminates. A shorter second value inherits the
+    tail of the first:
+      Searching for driver: sf2cen        ("sf2ce" over "pacman")
+      Parent path = "/var/runa/roms/mame" ("/var/run" over "/userdata/roms/mame")
+    parsePath() does terminate, except that its quoted branch writes the NUL
+    at slashIndex while the copy ended quoteIndex+1 bytes earlier.
+
+  * mame_machine_manager is a process-wide singleton and cli_frontend::
+    execute() skips `delete manager` under __LIBRETRO__, so the second run
+    reuses the first run's manager - holding the finished run's emu_options
+    and osd_interface - and calls start_luaengine() on it again. That re-runs
+    lua_engine::initialize() against a fully populated lua_State; re-
+    registering a usertype replaces the sol2 usertype_storage<T> held in the
+    registry, and the orphan's __gc runs during that same registration pass:
+
+      ~usertype_storage_base()
+      destroy_usertype_storage<lua_engine::bitmap_helper<bitmap_ind32>>()
+      GCTM / luaC_step
+      lua_pushcclosure()
+      sol::stack::set_field<meta_function, closure>()
+      lua_engine::initialize()
+
+    which segfaults. When the collector happens not to run there the state is
+    left inconsistent instead and the fault lands later, in lua_load() reading
+    plugins/boot.lua.
+
+  * retro_unload_game() latches retro_pause to -1 so a retro_run() arriving
+    after the teardown cannot step a machine that is gone, and retro_init() is
+    the only thing that ever cleared it. The second game therefore builds and
+    configures correctly and then never advances: retro_run() skips
+    retro_main_loop() every frame and retro_audio_queue() drops every sample.
+    POSTNOTIFY (holds MACHINE_NOTIFY_FRAME back so the hiscore plugin can
+    finish initialising) and first_run (drops the initial gray-bordered frame)
+    are stale in the same way.
+
+  * mmain() keeps its retro_options in a function-local static, and
+    core_options can take a value from a command line but has no notion of
+    dropping one the next command line leaves out. A game launched with
+    "-plugins -plugin hiscore -pluginspath ..." hands those to the next game,
+    which passes no plugin options at all, so plugins_path is back to its
+    default and start_luaengine() calls fatalerror():
+      Fatal error: Could not load plugin: hiscore
+    Every option leaks this way; the plugin one is just the one that is fatal.
+    The OSD has the mirror problem - a new retro_osd_interface per run, the
+    previous one dropped - so the two get the same owner.
+
+  * a run that fails to load leaves all of that behind with nothing to
+    collect it. retro_unload_game() is where the teardown belongs, but the
+    API does not ask a frontend to unload a game that never loaded, so it is
+    never called. The next retro_load_game() builds its command line for a
+    manager that already exists and keeps the failed run's emu_options, so
+    MAME runs the failed game again rather than the requested one:
+
+      Starting game from cmd: "mslugx -cfg_directory ..."
+      l1_mortal_kombat_3_u2_music_spch.u2 NOT FOUND (tried in mk3)
+
+    and start_luaengine() goes back over the same lua_State every launch
+    until the collector lands on an orphaned usertype and the segfault above
+    happens after all.
+
+Fixes, in the same order:
+
+  * reset ARGUC at the top of parse_cmdline(), the way Set_Default_Option()
+    already resets its sibling XARGC
+  * terminate every one of those copies
+  * do the teardown from retro_unload_game() instead of waiting for
+    retro_deinit(), gated on retro_load_ok, which it clears so a frontend that
+    reaches retro_deinit() cannot repeat it; null the freed globals and reset
+    firstgame so the next load starts from a fresh manager, machine and
+    lua_State
+  * reset retro_pause, POSTNOTIFY and first_run in retro_load_game(), next to
+    retro_load_ok - they are per-run state, and retro_load_game() is the one
+    function that runs once per run under every frontend
+  * allocate retro_options and retro_osd_interface per run and release them
+    from retro_finish(), after the machine and manager that reference them
+  * release the same four from retro_load_game() when the load fails, minus
+    the machine exit phase - running_machine::run() already ran that from its
+    catch block, and repeating it would write the NVRAM of a machine whose
+    ROMs never loaded over the good one
+
+Frontends that reload the core image between games are unaffected: they reach
+retro_deinit() with retro_load_ok already false and everything is rebuilt from
+scratch as before. One thing does change for them - retro_machine_exit() now
+runs at unload rather than at deinit, so NVRAM and .cfg are saved at the point
+the game actually ends.
+
+Signed-off-by: REG-Linux <cjom@reglinux.org>
+---
+--- a/src/frontend/mame/clifront.cpp
++++ b/src/frontend/mame/clifront.cpp
+@@ -57,6 +57,9 @@
+ {
+ 	util::archive_file::cache_clear();
+ 	delete retro_manager;
++	// mame_machine_manager::s_manager is cleared by the destructor, so the next
++	// mame_machine_manager::instance() call builds a new one from scratch
++	retro_manager = nullptr;
+ }
+ #endif
+ 
+--- a/src/frontend/mame/mame.cpp
++++ b/src/frontend/mame/mame.cpp
+@@ -37,10 +37,10 @@
+ extern int RLOOP;
+ extern int ENDEXEC;
+ extern mame_machine_manager *retro_manager;
+-extern core_options *retro_global_options;
+ extern void retro_loop(running_machine *machine);
+ extern void retro_execute();
+ extern void free_man();
++extern void free_retro_globals();
+ 
+ static running_machine *retro_global_machine;
+ static const machine_config *retro_global_config;
+@@ -69,18 +69,46 @@
+ 
+ void free_machineconfig()
+ {
+-	retro_manager->set_machine(nullptr);
++	if (retro_manager)
++		retro_manager->set_machine(nullptr);
+ 
+ 	delete retro_global_machine;
++	retro_global_machine = nullptr;
+ 	delete retro_global_config;
++	retro_global_config = nullptr;
+ }
+ 
+-void retro_finish()
++static void retro_release()
+ {
+-	retro_global_machine->retro_machine_exit();
+-
+ 	free_machineconfig();
+ 	free_man();
++
++	// machine and manager both reference these, so they go last
++	free_retro_globals();
++
++	// so a fresh manager gets a fresh run of the empty driver
++	firstgame = true;
++	mfirst = false;
++}
++
++void retro_finish()
++{
++	if (retro_global_machine)
++		retro_global_machine->retro_machine_exit();
++
++	retro_release();
++}
++
++/* The run never got off the ground - the manager, the machine, the options and
++   the OSD all exist, but the machine was never handed to the frontend. Drop
++   them without the exit phase: running_machine::run() already ran it from its
++   own catch block, and retro_machine_exit() would save the NVRAM of a machine
++   whose ROMs never loaded over the good one on disc. This is what the non-
++   libretro build does with them on any error - manager, machine and config are
++   all scope-bound there and go away whatever run() returned. */
++void retro_abandon()
++{
++	retro_release();
+ }
+ 
+ void retro_main_loop()
+--- a/src/osd/libretro/libretro-internal/libretro.cpp
++++ b/src/osd/libretro/libretro-internal/libretro.cpp
+@@ -22,6 +22,7 @@
+ /* forward decls / externs / prototypes */
+ 
+ extern void retro_finish();
++extern void retro_abandon();
+ extern void retro_main_loop();
+ 
+ int POSTNOTIFY     = 5; /* See retro_loop() */
+@@ -946,6 +947,21 @@
+ {
+    retro_load_ok = false;
+ 
++   /* retro_unload_game() latches retro_pause to -1 so that a retro_run() call
++      arriving after the teardown does not step a machine that is already
++      gone. Only retro_init() ever cleared it again, which is fine when the
++      frontend reloads the core between games but leaves the core paused
++      forever when it keeps it resident. Clear it here so every load starts
++      unpaused, whether or not retro_init() ran in between. */
++   retro_pause = 0;
++
++   /* Per-run startup state that retro_init() would otherwise be the only
++      thing to set: POSTNOTIFY holds MACHINE_NOTIFY_FRAME back for the first
++      few frames so the hiscore plugin can finish initialising, and first_run
++      drops the initial gray-bordered frame. */
++   POSTNOTIFY = 5;
++   first_run  = true;
++
+    check_variables();
+ 
+ //FIXME: re-add way to handle OGL
+@@ -987,6 +1003,20 @@
+       log_cb(RETRO_LOG_DEBUG, "%s osd_sleep\n", __func__);
+       osd_sleep(osd_ticks_per_second());
+       log_cb(RETRO_LOG_DEBUG, "%s osd_sleep done\n", __func__);
++
++      /* A failed load leaves the manager, the machine, the options and the
++         OSD of the attempt behind, and the frontend has no reason to call
++         retro_unload_game() for a game that never loaded - the API does not
++         ask it to - so nothing else will ever free them. The next
++         retro_load_game() then finds mame_machine_manager::instance() already
++         populated and hands it the new command line for nothing: the manager
++         keeps the emu_options of the failed run, so MAME runs that game again
++         (Metal Slug X reported "l1_mortal_kombat_3_u2_music_spch.u2 NOT FOUND
++         (tried in mk3)"), and start_luaengine() re-runs
++         lua_engine::initialize() over the same lua_State until sol2's
++         usertype garbage collector segfaults. */
++      retro_abandon();
++
+       return false;
+    }
+ 
+@@ -1006,6 +1036,23 @@
+ 
+    if (retro_pause == 0)
+       retro_pause = -1;
++
++   /* Tear MAME down here instead of waiting for retro_deinit(): the core is
++      not necessarily unloaded between games. A frontend that keeps the core
++      resident in its own process calls retro_load_game() again with no
++      retro_deinit() in between, and mame_machine_manager is a process-wide
++      singleton, so the next run would reuse the previous run's manager. That
++      re-runs lua_engine::initialize() on a lua_State that is already
++      populated, which orphans the sol2 usertype storage of the first run and
++      segfaults in its garbage-collector finalizer.
++
++      retro_deinit() still calls retro_finish() for frontends that get there
++      first; the retro_load_ok guard keeps it to one teardown. */
++   if (retro_load_ok)
++   {
++      retro_finish();
++      retro_load_ok = false;
++   }
+ }
+ 
+ size_t retro_serialize_size(void)
+--- a/src/osd/libretro/libretro-internal/retro_init.cpp
++++ b/src/osd/libretro/libretro-internal/retro_init.cpp
+@@ -198,10 +198,15 @@
+       return 0;
+ 
+    if (quoteIndex > -1)
++   {
+       strncpy(gamePath, path + (quoteIndex + 1), slashIndex - (quoteIndex + 1));
++      gamePath[slashIndex - (quoteIndex + 1)] = 0;
++   }
+    else
++   {
+       strncpy(gamePath, path, slashIndex);
+-   gamePath[slashIndex] = 0;
++      gamePath[slashIndex] = 0;
++   }
+ 
+    strncpy(gameName, path + (slashIndex + 1), dotIndex - (slashIndex + 1));
+    gameName[dotIndex - (slashIndex + 1)] = 0;
+@@ -236,6 +241,7 @@
+       return 0;
+ 
+    strncpy(systemName, path + (slashIndex[1] + 1), slashIndex[0] - slashIndex[1] - 1);
++   systemName[slashIndex[0] - slashIndex[1] - 1] = '\0';
+    return 1;
+ }
+ 
+@@ -276,9 +282,15 @@
+       return 0;
+ 
+    if (quoteIndex > -1)
++   {
+       strncpy(parentPath, path + (quoteIndex + 1), slashIndex[1] - (quoteIndex + 1));
++      parentPath[slashIndex[1] - (quoteIndex + 1)] = '\0';
++   }
+    else
++   {
+       strncpy(parentPath, path, slashIndex[1]);
++      parentPath[slashIndex[1]] = '\0';
++   }
+    return 1;
+ }
+ 
+@@ -708,6 +720,16 @@
+    char *p2 = NULL;
+    char *start_of_word = NULL;
+ 
++   /* ARGUC is file scope and is only ever incremented below. A frontend that
++    * keeps the core loaded across games calls retro_load_game() again without
++    * a fresh retro_init(), so without this reset the new tokens are appended
++    * to the previous game's and MAME receives the command line twice. */
++   ARGUC = 0;
++
++   /* For the same reason the two token copies below terminate what they write:
++    * they only ever store the word's own bytes, so they used to depend on
++    * ARGUV still being the zero-filled BSS it is for the first game only. */
++
+    strcpy(buffer, argv);
+    strcat(buffer, " \0");
+ 
+@@ -742,6 +764,7 @@
+                //... do something with the word ...
+                for (c2=0, p2 = start_of_word; p2 < p; p2++, c2++)
+                   ARGUV[ARGUC][c2] = (unsigned char)*p2;
++               ARGUV[ARGUC][c2] = '\0';
+                ARGUC++;
+ 
+                state = DULL; /* back to "not in word, not in string" state */
+@@ -756,6 +779,7 @@
+                /*... do something with the word ... */
+                for (c2=0,p2 = start_of_word; p2 <p; p2++,c2++)
+                   ARGUV[ARGUC][c2] = (unsigned char) *p2;
++               ARGUV[ARGUC][c2] = '\0';
+                ARGUC++;
+ 
+                state = DULL; /* back to "not in word, not in string" state */
+--- a/src/osd/libretro/retromain.cpp
++++ b/src/osd/libretro/retromain.cpp
+@@ -210,6 +210,30 @@
+ //============================================================
+ 
+ retro_osd_interface *retro_global_osd;
++static retro_options *retro_global_options;
++
++/* Release the options and OSD of the run that just ended. Called from
++   retro_finish(), after the machine and the machine manager are gone - both
++   hold references into these two objects, so they have to outlive them.
++
++   They used to be a function-local static and a per-call leak respectively,
++   which is invisible under a frontend that reloads the core image between
++   games but wrong under one that keeps it resident: emu_options only knows how
++   to take a value from a command line, never how to drop one that the next
++   command line leaves out. So a game launched with "-plugins -plugin hiscore"
++   handed those on to the next game, which was then killed by
++
++     Fatal error: Could not load plugin: hiscore
++
++   because it had no reason to pass -pluginspath anywhere near the plugin.
++   Every option is affected; the plugin one is just the one that is fatal. */
++void free_retro_globals()
++{
++	delete retro_global_osd;
++	retro_global_osd = nullptr;
++	delete retro_global_options;
++	retro_global_options = nullptr;
++}
+ 
+ // translated to utf8_main
+ int mmain(int argc, char *argv[])
+@@ -241,15 +265,21 @@
+ #endif
+ 
+ 	{
+-		static retro_options retro_global_options;
+-		retro_global_osd = new retro_osd_interface(retro_global_options);
++		/* Start every run from a virgin options object. Both it and the OSD
++		   outlive this function - the running machine holds references to
++		   them and mmain() returns while the machine is still running - so
++		   they are owned by free_retro_globals() above, not by this scope.
++		   Do not free here: at this point the previous run's manager, if one
++		   somehow survived, would still be referencing them. */
++		retro_global_options = new retro_options;
++		retro_global_osd = new retro_osd_interface(*retro_global_options);
+ 
+ 		retro_output retrooutput;
+ 		osd_output::push(&retrooutput);
+ 
+ 		retro_global_osd->register_options();
+ 
+-		res = emulator_info::start_frontend(retro_global_options, *retro_global_osd, args);
++		res = emulator_info::start_frontend(*retro_global_options, *retro_global_osd, args);
+ 
+ 		osd_output::pop(&retrooutput);
+ 

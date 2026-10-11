@@ -42,10 +42,10 @@
 +
 +for root, directories, files in os.walk(DRIVER_SRC_DIR):
 +  for directory in directories:
-+    for path,dir,filenames in os.walk(os.path.join(DRIVER_SRC_DIR,directory)):
++    for path,dir,filenames in os.walk(os.path.join(root,directory)):
 +      for filename in filenames:
 +        if filename.endswith(".cpp"):
-+          full_path = os.path.join(root, directory, filename)
++          full_path = os.path.join(path, filename)
 +          with open(full_path, encoding="utf-8", errors="ignore") as f:
 +            content = f.read()
 +            # Try to extract the game drivers defined in this file marked as MACHINE_NOT_WORKING
