@@ -51,12 +51,4 @@ define PANDA3DS_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/bin/panda3ds
 endef
 
-define PANDA3DS_POST_PROCESS
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-#	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/panda3ds/3ds.panda3ds.keys \
-#	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-PANDA3DS_POST_INSTALL_TARGET_HOOKS += PANDA3DS_POST_PROCESS
-
 $(eval $(cmake-package))
