@@ -1,0 +1,18 @@
+From: REG-Linux <cjom@reglinux.org>
+Subject: [PATCH] outer.hh: include <cstdint> for uintptr_t
+
+GCC 16's libstdc++ no longer pulls <cstdint> in through <cstddef>, so
+UserSettings.cc fails with "'uintptr_t' does not name a type".
+
+Signed-off-by: REG-Linux <cjom@reglinux.org>
+---
+--- a/src/utils/outer.hh
++++ b/src/utils/outer.hh
+@@ -2,6 +2,7 @@
+ #define OUTER_HH
+ 
+ #include <cstddef>
++#include <cstdint>
+ 
+ // Example usage:
+ //   class Foo {
