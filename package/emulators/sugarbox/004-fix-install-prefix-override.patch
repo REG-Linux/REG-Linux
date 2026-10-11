@@ -1,7 +1,10 @@
---- a/CMakeLists.txt	2024-12-21 18:43:29.294288535 +0100
-+++ b/CMakeLists.txt	2024-12-21 18:43:46.788639208 +0100
-@@ -1,13 +1,5 @@
- cmake_minimum_required(VERSION 3.0)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e831d43..e5f652a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.16)
+ 
+ project(SugarboxV2 LANGUAGES CXX C)
  
 -if (MSVC)
 -   set (CMAKE_INSTALL_BINDIR .)

@@ -1,0 +1,38 @@
+diff --git a/CPCCore/AmstradCore/CMakeLists.txt b/CPCCore/AmstradCore/CMakeLists.txt
+index bfc4851..70db95c 100644
+--- a/CPCCore/AmstradCore/CMakeLists.txt
++++ b/CPCCore/AmstradCore/CMakeLists.txt
+@@ -48,5 +48,5 @@ else()
+ endif()
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} --std=c++17)
++	set_property(TARGET AmstradCore PROPERTY CXX_STANDARD 17)
+ endif()
+diff --git a/CPCCore/CPCCoreEmu/CMakeLists.txt b/CPCCore/CPCCoreEmu/CMakeLists.txt
+index f61a853..503d622 100644
+--- a/CPCCore/CPCCoreEmu/CMakeLists.txt
++++ b/CPCCore/CPCCoreEmu/CMakeLists.txt
+@@ -66,7 +66,7 @@ else()
+ endif()
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} --std=c++17)
++	set_property(TARGET CPCCoreEmu PROPERTY CXX_STANDARD 17)
+ endif()
+ 
+ install ( DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Keyboards" DESTINATION .) 
+\ No newline at end of file
+diff --git a/CPCCore/UnitTests/CMakeLists.txt b/CPCCore/UnitTests/CMakeLists.txt
+index 4c23e3b..00972ad 100644
+--- a/CPCCore/UnitTests/CMakeLists.txt
++++ b/CPCCore/UnitTests/CMakeLists.txt
+@@ -65,7 +65,7 @@ IF(MSVC)
+ ENDIF(MSVC)
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} --std=c++17)
++    set_property(TARGET unitTests PROPERTY CXX_STANDARD 17)
+     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+         set(LIBZA libz.a)
+     elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")

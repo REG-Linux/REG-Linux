@@ -1,0 +1,11 @@
+diff --git a/CPCCore/CPCCoreEmu/BreakpointToken.h b/CPCCore/CPCCoreEmu/BreakpointToken.h
+index 55c1d7a..915dd1b 100644
+--- a/CPCCore/CPCCoreEmu/BreakpointToken.h
++++ b/CPCCore/CPCCoreEmu/BreakpointToken.h
+@@ -1,5 +1,6 @@
+ 
+ #pragma once
++#include <algorithm>
+ #include <functional>
+ #include <string>
+ #include <sstream>
