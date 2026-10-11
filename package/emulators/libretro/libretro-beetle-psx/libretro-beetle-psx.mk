@@ -27,8 +27,11 @@ LIBRETRO_BEETLE_PSX_EXTRAOPT += GLES=1
 endif
 endif
 
-# Desktop GL (requires GL core 3.3+)
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# Desktop GL (requires GL core 3.3+) — must match RetroArch's API
+# selection. Key off HAS_DESKTOP_OPENGL rather than HAS_LIBGL, since
+# HAS_LIBGL is polluted by XWayland and would trigger the desktop-GL
+# build on panfrost/v3d targets that cap at GL 3.1.
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_BEETLE_PSX_DEPENDENCIES += libgl
 LIBRETRO_BEETLE_PSX_EXTRAOPT += HAVE_OPENGL=1
 LIBRETRO_BEETLE_PSX_OUTFILE=mednafen_psx_hw_libretro.so
