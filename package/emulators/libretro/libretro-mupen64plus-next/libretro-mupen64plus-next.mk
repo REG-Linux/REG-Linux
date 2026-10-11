@@ -3,8 +3,8 @@
 # libretro-mupen64plus-next
 #
 ################################################################################
-# Version: Commits on Jul 1, 2025
-LIBRETRO_MUPEN64PLUS_NEXT_VERSION = 1b693cdac7c42979f6ef53ffe260a76454f0cf45
+# Version: Commits on Aug 6, 2026
+LIBRETRO_MUPEN64PLUS_NEXT_VERSION = f275caf4b2bfa1e6d1c51636746ea793f3d80320
 LIBRETRO_MUPEN64PLUS_NEXT_SITE = $(call github,libretro,mupen64plus-libretro-nx,$(LIBRETRO_MUPEN64PLUS_NEXT_VERSION))
 LIBRETRO_MUPEN64PLUS_NEXT_LICENSE = GPLv2
 LIBRETRO_MUPEN64PLUS_NEXT_DEPENDENCIES = host-nasm
@@ -22,8 +22,10 @@ else ifeq ($(BR2_aarch64),y)
 LIBRETRO_MUPEN64PLUS_NEXT_EXTRA_ARGS = ARCH=aarch64
 endif
 
-# OpenGL backend
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# OpenGL backend — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL (real GL >= 3.3 driver) rather than
+# HAS_LIBGL (only "libGL.so.1 exists on disk", polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
         LIBRETRO_MUPEN64PLUS_NEXT_DEPENDENCIES += libgl
 else ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
         LIBRETRO_MUPEN64PLUS_NEXT_DEPENDENCIES += libgles
@@ -39,6 +41,7 @@ ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
 	LIBRETRO_MUPEN64PLUS_NEXT_TARGET_CXXFLAGS += -DEGL_NO_X11
 endif
 
+# Mali hack
 # Platform
 ifeq ($(BR2_aarch64),y)
 LIBRETRO_MUPEN64PLUS_NEXT_PLATFORM = $(LIBRETRO_PLATFORM) arm64
