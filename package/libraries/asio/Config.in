@@ -1,0 +1,9 @@
+config BR2_PACKAGE_ASIO
+	bool "asio"
+
+	help
+	  Asio is a cross-platform C++ library for network and low-level
+	  I/O programming that provides a consistent asynchronous model.
+	  This is the standalone (non-Boost) distribution.
+
+	  https://think-async.com/Asio/
