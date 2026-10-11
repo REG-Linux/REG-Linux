@@ -1,0 +1,59 @@
+GSH_OpenGL_Libretro: don't treat GLEW_ERROR_NO_GLX_DISPLAY as fatal
+
+Under Wayland the core loaded, negotiated its GL context, then rendered
+nothing at all while audio kept playing, printing only:
+
+    InitializeImpl
+    Error: Unknown error
+
+That message is glewInit() failing. glewInit() calls glewContextInit() first
+-- which is what actually loads the GL entry points -- and only then probes
+GLX via glxewInit(). libglew is built against GLX (its Buildroot package
+depends on xlib_libX11/Xext/Xi/Xmu, with no EGL support), so on a native
+Wayland session there is no GLX display current and that probe returns
+GLEW_ERROR_NO_GLX_DISPLAY. The GL function pointers are perfectly valid; only
+the GLX extension table is missing, which a Wayland/EGL client never uses.
+
+InitializeImpl treated any non-GLEW_OK result as fatal and returned early,
+skipping CGSH_OpenGL::InitializeImpl() and leaving the GS handler
+uninitialised -- hence a blank screen with working sound.
+
+The diagnostic was actively misleading too: GLEW 2.2.0's _glewErrorString[]
+table has five entries and its last one, index 4, is the literal string
+"Unknown error" -- which doubles as the clamp for out-of-range codes.
+GLEW_ERROR_NO_GLX_DISPLAY *is* 4, so the one error that matters here prints
+as "Unknown error" instead of mentioning GLX.
+
+Ignore that specific code. Guarded by #ifdef since it only exists in GLEW
+builds that have GLX support at all.
+
+Reproduced on sm8250 (Adreno 650, Mesa 26.1.3, sway) with RetroArch glcore.
+
+Signed-off-by: REG-Linux <reglinux@reglinux.org>
+
+--- a/Source/ui_libretro/GSH_OpenGL_Libretro.cpp
++++ b/Source/ui_libretro/GSH_OpenGL_Libretro.cpp
+@@ -30,6 +30,23 @@
+ #if defined(USE_GLEW)
+ 	glewExperimental = GL_TRUE;
+ 	auto result = glewInit();
++#ifdef GLEW_ERROR_NO_GLX_DISPLAY
++	//Expected and harmless under Wayland. glewInit() runs glewContextInit()
++	//first -- which is what actually loads the GL entry points, and which
++	//succeeded if we got this far -- and only then probes GLX via glxewInit().
++	//libglew is built against GLX (libglew.mk depends on xlib_libX11), so with
++	//no GLX display current that probe returns GLEW_ERROR_NO_GLX_DISPLAY.
++	//
++	//Treating it as fatal skipped CGSH_OpenGL::InitializeImpl() below, leaving
++	//the GS handler uninitialised: the core rendered nothing while audio kept
++	//playing. Worse, GLEW 2.2.0's _glewErrorString[] table ends at index 4, so
++	//glewGetErrorString() reports this as the thoroughly unhelpful
++	//"Unknown error" rather than naming GLX.
++	if(result == GLEW_ERROR_NO_GLX_DISPLAY)
++	{
++		result = GLEW_OK;
++	}
++#endif
+ 	CLog::GetInstance().Warn(LOG_NAME, "glewInit %d\n", result == GLEW_OK);
+ 	assert(result == GLEW_OK);
+ 	if(result != GLEW_OK)
