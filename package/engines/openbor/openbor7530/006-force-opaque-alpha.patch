@@ -1,0 +1,28 @@
+diff --git a/engine/sdl/video.c b/engine/sdl/video.c
+index 45687e5..2d0dd7e 100644
+--- a/engine/sdl/video.c
++++ b/engine/sdl/video.c
+@@ -228,6 +228,23 @@ int video_copy_screen(s_screen* src)
+ 	// do any needed scaling and color conversion
+ 	s_videosurface *surface = getVideoSurface(src);
+ 
++	// reglinux: the engine's 32bpp output is XBGR8888 -- the 4th byte is
++	// unused padding, never a real alpha channel, so it's left at whatever
++	// the software blitter happened to leave there (usually 0). We upload
++	// it to an SDL_PIXELFORMAT_ABGR8888 texture though, which does have a
++	// real alpha channel; if the GPU-accelerated path's buffer format ends
++	// up with actual per-pixel alpha compositing on the display plane, an
++	// all-zero 4th byte makes every pixel fully transparent -- correct
++	// colors uploaded and presented successfully, nothing visible on
++	// screen. Force it opaque before upload so that can't happen.
++	if(surface && surface->data && surface->pitch == surface->width * 4)
++	{
++		unsigned char *p = (unsigned char*)surface->data;
++		int total = surface->pitch * surface->height;
++		int i;
++		for(i = 3; i < total; i += 4) p[i] = 0xFF;
++	}
++
+ 	if(opengl) return video_gl_copy_screen(surface);
+ 
+ 	SDL_UpdateTexture(texture, NULL, surface->data, surface->pitch);
