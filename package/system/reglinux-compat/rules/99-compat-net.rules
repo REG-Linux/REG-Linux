@@ -1,0 +1,11 @@
+# 99-compat-net.rules — Re-sync compat report when network interface comes up.
+# Installed to /etc/udev/rules.d/99-compat-net.rules
+#
+# Triggers on wlan*/eth* link becoming available. The sync script
+# checks connectivity and rate-limits itself (1 sync per 24h).
+
+SUBSYSTEM=="net", ACTION=="add|change", ENV{INTERFACE}=="wlan*", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-sync &'"
+
+SUBSYSTEM=="net", ACTION=="add|change", ENV{INTERFACE}=="eth*", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-sync &'"

@@ -1,0 +1,21 @@
+# 99-compat-hw.rules — Re-probe hardware features on hotplug events.
+# Installed to /etc/udev/rules.d/99-compat-hw.rules
+#
+# Each rule runs the probe script with a targeted flag so only
+# the relevant feature is re-checked, not the full probe.
+
+# Bluetooth controller appears/changes
+SUBSYSTEM=="bluetooth", ACTION=="add|change", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-probe --bluetooth &'"
+
+# HDMI plug/unplug (DRM connector change)
+SUBSYSTEM=="drm", ACTION=="change", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-probe --hdmi &'"
+
+# USB device plugged in (gamepad, keyboard, etc.)
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-probe --usb &'"
+
+# Input device added (gamepad hotplug)
+SUBSYSTEM=="input", ACTION=="add", ENV{ID_INPUT_JOYSTICK}=="1", \
+    RUN+="/bin/sh -c '/usr/bin/reg-compat-probe --usb &'"
