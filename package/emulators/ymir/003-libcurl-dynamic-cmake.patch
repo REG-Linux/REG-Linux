@@ -1,6 +1,15 @@
---- a/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 20:19:37.697517970 +0800
-+++ b/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 20:20:00.905879983 +0800
-@@ -379,7 +379,7 @@
+From 003-libcurl-dynamic-cmake: Link against dynamic libcurl
+
+This patch changes the curl linkage from static to dynamic,
+which is preferred for Buildroot cross-compilation to avoid
+static linking issues and reduce binary size.
+
+---
+diff --git a/apps/ymir-sdl3/CMakeLists.txt b/apps/ymir-sdl3/CMakeLists.txt
+index 7c8d9e2..5f3a1b8 100644
+--- a/apps/ymir-sdl3/CMakeLists.txt
++++ b/apps/ymir-sdl3/CMakeLists.txt
+@@ -379,7 +379,7 @@ target_link_libraries(ymir-sdl3 PRIVATE
      cereal::cereal
      lz4::lz4
      RtMidi::rtmidi

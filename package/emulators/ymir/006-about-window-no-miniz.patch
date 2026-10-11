@@ -1,0 +1,26 @@
+Drop the <miniz/miniz.h> include and the About-window miniz entry. The
+bundled miniz from libchdr/deps/miniz-3.1.1 doesn't expose its header
+under the "miniz/" subdir that vcpkg's port uses, and miniz is private to
+libchdr — the About listing is purely informational, so removing it is
+simpler than wiring up a public include path.
+
+--- a/apps/ymir-sdl3/src/app/ui/windows/about_window.cpp
++++ b/apps/ymir-sdl3/src/app/ui/windows/about_window.cpp
+@@ -32,9 +32,6 @@
+ #include <zlib.h>
+ #include <zstd.h>
+
+-#define MINIZ_NO_ZLIB_COMPATIBLE_NAMES
+-#include <miniz/miniz.h>
+-
+ #define _STR_IMPL(x) #x
+ #define _STR(x) _STR_IMPL(x)
+ #define _SEMVER_STR(major, minor, patch) _STR(major.minor.patch)
+@@ -121,7 +118,6 @@
+     {.name = "Cameron Hart/glm",              .version = GLM_VERSION,                .license = licenseMIT,           .repoURL = "https://github.com/g-truc/glm",                  .licenseURL = "https://github.com/g-truc/glm/blob/master/LICENSE",                       .homeURL = "https://glm.g-truc.net/"},
+     {.name = "lzma",                          .version = LZMA_VERSION,               .license = licensePublicDomain,                                                                                                                                                       .homeURL = "https://www.7-zip.org/sdk.html",},
+     {.name = "mio",                           .version = MIO_VERSION,                .license = licenseMIT,           .repoURL = "https://github.com/StrikerX3/mio",               .licenseURL = "https://github.com/StrikerX3/mio/blob/master/LICENSE"},
+-    {.name = "miniz",                         .version = MZ_VERSION,                 .license = licenseMIT,           .repoURL = "https://github.com/richgel999/miniz",            .licenseURL = "https://github.com/richgel999/miniz/blob/master/LICENSE"},
+     {.name = "moodycamel::\nConcurrentQueue", .version = "\n" MC_CONCQUEUE_VERSION,  .license = licenseBSD2,          .repoURL = "https://github.com/cameron314/concurrentqueue",  .licenseURL = "https://github.com/cameron314/concurrentqueue/blob/master/LICENSE.md"},
+     {.name = "Neargye/semver",                .version = SEMVER_VERSION,             .license = licenseMIT,           .repoURL = "https://github.com/Neargye/semver",              .licenseURL = "https://github.com/Neargye/semver/blob/master/LICENSE"},
+     {.name = "nghttp2",                       .version = NGHTTP2_VERSION,            .license = licenseMIT,           .repoURL = "https://github.com/nghttp2/nghttp2",             .licenseURL = "https://github.com/nghttp2/nghttp2/blob/master/COPYING",                 .homeURL = "https://nghttp2.org/"},
