@@ -1,0 +1,85 @@
+default:
+  options:
+    videomode:                  max-640x480
+    video_threaded:             true
+    smooth:                     false
+    retroarch.audio_driver:     alsathread
+    retroarch.audio_out_rate:   44100
+    retroarch.audio_latency:    96
+    retroarch.menu_driver:      rgui
+
+amiga500:
+  emulator: libretro
+  core:     uae4arm
+amiga1200:
+  emulator: libretro
+  core:     uae4arm
+amigacd32:
+  emulator: libretro
+  core:     uae4arm
+amigacdtv:
+  emulator: libretro
+  core:     uae4arm
+atarist:
+  emulator: libretro
+  core:     hatari
+gba:
+  emulator: libretro
+  core:     gpsp
+nds:
+  emulator: drastic
+  core:     drastic
+mame:
+  emulator: libretro
+  core:     imame4all
+gamegear:
+  emulator: libretro
+  core:     picodrive
+mastersystem:
+  emulator: libretro
+  core:     picodrive
+megadrive:
+  emulator: libretro
+  core:     picodrive
+segacd:
+  emulator: libretro
+  core:     picodrive
+satellaview:
+  emulator: libretro
+  core:     pocketsnes
+snes:
+  emulator: libretro
+  core:     pocketsnes
+snes-msu1:
+  emulator: libretro
+  core:     pocketsnes
+spectravideo:
+  emulator: libretro
+  core:     bluemsx
+c64:
+  emulator: libretro
+  core:     vice_x64
+c20:
+  emulator: libretro
+  core:     vice_xvic
+c128:
+  emulator: libretro
+  core:     vice_x128
+cplus4:
+  emulator: libretro
+  core:     vice_xplus4
+pet:
+  emulator: libretro
+  core:     vice_xpet
+atari2600:
+  emulator: libretro
+  core:     stella2014
+fbneo:
+  emulator: libretro
+  core:     fbalpha
+neogeo:
+  emulator: libretro
+  core:     fbalpha
+scummvm:
+  emulator: libretro
+  core:     scummvm

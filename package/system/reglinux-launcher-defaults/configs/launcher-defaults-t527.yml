@@ -1,0 +1,12 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.audio_driver: alsathread
+
+nds:
+  emulator: libretro
+  core:     melonds
+fmtowns:
+  emulator: libretro
+  core:     mame

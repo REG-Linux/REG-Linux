@@ -1,0 +1,150 @@
+################################################################################
+#
+# reglinux-launcher-defaults
+#
+# Data-only package: the system -> (emulator, core) + options defaults that
+# regmsgd's launcher resolves against, plus the per-SoC overlay for this board.
+#
+# Two consumers, which is why this lives in REG-WIP rather than in the regmsg
+# repo: es-system reads the pair from $(STAGING_DIR) at BUILD time to generate
+# rs_systems.cfg / rs_features.json, and regmsgd reads them from $(TARGET_DIR)
+# at RUNTIME (launcher/system_map.rs). Picking the right overlay needs the
+# BR2_PACKAGE_SYSTEM_TARGET_* symbols, and reglinux-msg's prebuilt-binary
+# branch has no staging install at all.
+#
+################################################################################
+
+REGLINUX_LAUNCHER_DEFAULTS_VERSION = 1.0.0
+REGLINUX_LAUNCHER_DEFAULTS_LICENSE = GPL
+REGLINUX_LAUNCHER_DEFAULTS_SOURCE =
+REGLINUX_LAUNCHER_DEFAULTS_INSTALL_STAGING = YES
+
+LAUNCHER_DEFAULTS_DIR = $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-launcher-defaults
+LAUNCHER_DEFAULTS_SHARE = usr/share/regmsg/launcher
+
+# Which per-SoC overlay ships as launcher-defaults-arch.yml. NOT interchangeable
+# with REGLINUX_SYSTEM_ARCH -- that vocabulary has l4t/riscv/unknown/x86_64_v3,
+# this one has cha/s9gen4/t527/th1520/jh7110/k1/k3/mt8395/asahi/jz4770.
+# A board with no branch here simply gets no overlay (the base file still
+# applies), which is why the install below tolerates a missing file.
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = bcm2835
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = bcm2836
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = bcm2837
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = bcm2711
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = bcm2712
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_XU4),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = odroidxu4
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3288),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3288
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S905),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s905
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S905GEN2),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s905gen2
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S905GEN3),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s905gen3
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_T527),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = t527
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S9GEN4),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s9gen4
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = x86_64
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3399
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S922X),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s922x
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = a3gen2
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3328),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3328
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3568),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3568
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3576),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3576
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3326),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3326
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H3),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = h3
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = cha
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SUN50I),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = sun50i
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H616),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = h616
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = h700
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A133),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = a133
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = s812
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3128),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3128
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SDM845),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = sdm845
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = sm6115
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_QCS6490),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = qcs6490
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = sm8250
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = sm8550
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = rk3588
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = jh7110
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = k1
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K3),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = k3
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = th1520
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = asahi
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JZ4770),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = jz4770
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = mt8395
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = odroidc5
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_DE10NANO),y)
+	REGLINUX_LAUNCHER_DEFAULTS_SOC = de10nano
+endif
+
+REGLINUX_LAUNCHER_DEFAULTS_ARCH_YML = \
+	$(LAUNCHER_DEFAULTS_DIR)/configs/launcher-defaults-$(REGLINUX_LAUNCHER_DEFAULTS_SOC).yml
+
+# $(1): destination root ($(STAGING_DIR) or $(TARGET_DIR))
+define REGLINUX_LAUNCHER_DEFAULTS_INSTALL
+	$(INSTALL) -m 0644 -D $(LAUNCHER_DEFAULTS_DIR)/configs/launcher-defaults.yml \
+	    $(1)/$(LAUNCHER_DEFAULTS_SHARE)/launcher-defaults.yml
+	if test -f $(REGLINUX_LAUNCHER_DEFAULTS_ARCH_YML) ; then \
+	    $(INSTALL) -m 0644 -D $(REGLINUX_LAUNCHER_DEFAULTS_ARCH_YML) \
+	        $(1)/$(LAUNCHER_DEFAULTS_SHARE)/launcher-defaults-arch.yml ; \
+	else \
+	    rm -f $(1)/$(LAUNCHER_DEFAULTS_SHARE)/launcher-defaults-arch.yml ; \
+	fi
+endef
+
+define REGLINUX_LAUNCHER_DEFAULTS_INSTALL_STAGING_CMDS
+	$(call REGLINUX_LAUNCHER_DEFAULTS_INSTALL,$(STAGING_DIR))
+endef
+
+define REGLINUX_LAUNCHER_DEFAULTS_INSTALL_TARGET_CMDS
+	$(call REGLINUX_LAUNCHER_DEFAULTS_INSTALL,$(TARGET_DIR))
+endef
+
+# The `ports` system resolves to emulator/core `sh` (launcher-defaults.yml),
+# but regmsgd's resolver only ever scans /usr/bin and the shell lives at /bin/sh,
+# so the pair resolves to nothing and every .sh/.zar port fails.
+define REGLINUX_LAUNCHER_DEFAULTS_LINK_SH
+	mkdir -p $(TARGET_DIR)/usr/bin
+	ln -sf ../../bin/sh $(TARGET_DIR)/usr/bin/sh
+endef
+REGLINUX_LAUNCHER_DEFAULTS_POST_INSTALL_TARGET_HOOKS += REGLINUX_LAUNCHER_DEFAULTS_LINK_SH
+
+$(eval $(generic-package))

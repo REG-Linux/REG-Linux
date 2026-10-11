@@ -1,0 +1,13 @@
+default:
+  options:
+    retroarch.menu_driver: rgui
+
+nds:
+  emulator: drastic
+  core:     drastic
+fmtowns:
+  emulator: libretro
+  core:     mame
+flash:
+  emulator: lightspark
+  core:     lightspark

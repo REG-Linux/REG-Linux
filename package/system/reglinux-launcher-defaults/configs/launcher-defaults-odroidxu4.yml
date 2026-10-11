@@ -1,0 +1,30 @@
+default:
+  options:
+    retroarch.video_hard_sync: 0
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+
+dreamcast:
+  options:
+    # menu retroarch
+    # settings to fix sound issue only on Odroid XU4
+    retroarch.audio_latency:   128
+    retroarch.video_hard_sync: 1
+    # setting to fix Flycast performances on xu4
+    reicast_synchronous_rendering: disabled
+psx:
+  options:
+    gpu_software: true
+    # menu retroarch
+    # settings to fix sound issue only on Odroid XU4
+    retroarch.audio_latency:   128
+    retroarch.video_hard_sync: 1
+fmtowns:
+  emulator: libretro
+  core:     mame
+nds:
+  emulator: drastic
+  core:     drastic
+flash:
+  emulator: lightspark
+  core:     lightspark

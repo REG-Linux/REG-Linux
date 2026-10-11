@@ -1,0 +1,19 @@
+default:
+  options:
+    gfxbackend: gl
+
+nds:
+  emulator: libretro
+  core:     melondsds
+fmtowns:
+  emulator: libretro
+  core:     mame
+atomiswave:
+  emulator: libretro
+  core:     flycast
+dreamcast:
+  emulator: libretro
+  core:     flycast
+naomi:
+  emulator: libretro
+  core:     flycast

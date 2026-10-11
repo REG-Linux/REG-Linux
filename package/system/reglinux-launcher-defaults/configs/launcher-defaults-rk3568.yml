@@ -1,0 +1,9 @@
+nds:
+  emulator: libretro
+  core:     melonds
+fmtowns:
+  emulator: libretro
+  core:     mame
+ps2:
+  emulator: libretro
+  core:     play

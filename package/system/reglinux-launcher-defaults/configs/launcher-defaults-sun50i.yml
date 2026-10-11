@@ -1,0 +1,55 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+
+mastersystem:
+  emulator: libretro
+  core:     picodrive
+megadrive:
+  emulator: libretro
+  core:     picodrive
+snes:
+  emulator: libretro
+  core:     snes9x
+c64:
+  emulator: vice
+  core:     x64
+c128:
+  emulator: vice
+  core:     x128
+c20:
+  emulator: vice
+  core:     xvic
+pet:
+  emulator: vice
+  core:     xpet
+cplus4:
+  emulator: vice
+  core:     xplus4
+nds:
+  emulator: drastic
+  core:     drastic
+fmtowns:
+  emulator: libretro
+  core:     mame
+atomiswave:
+  emulator: flycast
+  core:     flycast
+dreamcast:
+  emulator: flycast
+  core:     flycast
+naomi:
+  emulator: flycast
+  core:     flycast
+naomi2:
+  emulator: flycast
+  core:     flycast
+systemsp:
+  emulator: flycast
+  core:     flycast
+flash:
+  emulator: lightspark
+  core:     lightspark

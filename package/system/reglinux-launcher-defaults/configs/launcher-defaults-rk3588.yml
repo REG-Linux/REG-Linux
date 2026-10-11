@@ -1,0 +1,15 @@
+pcengine:
+  emulator: libretro
+  core:     pce
+pcenginecd:
+  emulator: libretro
+  core:     pce
+nds:
+  emulator: libretro
+  core:     melondsds
+ps2:
+  emulator: libretro
+  core:     play
+jaguar:
+  emulator: bigpemu
+  core:     bigpemu

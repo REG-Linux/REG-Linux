@@ -1,0 +1,52 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.menu_driver: rgui
+    retroarch.audio_driver: alsathread
+
+amiga500:
+  emulator: libretro
+  core:     puae
+amiga1200:
+  emulator: libretro
+  core:     puae
+amigacd32:
+  emulator: libretro
+  core:     puae
+amigacdtv:
+  emulator: libretro
+  core:     puae
+atari2600:
+  emulator: libretro
+  core:     stella2014
+atarist:
+  emulator: libretro
+  core:     hatari
+mastersystem:
+  emulator: libretro
+  core:     picodrive
+megadrive:
+  emulator: libretro
+  core:     picodrive
+snes:
+  emulator: libretro
+  core:     snes9x_next
+c64:
+  emulator: libretro
+  core:     vice_x64
+c20:
+  emulator: libretro
+  core:     vice_xvic
+c128:
+  emulator: libretro
+  core:     vice_x128
+cplus4:
+  emulator: libretro
+  core:     vice_xplus4
+pet:
+  emulator: libretro
+  core:     vice_xpet
+fbneo:
+  options:
+    frameskip: auto
