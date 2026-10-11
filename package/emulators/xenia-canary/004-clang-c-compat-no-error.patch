@@ -1,0 +1,31 @@
+Keep clang's newer default-error C diagnostics as warnings for vendored C
+
+Everything xenia itself writes is C++; the COMPILE_LANGUAGE:C block only
+reaches the third-party C it vendors, chiefly its FFmpeg submodule, which it
+already compiles with -w because it does not own that code. That is also why
+the block already carries -Wno-implicit-function-declaration: clang 15 turned
+that diagnostic into an error by default and the vendored C had not caught up.
+
+Clang has since done the same to two more: -Wint-conversion (clang 16) and
+-Wincompatible-pointer-types (clang 21). Building against LLVM 22 therefore
+fails on pre-C99-era constructs in code xenia deliberately does not police, and
+-w cannot help because it silences warnings without demoting errors.
+
+Demote both to warnings, which -w then silences, matching the treatment the
+implicit-function-declaration case already gets. -Wno-error= rather than -Wno=
+so the diagnostics survive for anyone who drops -w.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -181,6 +181,8 @@
+   # C-specific warnings
+   add_compile_options(
+     $<$<COMPILE_LANGUAGE:C>:-Wno-implicit-function-declaration>
++    $<$<COMPILE_LANGUAGE:C>:-Wno-error=incompatible-pointer-types>
++    $<$<COMPILE_LANGUAGE:C>:-Wno-error=int-conversion>
+   )
+ 
+   # GTK3 via pkg-config

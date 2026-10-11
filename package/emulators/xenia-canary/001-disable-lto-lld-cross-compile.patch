@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dc8defe7a..dc16b18c0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -221,9 +221,13 @@ else()
+   )
+   add_compile_options($<$<CONFIG:Release>:-O3>)
+   # Link-time optimization (use lld to avoid system linker LTO plugin version mismatch)
+-  add_compile_options($<$<CONFIG:Release>:-flto=thin>)
+-  add_link_options($<$<CONFIG:Release>:-flto=thin>)
+-  add_link_options($<$<CONFIG:Release>:-fuse-ld=lld>)
++  # LTO disabled for cross-compilation (LLVMgold.so not available)
++  #   add_compile_options($<$<CONFIG:Release>:-flto=thin>)
++  #   add_link_options($<$<CONFIG:Release>:-flto=thin>)
++  # lld linker not available in cross-compilation toolchain, use system linker
++  add_link_options($<$<CONFIG:Release>:-lm>)
++  add_link_options($<$<CONFIG:Release>:-lstdc++>)
++  #   add_link_options($<$<CONFIG:Release>:-fuse-ld=lld>)
+   # No symbols in release on non-Windows
+   string(REPLACE "-g" "" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+   string(REPLACE "-g" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
