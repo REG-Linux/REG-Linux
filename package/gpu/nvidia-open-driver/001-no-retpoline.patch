@@ -1,0 +1,36 @@
+--- a/kernel/common/inc/nv-retpoline.h	2024-06-07 01:30:12.195035341 +0200
++++ b/kernel/common/inc/nv-retpoline.h	2024-06-07 01:30:47.610331995 +0200
+@@ -26,11 +26,11 @@
+ 
+ #include "cpuopsys.h"
+ 
+-#if (NV_SPECTRE_V2 == 0)
++//#if (NV_SPECTRE_V2 == 0)
+ #define NV_RETPOLINE_THUNK NV_SPEC_THUNK
+-#else
+-#define NV_RETPOLINE_THUNK NV_NOSPEC_THUNK
+-#endif
++//#else
++//#define NV_RETPOLINE_THUNK NV_NOSPEC_THUNK
++//#endif
+ 
+ #if defined(NVCPU_X86_64)
+ #define NV_SPEC_THUNK(REG)                                        \
+--- a/kernel-open/common/inc/nv-retpoline.h	2024-06-07 01:36:13.155870357 +0200
++++ b/kernel-open/common/inc/nv-retpoline.h	2024-06-07 01:36:23.119672676 +0200
+@@ -26,11 +26,11 @@
+ 
+ #include "cpuopsys.h"
+ 
+-#if (NV_SPECTRE_V2 == 0)
++//#if (NV_SPECTRE_V2 == 0)
+ #define NV_RETPOLINE_THUNK NV_SPEC_THUNK
+-#else
+-#define NV_RETPOLINE_THUNK NV_NOSPEC_THUNK
+-#endif
++//#else
++//#define NV_RETPOLINE_THUNK NV_NOSPEC_THUNK
++//#endif
+ 
+ #if defined(NVCPU_X86_64)
+ #define NV_SPEC_THUNK(REG)                                        \
