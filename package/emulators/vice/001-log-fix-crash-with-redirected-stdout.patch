@@ -1,0 +1,32 @@
+From: REG-Linux <cjom@reglinux.org>
+Subject: [PATCH] log: fix crash when stdout is not a terminal
+
+Backport of upstream r46240 (bug #2259) and r46177 (bug #2240).
+
+With no writable log file VICE logs to stdout only; if stdout is also
+redirected, log_archdep() gets NULL no-color strings and segfaults.
+Also flush the log file before closing it, not after.
+---
+--- a/src/log.c
++++ b/src/log.c
+@@ -171,10 +171,10 @@
+ {
+     DBG(("log_file_close %p\n", log_file));
+     if (log_file) {
++        fflush(log_file);
+         if (log_file != stdout) {
+             fclose(log_file);
+         }
+-        fflush(log_file);
+         log_file = NULL;
+     }
+ }
+@@ -743,7 +743,7 @@
+         return -1;
+     }
+ 
+-    if ((log_to_file) || (!log_colorize)) {
++    if ((log_to_file) || (archdep_default_logger_is_terminal() == 0) || (!log_colorize)) {
+         nocolorpre = logskipcolors(pretxt);
+         nocolortxt = logskipcolors(logtxt);
+     }

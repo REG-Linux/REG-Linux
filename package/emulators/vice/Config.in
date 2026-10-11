@@ -1,22 +1,37 @@
 config BR2_PACKAGE_VICE
 	bool "vice"
-	#needs old ffmpeg 4.x select BR2_PACKAGE_FFMPEG
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL2_IMAGE
-	select BR2_PACKAGE_PNG
-	select BR2_PACKAGE_JPEG
-	select BR2_PACKAGE_GIFLIB
-	select BR2_PACKAGE_ZLIB
-	select BR2_PACKAGE_LAME
 	select BR2_PACKAGE_ALSA_LIB
 	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_HOST_XA
+	select BR2_PACKAGE_HOST_DOS2UNIX
+	# Image formats
+	select BR2_PACKAGE_GIFLIB
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBPNG
+	# Audio formats (all enabled for full compatibility)
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LAME
 	select BR2_PACKAGE_LIBVORBIS
 	select BR2_PACKAGE_MPG123
 	select BR2_PACKAGE_FLAC
-	select BR2_PACKAGE_HOST_XA
-	select BR2_PACKAGE_HOST_DOS2UNIX
 	help
-	  VICE is an emulator collection which emulates the C64, the C64-DTV, the C128, the VIC20, practically all PET models, the PLUS4 and the CBM-II (aka C610). It runs on Unix, MS-DOS, Win32, OS/2, Acorn RISC OS, BeOS, QNX 6.x, Amiga, GP2X or Mac OS X machines.
+	  VICE is an emulator collection which emulates the C64, the
+	  C64-DTV, the C128, the VIC20, practically all PET models,
+	  the PLUS4 and the CBM-II (aka C610).
+
+	  This build uses SDL2 for the user interface (not GTK3).
+
+	  Features:
+	  - SDL2 video/audio/input
+	  - ALSA audio output
+	  - EVDEV input support
+	  - Multiple audio formats (MP3, FLAC, Vorbis)
+	  - Image formats (PNG, GIF, JPEG)
+	  - Network update support (libcurl)
+
+	  https://vice-emu.sourceforge.io/
 
 # Select which VICE binaries we should build
 config BR2_PACKAGE_VICE_X64
@@ -79,4 +94,3 @@ config BR2_PACKAGE_VICE_XSCPU64
     depends on BR2_PACKAGE_VICE
     help
       Build the C64 SuperCPU binary (xscpu64).
-

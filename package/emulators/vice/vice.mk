@@ -7,9 +7,11 @@
 VICE_VERSION = 3.10
 VICE_SOURCE = vice-$(VICE_VERSION).tar.gz
 VICE_SITE = https://sourceforge.net/projects/vice-emu/files/releases
-VICE_LICENSE = GPLv2
+VICE_LICENSE = GPL-2.0
+VICE_LICENSE_FILES = COPYING
 VICE_DEPENDENCIES = sdl2 sdl2_image libcurl host-dos2unix host-xa
-VICE_DEPENDENCIES += giflib alsa-lib jpeg
+VICE_DEPENDENCIES += giflib alsa-lib jpeg libpng zlib
+VICE_DEPENDENCIES += lame libvorbis mpg123 flac
 
 VICE_CONF_OPTS += --disable-option-checking
 VICE_CONF_OPTS += --enable-midi
@@ -25,49 +27,27 @@ VICE_CONF_OPTS += --disable-parsid
 VICE_CONF_OPTS += --disable-debug-gtk3ui
 VICE_CONF_OPTS += --disable-html-docs
 VICE_CONF_OPTS += --disable-pdf-docs
-# TODO handle properly these
+# Audio and image format support (all enabled)
 VICE_CONF_OPTS += --with-alsa
 VICE_CONF_OPTS += --with-jpeg
 VICE_CONF_OPTS += --with-gif
-# needs old ffmpeg 4.x
-#VICE_CONF_OPTS += --enable-ffmpeg
+VICE_CONF_OPTS += --with-png
+VICE_CONF_OPTS += --with-zlib
+VICE_CONF_OPTS += --with-mpg123
+VICE_CONF_OPTS += --with-flac
+VICE_CONF_OPTS += --with-lame
+VICE_CONF_OPTS += --with-vorbis
+# Video capture support (optional, requires ffmpeg)
+# VICE 3.10+ supports newer ffmpeg versions
+# VICE_CONF_OPTS += --enable-ffmpeg
+# VICE_DEPENDENCIES += ffmpeg
 
-# Enforce FastSID for very weak CPUs
+# Enforce FastSID for very weak CPUs (no ReSID)
 ifeq ($(BR2_mipsel)$(BR2_arm1176jzf_s)$(BR2_cortex_a7),y)
 VICE_CONF_OPTS += --without-resid
 endif
 
-ifeq ($(BR2_PACKAGE_MPG123),y)
-VICE_CONF_OPTS += --with-mpg123
-VICE_DEPENDENCIES += mpg123
-endif
-
-ifeq ($(BR2_PACKAGE_FLAC),y)
-VICE_CONF_OPTS += --with-flac
-VICE_DEPENDENCIES += flac
-endif
-
-ifeq ($(BR2_PACKAGE_LAME),y)
-VICE_CONF_OPTS += --with-lame
-VICE_DEPENDENCIES += lame
-endif
-
-ifeq ($(BR2_PACKAGE_LIBPNG),y)
-VICE_CONF_OPTS += --with-png
-VICE_DEPENDENCIES += libpng
-endif
-
-ifeq ($(BR2_PACKAGE_ZLIB),y)
-VICE_CONF_OPTS += --with-zlib
-VICE_DEPENDENCIES += zlib
-endif
-
-ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
-VICE_CONF_OPTS += --with-vorbis
-VICE_DEPENDENCIES += libvorbis
-endif
-
-VICE_CONF_ENV += LDFLAGS=-lSDL2
+VICE_CONF_ENV += LDFLAGS="$(TARGET_LDFLAGS) -lSDL2"
 
 ifeq ($(BR2_PACKAGE_VICE_X64),y)
 VICE_TARGETS += x64
@@ -114,15 +94,6 @@ VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_X64DTV),, rm -Rf $(TA
 VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_X64SC),, rm -Rf $(TARGET_DIR)/usr/bin/x64sc ; )
 VICE_KEEP_ONLY_SELECTED_TARGETS += $(if $(BR2_PACKAGE_VICE_XSCPU64),, rm -Rf $(TARGET_DIR)/usr/bin/xscpu64 ; )
 
-define VICE_POST_PROCESS_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/vice/c64.vice.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/vice/c128.vice.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
-VICE_POST_INSTALL_TARGET_HOOKS += VICE_POST_PROCESS_EVMAPY
 VICE_POST_INSTALL_TARGET_HOOKS += VICE_KEEP_ONLY_SELECTED_TARGETS
 
 $(eval $(autotools-package))
