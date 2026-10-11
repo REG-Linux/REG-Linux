@@ -1,0 +1,42 @@
+Link file_engine.o into the detection objects
+
+With --enable-plugins --default-dynamic the scumm engine becomes
+plugins/libscumm.so while the detection objects link into the main
+scummvm binary. DETECT_OBJS picks up file.o and file_nes.o but not
+file_engine.o, so ScummPAKFile - implemented there - has its vtable
+emitted only inside the plugin.
+
+engines/scumm/file.h gives ScummPAKFile an inline virtual destructor,
+and detection.cpp includes that header. detection_internal.h deletes
+through a BaseScummFile*, and at -O3 gcc speculatively devirtualizes
+that polymorphic delete against the derived types it can see. That
+emits ScummPAKFile's inline dtor into detection.o, which then
+references a vtable the main binary does not have:
+
+  engines/scumm/detection.o: in function `Scumm::ScummPAKFile::~ScummPAKFile()':
+  undefined reference to `vtable for Scumm::ScummPAKFile'
+  undefined reference to `VTT for Scumm::ScummPAKFile'
+
+Whether gcc emits that dtor depends on per-target devirtualization
+heuristics, so the failure is architecture-dependent - riscv64 hit it
+while most other targets did not.
+
+Add file_engine.o alongside its two siblings, which are already listed
+here for the same reason. All three are in MODULE_OBJS as well, and
+file_engine.cpp only reads ScummEngine members (_game.platform,
+_containerFile, _game.id), so it pulls no engine code into the
+detection library. The existing STATIC_PLUGIN guard still applies: a
+static module already contains these objects.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+diff --git a/engines/scumm/module.mk b/engines/scumm/module.mk
+--- a/engines/scumm/module.mk
++++ b/engines/scumm/module.mk
+@@ -289,5 +289,6 @@
+ # module is enabled, because it already has the contents.
+ ifneq ($(ENABLE_SCUMM), STATIC_PLUGIN)
+ DETECT_OBJS += $(MODULE)/file.o
++DETECT_OBJS += $(MODULE)/file_engine.o
+ DETECT_OBJS += $(MODULE)/file_nes.o
+ endif
