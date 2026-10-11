@@ -1,9 +1,5 @@
-# HLSDK Xash3D (generic)
+# hlsdk-xash3d
 
-Builds the Half-Life SDK libraries required by numerous GoldSource mods via the `mobile_hacks` branch.
+Half-Life game libraries for Xash3D-FWGS. Upstream: https://github.com/FWGS/hlsdk-portable
 
-## Build notes
-- **Branch:** `mobile_hacks` on Jan 3, 2025 (Version `c525400a...`).
-- **Config:** selects SDL2, SDL2_mixer, SDL2_image, SDL2_ttf, and libsodium.
-- **Build system:** uses Waf (`waf-package`) with `--build-type=release` and an optional `--64bits` flag on 64-bit hosts.
-- **Install:** deploys the compiled `cl_dlls` and `dlls` into `/usr/lib/xash3d/hlsdk/hl/` so Xash3D-FWGS can find them.
+Uses the `mobile_hacks` branch, which patches the SDK for compatibility with numerous GoldSource mods beyond vanilla Half-Life. Uses `waf-package`. Installs `cl_dlls/` and `dlls/` to `/usr/lib/xash3d/hlsdk/hl/`.
