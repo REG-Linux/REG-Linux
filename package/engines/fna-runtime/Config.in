@@ -1,0 +1,31 @@
+config BR2_PACKAGE_FNA_RUNTIME
+	bool "fna-runtime"
+	depends on BR2_aarch64 || BR2_x86_64 || BR2_RISCV_64
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS # SDL2
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_GCOMPAT if BR2_TOOLCHAIN_USES_MUSL # glibc compat for MonoKickstart
+	select BR2_PACKAGE_BOX64 if BR2_RISCV_64 # x86_64 MonoKickstart via Box64
+	help
+	  FNA game runtime for running XNA/FNA games (Stardew Valley,
+	  Celeste, TMNT Shredder's Revenge, etc.).
+
+	  Includes:
+	  - FNA3D (3D graphics, SDL2 backend)
+	  - FAudio (XAudio2 reimplementation, SDL2 backend)
+	  - Theorafile (Theora video decoding)
+	  - MonoKickstart (embedded Mono runtime for .NET/FNA games)
+
+	  On aarch64/x86_64+glibc: MonoKickstart runs natively.
+	  On aarch64+musl: MonoKickstart runs via gcompat.
+	  On riscv64: x86_64 MonoKickstart runs via Box64.
+
+	  Users must provide their own game files (Steam/GOG purchase).
+
+	  https://fna-xna.github.io
+
+comment "fna-runtime needs aarch64/x86_64/riscv64, C++, OpenGL/GLES, dynamic libs"
+	depends on !(BR2_aarch64 || BR2_x86_64 || BR2_RISCV_64) \
+		|| !BR2_INSTALL_LIBSTDCPP || BR2_STATIC_LIBS \
+		|| !(BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES)
