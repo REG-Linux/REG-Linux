@@ -1,7 +1,0 @@
-fmtowns:
-  emulator: libretro
-  core:     mame
-nds:
-  emulator: libretro
-  core:     melonds
-
