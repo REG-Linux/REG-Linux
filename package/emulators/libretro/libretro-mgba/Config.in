@@ -1,14 +1,31 @@
 config BR2_PACKAGE_LIBRETRO_MGBA
     bool "libretro-mgba"
-	
+
 	depends on BR2_INSTALL_LIBSTDCPP
 	select BR2_PACKAGE_LIBZIP
 	select BR2_PACKAGE_LIBPNG
 	select BR2_PACKAGE_ZLIB
 	help
-	  A libretro GBA emulator core for ARM.
+	  A libretro Game Boy Advance emulator core.
+
+	  mGBA is a fast, accurate, and portable GBA emulator with
+	  many features including save states, BIOS support, and
+	  controller support.
+
+	  Features:
+	  - High accuracy GBA emulation
+	  - Save states
+	  - Real-time clock support
+	  - Game Boy/Game Boy Color support
+	  - Controller support
+	  - Shader support
+	  - Cheat support
+
+	  Note: Requires GBA BIOS file for accurate emulation
+	  (optional, can run without BIOS)
 
 	  http://www.libretro.com
+	  https://mgba.io/
 
 comment "LIBRETRO_MGBA needs a toolchain w/ C++"
 	depends on !BR2_INSTALL_LIBSTDCPP

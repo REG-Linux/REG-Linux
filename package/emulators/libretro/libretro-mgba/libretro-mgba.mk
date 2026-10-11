@@ -6,8 +6,12 @@
 # Version: Release on Mar 9, 2025
 LIBRETRO_MGBA_VERSION = 0.10.5
 LIBRETRO_MGBA_SITE = $(call github,mgba-emu,mgba,$(LIBRETRO_MGBA_VERSION))
-LIBRETRO_MGBA_LICENSE = MPLv2.0
+LIBRETRO_MGBA_LICENSE = MPL-2.0
+LIBRETRO_MGBA_LICENSE_FILES = LICENSE
 
+# Dependencies for libretro build
+# Note: Some libraries are bundled upstream for libretro build
+# These are kept as dependencies for better integration
 LIBRETRO_MGBA_DEPENDENCIES = libzip libpng zlib
 
 LIBRETRO_MGBA_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
@@ -28,7 +32,9 @@ else ifeq ($(BR2_PACKAGE_HAS_GLES2),y)
     LIBRETRO_MGBA_CONF_OPTS += -DBUILD_GLES2=ON -DBUILD_GLES3=OFF
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# Desktop GL build — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL rather than HAS_LIBGL (polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
     LIBRETRO_MGBA_CONF_OPTS += -DBUILD_GL=ON
 else
     LIBRETRO_MGBA_CONF_OPTS += -DBUILD_GL=OFF
