@@ -1,0 +1,99 @@
+--- a/Sources/Jazz2/ContentResolver.h
++++ b/Sources/Jazz2/ContentResolver.h
+@@ -150,6 +150,9 @@
+ 		void OverridePaths(StringView contentPath, StringView sourcePath, StringView cachePath);
+ #endif
+ 
++		/** @brief Overrides the `"Source"` and, if not empty, the `"Cache"` directory (used by `--source`/`--cache` to select a data set other than the built-in one) */
++		void OverrideSourceAndCachePaths(StringView sourcePath, StringView cachePath);
++
+ #if !defined(DEATH_TARGET_EMSCRIPTEN)
+ 		/** @brief Scans the `"Content"` and `"Cache"` directories for `.pak` files and mounts them  */
+ 		void RemountPaks();
+--- a/Sources/Jazz2/ContentResolver.cpp
++++ b/Sources/Jazz2/ContentResolver.cpp
+@@ -180,6 +180,21 @@
+ 	}
+ #endif
+ 
++	void ContentResolver::OverrideSourceAndCachePaths(StringView sourcePath, StringView cachePath)
++	{
++		_sourcePath = sourcePath;
++		if (!cachePath.empty()) {
++			_cachePath = cachePath;
++			if (!fs::DirectoryExists(_cachePath)) {
++				fs::CreateDirectories(_cachePath);
++			}
++		}
++#if !defined(DEATH_TARGET_EMSCRIPTEN)
++		// The constructor already mounted .paks from the default paths, remount from the new ones
++		RemountPaks();
++#endif
++	}
++
+ 	void ContentResolver::InitializePaths()
+ 	{
+ #if defined(DEATH_TARGET_ANDROID)
+@@ -280,17 +295,16 @@
+ 			auto localStorage = fs::GetLocalStorage();
+ 			if (!localStorage.empty()) {
+ 				// Use "$XDG_DATA_HOME/Jazz² Resurrection/" if exists (for backward compatibility), otherwise "$XDG_DATA_HOME/{NCINE_LINUX_PACKAGE}/"
+-				_cachePath = fs::CombinePath(localStorage, "Jazz² Resurrection/Cache/"_s);
++				_cachePath = "/userdata/system/cache/jazz2/";
+ 				if (!fs::DirectoryExists(_cachePath)) {
+-					auto appData = fs::CombinePath(localStorage, NCINE_LINUX_PACKAGE);
+-					_cachePath = fs::CombinePath(appData, "Cache/"_s);
++					fs::CreateDirectories(_cachePath);
+ 				}
+ 			} else {
+ 				_cachePath = "Cache/"_s;
+ 			}
+ 
+ 			// Prefer system-wide Source only if it exists and the local one doesn't exist
+-			_sourcePath = fs::CombinePath(fs::GetDirectoryName(_cachePath), "Source/"_s);
++			_sourcePath = "/userdata/roms/jazz2/";
+ 			if (!fs::FindPathCaseInsensitive(fs::CombinePath(_sourcePath, "Anims.j2a"_s)) &&
+ 				!fs::FindPathCaseInsensitive(fs::CombinePath(_sourcePath, "AnimsSw.j2a"_s))) {
+ 				auto systemWideSource = NCINE_INSTALL_PREFIX "/share/" NCINE_LINUX_PACKAGE "/Source/";
+--- a/Sources/Main.cpp
++++ b/Sources/Main.cpp
+@@ -296,6 +296,28 @@
+ 	}
+ #endif
+ 
++#if defined(DEATH_TARGET_UNIX)
++	// Only one directory of original game files is ever scanned, so releases that ship their own
++	// `Anims.j2a` -- a different game version, Christmas Chronicles, a mod with its own tilesets --
++	// cannot be merged into the built-in one and need to be selected instead. `--cache` goes with
++	// `--source` because the cache is converted from it and its validity is keyed only on
++	// `Anims.j2a`'s timestamp, which two data sets can easily share.
++	{
++		StringView sourcePath, cachePath;
++		for (std::size_t i = 0; i + 1 < config.argc(); i++) {
++			auto arg = config.argv(i);
++			if (arg == "--source"_s || arg == "/source"_s) {
++				sourcePath = config.argv(i + 1);
++			} else if (arg == "--cache"_s || arg == "/cache"_s) {
++				cachePath = config.argv(i + 1);
++			}
++		}
++		if (!sourcePath.empty()) {
++			ContentResolver::Get().OverrideSourceAndCachePaths(sourcePath, cachePath);
++		}
++	}
++#endif
++
+ #if defined(WITH_MULTIPLAYER) && defined(DEDICATED_SERVER)
+ 	constexpr bool isServer = true;
+ #elif defined(DEATH_TARGET_APPLE) || defined(DEATH_TARGET_UNIX) || (defined(DEATH_TARGET_WINDOWS) && !defined(DEATH_TARGET_WINDOWS_RT))
+--- a/Sources/Shared/IO/FileSystem.cpp
++++ b/Sources/Shared/IO/FileSystem.cpp
+@@ -1377,7 +1377,7 @@
+ #elif defined(DEATH_TARGET_UNIX) || defined(DEATH_TARGET_EMSCRIPTEN) || defined(DEATH_TARGET_VITA)
+ 		StringView config = ::getenv("XDG_CONFIG_HOME");
+ 		if (IsAbsolutePath(config)) {
+-			return CombinePath(config, applicationName);
++			return CombinePath(config, "jazz2");
+ 		}
+ 
+ 		StringView home = ::getenv("HOME");
