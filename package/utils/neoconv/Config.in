@@ -1,0 +1,6 @@
+config BR2_PACKAGE_NEOCONV
+	bool "neoconv"
+	help
+	  MAME Neo Geo romset (.zip) to TerraOnion (.neo) converter.
+
+	  https://github.com/carmiker/neoconv
