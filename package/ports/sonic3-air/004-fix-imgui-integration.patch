@@ -1,0 +1,11 @@
+--- a/Oxygen/oxygenengine/source/oxygen/menu/imgui/ImGuiIntegration.cpp	2026-02-03 19:42:28.650075483 +0100
++++ b/Oxygen/oxygenengine/source/oxygen/menu/imgui/ImGuiIntegration.cpp	2026-02-03 19:43:11.702682582 +0100
+@@ -389,7 +389,7 @@
+ void ImGuiIntegration::buildContents()  {}
+ bool ImGuiIntegration::isCapturingMouse()  { return false; }
+ bool ImGuiIntegration::isCapturingKeyboard()  { return false; }
+-bool ImGuiIntegration::hasBlockingImGuiWindow()  { return false; }
++bool ImGuiIntegration::hasBlockingImGuiWindow() const { return false; }
+ void ImGuiIntegration::refreshImGuiStyle()  {}
+ void ImGuiIntegration::saveIniSettings()  {}
+ 
