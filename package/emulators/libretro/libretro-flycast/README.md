@@ -1,10 +1,5 @@
-# Libretro Flycast
+# libretro-flycast
 
-The `libretro-flycast` core runs Dreamcast/Naomi/Atomiswave emulation with the OpenMP and GL/GLES hooks REG-Linux enables for ARM/x86 targets.
+Dreamcast / Naomi / Atomiswave libretro core (Flycast). Upstream: https://github.com/flyinghead/flycast
 
-## Build notes
-
-- `Version`: `$(FLYCAST_VERSION)`
-- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `BR2_GCC_ENABLE_OPENMP`, `(BR2_PACKAGE_HAS_LIBGLES || BR2_PACKAGE_HAS_LIBGL)`, and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: CMake-based (`cmake-package`)
-- `Extras`: applies `000-makefile-additions.patch`
+Shares the version pin with the standalone flycast package. GL backend is selected per-platform: desktop GL, GLES3, or GLES2 in that priority order. Vulkan is enabled when `BR2_PACKAGE_REGLINUX_VULKAN` is set. Per-SoC flags (`-DRK3399=ON`, `-DRPI4=ON`, `-DS922X=ON`, etc.) tune recompiler behaviour.
