@@ -1,0 +1,9 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: egl
+Description: Mali Bifrost G52 EGL library
+Version: 21.0
+Libs: -L${libdir} -lEGL
+Cflags: -I${includedir}
