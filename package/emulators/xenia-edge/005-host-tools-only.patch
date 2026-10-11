@@ -1,0 +1,105 @@
+Add XE_HOST_TOOLS_ONLY: configure only xenia-shader-cc + its deps
+
+REG-Linux's native pre-pass (xenia-edge.mk, aarch64 boards) builds
+xenia-shader-cc on the build machine using system gcc, since it's a
+build-time host tool that must run natively regardless of the target
+arch (see 004-linux-aarch64-host-shader-cc.patch's commit message for
+the full story). That configure processes the *entire* tree though -
+CMake always does, regardless of which --target is later requested -
+and GTK3/SDL3/wxWidgets/FFmpeg all pull in libraries that only exist
+for whatever board is being cross-compiled to (via pkg-config/
+find_package calls resolving into that board's sysroot), never for
+the build machine a host tool actually runs on. Confirmed the hard
+way: routing those lookups through Buildroot's own pkg-config (always
+pinned to the target sysroot, no env var redirects it) leaked an
+aarch64 GTK3 include path into an otherwise-native x86_64 gcc compile
+line, which then pulled in ARM SVE-only glibc math headers and broke
+immediately on anything including <cmath>.
+
+xenia-shader-cc and its actual deps (glslang, SPIRV-Tools-static/-opt,
+SPIRV-Headers) need none of GTK3/SDL3/wxWidgets/FFmpeg - this option
+skips exactly those parts of the configure (and add_subdirectory(
+src/xenia), the app/UI code that needs them) rather than trying to
+make their target-scoped lookups behave under a native compile, which
+structurally can't be made to work (the libraries in question are
+never built for the build machine in this cross setup at all).
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,15 @@
+ 
+ option(XENIA_BUILD_TESTS "Build test suites" OFF)
+ option(XENIA_BUILD_MISC "Build misc subprojects (trace viewers, shader compiler, vfs-dump, demos)" OFF)
++# REG-Linux: configures/builds only xenia-shader-cc and its glslang/
++# SPIRV-Tools-static/-opt deps (third_party/CMakeLists.txt) - none of
++# which need GTK3/SDL3/wxWidgets/FFmpeg, all of which pull in libraries
++# that only exist for whatever board this is being cross-compiled for,
++# never for the build machine itself. Skips add_subdirectory(src/xenia)
++# below and the matching blocks in third_party/CMakeLists.txt so a
++# native host-tools-only configure never calls pkg-config/find_package
++# for anything target-scoped in the first place.
++option(XE_HOST_TOOLS_ONLY "REG-Linux: configure only the xenia-shader-cc host tool and its deps, skip GTK3/SDL3/wxWidgets/FFmpeg/src" OFF)
+ option(XENIA_ENABLE_LTO "Enable link-time optimization in Release (slow link)" ON)
+ option(XENIA_ENABLE_PROFILER "Enable profiler (UI is Debug-only)" OFF)
+ option(XENIA_ENABLE_ITRACE "Enable JIT per-instruction tracing to the log (slow)" OFF)
+@@ -356,11 +365,13 @@
+       pthread
+     )
+   elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-    find_package(PkgConfig REQUIRED)
+-    pkg_check_modules(GTK3 REQUIRED gtk+-x11-3.0)
+-    include_directories(${GTK3_INCLUDE_DIRS})
+-    link_directories(${GTK3_LIBRARY_DIRS})
+-    add_compile_options(${GTK3_CFLAGS_OTHER})
++    if(NOT XE_HOST_TOOLS_ONLY)
++      find_package(PkgConfig REQUIRED)
++      pkg_check_modules(GTK3 REQUIRED gtk+-x11-3.0)
++      include_directories(${GTK3_INCLUDE_DIRS})
++      link_directories(${GTK3_LIBRARY_DIRS})
++      add_compile_options(${GTK3_CFLAGS_OTHER})
++    endif()
+ 
+     link_libraries(stdc++fs dl lz4 m pthread rt)
+ 
+@@ -453,6 +464,8 @@
+ 
+ add_subdirectory(third_party)
+ 
+-add_subdirectory(src/xenia)
++if(NOT XE_HOST_TOOLS_ONLY)
++  add_subdirectory(src/xenia)
++endif()
+ 
+ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT xenia-app)
+
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -702,6 +702,17 @@
+   target_include_directories(libusb PUBLIC libusb/libusb PRIVATE libusb/msvc)
+ endif()
+ 
++# REG-Linux: SDL3, FFmpeg and wxWidgets (down to the matching endif() right
++# before the Metal Shader Converter section) are all app/runtime deps -
++# none of them are needed to build xenia-shader-cc or its glslang/
++# SPIRV-Tools-static/-opt deps above. Skipped for a host-tools-only native
++# configure (see XE_HOST_TOOLS_ONLY in the top-level CMakeLists.txt) since
++# their pkg-config/find_package calls (SDL3's CheckX11, wx's OpenGL/ZLIB/
++# EXPAT) resolve into whatever board this is being cross-compiled for -
++# never valid include/library paths for the build machine a host tool
++# actually runs on.
++if(NOT XE_HOST_TOOLS_ONLY)
++
+ # ==============================================================================
+ # SDL3
+ # ==============================================================================
+@@ -1517,6 +1528,8 @@
+   endforeach()
+ endif()
+ 
++endif()  # NOT XE_HOST_TOOLS_ONLY (SDL3 + FFmpeg + wxWidgets block)
++
+ # ==============================================================================
+ # Metal Shader Converter (Apple only — the DXIL -> AIR half of the Metal guest
+ # shader path, taking the DXIL that spirv_to_dxil above produces)

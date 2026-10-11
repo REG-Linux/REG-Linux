@@ -1,0 +1,145 @@
+Extend the Windows x64->ARM64 host-shader-cc workaround to Linux cross builds
+
+xenia-shader-cc (a build-time host tool: GLSL/XeSL -> SPIR-V -> .h codegen,
+run *during* the build itself via XeniaHelpers.cmake custom commands) must
+execute on the build machine regardless of what CMAKE_SYSTEM_PROCESSOR the
+rest of the tree is being cross-compiled for. Upstream already has this
+exact problem on Windows (x64 host, ARM64 target: the cross toolchain
+would otherwise produce an ARM64 PE that can't run on the x64 host) and
+solves it via _xe_use_host_shader_cc: skip building xenia-shader-cc (and
+its host-only glslang/SPIRV-Tools-static/-opt deps) from source, and
+instead import a binary already produced by a prior *native* build.
+
+REG-Linux hits the identical problem doing a Linux x86_64-host ->
+aarch64-target Buildroot cross build (xenia-edge on e.g. sm8250):
+xenia-shader-cc got compiled as an ARM64 ELF by the cross toolchain,
+which then fails to execute at build time - "not found" from /bin/sh is
+actually ENOENT on the missing aarch64 dynamic loader
+(/lib/ld-linux-aarch64.so.1), not a missing file; confirmed via `file` on
+the built binary (ARM aarch64) and on libglslang.a's own object members
+(also aarch64 - it's a genuine host/target split, not a race).
+
+Upstream's own condition is WIN32-only - not an oversight so much as
+scope: xenia-build.py's own --target-arch flag hard-refuses non-native
+values on Linux ("Cross-compilation ... is only supported on Windows and
+macOS"), so upstream never needed a Linux branch here. REG-Linux's
+xenia-edge.mk drives this cross build a different way (CMAKE_SYSTEM_
+PROCESSOR/CMAKE_SYSTEM_NAME injected directly via SYSTEM_PROCESSOR env,
+see 002-cmake-find-root-path.patch) rather than through --target-arch, so
+that upstream guard never fires - but the same host/target split is
+still needed underneath.
+
+The host-side binary comes from a dedicated Buildroot package,
+host-xenia-edge (package/emulators/xenia-edge/xenia-edge.mk), built with
+the container's system gcc/g++ and a host-tools-only CMake configure
+(005-host-tools-only.patch skips everything that isn't xenia-shader-cc's
+own dependency chain) into its OWN independent build tree - never this
+package's build/ dir. Two earlier approaches were tried and both hit real
+architectural walls, not typos: (1) an in-package native pre-pass sharing
+this package's own build/ dir hit CMake caching a stale cross --sysroot
+across the reconfigure; (2) giving that pre-pass its own directory instead
+still routed through Buildroot's target-pinned pkg-config wrapper (no env
+var redirects it to anything else), which leaked an aarch64 GTK3 include
+path into the "native" gcc compile and pulled in ARM SVE-only glibc math
+headers. A real separate Buildroot host package sidesteps both: its own
+extraction directory can't inherit cache from this package's cross
+configure, and 005-host-tools-only.patch means its configure never calls
+pkg-config for anything target-scoped in the first place.
+
+xenia-edge.mk sets XE_HOST_SHADER_CC to that host package's install path
+($(HOST_DIR)/usr/bin/xenia-shader-cc) as an environment variable when
+running the real (aarch64) cross build - this patch's import branch reads
+it via CMake's $ENV{} before falling back to upstream's own
+build/host_tools/<Config>/ search (unaffected, still what a manual
+`xb build --target xenia-shader-cc` on Windows or on Linux directly
+without going through this Buildroot package produces).
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -187,11 +187,22 @@
+ # the x64 host, so reuse the binary from a previous native build instead
+ # (Windows-on-ARM runs x64 fine via Prism, and macOS handles its own
+ # x86_64↔arm64 via Rosetta — both directions are unaffected).
++#
++# REG-Linux: same host/target split needed for Linux x86_64-host ->
++# aarch64-target Buildroot cross builds - host-xenia-edge
++# (package/emulators/xenia-edge/xenia-edge.mk) builds xenia-shader-cc
++# natively and installs it to $(HOST_DIR)/usr/bin/xenia-shader-cc,
++# independent of this package's own build tree (see the
++# XE_HOST_SHADER_CC env var check a few lines below).
+ set(_xe_use_host_shader_cc FALSE)
+ if(WIN32 AND CMAKE_CROSSCOMPILING AND XE_TARGET_AARCH64
+     AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64|x86_64")
+   set(_xe_use_host_shader_cc TRUE)
+ endif()
++if(UNIX AND NOT APPLE AND CMAKE_CROSSCOMPILING AND XE_TARGET_AARCH64
++    AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64|x86_64")
++  set(_xe_use_host_shader_cc TRUE)
++endif()
+
+ if(NOT _xe_use_host_shader_cc)
+
+@@ -429,19 +440,40 @@
+
+ else()  # _xe_use_host_shader_cc: x64→ARM64 cross-compile, use native build's binary
+
+-# Native x64 build lives at <repo>/build/ (xenia-build.py: get_build_dir(None)).
+-set(_xe_host_shader_cc_dir "${CMAKE_SOURCE_DIR}/build/host_tools")
+ set(_xe_host_shader_cc_any "")
+-foreach(_cfg Release Checked Debug)
+-  if(EXISTS "${_xe_host_shader_cc_dir}/${_cfg}/xenia-shader-cc.exe")
+-    set(_xe_host_shader_cc_any "${_xe_host_shader_cc_dir}/${_cfg}/xenia-shader-cc.exe")
+-    break()
++
++# REG-Linux: host-xenia-edge (package/emulators/xenia-edge/xenia-edge.mk)
++# builds xenia-shader-cc natively in its own independent build tree and
++# installs it to $(HOST_DIR)/usr/bin/xenia-shader-cc - stable, absolute,
++# and unrelated to this package's own build/ dir (the shared-build-dir
++# approach tried before this had its own stale-cache problems). Preferred
++# over the WIN32-native-build-dir search below when set.
++if(DEFINED ENV{XE_HOST_SHADER_CC} AND EXISTS "$ENV{XE_HOST_SHADER_CC}")
++  set(_xe_host_shader_cc_any "$ENV{XE_HOST_SHADER_CC}")
++endif()
++
++if(NOT _xe_host_shader_cc_any)
++  # Native x64 build lives at <repo>/build/ (xenia-build.py: get_build_dir(None)).
++  # WIN32's own native pre-build always names it .exe; a Linux native
++  # build run directly via xenia-build.py (not through REG-Linux's
++  # XE_HOST_SHADER_CC-setting Buildroot package above) has none.
++  set(_xe_host_shader_cc_dir "${CMAKE_SOURCE_DIR}/build/host_tools")
++  set(_xe_host_shader_cc_ext "")
++  if(WIN32)
++    set(_xe_host_shader_cc_ext ".exe")
+   endif()
+-endforeach()
++  foreach(_cfg Release Checked Debug)
++    if(EXISTS "${_xe_host_shader_cc_dir}/${_cfg}/xenia-shader-cc${_xe_host_shader_cc_ext}")
++      set(_xe_host_shader_cc_any "${_xe_host_shader_cc_dir}/${_cfg}/xenia-shader-cc${_xe_host_shader_cc_ext}")
++      break()
++    endif()
++  endforeach()
++endif()
+ if(NOT _xe_host_shader_cc_any)
+   message(FATAL_ERROR
+-    "Cross-compile to ARM64 needs a host xenia-shader-cc.exe but none was found "
+-    "under ${_xe_host_shader_cc_dir}/<Config>/.\n"
++    "Cross-compile to ARM64 needs a host xenia-shader-cc but none was found "
++    "(checked $ENV{XE_HOST_SHADER_CC} and "
++    "${CMAKE_SOURCE_DIR}/build/host_tools/<Config>/xenia-shader-cc.exe).\n"
+     "  Run a native build first to produce it, e.g.:\n"
+     "    xb build --target xenia-shader-cc --config=release\n"
+     "  Then re-run the cross-compile.")
+@@ -449,9 +481,9 @@
+ add_executable(xenia-shader-cc IMPORTED GLOBAL)
+ set_target_properties(xenia-shader-cc PROPERTIES
+   IMPORTED_LOCATION "${_xe_host_shader_cc_any}"
+-  IMPORTED_LOCATION_RELEASE "${_xe_host_shader_cc_dir}/Release/xenia-shader-cc.exe"
+-  IMPORTED_LOCATION_CHECKED "${_xe_host_shader_cc_dir}/Checked/xenia-shader-cc.exe"
+-  IMPORTED_LOCATION_DEBUG "${_xe_host_shader_cc_dir}/Debug/xenia-shader-cc.exe")
++  IMPORTED_LOCATION_RELEASE "${_xe_host_shader_cc_any}"
++  IMPORTED_LOCATION_CHECKED "${_xe_host_shader_cc_any}"
++  IMPORTED_LOCATION_DEBUG "${_xe_host_shader_cc_any}")
+
+ endif()

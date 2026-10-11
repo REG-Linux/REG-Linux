@@ -1,0 +1,86 @@
+Honor SYSROOT and SYSTEM_PROCESSOR env vars for CMake's own cross detection
+
+run_cmake_configure() already reads CC/CXX from the environment so a cross
+compiler wrapper can be swapped in, but never tells CMake's own
+find_package()/find_path()/find_library() calls to look under a sysroot -
+those search hardcoded host paths (e.g. CheckX11 in SDL3's sdlchecks.cmake
+walks /usr/include/X11, /usr/X11R6/include, ...) regardless of what
+--sysroot the compiler itself was given. Under a buildroot-style cross
+build this means SDL3 configures against nothing (X11/Wayland dev files
+live only in the target sysroot, never on the host build machine), and
+CMake's own message is misleading: "SDL could not find X11 or Wayland
+development libraries on your system", when they are simply not where
+CMake is looking.
+
+Read SYSROOT the same way CC/CXX already are, and when it's set, add the
+standard CMAKE_FIND_ROOT_PATH* defines: LIBRARY/INCLUDE/PACKAGE restricted
+to the sysroot (host libs/configs must never leak into a cross build), and
+PROGRAM forced to NEVER - CMake's default here is BOTH, not NEVER, since
+this script never sets CMAKE_SYSTEM_NAME/PROCESSOR on Linux and so CMake
+never considers itself to be cross-compiling. Without forcing PROGRAM off,
+find_package(Python3) picks the sysroot's own /usr/bin/python3 - a
+target-arch ELF (e.g. aarch64 on an x86_64 build host) - and fails to
+execute it, rather than falling through to the host's usable interpreter
+on PATH.
+
+Also read SYSTEM_PROCESSOR and, when set, add CMAKE_SYSTEM_NAME/PROCESSOR.
+Without it CMAKE_SYSTEM_PROCESSOR is whatever this script itself runs on
+(the build host), not the compiler's actual target -
+src/xenia/base/xe_target.cc's XE_TARGET_AARCH64/XE_TARGET_X86_64 detection
+reads CMAKE_SYSTEM_PROCESSOR at configure time, so on an aarch64 target
+build this silently selects the x64/Xbyak CPU backend instead of
+a64/xbyak_aarch64: it configures cleanly and only fails later, deep in
+backend/x64, on x86 inline asm an aarch64-targeting clang cannot compile.
+Setting CMAKE_SYSTEM_NAME is also what flips CMAKE_CROSSCOMPILING to
+TRUE, which is what makes FIND_ROOT_PATH_MODE_PROGRAM's real default
+NEVER instead of BOTH - the explicit NEVER above is kept regardless, belt
+and braces.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+--- a/xenia-build.py
++++ b/xenia-build.py
+@@ -879,6 +879,43 @@
+             f"-DCMAKE_C_COMPILER={c_compiler}",
+             f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
+         ]
++        sysroot = os.environ.get("SYSROOT")
++        if sysroot:
++            args += [
++                f"-DCMAKE_FIND_ROOT_PATH={sysroot}",
++                "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY",
++                "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY",
++                "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY",
++                # Interpreters/tools (python3, wayland-scanner, ...) must
++                # keep resolving from PATH, i.e. the host build machine -
++                # the sysroot's own /usr/bin/python3 is a target-arch ELF
++                # (e.g. aarch64 on an x86_64 build host) that CMake would
++                # otherwise happily pick and then fail to execute. This is
++                # NOT already CMake's default here: default PROGRAM mode
++                # is BOTH unless CMAKE_CROSSCOMPILING is TRUE, which it
++                # never is in this build (no CMAKE_SYSTEM_NAME/PROCESSOR
++                # is set anywhere in this script on Linux).
++                "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER",
++            ]
++        system_processor = os.environ.get("SYSTEM_PROCESSOR")
++        if system_processor:
++            # Without this, CMAKE_SYSTEM_PROCESSOR is whatever this script
++            # itself runs on (the build host), not the compiler's actual
++            # target - src/xenia/base/xe_target.cc's XE_TARGET_AARCH64 /
++            # XE_TARGET_X86_64 detection reads CMAKE_SYSTEM_PROCESSOR at
++            # configure time, so on an aarch64 target build this silently
++            # selects the x64/Xbyak CPU backend instead of a64/xbyak_aarch64
++            # - it configures fine and dies later, deep in backend/x64, on
++            # x86 inline asm an aarch64-targeting clang can't compile.
++            # Setting CMAKE_SYSTEM_NAME here is also what flips
++            # CMAKE_CROSSCOMPILING to TRUE, which is what makes
++            # FIND_ROOT_PATH_MODE_PROGRAM's real default NEVER instead of
++            # BOTH - the explicit NEVER above stays anyway, belt and
++            # braces.
++            args += [
++                "-DCMAKE_SYSTEM_NAME=Linux",
++                f"-DCMAKE_SYSTEM_PROCESSOR={system_processor}",
++            ]
+     if sys.platform == "darwin" and target_arch is not None:
+         # Apple clang is universal; CMAKE_OSX_ARCHITECTURES drives -arch.
+         # We don't set CMAKE_SYSTEM_PROCESSOR here — without
