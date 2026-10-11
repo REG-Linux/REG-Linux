@@ -7,11 +7,17 @@ config BR2_PACKAGE_IKEMEN
 	depends on BR2_PACKAGE_HAS_LIBGL
 	select BR2_PACKAGE_HOST_GO
 	select BR2_PACKAGE_LIBGTK3
-	select BR2_PACKAGE_OPENAL
-	select BR2_PACKAGE_LIBGLFW
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_LIBGL
 
 	help
-        A MUGEN emulator written in GoLang
+	  A MUGEN emulator written in GoLang
+
+	  Ikemen GO is an open source fighting game engine that supports
+	  resources from the MUGEN engine. It features rollback netcode,
+	  OpenGL 3.3 rendering, and SDL2-based input/audio handling.
+
+	  https://github.com/ikemen-engine/Ikemen-GO
 
 comment "ikemen needs a toolchain w/ threads"
 	depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
