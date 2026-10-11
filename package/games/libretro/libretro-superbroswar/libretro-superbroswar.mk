@@ -3,8 +3,8 @@
 # libretro-superbroswar - libretro port of Super Mario Wat
 #
 ################################################################################
-# Version.: Commits on Oct 21, 2024
-LIBRETRO_SUPERBROSWAR_VERSION = d8d5d58f3cbc1e08f91a0e218bc990ec47282c08
+# Version.: Commits on Sep 1, 2026
+LIBRETRO_SUPERBROSWAR_VERSION = 7f94e03163e1641ecd2a5703eb9ca7e1312b5e8d
 LIBRETRO_SUPERBROSWAR_SITE = https://github.com/libretro/superbroswar-libretro.git
 LIBRETRO_SUPERBROSWAR_SITE_METHOD = git
 LIBRETRO_SUPERBROSWAR_LICENSE = GPLv3
