@@ -1,0 +1,24 @@
+diff --git a/engine/common/bothdefs.h b/engine/common/bothdefs.h
+index 1111111..2222222 100644
+--- a/engine/common/bothdefs.h
++++ b/engine/common/bothdefs.h
+@@ -350,6 +350,19 @@
+ 	#endif
+ 	#define NO_OPENAL
+ #endif
++#ifdef FTE_GLES
++	//REG-Linux: generic Linux GLES-only build (see CMakeLists.txt --
++	//FTE_GLES is only defined when FIND_PACKAGE(OpenGL) found no desktop
++	//GL/GLX but GLES2/gl2.h was found instead). Same reasoning as the
++	//ANDROID block above: several desktop-GL-only codepaths are gated on
++	//"#ifndef GLESONLY" (e.g. gl_backend.c's GLBE_Init() querying
++	//GL_STENCIL via glGetFramebufferAttachmentParameteriv, a desktop-only
++	//enum absent from GLES2/gl2.h) and need it defined to be skipped.
++	//Unlike the ANDROID/WEB blocks, freetype/openal are still wanted and
++	//already handled by this package's own build options, so leave those
++	//alone.
++	#define GLESONLY
++#endif
+ #if (defined(_MSC_VER) && (_MSC_VER < 1500)) || defined(FTE_SDL)
+ 	#undef AVAIL_WASAPI	//wasapi is available in the vista sdk, while that's compatible with earlier versions, its not really expected until 2008
+ #endif

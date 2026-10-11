@@ -1,0 +1,20 @@
+config BR2_PACKAGE_FTEQW
+	bool "fteqw"
+	depends on BR2_PACKAGE_SDL3
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBVORBIS
+	help
+	  FTEQW is a heavily extended, actively maintained, multi-game
+	  idTech1-derived engine. It natively plays Quake and Hexen II
+	  (including their mission packs) using its own compiled-in game
+	  profiles, selected at launch with a flag such as -quake or
+	  -hexen2. It renders via SDL3, so it picks up whichever of GL,
+	  GLES, or Vulkan SDL3 itself was built with.
+
+	  Game data (.pak files) must be provided separately.
+
+	  https://github.com/fte-team/fteqw

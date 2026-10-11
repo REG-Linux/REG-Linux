@@ -1,0 +1,13 @@
+diff --git a/engine/common/config_fteqw.h b/engine/common/config_fteqw.h
+index 1111111..2222222 100644
+--- a/engine/common/config_fteqw.h
++++ b/engine/common/config_fteqw.h
+@@ -146,7 +146,7 @@
+ #define NQPROT					//act as an nq client/server, with nq gamecode.
+ #define HAVE_PACKET				//we can send unreliable messages!
+ #define HAVE_TCP				//we can create/accept TCP connections.
+-#define HAVE_GNUTLS				//on linux
++//#define HAVE_GNUTLS				//on linux -- REG-Linux: built with FTE_DEP_GNUTLS=OFF (no HTTPS/DTLS master-server features needed for local single-player use), but this file's HAVE_GNUTLS is a separate hardcoded switch the CMake option doesn't touch, so <gnutls/gnutls.h> was still included and failed to compile without it.
+ #define HAVE_WINSSPI			//on windows
+ #define FTPSERVER				//sv_ftp cvar.
+ #define WEBCLIENT				//uri_get+any internal downloads etc
