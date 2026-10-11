@@ -1,0 +1,11 @@
+--- a/src/audio/openal_soft_wrapper/build.rs
++++ b/src/audio/openal_soft_wrapper/build.rs
+@@ -57,7 +57,7 @@ fn main() {
+         // Some dependencies of OpenAL Soft.
+         if os.eq_ignore_ascii_case("linux") {
+             // OpenAL on Linux depends on sndio, needs to be dynamically linked
+-            println!("cargo:rustc-link-lib=dylib=sndio");
++            // println!("cargo:rustc-link-lib=dylib=sndio");
+         }
+         if os.eq_ignore_ascii_case("android") {
+             println!("cargo:rustc-link-lib=dylib=OpenSLES");
