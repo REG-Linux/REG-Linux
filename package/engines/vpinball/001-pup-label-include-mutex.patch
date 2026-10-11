@@ -1,0 +1,15 @@
+GCC 16 no longer pulls <mutex> in through other headers: PUPLabel.h
+uses std::mutex without including it.
+
+diff --git a/standalone/inc/pup/PUPLabel.h b/standalone/inc/pup/PUPLabel.h
+index 2da63dc..71c1c3f 100644
+--- a/standalone/inc/pup/PUPLabel.h
++++ b/standalone/inc/pup/PUPLabel.h
+@@ -2,6 +2,7 @@
+ 
+ #include <SDL2/SDL_ttf.h>
+ #include <SDL2/SDL_image.h>
++#include <mutex>
+ 
+ typedef enum
+ {
