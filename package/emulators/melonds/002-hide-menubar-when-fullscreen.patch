@@ -1,0 +1,33 @@
+Hide the menu bar whenever the window is fullscreen, not only when
+melonDS itself toggles it: on dual-screen handhelds the compositor
+fullscreens each window (top/bottom screen), and the second one kept its
+menu bar.
+
+--- a/src/frontend/qt_sdl/Window.h
++++ b/src/frontend/qt_sdl/Window.h
+@@ -147,6 +147,7 @@
+ protected:
+     void keyPressEvent(QKeyEvent* event) override;
+     void keyReleaseEvent(QKeyEvent* event) override;
++    void changeEvent(QEvent* event) override;
+ 
+     void dragEnterEvent(QDragEnterEvent* event) override;
+     void dropEvent(QDropEvent* event) override;
+--- a/src/frontend/qt_sdl/Window.cpp
++++ b/src/frontend/qt_sdl/Window.cpp
+@@ -2222,6 +2222,15 @@
+     }
+ }
+ 
++// The compositor can fullscreen a window too (e.g. each window of a
++// dual-screen handheld): hide the menu bar then, as toggleFullscreen() does.
++void MainWindow::changeEvent(QEvent* event)
++{
++    QMainWindow::changeEvent(event);
++    if (event->type() == QEvent::WindowStateChange && hasMenu)
++        menuBar()->setFixedHeight(isFullScreen() ? 0 : menuBar()->sizeHint().height());
++}
++
+ void MainWindow::onFullscreenToggled()
+ {
+     toggleFullscreen();
