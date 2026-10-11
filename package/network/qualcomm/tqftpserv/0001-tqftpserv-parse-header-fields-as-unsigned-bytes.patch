@@ -1,0 +1,76 @@
+From 5ac087c72b64c2c4c9a483546b96ad2ae5ed947d Mon Sep 17 00:00:00 2001
+From: Romain TISSERAND <romain@playdigious.com>
+Date: Sun, 4 Oct 2026 01:35:01 +0200
+Subject: [PATCH] tqftpserv: parse header fields as unsigned bytes
+
+The opcode, block and error fields were read from plain char buffers.
+Where char is signed (-fsigned-char, or architectures where it is the
+default), a byte of 0x80 or more is sign extended: an ACK for block 130
+reads as 65410. The reader then thinks rsize was reached and stops after
+the first 1 MiB, the client retries forever, and the modem's WLAN user
+PD never loads wlanmdsp.mbn ("User-PD grace timer expired for
+wlan_process").
+
+Cast the bytes to uint8_t before combining them.
+---
+ tqftpserv.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tqftpserv.c b/tqftpserv.c
+index 5231243..7efd3e4 100644
+--- a/tqftpserv.c
++++ b/tqftpserv.c
+@@ -761,10 +761,10 @@ static int handle_reader(struct tftp_client *client)
+ 		return -1;
+ 	}
+ 
+-	opcode = buf[0] << 8 | buf[1];
++	opcode = (uint8_t)buf[0] << 8 | (uint8_t)buf[1];
+ 	if (opcode == OP_ERROR) {
+ 		buf[len] = '\0';
+-		int err = buf[2] << 8 | buf[3];
++		int err = (uint8_t)buf[2] << 8 | (uint8_t)buf[3];
+ 		/* "End of Transfer" is not an error, used with stat(2)-like calls */
+ 		if (err == ERROR_END_OF_TRANSFER)
+ 			log_info("Reader received end of transfer from %d:%d\n", sq.sq_node, sq.sq_port);
+@@ -777,7 +777,7 @@ static int handle_reader(struct tftp_client *client)
+ 		return -1;
+ 	}
+ 
+-	last = buf[2] << 8 | buf[3];
++	last = (uint8_t)buf[2] << 8 | (uint8_t)buf[3];
+ 	log_debug("Got ack for %d from %d:%d\n", last, sq.sq_node, sq.sq_port);
+ 
+ 	/* We've sent enough data for rsize already */
+@@ -833,8 +833,8 @@ static int handle_writer(struct tftp_client *client)
+ 	    sq.sq_port != client->sq.sq_port)
+ 		return -1;
+ 
+-	opcode = buf[0] << 8 | buf[1];
+-	block = buf[2] << 8 | buf[3];
++	opcode = (uint8_t)buf[0] << 8 | (uint8_t)buf[1];
++	block = (uint8_t)buf[2] << 8 | (uint8_t)buf[3];
+ 	if (opcode != OP_DATA) {
+ 		log_err("Expected DATA opcode, got %d\n", opcode);
+ 		tftp_send_error(client->sock, TFTP_ERROR_EBADOP, "Expected DATA opcode");
+@@ -1031,7 +1031,7 @@ int main(int argc, char **argv)
+ 				if (len < 2)
+ 					continue;
+ 
+-				opcode = buf[0] << 8 | buf[1];
++				opcode = (uint8_t)buf[0] << 8 | (uint8_t)buf[1];
+ 				switch (opcode) {
+ 				case OP_RRQ:
+ 					handle_rrq(buf, len, &sq);
+@@ -1042,7 +1042,7 @@ int main(int argc, char **argv)
+ 				case OP_ERROR:
+ 					buf[len] = '\0';
+ 					log_err("received error %d from %d:%d: %s\n",
+-						buf[2] << 8 | buf[3], sq.sq_node, sq.sq_port, buf + 4);
++						(uint8_t)buf[2] << 8 | (uint8_t)buf[3], sq.sq_node, sq.sq_port, buf + 4);
+ 					break;
+ 				default:
+ 					log_err("unhandled op %d from %d:%d\n",
+-- 
+2.43.0
+
