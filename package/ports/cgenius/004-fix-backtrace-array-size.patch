@@ -1,0 +1,23 @@
+--- a/GsKit/base/interface/Debug.cpp
++++ b/GsKit/base/interface/Debug.cpp
+@@ -418,7 +418,9 @@
+ 
+ void DumpCallstackPrintf(void* callpnt) {
+ 	void *callstack[128];
+-	int framesC = backtrace(callstack, sizeof(callstack));    
++	// backtrace() counts entries, not bytes: sizeof() promised 512 slots for an
++	// array of 128 on a 32-bit target, so a deep stack writes past the end.
++	int framesC = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));    
+     gLogging.ftextOut("backtrace() returned %d addresses\n<br>", framesC);
+ 	if(callpnt != NULL && framesC > 3) callstack[3] = callpnt; // expected to be called from signal handler
+ 	char** strs = backtrace_symbols(callstack, framesC);
+@@ -433,7 +435,8 @@
+ 
+ void DumpCallstack(void (*PrintOutFct) (const std::string&)) {
+ 	void *callstack[128];
+-	int framesC = backtrace(callstack, sizeof(callstack));
++	// Entry count, not byte size -- see DumpCallstackPrintf() above.
++	int framesC = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+ 	(*PrintOutFct) ("DumpCallstack: " + itoa(framesC) + " addresses:");
+ 	char** strs = backtrace_symbols(callstack, framesC);
+ 	for(int i = 0; i < framesC; ++i) {

@@ -1,0 +1,11 @@
+--- a/GsKit/base/interface/Debug.cpp
++++ b/GsKit/base/interface/Debug.cpp
+@@ -398,7 +398,7 @@
+ 
+ #ifndef HAVE_EXECINFO
+ #	if defined(__linux__)
+-#		if defined(DINGOO) || defined(ANDROID) // Dingoo's toolchain does not support execinfo
++#		if defined(DINGOO) || defined(ANDROID) || !defined(__GLIBC__) // no execinfo on Dingoo's toolchain; musl's faults in getframeaddr() on ARM
+ #			define HAVE_EXECINFO 0
+ #		else
+ #			define HAVE_EXECINFO 1
