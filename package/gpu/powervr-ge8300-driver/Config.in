@@ -1,0 +1,32 @@
+comment "powervr-ge8300-driver needs a glibc toolchain"
+	depends on BR2_aarch64
+	depends on BR2_PACKAGE_SYSTEM_TARGET_A133
+	depends on !BR2_TOOLCHAIN_USES_GLIBC
+
+config BR2_PACKAGE_POWERVR_GE8300_DRIVER
+	bool "PowerVR GE8300 GPU driver"
+	depends on BR2_aarch64
+	depends on BR2_PACKAGE_SYSTEM_TARGET_A133
+	# Binary libs are glibc-linked
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	select BR2_PACKAGE_HAS_LIBEGL
+	select BR2_PACKAGE_HAS_LIBGLES
+
+	help
+	  Binary user-space driver for the PowerVR GE8300 GPU found in the
+	  Allwinner A133 SoC (TrimUI Smart Pro, TrimUI Brick, Powkiddy V20,
+	  Powkiddy V90S, MagicX Zero 28).
+
+	  This package requires a BSP kernel (4.9.x) with the powervrkm
+	  GPU kernel driver enabled. There is no mainline kernel support
+	  for this GPU.
+
+if BR2_PACKAGE_POWERVR_GE8300_DRIVER
+
+config BR2_PACKAGE_PROVIDES_LIBEGL
+	default "powervr-ge8300-driver"
+
+config BR2_PACKAGE_PROVIDES_LIBGLES
+	default "powervr-ge8300-driver"
+
+endif
