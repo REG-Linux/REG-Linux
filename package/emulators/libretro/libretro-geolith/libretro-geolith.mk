@@ -4,11 +4,13 @@
 # libretro-geolith
 #
 ################################################################################
-# Version: Commits on Dec 14, 2025
-LIBRETRO_GEOLITH_VERSION = a137836711bbbd6e279310dc6e91bedc03904016
+# Version: Commits on Aug 29, 2026
+LIBRETRO_GEOLITH_VERSION = 57622ca5aee387867637d51ec553e0d745f6f210
 LIBRETRO_GEOLITH_SITE = https://github.com/libretro/geolith-libretro.git
 LIBRETRO_GEOLITH_SITE_METHOD = git
 LIBRETRO_GEOLITH_LICENSE = BSD
+
+LIBRETRO_GEOLITH_DEPENDENCIES = zlib zstd
 
 LIBRETRO_GEOLITH_PLATFORM = $(LIBRETRO_PLATFORM)
 
@@ -29,7 +31,8 @@ endif
 define LIBRETRO_GEOLITH_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/libretro \
 	    -f Makefile platform="$(LIBRETRO_GEOLITH_PLATFORM)" \
-#        GIT_VERSION="-$(shell echo $(LIBRETRO_GEOLITH_VERSION) | cut -c 1-7)"
+	    EXTRA_INCLUDES="-DHAVE_ZLIB -DHAVE_7ZIP -DHAVE_DR_FLAC -DHAVE_FLAC -DHAVE_ZSTD -DHAVE_CHDR" \
+	    LIBS="-lm -lz -lzstd"
 endef
 
 define LIBRETRO_GEOLITH_INSTALL_TARGET_CMDS
