@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBGME
+	bool "libgme"
+	help
+	  Game Music Emu is a library to play console-style music files
+	  (NSF, GBS, SPC, VGM, GYM, AY, HES, SAP, KSS, NSFE).
+
+	  https://bitbucket.org/mpyne/game-music-emu
