@@ -1,0 +1,35 @@
+config BR2_PACKAGE_REGLINUX_NVIDIA
+    bool "reglinux-nvidia"
+
+    select BR2_PACKAGE_XWAYLAND
+
+    # drivers
+    select BR2_PACKAGE_NVIDIA_OPEN_DRIVER      # the latest driver
+    select BR2_PACKAGE_NVIDIA580_LEGACY_DRIVER # the legacy 580.xx driver
+    select BR2_PACKAGE_NVIDIA470_LEGACY_DRIVER # the legacy 470.xx driver
+
+    # kernel modules
+    select BR2_PACKAGE_NVIDIA_OPEN_DRIVER_MODULE
+    select BR2_PACKAGE_NVIDIA580_LEGACY_DRIVER_MODULE
+    select BR2_PACKAGE_NVIDIA470_LEGACY_DRIVER_MODULE
+
+    # cuda
+    select BR2_PACKAGE_NVIDIA_OPEN_DRIVER_CUDA
+
+    help
+      This package a switch between the different nvidia drivers
+
+config BR2_PACKAGE_REGLINUX_NVIDIA_32BIT
+    bool "32-bit (i386) driver libraries"
+    depends on BR2_PACKAGE_REGLINUX_NVIDIA
+    default n
+    help
+      Install the 32-bit NVIDIA userspace libraries into /lib32, for
+      every driver branch, along with the matching i686 Vulkan ICDs.
+
+      Say 'n' unless something on the image can actually execute 32-bit
+      code. A pure 64-bit REG-Linux target has no /lib/ld-linux.so.2 and
+      no 32-bit glibc, so these libraries can never be loaded - they only
+      exist to support a 32-bit runtime such as Wine, which is packaged
+      separately by board/scripts/doWinepackage.sh. Enabling this adds
+      roughly 450MB of uncompressed libraries to the image.
