@@ -1,0 +1,7 @@
+config BR2_PACKAGE_NSYNC
+	bool "nsync"
+
+	help
+	  Google nsync library
+
+	  https://github.com/google/nsync
