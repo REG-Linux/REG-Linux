@@ -1,4 +1,5 @@
 config BR2_PACKAGE_REGLINUX_RESCUE
-        bool "reglinux-rescue"
-        help
-          minimal rootfs for rescue/update mode
+	bool "reglinux-rescue"
+	depends on BR2_aarch64 || BR2_arm || BR2_riscv || BR2_mipsel || BR2_x86_64
+	help
+	  minimal rootfs for rescue/update mode
