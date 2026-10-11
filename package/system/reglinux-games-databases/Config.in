@@ -1,0 +1,19 @@
+config BR2_PACKAGE_REGLINUX_GAMES_DATABASES
+	bool "REG-Linux games databases"
+	help
+	  Downloads the Redump.org, GameTDB and MAME offline databases,
+	  gzipped, into /usr/share/reglinux/datainit/bios/databases
+	  (unpacked to /userdata/bios/databases on first boot).
+
+	  Redump.org/GameTDB (databases/) let regmsgd's scraper resolve an
+	  optical disc's printed serial number straight to its known
+	  checksum, without having to hash the whole disc image. MAME's own
+	  "-listxml" release (mame/, stripped down to just name/year/
+	  manufacturer/rotation/players) lets regmsgd's arcade library
+	  resolve exact screen-rotation and metadata for the whole MAME/
+	  FBNeo/Naomi/Atomiswave family, even on targets with no real mame
+	  binary of their own.
+
+	  https://redump.org
+	  https://www.gametdb.com
+	  https://www.mamedev.org
