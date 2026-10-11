@@ -1,8 +1,5 @@
-# VCMI (Heroes of Might and Magic 3 engine)
+# VCMI
 
-Open-source reimplementation of Heroes of Might and Magic 3.
+Heroes of Might and Magic 3 engine reimplementation. Upstream: https://github.com/vcmi/vcmi
 
-## Build notes
-- **Version:** 1.6.8 (Jan 2025) built from `vcmi/vcmi` with Git submodules.
-- **Config:** selects SDL2, SDL2_image/mixer/ttf, FFmpeg, minizip, TBB, and a broad Boost set; musl adds `libexecinfo`. Qt6 and REG-Linux Qt bindings are optional for the launcher/editor.
-- **Build system:** CMake release build with Ninja, static libraries, and toggles for launcher/translations (Qt6 only). The install path is `/usr/vcmi/`.
+Uses Ninja. Installs to `/usr/vcmi/` with `-DENABLE_MONOLITHIC_INSTALL=ON`. The launcher and translations require Qt6; without it, the server is also disabled. Adds `libexecinfo` on musl. MMAI is disabled pending onnxruntime support.
