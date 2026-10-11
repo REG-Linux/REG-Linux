@@ -1,7 +1,7 @@
 config BR2_PACKAGE_XEMU
     bool "xemu"
     depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8
-    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_SDL3
     select BR2_PACKAGE_LIBSAMPLERATE
     select BR2_PACKAGE_SLIRP
     select BR2_PACKAGE_PYTHON_PYYAML
