@@ -1,0 +1,16 @@
+config BR2_PACKAGE_SRB2
+	bool "srb2"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBCURL
+	help
+	  Sonic Robo Blast 2 is a 3D Sonic the Hedgehog fan game
+	  built on the Doom Legacy engine. Full campaigns,
+	  multiplayer, completely free.
+
+	  https://github.com/STJr/SRB2
