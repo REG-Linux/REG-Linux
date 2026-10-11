@@ -1,0 +1,12 @@
+config BR2_PACKAGE_OPENFODDER
+	bool "openfodder"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	help
+	  OpenFodder is a reimplementation of Cannon Fodder.
+	  Includes shareware campaign data. Full campaigns
+	  require original Amiga/DOS/CD32 game data.
+
+	  https://github.com/OpenFodder/openfodder
