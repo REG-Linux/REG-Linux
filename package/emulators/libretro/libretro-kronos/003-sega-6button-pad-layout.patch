@@ -1,0 +1,96 @@
+Use the Sega 6-button pad layout for the Saturn Control Pad.
+
+The Saturn pad is two rows of three: A B C on the bottom, X Y Z above.
+The primary row belongs across the face buttons of a modern pad and the
+secondary row on top:
+
+    Saturn        RetroPad
+    X  Y  Z       L   X   R
+    A  B  C       Y   B   A
+
+This is the layout Genesis Plus GX uses for the Mega Drive 6-button pad,
+which is the same physical arrangement, and it is what REG-Linux applies
+across every Saturn backend (lr-yabasanshiro, lr-beetle-saturn and the
+mednafen "ss" module) so the buttons do not move when you switch
+emulator.
+
+The stock mapping put A/B on the B/A diamond and left C on a shoulder,
+splitting the primary row.
+
+The ST-V JAMMA key configs (stv_key_config / stv6b_key_config) keep the
+arcade layout and are deliberately untouched.
+
+--- a/yabause/src/libretro/libretro.c
++++ b/yabause/src/libretro/libretro.c
+@@ -432,32 +432,42 @@
+                else
+                   PerKeyUp((i << 8) + PERPAD_RIGHT);
+ 
+-               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y))
+-                  PerKeyDown((i << 8) + PERPAD_X);
+-               else
+-                  PerKeyUp((i << 8) + PERPAD_X);
++               /* Sega 6-button layout: the Saturn's primary row A B C sits
++                  across the face buttons and the secondary row X Y Z on top,
++                  matching Genesis Plus GX's Mega Drive 6-button pad.
++
++                     Saturn        RetroPad
++                     X  Y  Z       L   X   R
++                     A  B  C       Y   B   A
+ 
+-               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B))
++                  (The ST-V JAMMA configs above keep the arcade layout.) */
++
++               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y))
+                   PerKeyDown((i << 8) + PERPAD_A);
+                else
+                   PerKeyUp((i << 8) + PERPAD_A);
+ 
+-               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A))
++               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B))
+                   PerKeyDown((i << 8) + PERPAD_B);
+                else
+                   PerKeyUp((i << 8) + PERPAD_B);
+ 
++               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A))
++                  PerKeyDown((i << 8) + PERPAD_C);
++               else
++                  PerKeyUp((i << 8) + PERPAD_C);
++
++               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L))
++                  PerKeyDown((i << 8) + PERPAD_X);
++               else
++                  PerKeyUp((i << 8) + PERPAD_X);
++
+                if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X))
+                   PerKeyDown((i << 8) + PERPAD_Y);
+                else
+                   PerKeyUp((i << 8) + PERPAD_Y);
+ 
+                if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R))
+-                  PerKeyDown((i << 8) + PERPAD_C);
+-               else
+-                  PerKeyUp((i << 8) + PERPAD_C);
+-
+-               if (input_state_cb_wrapper(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L))
+                   PerKeyDown((i << 8) + PERPAD_Z);
+                else
+                   PerKeyUp((i << 8) + PERPAD_Z);
+@@ -1096,12 +1106,12 @@
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" };
+-         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" };
+-         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "B" };
+-         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "C" };
+-         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "X" };
++         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" };
++         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "C" };
++         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "Z" };
++         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "A" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Y" };
+-         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "Z" };
++         input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "X" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "L" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "R" };
+          input_descriptors[j++] = (struct retro_input_descriptor){ i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" };

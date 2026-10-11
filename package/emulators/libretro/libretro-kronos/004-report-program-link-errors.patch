@@ -1,0 +1,171 @@
+Report program link errors with glGetProgramInfoLog.
+
+Ygl_printShaderError() / YglCommon_printShaderError() take a shader, but
+every link-failure path passed a *program* object.  glGetShaderiv() and
+glGetShaderInfoLog() on a program raise GL_INVALID_OPERATION and write
+nothing, so bufSize was read uninitialised and the info log was never
+retrieved -- a failed link printed an empty "Shaderlog:" or, depending on
+what happened to be on the stack, nothing at all.
+
+On RP5 (sm8250, Mesa 26.2 freedreno/a6xx) a VDP2 blit compute program fails
+to link and the core aborts with only "Error init prog 1094" to go on; the
+driver's explanation was being thrown away by this bug.  Add a program
+variant using glGetProgramiv/glGetProgramInfoLog and route the nine
+GL_LINK_STATUS failure sites to it (2 in common_glshader.c, 7 in
+ogl_shader.c).  bufSize is initialised in the shader variant too -- the same
+uninitialised read was reachable there via any GL error.
+
+Diagnostic only: it does not fix the link failure, it makes the driver say
+what the failure is.
+
+--- a/yabause/src/core/video/opengl/common/src/common_glshader.c
++++ b/yabause/src/core/video/opengl/common/src/common_glshader.c
+@@ -1828,9 +1828,31 @@
+   }
+ }
+ 
++/* Programs are not shaders: glGetShaderiv()/glGetShaderInfoLog() on a program
++   object raise GL_INVALID_OPERATION and write nothing, leaving bufSize with
++   whatever was on the stack. The link-failure paths below used to call the
++   shader version with a program, so a failed link printed an empty "Shaderlog:"
++   or nothing at all -- which is exactly what hid the compute-shader link error
++   behind "Error init prog 1094" on Mesa/freedreno. */
++static void YglCommon_printProgramError( GLuint program )
++{
++  GLsizei bufSize = 0;
++
++  glGetProgramiv(program, GL_INFO_LOG_LENGTH , &bufSize);
++  if (bufSize > 1) {
++    GLchar *infoLog = (GLchar *)malloc(bufSize);
++    if (infoLog != NULL) {
++      GLsizei length;
++      glGetProgramInfoLog(program, bufSize, &length, infoLog);
++      YuiMsg("Programlog:\n%s\n", infoLog);
++      free(infoLog);
++    }
++  }
++}
++
+ static void YglCommon_printShaderError( GLuint shader )
+ {
+-  GLsizei bufSize;
++  GLsizei bufSize = 0;
+ 
+   glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &bufSize);
+   if (bufSize > 1) {
+@@ -1884,7 +1906,7 @@
+     glGetProgramiv(_prgid[id], GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+        YGLLOG("Link error..\n");
+-       YglCommon_printShaderError(_prgid[id]);
++       YglCommon_printProgramError(_prgid[id]);
+        _prgid[id] = 0;
+        return -1;
+     }
+@@ -1959,7 +1981,7 @@
+   glGetProgramiv(_prgid[id], GL_LINK_STATUS, &status);
+   if (status == GL_FALSE) {
+     YGLLOG("Link error..\n");
+-    YglCommon_printShaderError(_prgid[id]);
++    YglCommon_printProgramError(_prgid[id]);
+     _prgid[id] = 0;
+     return -1;
+   }
+--- a/yabause/src/core/video/opengl/common/src/ogl_shader.c
++++ b/yabause/src/core/video/opengl/common/src/ogl_shader.c
+@@ -47,9 +47,31 @@
+ static YglVdp1CommonParam _ids[PG_MAX] = { 0 };
+ extern void vdp1_compute_reset(void);
+ 
++/* Programs are not shaders: glGetShaderiv()/glGetShaderInfoLog() on a program
++   object raise GL_INVALID_OPERATION and write nothing, leaving bufSize with
++   whatever was on the stack. The link-failure paths below used to call the
++   shader version with a program, so a failed link printed an empty "Shaderlog:"
++   or nothing at all -- which is exactly what hid the compute-shader link error
++   behind "Error init prog 1094" on Mesa/freedreno. */
++static void Ygl_printProgramError( GLuint program )
++{
++  GLsizei bufSize = 0;
++
++  glGetProgramiv(program, GL_INFO_LOG_LENGTH , &bufSize);
++  if (bufSize > 1) {
++    GLchar *infoLog = (GLchar *)malloc(bufSize);
++    if (infoLog != NULL) {
++      GLsizei length;
++      glGetProgramInfoLog(program, bufSize, &length, infoLog);
++      YuiMsg("Programlog:\n%s\n", infoLog);
++      free(infoLog);
++    }
++  }
++}
++
+ static void Ygl_printShaderError( GLuint shader )
+ {
+-  GLsizei bufSize;
++  GLsizei bufSize = 0;
+ 
+   glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &bufSize);
+ 
+@@ -993,7 +1015,7 @@
+     glGetProgramiv(clear_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(clear_prg);
++      Ygl_printProgramError(clear_prg);
+       clear_prg = -1;
+       return -1;
+     }
+@@ -1112,7 +1134,7 @@
+     glGetProgramiv(fill_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(fill_prg);
++      Ygl_printProgramError(fill_prg);
+       fill_prg = -1;
+       return -1;
+     }
+@@ -1502,7 +1524,7 @@
+     glGetProgramiv(winprio_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(winprio_prg);
++      Ygl_printProgramError(winprio_prg);
+       winprio_prg = -1;
+       abort();
+     }
+@@ -1672,7 +1694,7 @@
+     glGetProgramiv(vdp1_write_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(vdp1_write_prg);
++      Ygl_printProgramError(vdp1_write_prg);
+       vdp1_write_prg = -1;
+       abort();
+     }
+@@ -1720,7 +1742,7 @@
+     glGetProgramiv(vdp1_read_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(vdp1_read_prg);
++      Ygl_printProgramError(vdp1_read_prg);
+       vdp1_read_prg = -1;
+       abort();
+     }
+@@ -2065,7 +2087,7 @@
+     glGetProgramiv(blit_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+ 		YuiMsg("Link error..\n");
+-      Ygl_printShaderError(blit_prg);
++      Ygl_printProgramError(blit_prg);
+       blit_prg = -1;
+ 	  return -1;
+     }
+@@ -2246,7 +2268,7 @@
+     glGetProgramiv(mosaic_prg, GL_LINK_STATUS, &linked);
+     if (linked == GL_FALSE) {
+       YGLLOG("Link error..\n");
+-      Ygl_printShaderError(mosaic_prg);
++      Ygl_printProgramError(mosaic_prg);
+       mosaic_prg = -1;
+       return -1;
+     }

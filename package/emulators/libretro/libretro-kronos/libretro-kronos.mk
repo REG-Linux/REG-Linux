@@ -10,7 +10,9 @@ LIBRETRO_KRONOS_LICENSE = BSD-3-Clause
 
 LIBRETRO_KRONOS_PLATFORM = $(LIBRETRO_PLATFORM)
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# OpenGL backend — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL rather than HAS_LIBGL (polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_KRONOS_DEPENDENCIES += libgl
 else ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 LIBRETRO_KRONOS_DEPENDENCIES += libgles
