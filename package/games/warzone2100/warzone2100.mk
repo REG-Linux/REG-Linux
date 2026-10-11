@@ -3,12 +3,12 @@
 # Warzone 2100
 #
 ################################################################################
-# Version.: Release 4.6.1 on Sep 16, 2025
-WARZONE2100_VERSION = 4.6.1
+# Version.: Release 4.7.0 on Apr 10, 2026
+WARZONE2100_VERSION = 4.7.0
 WARZONE2100_SOURCE = warzone2100_src.tar.xz
 WARZONE2100_SITE = https://github.com/Warzone2100/warzone2100/releases/download/$(WARZONE2100_VERSION)
 
-WARZONE2100_DEPENDENCIES =  sdl2 libsodium sqlite protobuf
+WARZONE2100_DEPENDENCIES =  sdl3 libsodium sqlite protobuf host-zip
 WARZONE2100_DEPENDENCIES += libzip physfs openal libtheora libcurl
 
 WARZONE2100_LICENSE = GPL-2.0
