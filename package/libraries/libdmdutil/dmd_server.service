@@ -9,14 +9,14 @@ start() {
 	# add hooks
         for EVT in ${EVENTS}
         do
-            mkdir -p /var/run/emulationstation/scripts/${EVT} || exit 1
-            ln -sf /usr/share/dmd-simulator/scripts/${EVT}.sh /var/run/emulationstation/scripts/${EVT}/dmd-server.sh || exit 1
+            mkdir -p /var/run/regstation/scripts/${EVT} || exit 1
+            ln -sf /usr/share/dmd-simulator/scripts/${EVT}.sh /var/run/regstation/scripts/${EVT}/dmd-server.sh || exit 1
         done
 
         ARGS=
-        DMDZEDMDMATRIX=$(/usr/bin/system-settings-get dmd.zedmd.matrix)
+        DMDZEDMDMATRIX=$(/usr/bin/regmsg systemconf getconfigkey dmd.zedmd.matrix)
         test -z "${DMDZEDMDMATRIX}" && DMDZEDMDMATRIX=auto
-        DMDZEDMDBRIGHTNESS=$(/usr/bin/system-settings-get dmd.zedmd.brightness)
+        DMDZEDMDBRIGHTNESS=$(/usr/bin/regmsg systemconf getconfigkey dmd.zedmd.brightness)
         test -z "${DMDZEDMDBRIGHTNESS}" && DMDZEDMDBRIGHTNESS=-1
         dmdserver-config --zedmd-matrix "${DMDZEDMDMATRIX}" --zedmd-brightness "${DMDZEDMDBRIGHTNESS}" || return 1 # configure the dmd server
         test -e /userdata/system/configs/dmdserver/config.ini && ARGS="-c /userdata/system/configs/dmdserver/config.ini"
@@ -36,12 +36,12 @@ stop() {
         # remove hooks
         for EVT in ${EVENTS}
         do
-            unlink /var/run/emulationstation/scripts/${EVT}/dmd-server.sh
+            unlink /var/run/regstation/scripts/${EVT}/dmd-server.sh
         done
 
         start-stop-daemon -K -q -p $PIDFILE
 	RETVAL=$?
-	
+
         echo "done"
         return $RETVAL
 }
@@ -65,9 +65,9 @@ case "$1" in
 	status)
                 status
                 ;;
-        *)
-                echo "Usage: $0 {start|stop}"
-                exit 1
+	enable|enabled|disable|disabled) ;;
+	*)
+		printf '%s\n' "Usage: $0 {start|stop|restart|enable|disable|status}" >&2
+		exit 1
+		;;
 esac
-
-exit $?
