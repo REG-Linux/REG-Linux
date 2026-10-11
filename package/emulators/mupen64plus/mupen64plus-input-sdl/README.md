@@ -1,9 +1,45 @@
-# Mupen64Plus input SDL
+# mupen64plus-input-sdl
 
-The `mupen64plus-input-sdl` plugin provides SDL2-backed controller support to REG-Linux’s Mupen64Plus builds.
+Input plugin for Mupen64Plus using SDL. Upstream: https://github.com/mupen64plus/mupen64plus-input-sdl
 
-## Build notes
+## Build Configuration
 
-- `Version`: 2.6.0
-- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`
-- `Build helper`: Generic/Makefile (`generic-package`)
+This package uses the Buildroot generic-package infrastructure with custom build commands.
+It requires `mupen64plus-core` to be built first.
+
+## Dependencies
+
+### Required
+
+- `sdl2` - Input handling through SDL
+- `alsa-lib` - Required dependency (inherited from core)
+- `mupen64plus-core` - Core emulator library
+
+## Input Support
+
+This plugin provides:
+
+- Gamepad/controller support through SDL
+- Keyboard input mapping
+- Analog stick emulation
+- Rumble feedback support
+
+## Installation
+
+The plugin is installed to:
+
+- `/usr/lib/mupen64plus/mupen64plus-input-sdl.so`
+
+## Configuration
+
+Input settings are configured in `/usr/share/mupen64plus/InputAutoCfg.ini`:
+
+- Controller mappings
+- Button configurations
+- Axis mappings
+
+## Notes
+
+- This plugin is derived from the original Mupen64 blight_input plugin
+- Uses SDL2 for cross-platform input handling
+- Supports multiple controllers simultaneously
