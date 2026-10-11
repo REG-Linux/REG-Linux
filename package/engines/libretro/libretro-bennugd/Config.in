@@ -1,0 +1,9 @@
+config BR2_PACKAGE_LIBRETRO_BENNUGD
+	bool "libretro-bennugd"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  BennuGD libretro core. Runs BennuGD games (.dcb/.dat
+	  bytecode) through RetroArch. Used for Streets of Rage
+	  Remake and other BennuGD games.
+
+	  https://github.com/diekleinekuh/BennuGD_libretro
