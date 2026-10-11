@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBPORTMIDI_VERSION = v2.0.4
+LIBPORTMIDI_VERSION = v2.0.7
 LIBPORTMIDI_SITE = $(call github,PortMidi,portmidi,$(LIBPORTMIDI_VERSION))
 LIBPORTMIDI_LICENSE = PortMidi
 LIBPORTMIDI_LICENSE_FILES = license.txt
