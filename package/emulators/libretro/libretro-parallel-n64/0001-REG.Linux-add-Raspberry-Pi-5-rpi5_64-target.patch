@@ -1,0 +1,35 @@
+From 65cbddefcb3fea54f7d76ccc0e12d0b6b52105c3 Mon Sep 17 00:00:00 2001
+From: REG-Linux <cjom@reglinux.org>
+Date: Tue, 29 Sep 2026 17:04:03 +0100
+Subject: [PATCH 1/2] REG.Linux: add Raspberry Pi 5 (rpi5_64) target
+
+Without it rpi5_64 matches the generic rpi case and falls through to
+the ARMv5 fallback; build it like rpi4_64 (aarch64 dynarec, Vulkan
+only).
+---
+ Makefile | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 63084d3d..ce1eaea8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -166,6 +166,15 @@ ifneq (,$(findstring unix,$(platform)))
+          HAVE_NEON = 0
+          HAVE_OPENGL = 0
+          GLES = 0
++      # Raspberry pi 5 in 64bit mode with VULKAN
++      else ifneq (,$(findstring rpi5_64,$(platform)))
++         CPUFLAGS += -DNO_ASM -DARM -DARM_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
++         CPUFLAGS += -march=armv8.2-a+fp16+simd -mcpu=cortex-a76 -mtune=cortex-a76
++         HAVE_PARALLEL = 1
++         WITH_DYNAREC = aarch64
++         HAVE_NEON = 0
++         HAVE_OPENGL = 0
++         GLES = 0
+       else
+          CPUFLAGS += -DARMv5_ONLY -DNO_ASM
+       endif
+-- 
+2.53.0
+
