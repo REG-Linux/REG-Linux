@@ -6,7 +6,12 @@
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 IMG_GPU_POWERVR_VERSION = k1-bl-v2.2-release
-IMG_GPU_POWERVR_SITE = https://gitee.com/bianbu-linux/img-gpu-powervr.git
+IMG_GPU_POWERVR_SITE = https://github.com/spacemit-com/img-gpu-powervr.git
+IMG_GPU_POWERVR_SITE_METHOD = git
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K3),y)
+# K3 PowerVR BXM4-64-MC1, DDK 24.2 (firmware BVNC 36.56.104.183)
+IMG_GPU_POWERVR_VERSION = k3-br-v1.0.y
+IMG_GPU_POWERVR_SITE = https://github.com/spacemit-com/img-gpu-powervr.git
 IMG_GPU_POWERVR_SITE_METHOD = git
 else
 IMG_GPU_POWERVR_VERSION = 1.19
