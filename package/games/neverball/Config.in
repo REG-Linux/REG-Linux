@@ -1,0 +1,16 @@
+config BR2_PACKAGE_NEVERBALL
+	bool "neverball"
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_JPEG
+	help
+	  Neverball is a tilt-the-floor ball puzzle game.
+	  Includes Neverputt (mini-golf). Fully free, all
+	  game data included.
+
+	  https://github.com/Neverball/neverball
