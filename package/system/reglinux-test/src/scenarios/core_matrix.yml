@@ -1,0 +1,57 @@
+id: core_matrix
+description: Per-system, per-backend matrix run. Compares regmsgd path vs libra.
+requires_display: any
+
+matrix:
+  system: [megadrive, snes, nes, psx, gba]
+  backend: [regmsgd, libra]
+
+steps:
+  # Resolve to know which core regmsgd would pick — used by both paths.
+  - ipc: launcher_resolve
+    args: ["{system}"]
+    capture: resolved
+    fail_codes: [no_emulator]
+
+  - run: |
+      cfg=/usr/share/regstation/rs_systems.cfg
+      python3 -c "
+      import xml.etree.ElementTree as ET
+      t = ET.parse('$cfg').getroot()
+      for s in t.findall('system'):
+          if (s.findtext('name') or '') == '{system}':
+              p, exts = s.findtext('path') or '', (s.findtext('extension') or '').split()
+              import os
+              for r,_,fs in os.walk(p):
+                  for f in fs:
+                      if any(f.endswith(e) for e in exts):
+                          print(os.path.join(r,f)); raise SystemExit
+              raise SystemExit(1)
+      raise SystemExit(1)"
+    capture: rom_pick
+    expect_rc: 0
+    allow_fail: true
+    timeout: 60
+
+  # ---- regmsgd path ----
+  - ipc: launcher_launch
+    args: ["{system}", "{rom_pick}"]
+    capture: launch
+    only_if_backend_var: [regmsgd]
+    fail_codes: [no_emulator, spawn_failed]
+
+  - sleep: "{time_per_game}"
+
+  - probe: screenshot
+    save: "{case_dir}/{system}-{backend}.png"
+
+  - ipc: launcher_stop
+    args: ["{launch.pid}"]
+
+  # ---- libra path ----
+  - libra:
+      core: "{resolved.core}"
+      rom: "{rom_pick}"
+      frames: 600
+
+  - probe: no_orphan_emulator

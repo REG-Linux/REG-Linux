@@ -1,0 +1,9 @@
+id: fuzz_rom
+description: Smoke fuzzer launched from scenario harness (small budget).
+            Use `reglinux-test fuzz rom --time N` for real campaigns.
+requires_display: any
+
+steps:
+  - run: reglinux-test fuzz rom --time 30 --out {run_dir}
+    timeout: 60
+    allow_fail: true

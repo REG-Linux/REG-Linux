@@ -1,0 +1,68 @@
+id: launcher_smoke
+description: Auto-pick one game per system, launch via regmsgd, screenshot, stop.
+requires_display: any
+
+defaults:
+  pick_script: |
+    set -e
+    sys="{system}"
+    cfg=/userdata/system/configuration/regstation/rs_systems.cfg
+    [ -f "$cfg" ] || cfg=/usr/share/regstation/rs_systems.cfg
+    path="$(python3 -c "
+    import xml.etree.ElementTree as ET, sys
+    t = ET.parse('$cfg').getroot()
+    for s in t.findall('system'):
+        if (s.findtext('name') or '') == '$sys':
+            print(s.findtext('path') or '')
+            sys.exit(0)
+    sys.exit(1)
+    ")" || { echo "system $sys not in cfg" >&2; exit 1; }
+    exts="$(python3 -c "
+    import xml.etree.ElementTree as ET
+    t = ET.parse('$cfg').getroot()
+    for s in t.findall('system'):
+        if (s.findtext('name') or '') == '$sys':
+            print(s.findtext('extension') or '')
+    ")"
+    for ext in $exts; do
+        found=$(find "$path" -maxdepth 4 -type f -name "*$ext" 2>/dev/null | head -1)
+        [ -n "$found" ] && { echo "$found"; exit 0; }
+    done
+    echo "no rom for $sys" >&2; exit 1
+
+systems:
+  - megadrive
+  - snes
+  - nes
+  - psx
+
+steps:
+  - run: "{pick_script}"
+    capture: rom_pick
+    expect_rc: 0
+    allow_fail: true
+    timeout: 30
+
+  - ipc: launcher_launch
+    args: ["{system}", "{rom_pick}"]
+    capture: launch
+    fail_codes: [no_emulator, spawn_failed]
+
+  - sleep: "{time_per_game}"
+
+  - ipc: launcher_status
+    args: ["{launch.pid}"]
+    capture: status
+
+  - probe: screenshot
+    save: "{case_dir}/{system}.png"
+
+  - ipc: launcher_stop
+    args: ["{launch.pid}"]
+
+  - sleep: 2
+  - probe: no_orphan_emulator
+
+cleanup:
+  - frontend: emukill
+    allow_fail: true

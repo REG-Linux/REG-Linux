@@ -1,0 +1,57 @@
+id: display_matrix
+description: Sweep rotation + resolution; assert mode applied + non-black frame.
+requires_display: any
+
+matrix:
+  rotation: [0, 90, 180, 270]
+  resolution: ["auto"]
+  system: [megadrive]
+
+defaults:
+  rom: ""
+
+steps:
+  - run: regmsg systemconf setconfigkey /userdata/system/system.conf display.rotate {rotation}
+  - run: regmsg screen setmode {resolution}
+    allow_fail: true
+
+  - run: |
+      cfg=/usr/share/regstation/rs_systems.cfg
+      python3 -c "
+      import xml.etree.ElementTree as ET, os, sys
+      t = ET.parse('$cfg').getroot()
+      for s in t.findall('system'):
+          if (s.findtext('name') or '') == '{system}':
+              p = s.findtext('path') or ''
+              exts = (s.findtext('extension') or '').split()
+              for r,_,fs in os.walk(p):
+                  for f in fs:
+                      if any(f.endswith(e) for e in exts):
+                          print(os.path.join(r,f)); raise SystemExit
+              sys.exit(1)
+      sys.exit(1)"
+    capture: rom_pick
+    allow_fail: true
+    timeout: 60
+
+  - ipc: launcher_launch
+    args: ["{system}", "{rom_pick}"]
+    capture: launch
+    fail_codes: [no_emulator, spawn_failed]
+
+  - sleep: 8
+  - probe: screenshot
+    save: "{case_dir}/{system}-r{rotation}-m{resolution}.png"
+  - probe: assert_not_black
+    path: "{case_dir}/{system}-r{rotation}-m{resolution}.png"
+
+  - ipc: launcher_stop
+    args: ["{launch.pid}"]
+
+cleanup:
+  - run: regmsg systemconf setconfigkey /userdata/system/system.conf display.rotate 0
+    allow_fail: true
+  - run: regmsg screen setmode auto
+    allow_fail: true
+  - frontend: emukill
+    allow_fail: true
