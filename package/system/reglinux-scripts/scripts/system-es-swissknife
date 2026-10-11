@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script for REG-Linux to terminate every emulator instance
-# or to give feedback about state of EmulationStation and active EMULATORS
+# or to give feedback about state of REG-Station and active EMULATORS
 # or to give some basic info about your build
 
 # Logging function
@@ -75,14 +75,19 @@ function smart_wait() {
 }
 
 # Emulator currently running?
+# regmsgd spawns and owns the emulator process, so ask it rather than pattern-
+# matching a process name (the old `pgrep -f emulatorlauncher` died with
+# configgen). `launcher status` reports the pid it launched, 0 when idle.
 function check_emurun() {
-    local RC_PID="$(pgrep -f -n emulatorlauncher)"
-    echo $RC_PID
+    local RC_PID="$(/usr/bin/regmsg launcher status 2>/dev/null |
+                        sed -n 's/.*"pid"[[:space:]]*:[[:space:]]*\([0-9]\+\).*/\1/p' |
+                        head -n1)"
+    echo ${RC_PID:-0}
 }
 
-# Emulationstation currently running?
+# Regstation currently running?
 function check_esrun() {
-    local ES_PID="$(pgrep -f -n emulationstation)"
+    local ES_PID="$(pgrep -f -n regstation)"
     echo $ES_PID
 }
 
@@ -147,10 +152,10 @@ check_privileges "$1"
 case ${1,,} in
     --restart)
         ES_PID=$(check_esrun)
-        verify_service_script "/etc/init.d/S31emulationstation"
-        /etc/init.d/S31emulationstation stop
+        verify_service_script "/etc/init.d/S31regstation"
+        /etc/init.d/S31regstation stop
         [[ -z $ES_PID ]] || smart_wait 0 $ES_PID
-        /etc/init.d/S31emulationstation start
+        /etc/init.d/S31regstation start
     ;;
 
     --espid)
@@ -171,12 +176,12 @@ case ${1,,} in
 
         ES_PID=$(check_esrun)
         if [ "${1,,}" = "--shutdown" ] && [ -n "$ES_PID" ]; then
-            verify_service_script "/etc/init.d/S31emulationstation"
-            /etc/init.d/S31emulationstation stop
+            verify_service_script "/etc/init.d/S31regstation"
+            /etc/init.d/S31regstation stop
             shutdown -h now
         elif [ "${1,,}" = "--reboot" ] && [ -n "$ES_PID" ]; then
-            verify_service_script "/etc/init.d/S31emulationstation"
-            /etc/init.d/S31emulationstation stop
+            verify_service_script "/etc/init.d/S31regstation"
+            /etc/init.d/S31regstation stop
             reboot
         fi
     ;;
@@ -296,17 +301,17 @@ case ${1,,} in
     ;;
     *)
         cat <<-_EOF_
-		SYSTEM SWISS KNIFE FOR EmulationStation
+		SYSTEM SWISS KNIFE FOR REG-Station
 		  Please parse parameters to this script!
-		  --restart  will RESTART EmulationStation only
+		  --restart  will RESTART REG-Station only
 		  --reboot   will REBOOT whole system
 		  --shutdown will SHUTDOWN whole system
 		  --emukill  will exit any running EMULATORS
-		  --espid    checks if EmulationStation is currently active
+		  --espid    checks if REG-Station is currently active
 		      This number is the real PID of the binary!
 		      If the ouput is 0, then ES isn't active
 		  --emupid   to check if an Emulator is running
-		      This number is just the PID of emulatorlauncher.py
+		      This is the PID of the emulator regmsgd launched
 		      If output is 0 then there is no emulator active!
 
 		  --arch     Shows current architecture running

@@ -137,18 +137,16 @@ if [ "${FULL_DISPLAY}" != 0 ]; then
         [ -z "${V_OPENGLVERSION}" ] && V_OPENGLVERSION=$(DISPLAY=:0.0 glxinfo 2>/dev/null | sed -n -e 's|^OpenGL version string:[ ]*\(.*\)|\1|p')
         echo "OpenGL Driver Version: ${V_OPENGLVERSION}"
     fi
-    # VULKAN
-    if [ "$(system-vulkan hasVulkan 2>/dev/null)" = "true" ]; then
-        if [ "$(system-vulkan hasDiscrete 2>/dev/null)" = "true" ]; then
-            echo "Vulkan Driver Name: $(system-vulkan discreteName | tr -d '\n')"
-            discreteIndex=$(system-vulkan discreteIndex)
-            apiVersion=$(vulkaninfo | grep -A8 "GPU$discreteIndex" | awk '/apiVersion/ {print $3}')
-            echo "Vulkan Driver Version: $apiVersion"
-        else
-            echo "Vulkan Driver Name: $(system-vulkan listDevices | tr -d '\n')"
-            apiVersion=$(vulkaninfo | grep -A8 "GPU0" | awk '/apiVersion/ {print $3}')
-            echo "Vulkan Driver Version: $apiVersion"
-        fi
+    # VULKAN (parse `vulkaninfo --summary` directly)
+    VKINFO=$(vulkaninfo --summary 2>/dev/null)
+    if echo "${VKINFO}" | grep -q deviceName; then
+        DTYPES=$(echo "${VKINFO}" | grep deviceType)
+        DIDX=$(echo "${DTYPES}" | grep -n PHYSICAL_DEVICE_TYPE_DISCRETE_GPU | head -1 | cut -d: -f1)
+        [ -z "${DIDX}" ] && DIDX=1
+        NAME=$(echo "${VKINFO}" | grep deviceName | sed -n "${DIDX}p" | awk -F'= ' '{print $2}')
+        APIVERSION=$(echo "${VKINFO}" | grep apiVersion | sed -n "${DIDX}p" | awk -F'= ' '{print $2}')
+        echo "Vulkan Driver Name: $(echo "${NAME}" | tr -d '\n')"
+        echo "Vulkan Driver Version: ${APIVERSION}"
     fi
 fi
 

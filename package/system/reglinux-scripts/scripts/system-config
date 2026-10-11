@@ -8,8 +8,6 @@ usage() {
         "	canupdate" \
         "	update" \
         "	storage [current|list|INTERNAL|ANYEXTERNAL|RAM|DEV UUID]" \
-        "	setRootPassword [password]" \
-        "	getRootPassword" \
         "	tz [|tz]"
     exit 1
 }
@@ -33,21 +31,6 @@ postBootConfig() {
 }
 
 log="/userdata/system/logs/reglinux.log"
-
-do_setRootPassword() {
-    PASSWD="$1"
-    [ -z "$PASSWD" ] && PASSWD=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | tr -dc '0-9A-Za-z_-' | head -c8)
-    PASSWDENC=$(/usr/bin/system-encode encode "$PASSWD") || return 1
-
-    preBootConfig
-    if /usr/bin/regmsg systemconf setconfigkey "$storageFile" rootshadowpassword "$PASSWDENC" ; then
-        postBootConfig
-        return 1
-    else
-        postBootConfig
-        return 0
-    fi
-}
 
 load_or_unload_module() {
     modulename="$1"
@@ -80,24 +63,6 @@ load_or_unload_module() {
 }
 
 case "$command" in
-    getRootPassword)
-        [ -z "$mode" ] && mode="$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)"
-        [ "$mode" != "1" ] && { echo "linux"; exit 0; }
-        rootshadowpassword="$(/usr/bin/regmsg systemconf getconfigkey rootshadowpassword)"
-        if [ -z "$rootshadowpassword" ]; then
-            PASSWD=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | tr -dc '0-9A-Za-z_-' | head -c8)
-            do_setRootPassword "$PASSWD" || exit 1
-        else
-            PASSWD=$(/usr/bin/system-encode decode "$rootshadowpassword")
-        fi
-        { [ -z "$PASSWD" ] && exit 1; } || { echo "$PASSWD"; exit 0; }
-        ;;
-
-    setRootPassword)
-        [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)" != "1" ] && exit 0
-        { do_setRootPassword "$2" && exit 0; } || exit 1
-        ;;
-
     overscan)
         if [ "$mode" = "set" ]; then
             if [ -z "$extra1" ] || [ -z "$extra2" ] || [ -z "$extra3" ] || [ -z "$extra4" ]; then
@@ -109,10 +74,10 @@ case "$command" in
             printf "setting overscan values %s %s %s %s\n" "$extra1" "$extra2" "$extra3" "$extra4" >> "$log"
             if /usr/bin/regmsg systemconf setconfigkey "$configFile" disable_overscan 0 overscan_scale 1 overscan_left "$extra1" overscan_right "$extra2" overscan_top "$extra3" overscan_bottom "$extra4" ; then
                 postBootConfig
-                exit 1
+                exit 0
             else
                 postBootConfig
-                exit 0
+                exit 1
             fi
         fi
 
@@ -123,20 +88,20 @@ case "$command" in
                     echo "enabling overscan" >> "$log"
                     if /usr/bin/regmsg systemconf setconfigkey "$configFile" disable_overscan 0 overscan_scale 1 ; then
                         postBootConfig
-                        exit 1
+                        exit 0
                     else
                         postBootConfig
-                        exit 0
+                        exit 1
                     fi
                     ;;
                 disable)
                     echo "disabling overscan" >> "$log"
-                    if /usr/bin/regmsg systemconf setconfigkey "$configFile" disable_overscan 01 overscan_scale 0 ; then
-                        postBootConfig
-                        exit 1
-                    else
+                    if /usr/bin/regmsg systemconf setconfigkey "$configFile" disable_overscan 1 overscan_scale 0 ; then
                         postBootConfig
                         exit 0
+                    else
+                        postBootConfig
+                        exit 1
                     fi
                     ;;
                 *)
@@ -247,21 +212,20 @@ case "$command" in
             fi
             if /usr/bin/regmsg systemconf setconfigkey "$storageFile" sharedevice "$newval" ; then
                 postBootConfig
-                exit 1
+                exit 0
             else
                 postBootConfig
-                exit 0
+                exit 1
             fi
         fi
         ;;
 
     forgetBT)
+        # regmsgd owns the pairing store (a bind-mount of /userdata over the
+        # tmpfs /var/lib/bluetooth) and the bluetoothd lifecycle, so it stops,
+        # wipes and restarts in one step.
         killall -9 hcitool 2>/dev/null || true
-        /etc/init.d/S32bluetooth stop
-        rm -rf /var/lib/bluetooth
-        mkdir -p /var/lib/bluetooth
-        rm -f /userdata/system/bluetooth/bluetooth.tar
-        /etc/init.d/S32bluetooth start
+        /usr/bin/regmsg bluetooth forget
         exit 0
         ;;
 

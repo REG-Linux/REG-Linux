@@ -3,7 +3,7 @@
 updateurl="https://updates.reglinux.org"
 
 # customizable upgrade url website
-settingsupdateurl="$(/usr/bin/system-settings-get updates.url)"
+settingsupdateurl="$(/usr/bin/regmsg systemconf getconfigkey updates.url)"
 test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
 
 IMGFOLDER="/userdata/system/installs"
@@ -155,7 +155,7 @@ do_install() {
 		FILETHERE=1
 	    fi
 	fi
-    
+
 	# if the file is already there, skip the download
 	if test "${FILETHERE}" = 1
 	then

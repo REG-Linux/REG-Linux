@@ -1,2 +1,0 @@
-# Trigger soft-connect when cable state changes (if supported by the UDC driver)
-SUBSYSTEMS=="extcon", ACTION=="change", RUN+="/usr/bin/usbgadget trigger"

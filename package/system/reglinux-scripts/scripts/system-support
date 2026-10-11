@@ -59,7 +59,7 @@ blkid                   > "${DSYSTEM}/disks.txt"
 wpctl status            > "${DSYSTEM}/wireplumber.txt"
 connmanctl technologies > "${DSYSTEM}/connman-technologies.txt"
 connmanctl services     > "${DSYSTEM}/connman-services.txt"
-system-systems          > "${DSYSTEM}/bios.txt"
+regmsg bios check --lines > "${DSYSTEM}/bios.txt"
 system-version          > "${DSYSTEM}/system.version"
 system-info             > "${DSYSTEM}/system.info"
 ldconfig -p             > "${DSYSTEM}/ldcache.txt"
@@ -72,12 +72,18 @@ f_cp /boot/config.txt                                               "${DSYSTEM}"
 f_cp /userdata/system/system.conf                                   "${DSYSTEM}"
 d_cp /userdata/system/logs                                          "${DSYSTEM}"
 f_cp /var/log/messages                                              "${DSYSTEM}"
-f_cp /userdata/system/configs/emulationstation/es_settings.cfg      "${DSYSTEM}"
-f_cp /userdata/system/configs/emulationstation/es_log.txt           "${DSYSTEM}"
-f_cp /userdata/system/configs/emulationstation/gamecontrollerdb.txt "${DSYSTEM}"
+f_cp /userdata/system/configs/regstation/rs_settings.json      "${DSYSTEM}"
+f_cp /userdata/system/configs/regstation/rs_log.txt           "${DSYSTEM}"
+f_cp /userdata/system/configs/regstation/gamecontrollerdb.txt "${DSYSTEM}"
 f_cp /boot/system-boot.conf                                         "${DSYSTEM}"
 f_cp /var/log/Xorg.0.log                                            "${DSYSTEM}"
 f_cp /var/log/bluetooth-agent.log                                   "${DSYSTEM}"
+# Emulator output. /userdata/system/logs is copied wholesale above, but /var/log
+# is picked file by file, so anything landing there has to be named or it is
+# silently absent from every support archive.
+f_cp /var/log/regmsgd.log                                           "${DSYSTEM}"
+f_cp /var/log/scummvm.log                                           "${DSYSTEM}"
+d_cp /var/log/regmsg                                                "${DSYSTEM}"
 
 # boot.log
 if [ -f /var/run/boot.log ]; then
@@ -87,13 +93,17 @@ fi
 # clear passwords
 # filter some dangerous options (may include some path with /userdata)
 sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/logs/"*.log
-sed -i -e s+"^.*user.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
-sed -i -e s+"^.*pass.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
+sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/regmsg/"*.log "${DSYSTEM}/scummvm.log" 2>/dev/null
+sed -i -e s+"^.*user.*$"+""+gI "${DSYSTEM}/rs_settings.json"
+sed -i -e s+"^.*pass.*$"+""+gI "${DSYSTEM}/rs_settings.json"
 sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system.conf"
 sed -i -e s+"^.*retroachievements.*$"+""+gI "${DSYSTEM}/system.conf"
 sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/system.conf"
 sed -i -e s+"^.*token.*$"+""+gI "${DSYSTEM}/system.conf"
 sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system-boot.conf"
+sed -i -e s+"^.*retroachievements.*$"+""+gI "${DSYSTEM}/system-boot.conf"
+sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/system-boot.conf"
+sed -i -e s+"^.*token.*$"+""+gI "${DSYSTEM}/system-boot.conf"
 
 # Emulators configs
 #d_cp /userdata/system/configs                           "${TMPDIR}/configs", disabled, too big

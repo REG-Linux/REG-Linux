@@ -166,8 +166,8 @@ do_format_internal() {
 
         mount -o remount,ro /boot
         echo "the formatting will be done at next boot"
-        emulationstation-standalone --stop-rebooting        # sometimes ES restarts before rebooting
-        return 69                                           # 69 is the reboot code to es
+        regstation-standalone --stop-rebooting        # avoid RS restarting before reboot
+        return 69                                     # 69 is the reboot code
     fi
     return 1
 }

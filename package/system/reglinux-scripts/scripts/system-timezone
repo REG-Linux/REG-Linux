@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 #
 # Manage timezones
 #
@@ -23,7 +23,7 @@ function detect_tz() {
 }
 
 function tz_get() {
-	TZ="$(/usr/bin/system-settings-get system.timezone)"
+	TZ="$(/usr/bin/regmsg systemconf getconfigkey system.timezone)"
 	[[ -z "$TZ" ]] || echo "$TZ"
 }
 
@@ -41,6 +41,6 @@ elif [ x"$command" == "xset" ]; then
 	[ x"$tz" != "x" ] && tz_set "$tz" || usage
 elif [ x"$command" == "xget" ]; then
 	tz_get
-else 
-	usage	
+else
+	usage
 fi
