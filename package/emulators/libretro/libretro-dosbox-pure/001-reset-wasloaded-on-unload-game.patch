@@ -1,0 +1,45 @@
+Reset dbp_wasloaded in retro_unload_game so the next game re-acquires its
+own automatic pad mapping.
+
+init_dosbox() decides whether it is looking at new content with
+
+	const bool newcontent = !dbp_wasloaded;
+	if (newcontent && !reinit) dbp_auto_mapping = NULL; // re-acquire when switching content
+
+and the acquisition itself starts with `if (dbp_auto_mapping) return;`.
+dbp_wasloaded is set true once content has loaded and is never cleared again -
+not by retro_unload_game(), not by retro_deinit(). That is correct for a
+frontend that runs one game per process, because the flag exists to tell an
+in-game reboot apart from a content switch. It is wrong for a frontend that
+keeps the core loaded across games and relaunches with retro_unload_game() +
+retro_load_game() - e.g. REG-Station's in-process Libra player - where every
+game after the first is seen as "not new content" and silently keeps the
+FIRST game's automatic mapping.
+
+Observed on REG-Linux: launching Double Dragon and then Zeliard left the pad
+mapper showing "Double Dragon" while Zeliard was running, with the pad bound
+to Double Dragon's keys. Worse, it persists: the core saves the active mapping
+per game, so Zeliard's own PADMAP.DBP was written out byte-identical to Double
+Dragon's, and a saved custom mapping then overrides any preset the user picks -
+so switching the controller type appeared to do nothing at all.
+
+Cleared in retro_unload_game() rather than in DBP_Shutdown(), which is also
+called from init_dosbox()'s own re-init path where dbp_wasloaded must survive.
+Harmless under RetroArch, which closes the core between games and so starts
+with the flag already false.
+
+--- a/dosbox_pure_libretro.cpp
++++ b/dosbox_pure_libretro.cpp
+@@ -3359,6 +3359,12 @@
+ 
+ void retro_unload_game(void)
+ {
++	// REG-Linux: the content is going away, so the next retro_load_game is a
++	// genuine content switch. Without this a frontend that reuses the loaded
++	// core keeps the previous game's auto-mapping (see init_dosbox's
++	// `newcontent`), and the core then saves it into the new game's
++	// PADMAP.DBP.
++	dbp_wasloaded = false;
+ 	DBP_Shutdown();
+ }
+ 

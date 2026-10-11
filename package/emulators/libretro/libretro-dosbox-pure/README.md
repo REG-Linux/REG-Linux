@@ -1,10 +1,5 @@
-# Libretro DOSBox Pure
+# libretro-dosbox-pure
 
-The `libretro-dosbox-pure` core brings DOS emulation to REG-Linux’s libretro stack with Raspberry Pi patching.
+DOS libretro core (DOSBox Pure). Upstream: https://github.com/schellingb/dosbox-pure
 
-## Build notes
-
-- `Version`: 1.0-preview4
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-rpi_makefile.patch`
+Platform string maps Raspberry Pi models to specific `rpi*` targets; x86 and x86_64 builds pass `WITH_FAKE_SDL=1` to avoid a real SDL dependency.
