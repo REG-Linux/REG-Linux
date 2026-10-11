@@ -1,0 +1,37 @@
+--- a/libretro.cpp
++++ b/libretro.cpp
+@@ -42,6 +42,18 @@
+ 
+ static MDFN_Surface *surf;
+ 
++/* Libra (REG-Linux in-process player) keeps this core's .so mapped and
++ * retro_init()'d for the life of the process, reusing it across every game
++ * launch instead of doing a fresh dlopen. A function-local `static` in
++ * retro_run() would then leak the previous game's sample rate into the next
++ * game's first frame, so SoundFormatChanged never fires and the freshly
++ * constructed CSystem's Stereo_Buffer (mikbuf) never gets set_sample_rate()
++ * -- its Blip_Buffers stay unallocated and mix_stereo() dereferences a null
++ * buffer. Hoisted to file scope and reset in retro_load_game() so every new
++ * game re-triggers the buffer setup regardless of whether the rate itself
++ * changed. */
++static double last_sound_rate;
++
+ static bool libretro_supports_option_categories = false;
+ 
+ static char retro_system_directory[4096];
+@@ -291,6 +303,7 @@
+    rotate_screen = 0;
+    select_pressed_last_frame = 0;
+    rotate_screen_last_frame = 0;
++   last_sound_rate = 0;
+ 
+    check_variables();
+ 
+@@ -429,7 +442,6 @@
+ void retro_run(void)
+ {
+    static int16_t sound_buf[0x10000];
+-   static double last_sound_rate;
+    EmulateSpecStruct spec = {0};
+    bool updated           = false;
+ 
