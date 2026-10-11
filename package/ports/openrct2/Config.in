@@ -7,15 +7,28 @@ config BR2_PACKAGE_OPENRCT2
 	select BR2_PACKAGE_FLAC
 	select BR2_PACKAGE_LIBVORBIS
 	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_ZSTD
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_ICU
+	select BR2_PACKAGE_OPENSSL
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_FONTCONFIG
 	depends on BR2_INSTALL_LIBSTDCPP
+	# icu
+	depends on BR2_USE_WCHAR
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on BR2_HOST_GCC_AT_LEAST_4_9
+	depends on !BR2_BINFMT_FLAT
 
 	help
-	  An open-source re-implementation of 
-	  RollerCoaster Tycoon 2, a construction and 
-	  management simulation video game that simulates 
+	  An open-source re-implementation of
+	  RollerCoaster Tycoon 2, a construction and
+	  management simulation video game that simulates
 	  amusement park management.
-	
+
 	  https://openrct2.io/
 
-comment "BR2_PACKAGE_OPENRCT2 needs a toolchain w/ C++"
-	depends on !BR2_INSTALL_LIBSTDCPP
+comment "BR2_PACKAGE_OPENRCT2 needs a toolchain w/ C++, wchar, threads"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
