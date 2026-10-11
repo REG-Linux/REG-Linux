@@ -3,10 +3,11 @@
 # libretro-scummvm
 #
 ################################################################################
-# Version: 2026.1.0
-LIBRETRO_SCUMMVM_VERSION = v2026.1.0
+# Version: 2026.3.0
+LIBRETRO_SCUMMVM_VERSION = v2026.3.0
 LIBRETRO_SCUMMVM_SITE = $(call github,scummvm,scummvm,$(LIBRETRO_SCUMMVM_VERSION))
 LIBRETRO_SCUMMVM_LICENSE = GPLv2
+LIBRETRO_SCUMMVM_DEPENDENCIES = giflib
 
 LIBRETRO_SCUMMVM_PLATFORM = $(LIBRETRO_PLATFORM)
 
@@ -38,6 +39,8 @@ LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGLES2=1
 #endif
 endif
 
+LIBRETRO_SCUMMVM_MAKE_OPTS += USE_SYSTEM_gif=1
+
 define LIBRETRO_CLONE_AND_INIT
 	mkdir -p $(@D)/backends/platform/libretro/deps/$(1)
 	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) init
@@ -49,7 +52,7 @@ endef
 
 # Details from backends/platform/libretro/dependencies.mk
 define LIBRETRO_SCUMMVM_DEPS
-	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,abf5246b016569759e7d1b0ea91bb98c2e34d160)
+	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,a2a865e74f58035c416a0c63be5772fdcf35b071)
 	$(call LIBRETRO_CLONE_AND_INIT,libretro-common,70ed90c42ddea828f53dd1b984c6443ddb39dbd6)
 endef
 

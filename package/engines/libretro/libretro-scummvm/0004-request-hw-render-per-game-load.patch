@@ -1,0 +1,50 @@
+From: cjom <cjom@reglinux.org>
+Subject: [PATCH] libretro: request the HW render context on every game load
+
+libretro.h documents RETRO_ENVIRONMENT_SET_HW_RENDER as "Should be called
+in retro_load_game()". setup_hw_rendering(), which issues it, was only
+called from retro_init() -- once per process -- and from
+update_variables() when the HW-mode option changes.
+
+A frontend that unloads and reloads the shared object per game re-runs
+retro_init() every time, so it never noticed. A frontend that keeps the
+core loaded gets no HW render request for the second game: it never calls
+context_reset, the OpenGL graphics manager finds no current context, and
+gladLoad*() returns 0:
+
+  Couldn't initialize OpenGL          (graphics/opengl/context.cpp)
+
+That is a fatal error(), so the core aborts and the frontend drops back to
+its own UI. The first game of a session runs and every one after it fails.
+
+Request it in retro_load_game() as documented. The retro_init() call is
+left in place so first-load behaviour, including the pixel format it sets,
+is unchanged.
+
+diff --git a/backends/platform/libretro/src/libretro-core.cpp b/backends/platform/libretro/src/libretro-core.cpp
+index e3bb35a..3c1ff08 100644
+--- a/backends/platform/libretro/src/libretro-core.cpp
++++ b/backends/platform/libretro/src/libretro-core.cpp
+@@ -1088,6 +1088,22 @@ bool retro_load_game(const struct retro_game_info *game) {
+ 		game_buf_ptr = NULL;
+ 	}
+ 
++	/* Re-request the hardware render context for this game. libretro.h says of
++	   RETRO_ENVIRONMENT_SET_HW_RENDER: "Should be called in retro_load_game()",
++	   but the only calls were retro_init() -- once per process -- and
++	   update_variables() when the HW mode option changes.
++
++	   A frontend that unloads the core between games re-runs retro_init() and so
++	   never noticed. One that keeps it loaded gets no HW render request for the
++	   second game, never calls context_reset, and the OpenGL graphics manager
++	   then finds no current context:
++
++	     Couldn't initialize OpenGL          (graphics/opengl/context.cpp)
++
++	   which is a fatal error(), so the core aborts and the frontend is left
++	   dropping back to its own UI. */
++	setup_hw_rendering();
++
+ 	if (!retro_init_emu_thread()) {
+ 		if (retro_log_cb)
+ 			retro_log_cb(RETRO_LOG_ERROR, "[scummvm] Failed to initialize emulation thread!\n");

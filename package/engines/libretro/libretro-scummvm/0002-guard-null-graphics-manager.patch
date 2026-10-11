@@ -1,0 +1,79 @@
+From: cjom <cjom@reglinux.org>
+Subject: [PATCH] libretro: don't dereference a null graphics manager
+
+OSystem_libretro::getScreenWidth()/getScreenHeight() dynamic_cast
+_graphicsManager to WindowedGraphicsManager and dereference the result with
+no null check. The cast can legitimately return null: resetGraphicsManager()
+sets _graphicsManager to null before constructing the replacement, and
+nothing has created one at all until initBackend() runs.
+
+retro_run() reaches getScreenWidth() through retro_update_options_display()
+-> refreshRetroSettings() whenever the frontend reports a core option
+change, and a frontend is free to do that on the very first frame -- before
+initBackend(). The core then dies immediately:
+
+  signal : SIGSEGV (invalid memory access) [11]
+  address: 0x8
+  scummvm_libretro.so(retro_run+0x20c)
+    OSystem_libretro::refreshRetroSettings()
+      OSystem_libretro::getScreenWidth()
+
+0x8 is getWindowWidth()'s member read off a null this. Frontends that only
+signal an options update later never hit it, which is why this survived --
+it reproduces reliably on one that sets its options up front.
+
+Guard both casts. refreshRetroSettings() additionally keeps the previous
+cursor speed when no screen is available yet, rather than scaling it by a
+zero width; initBackend() calls it again with the real size once the manager
+exists. _adjusted_cursor_speed and _inverse_acceleration_time were also left
+indeterminate by the constructor, which that skip would otherwise expose --
+initialise them.
+
+diff --git a/backends/platform/libretro/src/libretro-os-base.cpp b/backends/platform/libretro/src/libretro-os-base.cpp
+index 47a2222..9d8bef0 100644
+--- a/backends/platform/libretro/src/libretro-os-base.cpp
++++ b/backends/platform/libretro/src/libretro-os-base.cpp
+@@ -41,7 +41,7 @@
+ #include "backends/platform/libretro/include/libretro-graphics-opengl.h"
+ #endif
+ 
+-OSystem_libretro::OSystem_libretro() : _mouseX(0), _mouseY(0), _mouseXAcc(0.0), _mouseYAcc(0.0), _dpadXAcc(0.0), _dpadYAcc(0.0), _dpadXVel(0.0f), _dpadYVel(0.0f), _mixer(0), _startTime(0), _cursorStatus(0) {
++OSystem_libretro::OSystem_libretro() : _mouseX(0), _mouseY(0), _mouseXAcc(0.0), _mouseYAcc(0.0), _dpadXAcc(0.0), _dpadYAcc(0.0), _dpadXVel(0.0f), _dpadYVel(0.0f), _adjusted_cursor_speed(0.0f), _inverse_acceleration_time(1.0f), _mixer(0), _startTime(0), _cursorStatus(0) {
+ 	_fsFactory = new FS_SYSTEM_FACTORY();
+ 
+ 	setLibretroDir(retro_get_system_dir(), s_systemDir);
+@@ -106,7 +106,14 @@ Audio::Mixer *OSystem_libretro::getMixer() {
+ }
+ 
+ void OSystem_libretro::refreshRetroSettings() {
+-	_adjusted_cursor_speed = (float)BASE_CURSOR_SPEED * retro_setting_get_gamepad_cursor_speed() * (float)getScreenWidth() / 320.0f; // Dpad cursor speed should always be based off a 320 wide screen, to keep speeds consistent;
++	/* retro_run() calls this whenever the frontend reports a core option
++	   change, which can happen before initBackend() has created a graphics
++	   manager. Keep the current cursor speed in that case rather than scaling
++	   it by a zero width: initBackend() calls this again once the manager
++	   exists, with the real screen size. */
++	const int16 screenWidth = getScreenWidth();
++	if (screenWidth > 0)
++		_adjusted_cursor_speed = (float)BASE_CURSOR_SPEED * retro_setting_get_gamepad_cursor_speed() * (float)screenWidth / 320.0f; // Dpad cursor speed should always be based off a 320 wide screen, to keep speeds consistent;
+ 	_inverse_acceleration_time = (retro_setting_get_gamepad_acceleration_time() > 0.0) ? (1.0f / (float)retro_setting_get_frame_rate()) * (1.0f / retro_setting_get_gamepad_acceleration_time()) : 1.0f;
+ }
+ 
+@@ -139,11 +146,16 @@ void OSystem_libretro::resetGraphicsContext(void) {
+ #endif
+ 
+ int16 OSystem_libretro::getScreenWidth(void) {
+-	return dynamic_cast<WindowedGraphicsManager *>(_graphicsManager)->getWindowWidth();
++	/* _graphicsManager is null for the whole of resetGraphicsManager(), and
++	   before initBackend() first runs it, so this cast can legitimately fail.
++	   Dereferencing it unconditionally segfaults. */
++	const WindowedGraphicsManager *manager = dynamic_cast<WindowedGraphicsManager *>(_graphicsManager);
++	return manager ? manager->getWindowWidth() : 0;
+ }
+ 
+ int16 OSystem_libretro::getScreenHeight(void) {
+-	return dynamic_cast<WindowedGraphicsManager *>(_graphicsManager)->getWindowHeight();
++	const WindowedGraphicsManager *manager = dynamic_cast<WindowedGraphicsManager *>(_graphicsManager);
++	return manager ? manager->getWindowHeight() : 0;
+ }
+ 
+ void OSystem_libretro::resetGraphicsManager(void) {

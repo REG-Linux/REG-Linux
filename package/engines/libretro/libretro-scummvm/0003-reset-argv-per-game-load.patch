@@ -1,0 +1,53 @@
+From: cjom <cjom@reglinux.org>
+Subject: [PATCH] libretro: reset the argument vector on every game load
+
+parse_command_params() only ever appends: it copies each token into
+cmd_params[cmd_params_num] and increments, and never rewinds. The only
+resets are init_command_params(), called from retro_init() -- once per
+process -- and from retro_reset().
+
+retro_load_game() never resets it. That is invisible to a frontend which
+unloads and reloads the shared object for each game, but a frontend that
+keeps the core loaded and simply calls retro_load_game() again hands
+ScummVM's main() the previous game's arguments as well as the new ones:
+
+  User picked target 'manhole' (engine ID 'made', game ID 'manhole')...
+  scummvm: Stray argument 'made:manhole'
+  Usage: scummvm [OPTIONS]... [GAME]
+
+ScummVM accepts at most one game argument, so it prints usage and refuses
+to start. The first game of a session runs, every one after it fails --
+and because the failure is a clean exit rather than a crash, the frontend
+just drops back to its own UI with nothing logged on its side.
+
+The argument vector describes exactly one game, so building it belongs in
+retro_load_game(). Reset it there, before the LIBRETRO_DEBUG block that
+may itself append to it.
+
+diff --git a/backends/platform/libretro/src/libretro-core.cpp b/backends/platform/libretro/src/libretro-core.cpp
+index 2a59b2a..e3bb35a 100644
+--- a/backends/platform/libretro/src/libretro-core.cpp
++++ b/backends/platform/libretro/src/libretro-core.cpp
+@@ -983,6 +983,22 @@ bool retro_load_game(const struct retro_game_info *game) {
+ 		return false;
+ 	}
+ 
++	/* Reset the argument vector for this game. parse_command_params() only ever
++	   appends -- it increments cmd_params_num and never rewinds it -- and until
++	   now the only resets were retro_init() (once per process) and
++	   retro_reset(). A frontend that keeps the core loaded between games, rather
++	   than unloading the library each time, therefore handed ScummVM's main()
++	   the previous game's arguments as well as the new ones, and it refused to
++	   start:
++
++	     User picked target 'manhole' (engine ID 'made', game ID 'manhole')...
++	     scummvm: Stray argument 'made:manhole'
++	     Usage: scummvm [OPTIONS]... [GAME]
++
++	   so the first launch worked and every launch after it died. The argument
++	   vector describes one game, so building it belongs here. */
++	init_command_params();
++
+ #ifdef LIBRETRO_DEBUG
+ 	char debug_buf [20];
+ 	sprintf(debug_buf, "--debuglevel=11");

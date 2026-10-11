@@ -1,0 +1,45 @@
+From: cjom <cjom@reglinux.org>
+Subject: [PATCH] libretro: don't divide by a zero frame rate
+
+audio_buffer_init() computes audio_samples_per_frame as
+sample_rate / frame_rate. With frame_rate 0 that is infinity, audio_run()
+then derives samples_to_read from it and the core delivers no audio for
+the entire session -- silently, since there is no error path.
+
+frame_rate 0 is reachable. scummvm_framerate defaults to "disabled",
+which makes update_variables() take the rate from
+RETRO_ENVIRONMENT_GET_TARGET_REFRESH_RATE, passing &frame_rate as the
+result pointer:
+
+  frame_rate = environ_cb(RETRO_ENVIRONMENT_GET_TARGET_REFRESH_RATE, &frame_rate)
+               ? frame_rate : DEFAULT_REFRESH_RATE;
+
+A frontend that handles the call and returns true, but writes 0.0 --
+because it has no refresh rate established at retro_init() time -- leaves
+frame_rate at 0 and suppresses the DEFAULT_REFRESH_RATE fallback, because
+the fallback is chosen on the return value, not on the value written.
+
+Fall back to DEFAULT_REFRESH_RATE in audio_buffer_init() as well, so the
+audio path cannot be taken out by a frontend's answer.
+
+diff --git a/backends/platform/libretro/src/libretro-core.cpp b/backends/platform/libretro/src/libretro-core.cpp
+index 3c1ff08..288468d 100644
+--- a/backends/platform/libretro/src/libretro-core.cpp
++++ b/backends/platform/libretro/src/libretro-core.cpp
+@@ -190,6 +190,16 @@ static void log_scummvm_exit_code(void) {
+ }
+ 
+ static void audio_buffer_init(uint16 sample_rate, uint16 frame_rate) {
++	/* A frame rate of 0 makes samples-per-frame infinite, and audio_run() then
++	   asks the mixer for a nonsensical number of samples and delivers nothing --
++	   silence for the whole session. It is reachable: with scummvm_framerate at
++	   its default "disabled" the rate comes from
++	   RETRO_ENVIRONMENT_GET_TARGET_REFRESH_RATE, and a frontend that answers the
++	   call successfully with 0.0 (for instance because it has not established a
++	   refresh rate yet) suppresses the DEFAULT_REFRESH_RATE fallback above. */
++	if (!frame_rate)
++		frame_rate = DEFAULT_REFRESH_RATE;
++
+ 	audio_samples_accumulator = 0.0f;
+ 	audio_samples_per_frame   = (float)sample_rate / (float)frame_rate;
+ 	uint32 audio_sample_buffer_size  = ((uint32)retro_setting_get_audio_samples_buffer_size()) * 2 * sizeof(int16);
