@@ -24,6 +24,8 @@ config BR2_PACKAGE_SDL3_X11
 	depends on BR2_USE_MMU # fork()
 	select BR2_PACKAGE_XLIB_LIBX11
 	select BR2_PACKAGE_XLIB_LIBXEXT
+	select BR2_PACKAGE_XLIB_LIBXCURSOR
+	select BR2_PACKAGE_XLIB_LIBXTST
 
 comment "X11 video driver needs X.org"
 	depends on !BR2_PACKAGE_XORG7
@@ -44,6 +46,14 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
 	depends on !BR2_PACKAGE_HAS_LIBGBM || \
 		!BR2_PACKAGE_HAS_LIBEGL || \
 		!(BR2_PACKAGE_SDL3_OPENGL || BR2_PACKAGE_SDL3_OPENGLES)
+
+config BR2_PACKAGE_SDL3_MALI
+	bool "Mali fbdev EGL video driver"
+	depends on BR2_PACKAGE_POWERVR_GE8300_DRIVER
+	depends on BR2_PACKAGE_HAS_LIBEGL
+
+comment "Mali fbdev video driver needs the PowerVR GE8300 driver"
+	depends on !BR2_PACKAGE_POWERVR_GE8300_DRIVER
 
 # REG
 config BR2_PACKAGE_SDL3_WAYLAND
