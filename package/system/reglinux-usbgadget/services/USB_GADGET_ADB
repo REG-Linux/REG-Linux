@@ -1,0 +1,25 @@
+#!/bin/dash
+get_key() {
+    /usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || awk -F'=' -v k="$1" '$0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}' /boot/system-boot.conf 2>/dev/null
+}
+
+case "$1" in
+  start|stop|restart|reload)
+    ;;
+  status)
+    { [ "$(get_key system.usb.gadget.adb)" = "1" ] && printf 'USB gadgets mode: ADB\n'; } || printf 'USB gadgets mode: MTP\n'
+    ;;
+  enable|enabled)
+    /etc/init.d/S13usbgadget stop
+    /usr/bin/regmsg systemconf setconfigkey /boot/system-boot.conf system.usb.gadget.adb 1
+    /etc/init.d/S13usbgadget start
+    ;;
+  disable|disabled)
+    /etc/init.d/S13usbgadget stop
+    /usr/bin/regmsg systemconf setconfigkey /boot/system-boot.conf system.usb.gadget.adb 0
+    /etc/init.d/S13usbgadget start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|reload|enable|disable|status}" >&2
+    exit 1
+esac

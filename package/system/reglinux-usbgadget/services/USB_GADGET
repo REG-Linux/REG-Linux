@@ -1,0 +1,25 @@
+#!/bin/dash
+get_key() {
+    /usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || awk -F'=' -v k="$1" '$0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}' /boot/system-boot.conf 2>/dev/null
+}
+
+case "$1" in
+  start|stop|restart|reload)
+    ;;
+  status)
+    { [ "$(get_key system.usb.gadget)" = "1" ] && printf 'USB Gadget status: enabled\n'; } || printf 'USB Gadget status: disabled\n'
+    ;;
+  enable|enabled)
+    /usr/bin/usbgadget stop    # Needed in case we changed the gadget mode (ADB/MTP)
+    /usr/bin/regmsg systemconf setconfigkey /boot/system-boot.conf system.usb.gadget 1
+    { [ "$(get_key system.usb.gadget.adb)" = "1" ] && /usr/bin/usbgadget adb; } || /usr/bin/usbgadget mtp
+    ;;
+  disable|disabled)
+    /usr/bin/usbgadget stop
+    /usr/bin/regmsg systemconf setconfigkey /boot/system-boot.conf system.usb.gadget 0
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|reload|enable|disable|status}" >&2
+    exit 1
+    ;;
+esac

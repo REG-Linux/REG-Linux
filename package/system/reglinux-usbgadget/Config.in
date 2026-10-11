@@ -1,0 +1,9 @@
+config BR2_PACKAGE_REGLINUX_USBGADGET
+	bool "reglinux-usbgadget"
+
+	select BR2_PACKAGE_UMTP_RESPONDER
+	select BR2_PACKAGE_ANDROID_TOOLS
+	select BR2_PACKAGE_ANDROID_TOOLS_ADBD
+
+	help
+	  reglinux usbgadget
