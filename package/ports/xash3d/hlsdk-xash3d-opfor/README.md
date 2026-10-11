@@ -1,9 +1,5 @@
-# HLSDK Xash3D Opposing Force
+# hlsdk-xash3d-opfor
 
-Opposing Force-specific Half-Life SDK libs.
+Opposing Force game libraries for Xash3D-FWGS. Upstream: https://github.com/FWGS/hlsdk-portable
 
-## Build notes
-- **Branch:** `opforfixed` (commit `0310381f...`).
-- **Config:** same SDL2 stack plus libsodium.
-- **Build system:** CMake with `-DGOLDSOURCE_SUPPORT=1`, `-DSERVER_LIBRARY_NAME=opfor`, and `-DGAMEDIR=gearbox` to match the mod directory.
-- **Install:** drops the `cl_dlls` and `dlls` under `/usr/lib/xash3d/hlsdk/opfor/`.
+Built from the `opforfixed` branch with `-DSERVER_LIBRARY_NAME=opfor -DGAMEDIR=gearbox`. Installs to `/usr/lib/xash3d/hlsdk/opfor/`.
