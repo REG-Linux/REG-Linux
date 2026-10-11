@@ -1,8 +1,5 @@
-# OpenOMF (One Must Fall 2097)
+# OpenOMF
 
-One Must Fall 2097 open-source remake built with SDL2 and networking support.
+One Must Fall 2097 open-source remake. Upstream: https://github.com/omf2097/openomf
 
-## Build notes
-- **Version:** 0.8.5 release.
-- **Config:** selects SDL2, SDL2_mixer, ENet, libconfuse, libminiupnpc, libnatpmp, and libepoxy.
-- **Build system:** CMake release build with static libs, disables localization, and packages multiple networking helpers.
+Language build is disabled (`-DBUILD_LANGUAGES=OFF`) because it does not cross-compile.
