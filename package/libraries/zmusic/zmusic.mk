@@ -3,7 +3,7 @@
 # zmusic
 #
 ################################################################################
-ZMUSIC_VERSION = 1.1.14
+ZMUSIC_VERSION = 1.3.0
 ZMUSIC_SITE = $(call github,ZDoom,ZMusic,$(ZMUSIC_VERSION))
 ZMUSIC_LICENSE = GPLv3
 ZMUSIC_INSTALL_STAGING = YES
