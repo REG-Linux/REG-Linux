@@ -1,0 +1,13 @@
+config BR2_PACKAGE_FREEGEMAS
+	bool "freegemas"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_JSONCPP
+	help
+	  Freegemas is an open-source Bejeweled clone.
+	  Fully free, all assets included.
+
+	  https://github.com/JoseTomasTocino/freegemas
