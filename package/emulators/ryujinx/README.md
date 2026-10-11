@@ -1,10 +1,5 @@
-# Ryujinx
+# ryujinx
 
-Ryujinx runs Nintendo Switch titles on REG-Linux, covering x86_64 and ARM hosts with GL/Vulkan toggles.
+Nintendo Switch emulator (pre-built binary). Upstream: https://git.ryujinx.app/ryubing/ryujinx
 
-## Build notes
-
-- `Version`: 1.3.3
-- `Dependencies`: `BR2_x86_64 || BR2_aarch64`, `BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_REGLINUX_VULKAN`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: copies `switch.ryujinx.keys` into `/usr/share/evmapy`
+Ships a pre-built tarball: `linux_x64` for x86_64, `linux_arm64` for AArch64. Installed to `/usr/ryujinx/`.
