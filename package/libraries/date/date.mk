@@ -3,7 +3,7 @@
 # date
 #
 ################################################################################
-DATE_VERSION = v3.0.4
+DATE_VERSION = v3.0.5
 DATE_SITE = $(call github,HowardHinnant,date,$(DATE_VERSION))
 DATE_LICENSE = MIT
 
