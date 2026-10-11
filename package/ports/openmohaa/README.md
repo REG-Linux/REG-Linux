@@ -1,8 +1,5 @@
-# OpenMoHAA (Medal of Honor: Allied Assault)
+# OpenMoHAA
 
-Modernized port of the MOH:AA engine with CMake/Ninja.
+Medal of Honor: Allied Assault engine port. Upstream: https://github.com/openmoh/openmohaa
 
-## Build notes
-- **Version:** v0.82.1 (Nov 2025).
-- **Config:** selects SDL2, SDL2_image/mixer/ttf, FFmpeg, libcurl, OpenAL, and minizip.
-- **Build system:** CMake release build that forces static libs, uses Ninja as the backend, and disables editor/debug helpers.
+Uses Ninja as the CMake backend. Editor, debug console, and git-version stamping are disabled.
