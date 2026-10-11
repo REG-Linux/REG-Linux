@@ -1,7 +1,7 @@
 diff --git a/Core/System.cpp b/Core/System.cpp
 index fc4d207f..4b753c8b 100644
---- a/Core/System.cpp
-+++ b/Core/System.cpp
+--- a/Core/Util/PathUtil.cpp
++++ b/Core/Util/PathUtil.cpp
 @@ -633,26 +633,21 @@ std::string PSP_GetLoading() {
  }
  
@@ -48,7 +48,7 @@ index fc4d207f..4b753c8b 100644
  	case DIRECTORY_TEXTURES:
  		return pspDirectory / "TEXTURES";
  	case DIRECTORY_PLUGINS:
-@@ -688,22 +688,22 @@ Path GetSysDirectory(PSPDirectories directoryType) {
+@@ -77,23 +77,24 @@
  		if (!g_Config.appCacheDirectory.empty()) {
  			return g_Config.appCacheDirectory;
  		}
@@ -67,14 +67,16 @@ index fc4d207f..4b753c8b 100644
  	case DIRECTORY_MEMSTICK_ROOT:
 -		return g_Config.memStickDirectory;
 +		return memStickDirectory;
- 	// Just return the memory stick root if we run into some sort of problem.
+ 		// Just return the memory stick root if we run into some sort of problem.
  	default:
  		ERROR_LOG(Log::FileSystem, "Unknown directory type.");
 -		return g_Config.memStickDirectory;
 +		return pspDirectory;
  	}
++
  }
  
+ bool CreateSysDirectories() {
 diff --git a/SDL/SDLJoystick.cpp b/SDL/SDLJoystick.cpp
 index 2f6b4717..4feccfc1 100644
 --- a/SDL/SDLJoystick.cpp

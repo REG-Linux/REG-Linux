@@ -1,10 +1,5 @@
-# Libretro PPSSPP
+# libretro-ppsspp
 
-The `libretro-ppsspp` core lets REG-Linux run PSP titles through libretro, keeping the standard libzip dependency and the distro’s path/cmake patches in place.
+PlayStation Portable libretro core (PPSSPP). Upstream: https://github.com/hrydgard/ppsspp
 
-## Build notes
-
-- `Version`: v1.19.3
-- `Dependencies`: `BR2_PACKAGE_LIBZIP`, supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: CMake-based (`cmake-package`)
-- `Extras`: applies `001-custom-paths.patch`, `002-cmake-arm-conversion-fix.patch`, `000-batocera-path.patch`
+Shares the version pin with the standalone ppsspp package. System ffmpeg is used on mipsel and musl targets (`-DUSE_SYSTEM_FFMPEG=ON`). Vulkan requires `BR2_PACKAGE_REGLINUX_VULKAN`; `USING_X11_VULKAN` is enabled only with xwayland, otherwise `-DEGL_NO_X11=1 -DMESA_EGL_NO_X11_HEADERS=1` are injected.

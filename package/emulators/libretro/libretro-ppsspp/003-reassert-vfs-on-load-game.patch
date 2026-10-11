@@ -1,0 +1,61 @@
+Re-assert the assets VFS on every retro_load_game.
+
+retro_init() registers g_VFS and retro_unload_game() clears it, but the
+libretro lifecycle allows many load/unload pairs per init. A host that
+caches an initialized core across games (REG-Station's in-process Libra
+player) therefore loses the VFS after the first game: PPGe fails with
+"Missing filesystem for 'ppge_atlas.zim'" and retries per frame, so any
+title that opens a PSP system dialog drops below 2 fps on relaunch.
+
+diff --git a/libretro/libretro.cpp b/libretro/libretro.cpp
+--- a/libretro/libretro.cpp
++++ b/libretro/libretro.cpp
+@@ -1187,6 +1187,12 @@
+    { NULL, 0 }
+ };
+ 
++/* REG-Linux: retro_init() computes the assets base directory into a LOCAL
++ * and registers it with g_VFS. retro_unload_game() clears g_VFS. A host that
++ * reuses an already-initialized core across games therefore loses the VFS,
++ * so stash the path here where retro_load_game() can re-assert it. */
++static Path reg_vfs_base_dir;
++
+ void retro_init(void)
+ {
+    TimeInit();
+@@ -1294,6 +1300,7 @@
+    g_Config.bDiscordRichPresence = false;
+ 
+    g_VFS.Register("", new DirectoryReader(retro_base_dir));
++   reg_vfs_base_dir = retro_base_dir;
+ 
+    g_threadManager.Init(cpu_info.num_cores, cpu_info.logical_cpu_count);
+ 
+@@ -1513,6 +1520,27 @@
+       return false;
+    }
+ 
++   /* REG-Linux: re-assert the assets VFS.
++    *
++    * The libretro lifecycle allows many load/unload pairs between a single
++    * retro_init/retro_deinit, and REG-Station's in-process Libra player uses
++    * it that way: it caches each core and initializes it once per process.
++    * But retro_unload_game() calls g_VFS.Clear() while only retro_init()
++    * registers, so every launch after the first ran with an empty VFS --
++    * "Missing filesystem for 'ppge_atlas.zim'", and PPGe (the PSP system
++    * dialogs: God of War's language selection, OSD text) could not draw and
++    * retried each frame, dropping the game to under 2 fps. Titles that never
++    * open a system dialog, e.g. Pinball Dreams, relaunched fine and hid this.
++    *
++    * Clear() first so this is idempotent whether or not retro_init() has just
++    * run; on the first launch it simply replaces an equivalent entry.
++    */
++   if (!reg_vfs_base_dir.empty())
++   {
++      g_VFS.Clear();
++      g_VFS.Register("", new DirectoryReader(reg_vfs_base_dir));
++   }
++
+    retro_check_backend();
+ 
+    ctx       = LibretroGraphicsContext::CreateGraphicsContext();
