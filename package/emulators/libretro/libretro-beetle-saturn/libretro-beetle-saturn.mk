@@ -14,7 +14,9 @@ ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 LIBRETRO_BEETLE_SATURN_DEPENDENCIES += libgles
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# Desktop GL build — must match RetroArch's API selection. Key off
+# HAS_DESKTOP_OPENGL rather than HAS_LIBGL (polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_BEETLE_SATURN_DEPENDENCIES += libgl
 else
 LIBRETRO_BEETLE_SATURN_PLATFORM = $(LIBRETRO_PLATFORM)-gles

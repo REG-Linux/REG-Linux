@@ -1,0 +1,47 @@
+Fail gracefully when no Saturn BIOS is present.
+
+Without this patch, retro_load_game proceeds into MDFNI_LoadGame ->
+disc_load_content (which mounts the CD and allocates CPU state) and
+only later, deep inside InitCommon(), notices the BIOS is missing and
+returns false.  By that point a partial init has happened: the SCU/SH2
+caches have been allocated, the disc parser holds pointers into the
+freshly-mapped BIOSROM region, and the libretro frontend's
+disc_cleanup() path dereferences state that InitCommon never finished
+populating -- visible as a SIGSEGV inside retro_load_game.
+
+Check up-front whether *any* of the three accepted BIOS filenames
+(saturn_bios.bin, sega_101.bin, mpr-17933.bin) is present in the
+frontend-provided system directory.  If not, log a clear error and
+return false immediately -- no disc mount, no CPU alloc, no crash.
+--- a/libretro.cpp	2026-05-14 13:26:41.874638643 +0200
++++ b/libretro.cpp	2026-05-14 13:26:41.914237892 +0200
+@@ -677,6 +677,29 @@
+    extract_directory(retro_cd_base_directory, info->path, sizeof(retro_cd_base_directory));
+ 
+    snprintf(tocbasepath, sizeof(tocbasepath), "%s" RETRO_SLASH "%s.toc", retro_cd_base_directory, retro_cd_base_name);
++   /* Saturn requires one of three BIOS images present in the system
++    * directory.  Failing this check up-front avoids a SIGSEGV from
++    * partial init when the BIOS is missing (see InitCommon @ ss.cpp). */
++   {
++      char path_buf[4096];
++      static const char* const bios_candidates[] = {
++         "saturn_bios.bin",
++         "sega_101.bin",
++         "mpr-17933.bin",
++      };
++      bool any_bios = false;
++      for (size_t i = 0; i < sizeof(bios_candidates) / sizeof(bios_candidates[0]); ++i) {
++         snprintf(path_buf, sizeof(path_buf), "%s" RETRO_SLASH "%s", retro_base_directory, bios_candidates[i]);
++         if (filestream_exists(path_buf)) { any_bios = true; break; }
++      }
++      if (!any_bios) {
++         log_cb(RETRO_LOG_ERROR,
++            "[Mednafen]: No Saturn BIOS found in '%s' (expected one of saturn_bios.bin / sega_101.bin / mpr-17933.bin). Aborting load.\n",
++            retro_base_directory);
++         return false;
++      }
++   }
++
+ 
+    if (!strstr(tocbasepath, "cdrom://") && filestream_exists(tocbasepath))
+       snprintf(retro_cd_path, sizeof(retro_cd_path), "%s", tocbasepath);

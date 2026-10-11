@@ -1,0 +1,50 @@
+Fail the load when the CD image cannot be parsed.
+
+CDAccess_Open() (mednafen/cdrom/CDAccess.cpp) dispatches on extension for
+.ccd/.pbp/.chd only and sends everything else to CDAccess_Image, the
+CUE/TOC parser -- there is no sniffing and no rejection.  Hand the core an
+image format it does not support and the parser finds no TRACK lines, so
+ImageOpen() returns false at "if(FirstTrack > LastTrack)".
+
+That return was discarded.  ImageOpen() signals failure by returning rather
+than throwing, and CDIF_Open() does not validate either, so disc.cpp's
+catch(std::exception&) never fired: a CDAccess_Image with zero tracks was
+handed up as a successful load.  The frontend reported "game loaded" and the
+Saturn BIOS, finding nothing bootable, dropped into its CD-player menu -- no
+error logged anywhere, just the wrong screen.  (Observed with an .mds, which
+this core does not support; its own libretro .info correctly advertises only
+ccd|chd|cue|toc|m3u.)
+
+Check the return and throw MDFN_Error, which the callers already handle.
+Cleanup() runs first because a partial parse can have opened track streams
+and the destructor does not run when a constructor throws.
+
+--- a/mednafen/cdrom/CDAccess_Image.cpp
++++ b/mednafen/cdrom/CDAccess_Image.cpp
+@@ -912,7 +912,25 @@
+ {
+    memset(Tracks, 0, sizeof(Tracks));
+ 
+-   ImageOpen(path, image_memcache);
++   /* ImageOpen() reports a failed parse by *returning* false rather than
++      throwing, and its return used to be discarded here. CDAccess_Open() sends
++      every extension it does not recognise (anything but .ccd/.pbp/.chd) to
++      this CUE/TOC parser, so handing the core an image format it does not
++      support -- an .mds, say -- left a fully-constructed CDAccess_Image with
++      zero tracks. CDIF_Open() does not validate either, so the frontend was
++      told the game had loaded and the Saturn BIOS, finding nothing bootable,
++      dropped into its CD-player menu: no error anywhere, just the wrong screen.
++
++      Turn it into the exception the callers already expect -- disc.cpp wraps
++      the load in catch(std::exception&) and MDFN_Error derives from it -- so an
++      unreadable image fails the load cleanly. Cleanup() first: a partial parse
++      can already have opened track streams, and ~CDAccess_Image() does not run
++      when the constructor throws. */
++   if(!ImageOpen(path, image_memcache))
++   {
++      Cleanup();
++      throw(MDFN_Error(0, _("Could not parse CD image \"%s\": unsupported format, or the file is corrupt."), path.c_str()));
++   }
+ }
+ 
+ CDAccess_Image::~CDAccess_Image()
