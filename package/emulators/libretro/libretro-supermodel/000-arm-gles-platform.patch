@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 1111111..2222222 100644
+--- a/Makefile
++++ b/Makefile
+@@ -437,7 +437,7 @@
+     PLATFORM_DEFINES += -DGLES -Dgles -DHAVE_OPENGLES=1 -DHAVE_OPENGLES3=1 -DCORE_GLES -D__glext_h_ -D__GLEXT_H_
+     
+     # 2. LIBRARY & PATHS
+-    LDFLAGS += $(SHARED) -L/usr/lib/aarch64-linux-gnu
++    LDFLAGS += $(SHARED)
+     LIBS := -lGLESv2 -lz -lm
+     
+     # 3. CXXFLAGS
