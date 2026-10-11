@@ -1,0 +1,19 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -473,6 +473,16 @@
+   endif()
+ endif()
+
++# GCC 15 has an ICE in riscv_vector::expand_builtin when RVV intrinsics
++# go through LTO.  Disable LTO on the translation units that pull in
++# <riscv_vector.h> via snes_ntsc.h so the build succeeds with -flto.
++if(CMAKE_SYSTEM_PROCESSOR MATCHES "riscv64")
++    set_source_files_properties(
++        src/main/sdl2/snes_ntsc.cpp
++        src/main/sdl2/rendersurface.cpp
++        PROPERTIES COMPILE_OPTIONS "-fno-lto")
++endif()
++
+ option(WITH_RVV "Enable RISC-V Vector (RVV) SIMD (requires -march=..._v)" OFF)
+ if(WITH_RVV AND CMAKE_SYSTEM_PROCESSOR MATCHES "riscv64")
+     target_compile_options(cannonball-se PRIVATE -march=rv64gcv)
