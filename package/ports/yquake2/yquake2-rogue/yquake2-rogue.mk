@@ -4,16 +4,18 @@
 #
 ################################################################################
 
-YQUAKE2_ROGUE_VERSION = ROGUE_2_15
+YQUAKE2_ROGUE_VERSION = ROGUE_2_16
 YQUAKE2_ROGUE_SITE = $(call github,yquake2,rogue,$(YQUAKE2_ROGUE_VERSION))
 YQUAKE2_ROGUE_DEPENDENCIES = sdl2
 
 YQUAKE2_ROGUE_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 
-# Install game library
+# Installed under datainit alongside yquake2-client so first-boot populate
+# lands game.so in /userdata/roms/quake2/rogue next to the user's own .pak
+# files (see package/ports/yquake2/yquake2-client/yquake2-client.mk).
 define YQUAKE2_ROGUE_INSTALL_TARGET_CMDS
-        mkdir -p $(TARGET_DIR)/usr/yquake2/rogue/
-        $(INSTALL) -D -m 0755 $(@D)/Release/game.so $(TARGET_DIR)/usr/yquake2/rogue/game.so
+        mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/roms/quake2/rogue/
+        $(INSTALL) -D -m 0755 $(@D)/Release/game.so $(TARGET_DIR)/usr/share/reglinux/datainit/roms/quake2/rogue/game.so
 endef
 
 $(eval $(cmake-package))
