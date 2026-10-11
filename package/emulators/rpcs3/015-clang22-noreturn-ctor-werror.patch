@@ -1,0 +1,38 @@
+RPCS3 marks fmt::throw_exception's constructor [[noreturn]] and relies on
+that to satisfy -Werror=return-type / -Werror=implicit-fallthrough after a
+switch's default case (or a case end) just calls fmt::throw_exception(...).
+
+The clang 22 toolchain built for REG-Linux no longer treats a [[noreturn]]
+constructor as terminating control flow for these two diagnostics (it still
+honours it for plain [[noreturn]] functions), so calls like
+fmt::throw_exception("Unreachable") in PPUDisAsm.h, SPUThread.h, atomic.cpp
+and bin_patch.cpp now trip -Werror. These are false positives: the
+constructor never returns, so the "missing" return/break is unreachable.
+Downgrade the two checks from hard errors to warnings under Clang rather
+than patch every call site.
+
+--- a/buildfiles/cmake/ConfigureCompiler.cmake
++++ b/buildfiles/cmake/ConfigureCompiler.cmake
+@@ -47,10 +47,20 @@
+ 	add_compile_options(-Werror=old-style-cast)
+ 	add_compile_options(-Werror=sign-compare)
+ 	add_compile_options(-Werror=reorder)
+-	add_compile_options(-Werror=return-type)
++	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
++		# This clang no longer treats a [[noreturn]] constructor
++		# (fmt::throw_exception) as terminating control flow for these
++		# two diagnostics, so unreachable switch defaults/case ends that
++		# only call fmt::throw_exception(...) now trip -Werror as false
++		# positives. Downgrade to warnings for Clang only.
++		add_compile_options(-Wreturn-type)
++		add_compile_options(-Wimplicit-fallthrough)
++	else()
++		add_compile_options(-Werror=return-type)
++		add_compile_options(-Werror=implicit-fallthrough)
++	endif()
+ 	add_compile_options(-Werror=overloaded-virtual)
+ 	add_compile_options(-Werror=missing-noreturn)
+-	add_compile_options(-Werror=implicit-fallthrough)
+ 	add_compile_options(-Wunused-parameter)
+ 	add_compile_options(-Wignored-qualifiers)
+ 	add_compile_options(-Wredundant-move)
