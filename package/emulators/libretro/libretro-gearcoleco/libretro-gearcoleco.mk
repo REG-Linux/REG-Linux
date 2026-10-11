@@ -3,8 +3,7 @@
 # libretro-gearcoleco
 #
 ################################################################################
-# Version: Release on Dec 8, 2025
-LIBRETRO_GEARCOLECO_VERSION = 1.5.5
+LIBRETRO_GEARCOLECO_VERSION = 1.7.3
 LIBRETRO_GEARCOLECO_SITE = $(call github,drhelius,Gearcoleco,$(LIBRETRO_GEARCOLECO_VERSION))
 LIBRETRO_GEARCOLECO_LICENSE = GPLv3
 
