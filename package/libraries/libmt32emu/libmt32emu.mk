@@ -3,7 +3,7 @@
 # libmt32emu
 #
 ################################################################################
-LIBMT32EMU_VERSION = libmt32emu_2_7_2
+LIBMT32EMU_VERSION = libmt32emu_2_7_3
 LIBMT32EMU_SITE = $(call github,munt,munt,$(LIBMT32EMU_VERSION))
 LIBMT32EMU_LICENSE = GPLv2
 
