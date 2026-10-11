@@ -6,8 +6,7 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_DEVILUTIONX			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Cannonball SE (OutRun)
-	# TODO requires SSE4 or NEON at the moment
-	select BR2_PACKAGE_CANNONBALL			if BR2_x86_x86_64_v3 || (BR2_arm && BR2_ARM_FPU_NEON_VFPV4) || BR2_aarch64
+	select BR2_PACKAGE_CANNONBALL			# ALL
 
 	# NxEngine (Cave Story)
 	select BR2_PACKAGE_LIBRETRO_NXENGINE		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
@@ -40,24 +39,24 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_DHEWM3			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SDM845     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM6115     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490    || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
 							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
 
-	# QuakeSpasm for GL targets
-	select BR2_PACKAGE_QUAKESPASM			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL
-	# TyrQuake (Quake 1) TO BE RMEOVED LATER
-	select BR2_PACKAGE_LIBRETRO_TYRQUAKE		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
+	# FTEQW (Quake 1 / Hexen II engine)
+	select BR2_PACKAGE_FTEQW			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Yamagi Quake 2 (source port)
 	# Note: Requires GL or GLES 3.0. Might work with GLES2 using GL 1.x + gl4es ?
-	select BR2_PACKAGE_YQUAKE2                      if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_YQUAKE2                      if BR2_PACKAGE_HAS_GLES3
 
 	# Quake 3 (source port)
 	# Note : needs work on gl4es patch (applying it only if no desktop GL support)
-	select BR2_PACKAGE_IOQUAKE3			if !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	select BR2_PACKAGE_IOQUAKE3			if !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_DE10NANO
 
 	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0
 	select BR2_PACKAGE_RAZE				if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
@@ -92,8 +91,11 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	# Jazz Jackrabbit
 	select BR2_PACKAGE_OPENJAZZ			# ALL
 
-	# Jazz Jackrabbit 2 (requires GLES 3.0 since 3.3.0)
-	select BR2_PACKAGE_JAZZ2_NATIVE			if BR2_PACKAGE_HAS_GLES3
+	# Jazz Jackrabbit 2 (standalone) asks for ES2 on boards without GLES3, so this no longer needs gating.
+	select BR2_PACKAGE_JAZZ2_NATIVE			# ALL
+	# Jazz Jackrabbit 2 (libretro core) hands the frontend exactly one frame of audio per retro_run.
+	# A board that cannot sustain the announced rate therefore underfeeds the audio buffer.
+	select BR2_PACKAGE_LIBRETRO_JAZZ2_NATIVE	if BR2_PACKAGE_HAS_GLES3
 
 	# Tomb Raider
 	select BR2_PACKAGE_OPENLARA			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
@@ -136,8 +138,8 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_OPENOMF			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3
 
 	# Open RCT2 (Roller Coaster Tycoon 2)
-	# WIP TODO generate assets for install
-	# select BR2_PACKAGE_OPENRCT2			if !BR2_PACKAGE_REGLINUX_RELEASE
+	select BR2_PACKAGE_OPENRCT2			if !BR2_PACKAGE_REGLINUX_RELEASE
 
 	help
 	  Ports
+

@@ -1,0 +1,10 @@
+# --- Anbernic RG Vita Pro default values ---
+
+# Panfrost GPU + Sway compositor for display rotation
+system.rs.environment=wayland
+
+# Suspend on handheld boards
+system.suspendmode=suspend
+
+# Shutdown delay for suspend (short press = suspend, long press = ES menu)
+system.shutdowndelay=1

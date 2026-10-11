@@ -1,10 +1,10 @@
 # Anbernic WIN600 default values
 
 # default resolution
-es.resolution=720x1280
+rs.resolution=720x1280
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland
 
 # default suspend on handled boards
 system.suspendmode=suspend

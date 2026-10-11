@@ -1,7 +1,7 @@
 # AYANEO 2S default values
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland
 
 # don't suspend until BIOS fixed
 system.suspendmode=

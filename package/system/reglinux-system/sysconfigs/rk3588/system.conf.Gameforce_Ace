@@ -1,4 +1,4 @@
 # GameForce Ace default values
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland

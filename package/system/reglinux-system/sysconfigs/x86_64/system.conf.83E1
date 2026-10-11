@@ -1,7 +1,7 @@
 # Lenovo Legion Go default values
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland
 
 # default suspend on handled boards
 system.suspendmode=hybrid

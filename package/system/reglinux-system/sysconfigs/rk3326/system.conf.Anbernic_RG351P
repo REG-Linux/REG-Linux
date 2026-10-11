@@ -1,6 +1,9 @@
 # anbernic rk3326 default values
 
 # default card
+# NOTE: pro-audio kept for now. Dropping it needs the OdroidC5 approach
+# (per-card UCM2 + WirePlumber prefer-profile rule), validated on real
+# hardware first — none of these boards were testable. See board/amlogic/odroidc5.
 audio.device=speakers
 audio.profile=pro-audio@alsa_card._sys_devices_platform_rk817-sound_sound_card0
 

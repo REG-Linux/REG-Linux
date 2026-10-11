@@ -1,0 +1,11 @@
+# --- Miniloong Pocket 1 default values ---
+
+# default wayland environment (rotate)
+system.rs.environment=wayland
+
+# default suspend on handled boards
+system.suspendmode=suspend
+
+# Audio: speaker output via external amplifier on HP output
+audio.device=alsa_output._sys_devices_platform_sound_sound_card0.HiFi__Speaker__sink
+audio.profile=HiFi (Mic, Speaker)@alsa_card._sys_devices_platform_sound_sound_card0

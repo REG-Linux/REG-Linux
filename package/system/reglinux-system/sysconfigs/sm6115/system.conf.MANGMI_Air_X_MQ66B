@@ -1,0 +1,13 @@
+# MANGMI Air X MQ66B default values
+
+# default wayland environment (rotate)
+system.rs.environment=wayland
+
+# default suspend on handled boards
+system.suspendmode=suspend
+
+# default refresh rate
+rs.resolution=1920x1080@60
+
+# default brightness
+display.brightness=80

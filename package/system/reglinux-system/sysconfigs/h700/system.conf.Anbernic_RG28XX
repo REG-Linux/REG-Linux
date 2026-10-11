@@ -1,10 +1,10 @@
 # Anbernic RG28XX default values
 
 # default resolution
-es.resolution=640x480
+rs.resolution=640x480
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland
 
 # Enable Suspend on handheld targets
 system.suspendmode=suspend
