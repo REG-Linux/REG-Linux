@@ -2,6 +2,8 @@ config BR2_PACKAGE_SDL3_TTF
 	bool "sdl3_ttf"
 	depends on !BR2_STATIC_LIBS
 	select BR2_PACKAGE_SDL3
+	select BR2_PACKAGE_PLUTOVG
+	select BR2_PACKAGE_PLUTOSVG
 	help
 	  SDL_ttf 3.0
 

@@ -18,7 +18,7 @@ else
 SDL3_TTF_CONF_OPTS = -DCMAKE_BUILD_TYPE=Release
 endif
 
-SDL3_TTF_DEPENDENCIES += sdl3
+SDL3_TTF_DEPENDENCIES += sdl3 plutovg plutosvg
 
 ifeq ($(BR2_PACKAGE_FREETYPE),y)
 SDL3_TTF_DEPENDENCIES += freetype
