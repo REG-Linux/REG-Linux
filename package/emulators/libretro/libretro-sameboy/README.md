@@ -1,10 +1,5 @@
-# Libretro SameBoy
+# libretro-sameboy
 
-The `libretro-sameboy` core runs the SameBoy Game Boy/Game Boy Color emulator under REG-Linux with RGBDS/XXD tooling and the same libstdc++ toggles.
+Game Boy / Game Boy Color libretro core (SameBoy). Upstream: https://github.com/LIJI32/SameBoy
 
-## Build notes
-
-- `Version`: v1.0.2
-- `Dependencies`: `BR2_PACKAGE_RGBDS`, `BR2_PACKAGE_XXD`, supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-makefile_hexdump.patch`
+Requires `host-rgbds`, `host-xxd`, and `host-util-linux` at build time to compile boot ROMs before the main libretro target.
