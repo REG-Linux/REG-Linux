@@ -9,7 +9,7 @@ THEFORCEENGINE_SITE = $(call github,luciusDXL,TheForceEngine,$(THEFORCEENGINE_VE
 THEFORCEENGINE_LICENSE = GPLv2
 THEFORCEENGINE_LICENSE_FILE = LICENSE
 
-# be sure to update configgen if the patch version changes
+# be sure to update the regmsg lua generator if the patch version changes
 THEFORCEENGINE_PATCH_VERSION = df_patch4
 THEFORCEENGINE_PATCH_SOURCE = $(THEFORCEENGINE_PATCH_VERSION).zip
 THEFORCEENGINE_EXTRA_DOWNLOADS = \
@@ -58,13 +58,6 @@ define THEFORCEENGINE_PATCH_ZIP
         $(THEFORCEENGINE_CONF_INIT)/Mods
 endef
 
-define THEFORCEENGINE_EVMAPY
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/theforceengine/theforceengine.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
 THEFORCEENGINE_POST_INSTALL_TARGET_HOOKS += THEFORCEENGINE_PATCH_ZIP
-THEFORCEENGINE_POST_INSTALL_TARGET_HOOKS += THEFORCEENGINE_EVMAPY
 
 $(eval $(cmake-package))
