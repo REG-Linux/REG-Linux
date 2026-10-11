@@ -1,0 +1,6 @@
+config BR2_PACKAGE_SYNAPTICS_DSX
+	bool "synaptics-dsx"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Synaptics DSX touchscreen driver for I2C.
+	  Supports chips with "synaptics,dsx-i2c" compatible.
