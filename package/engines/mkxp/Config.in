@@ -1,0 +1,33 @@
+config BR2_PACKAGE_MKXP
+	bool "mkxp"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS # SDL2
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	depends on BR2_PACKAGE_RUBY # needs MRI Ruby
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_SDL_SOUND
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_PHYSFS
+	select BR2_PACKAGE_PIXMAN
+	select BR2_PACKAGE_LIBSIGC
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_ZLIB
+	help
+	  Falcon-mkxp is a player for RPG Maker XP, VX and VX Ace
+	  games on Linux. Fork of Ancurio/mkxp with unlocked
+	  resolution support and Japanese font bundling.
+
+	  Reads mkxp.conf (INI format). Covers 17 PortMaster ports
+	  including To the Moon, LISA series, Finding Paradise.
+
+	  https://github.com/pk-2000/Falcon-mkxp
+
+comment "mkxp needs C++, OpenGL/GLES, dynamic libs, Ruby"
+	depends on !BR2_INSTALL_LIBSTDCPP || BR2_STATIC_LIBS \
+		|| !(BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES) \
+		|| !BR2_PACKAGE_RUBY
