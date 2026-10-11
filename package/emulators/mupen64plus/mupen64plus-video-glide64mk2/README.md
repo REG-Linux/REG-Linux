@@ -1,10 +1,45 @@
-# Mupen64Plus video Glide64mk2
+# mupen64plus-video-glide64mk2
 
-The `mupen64plus-video-glide64mk2` plugin keeps Gonetz’s Anniversary Glide64 renderer working within REG-Linux’s SDL/ALSA-backed Mupen64Plus builds.
+Glide64mk2 video plugin for Mupen64Plus. Upstream: https://github.com/mupen64plus/mupen64plus-video-glide64mk2
 
-## Build notes
+## Build Configuration
 
-- `Version`: 2.6.0
-- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_BOOST`, `BR2_PACKAGE_BOOST_SYSTEM`, `BR2_PACKAGE_BOOST_FILESYSTEM`, `BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `001-hide-framebuffer-message.patch`
+This package uses the Buildroot generic-package infrastructure with custom build commands.
+It requires `mupen64plus-core` to be built first.
+
+## Dependencies
+
+### Required
+
+- `sdl2` - Window/input handling
+- `alsa-lib` - Audio (inherited)
+- `mupen64plus-core` - Core emulator library
+- `boost` - C++ libraries
+
+## Graphics Features
+
+Glide64mk2 provides:
+
+- Glide API emulation
+- Good compatibility with many games
+- Based on gonetz's 10th anniversary release
+- OpenGL rendering
+
+## Installation
+
+The plugin is installed to:
+
+- `/usr/lib/mupen64plus/mupen64plus-video-glide64mk2.so`
+
+## Configuration
+
+Glide64mk2 settings are configured in:
+
+- `/usr/share/mupen64plus/glide64mk2.ini`
+
+## Notes
+
+- This plugin is based on the 10th anniversary release code from gonetz
+- Provides good compatibility for games that use the Glide API
+- Less demanding than GLideN64 but with fewer features
+- Suitable for lower-end hardware
