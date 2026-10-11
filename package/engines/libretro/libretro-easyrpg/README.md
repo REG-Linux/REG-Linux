@@ -1,8 +1,5 @@
-# libretro-easyrpg core
+# libretro-easyrpg
 
-Wraps EasyRPG Player as a libretro core for frontend display.
+EasyRPG Player built as a libretro core. Upstream: https://github.com/EasyRPG/Player
 
-## Build details
-- **Version:** 0.8.1.1 from `EasyRPG/Player` with git submodules.
-- **Config:** selects the full SDL2 stack plus libpng, fmt, freetype, mpg123, libvorbis, opusfile, pixman, speexdsp, libxmp, wildmidi, liblcf, json-for-modern-cpp, libsndfile, and lhasa to satisfy the player components; optional `harfbuzz` and `fluidsynth` follow their Buildroot equivalents.
-- **Build system:** CMake (`cmake-package`) with release build, forces shared/static builds, and sets `-fPIC` flags. The resulting `easyrpg_libretro.so` installs under `/usr/lib/libretro`.
+Configured with `-DPLAYER_TARGET_PLATFORM=libretro` and requires `liblcf` staged in the sysroot. Optional `harfbuzz` and `fluidsynth` are pulled in when their Buildroot counterparts are enabled. The resulting `easyrpg_libretro.so` installs under `/usr/lib/libretro/`.
