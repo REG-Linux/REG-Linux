@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt	2026-02-18 15:02:17.000000000 +0100
++++ b/CMakeLists.txt	2026-02-21 02:21:01.568407733 +0100
+@@ -138,6 +138,10 @@
+ 	target_compile_definitions(OpenJazz PRIVATE DATAPATH="${DATAPATH}")
+ endif()
+ 
++# force fullscreen only
++target_compile_definitions(OpenJazz PRIVATE FULLSCREEN_ONLY=1)
++set(FULLSCREEN_ONLY "Enabled")
++
+ # bundled libraries
+ 
+ add_subdirectory(ext)
+@@ -521,6 +521,7 @@
+ endif()
+ message(STATUS "Network: ${NETWORK_STATUS}")
+ message(STATUS "Scaling: ${SCALE_STATUS}")
++message(STATUS "Fullscreen only: ${FULLSCREEN_ONLY}")
+ if(DATAPATH)
+ 	message(STATUS "Additional/System Game Data Path: \"${DATAPATH}\"")
+ endif()

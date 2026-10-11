@@ -1,0 +1,88 @@
+--- a/src/io/gfx/video.cpp
++++ b/src/io/gfx/video.cpp
+@@ -468,6 +468,10 @@
+ 		LOG_ERROR("Could not create texture: %s", SDL_GetError());
+ 		return false;
+ 	}
++	// Palette colours loaded from game data never set alpha, so it defaults
++	// to 0. Blending the (fully opaque) frame against the backbuffer with a
++	// zero alpha channel would make it invisible; the frame is always opaque.
++	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+ 	if(!SDL_SetTexturePalette(texture, texturePalette)) {
+ 		LOG_ERROR("Could not set texture palette: %s", SDL_GetError());
+ 		return false;
+@@ -509,6 +513,10 @@
+ 		LOG_ERROR("Could not create texture: %s", SDL_GetError());
+ 		return false;
+ 	}
++	// Palette colours loaded from game data never set alpha, so it defaults
++	// to 0. Blending the (fully opaque) frame against the backbuffer with a
++	// zero alpha channel would make it invisible; the frame is always opaque.
++	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+
+ 	textureSurface = SDL_CreateRGBSurfaceWithFormat(0, renderW, renderH, SDL_BITSPERPIXEL(format), format);
+ 	if (!textureSurface) {
+--- a/src/io/file.cpp
++++ b/src/io/file.cpp
+@@ -645,6 +645,12 @@
+ 		palette[count].r = (buffer[count * 3] << 2) + (buffer[count * 3] >> 4);
+ 		palette[count].g = (buffer[(count * 3) + 1] << 2) + (buffer[(count * 3) + 1] >> 4);
+ 		palette[count].b = (buffer[(count * 3) + 2] << 2) + (buffer[(count * 3) + 2] >> 4);
++		// The file format has no alpha channel, so colours are always opaque.
++		// Leaving this unset reads back whatever was in the containing
++		// SDL_Color array before (uninitialised heap memory), which some
++		// platforms/allocators happen to leave non-zero and others zero,
++		// making SDL2 silently alpha-blend an "invisible" frame on the latter.
++		palette[count].a = 255;
+
+ 	}
+
+--- a/src/menu/gamemenu.cpp
++++ b/src/menu/gamemenu.cpp
+@@ -85,6 +85,7 @@
+ 		if (col > 79) col = 79;
+
+ 		greyPalette[i].r = greyPalette[i].g = greyPalette[i].b = col;
++		greyPalette[i].a = 255;
+
+ 	}
+
+--- a/src/io/gfx/font.cpp
++++ b/src/io/gfx/font.cpp
+@@ -615,7 +615,7 @@
+
+ 	for (int i = 0; i < length; i++) {
+ 		palette[i].r = palette[i].g = palette[i].b = (i * newLength / length) + newStart;
+-#if OJ_SDL3 || OJ_SDL3
++#if OJ_SDL3 || OJ_SDL2
+ 		palette[i].a = 0xFF;
+ #endif
+ 	}
+--- a/src/jj1/level/jj1levelplayer.cpp
++++ b/src/jj1/level/jj1levelplayer.cpp
+@@ -70,8 +70,10 @@
+
+ 	// Create the player's palette
+
+-	for (count = 0; count < MAX_PALETTE_COLORS; count++)
++	for (count = 0; count < MAX_PALETTE_COLORS; count++) {
+ 		palette[count].r = palette[count].g = palette[count].b = count;
++		palette[count].a = 255;
++	}
+
+
+ 	// Fur colours
+--- a/src/jj1/bonuslevel/jj1bonuslevelplayer.cpp
++++ b/src/jj1/bonuslevel/jj1bonuslevelplayer.cpp
+@@ -58,8 +58,10 @@
+
+ 	// Create the player's palette
+
+-	for (int i = 0; i < MAX_PALETTE_COLORS; i++)
++	for (int i = 0; i < MAX_PALETTE_COLORS; i++) {
+ 		palette[i].r = palette[i].g = palette[i].b = i;
++		palette[i].a = 255;
++	}
+
+ 	/// @todo Custom colours
+
