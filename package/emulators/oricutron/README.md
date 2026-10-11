@@ -1,10 +1,5 @@
-# Oricutron
+# oricutron
 
-The `oricutron` port keeps the Oric (Oric-1/Atmos) emulator alive on REG-Linux with the SDL2 frontend.
+Oric-1/Atmos emulator. Upstream: https://github.com/pete-gordon/oricutron
 
-## Build notes
-
-- `Version`: V1_2_10
-- `Dependencies`: `BR2_PACKAGE_SDL2`
-- `Build helper`: CMake-based (`cmake-package`)
-- `Extras`: applies `001-no-gui-x11.patch`
+X11 GUI support is patched out (`001-no-gui-x11.patch`) since REG-Linux uses Wayland/framebuffer.
