@@ -6,9 +6,7 @@ config BR2_PACKAGE_SONIC_MANIA
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_LIBOGG
 	select BR2_PACKAGE_LIBTHEORA
-	select BR2_PACKAGE_PORTAUDIO
-	select BR2_PACKAGE_PORTAUDIO_ALSA
 	help
 	  A complete decompilation of Sonic Mania (2017).
 
-	  https://github.com/Rubberduckycooly/Sonic-Mania-Decompilation
+	  https://github.com/RSDKModding/Sonic-Mania-Decompilation
