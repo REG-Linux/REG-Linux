@@ -1,0 +1,12 @@
+diff --git a/src/seg009.c b/src/seg009.c
+--- a/src/seg009.c
++++ b/src/seg009.c
+@@ -118,7 +118,7 @@ const char* locate_save_file_(const char* filename, char* dst, int size) {
+ #else
+ 	find_home_dir();
+ 	find_share_dir();
+-	char* dirs[3] = {home_dir, share_dir, exe_dir};
++	char* dirs[3] = {exe_dir, home_dir, share_dir};
+ 	for (int i = 0; i < 3; i++) {
+ 		struct stat path_stat;
+ 		int result = stat(dirs[i], &path_stat);

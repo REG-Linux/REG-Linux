@@ -1,0 +1,27 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/sdlpop-box.jpg",
+          "desc": "An open-source port of Prince of Persia, based on the disassembly of the DOS version, extended with new features, including save states and modding.\nThe player character has an infinite amount of lives, but has to restart at the beginning of a level each time he dies, and must complete the game within an hour.",
+          "developer": "NagyD",
+          "genre": "Adventure",
+          "image": "./images/sdlpop-image.png",
+          "lang": "en",
+          "marquee": "./images/sdlpop-marquee.png",
+          "name": "SDLPoP",
+          "players": "1",
+          "publisher": "https://github.com/NagyD/SDLPoP",
+          "rating": "0.7",
+          "releasedate": "20150101T000000",
+          "thumbnail": "./images/sdlpop-thumb.png",
+          "video": "./videos/sdlpop-video.mp4",
+          "wheel": "./images/sdlpop-wheel.png"
+        },
+        "path": "./sdlpop.sdlpop",
+        "type": "game"
+      }
+    ]
+  }
+}
