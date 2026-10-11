@@ -1,0 +1,21 @@
+config BR2_PACKAGE_ALEPHONE
+	bool "alephone"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBSNDFILE
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_LIBCURL
+	help
+	  Aleph One is the open-source Marathon engine. Bungie
+	  released the engine AND all three game campaigns as
+	  freeware. Three full FPS games, completely free.
+
+	  https://github.com/Aleph-One-Marathon/alephone
