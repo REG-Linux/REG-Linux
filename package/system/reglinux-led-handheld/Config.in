@@ -1,0 +1,11 @@
+config BR2_PACKAGE_REGLINUX_LED_HANDHELD
+	bool "reglinux-led-handheld"
+	select BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+
+	help
+	  LED controller daemon for handheld devices.
+	  Supports battery level indication, effects (rainbow, pulse),
+	  and per-LED individual control for devices like Retroid Pocket 5.
+
+	  https://github.com/REG-Linux/REG-Linux
