@@ -3,8 +3,8 @@
 # libretro-mame2003-plus
 #
 ################################################################################
-# Version: Commits on Nov 13, 2025
-LIBRETRO_MAME2003_PLUS_VERSION = 62c7089644966f6ac5fc79fe03592603579a409d
+# Version: Commits on Sep 3, 2026
+LIBRETRO_MAME2003_PLUS_VERSION = 07a41088de8a3438a521b2036fb462809cada54c
 LIBRETRO_MAME2003_PLUS_SITE = $(call github,libretro,mame2003-plus-libretro,$(LIBRETRO_MAME2003_PLUS_VERSION))
 LIBRETRO_MAME2003_PLUS_LICENSE = MAME
 
@@ -44,7 +44,6 @@ define LIBRETRO_MAME2003_PLUS_BUILD_CMDS
 	    -f Makefile platform="$(LIBRETRO_MAME2003_PLUS_PLATFORM)" \
         GIT_VERSION=" $(shell echo $(LIBRETRO_MAME2003_PLUS_VERSION) | cut -c 1-7)"
         rsync -a --exclude mame2003-plus.xml $(@D)/metadata/ $(@D)/metadata-install/
-        gzip -9c $(@D)/metadata/mame2003-plus.xml > $(@D)/metadata-install/mame2003-plus.xml.gz
 endef
 
 define LIBRETRO_MAME2003_PLUS_INSTALL_TARGET_CMDS
@@ -57,6 +56,12 @@ define LIBRETRO_MAME2003_PLUS_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/mame2003-plus/samples
 	cp -r $(@D)/metadata-install/* \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/mame2003-plus
+	# regmsgd reads mame2003-plus.xml (the core only writes its own): gzipped into bios/databases.
+	rm -rf $(TARGET_DIR)/usr/share/reglinux/datainit/bios/mame2003-plus/mame2003-plus.xml.gz \
+		$(TARGET_DIR)/usr/share/regmsg/data/mame2003-plus
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/databases
+	gzip -9nc $(@D)/metadata/mame2003-plus.xml \
+		> $(TARGET_DIR)/usr/share/reglinux/datainit/bios/databases/mame2003-plus.xml.gz
 endef
 
 define LIBRETRO_MAME2003_PLUS_NAMCO_QUICK_FIX
