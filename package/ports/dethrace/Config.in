@@ -1,0 +1,10 @@
+config BR2_PACKAGE_DETHRACE
+	bool "dethrace"
+	depends on !BR2_STATIC_LIBS
+	select BR2_PACKAGE_SDL2
+	help
+	  Dethrace is a reimplementation of the Carmageddon engine.
+	  Software renderer (BRender), no OpenGL needed.
+	  Requires original Carmageddon game data.
+
+	  https://github.com/dethrace-labs/dethrace
