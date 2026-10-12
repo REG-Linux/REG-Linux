@@ -6,22 +6,22 @@ gpio_enabled=1
 arch="$(cat /usr/share/reglinux/system.arch)"
 
 ba_gpio_configure() {
-    settings_gpio_mk="$(/usr/bin/system-settings-get controllers.gpio.enabled)"
+    settings_gpio_mk="$(/usr/bin/regmsg systemconf getconfigkey controllers.gpio.enabled)"
     if [ "$settings_gpio_mk" = "1" ]; then
-        settings_gpio_map="$(/usr/bin/system-settings-get controllers.gpio.args)"
+        settings_gpio_map="$(/usr/bin/regmsg systemconf getconfigkey controllers.gpio.args)"
     [ "$settings_gpio_map" = "" ] && settings_gpio_map="map=1,2"
         eval $config_script "module" "load" mk_arcade_joystick_rpi "$settings_gpio_map" >> $log
     else
     # mk disabled let's check for db9
-    settings_db9="$(/usr/bin/system-settings-get controllers.db9.enabled)"
+    settings_db9="$(/usr/bin/regmsg systemconf getconfigkey controllers.db9.enabled)"
         if [ "$settings_db9" = "1" ]; then
-            settings_db9_map="$(/usr/bin/system-settings-get controllers.db9.args)"
+            settings_db9_map="$(/usr/bin/regmsg systemconf getconfigkey controllers.db9.args)"
             eval $config_script "module" "load" db9_gpio_rpi "$settings_db9_map" >> $log
         else
         # db9 and mk disabled let's check for gamecon
-            settings_gamecon="$(/usr/bin/system-settings-get controllers.gamecon.enabled)"
+            settings_gamecon="$(/usr/bin/regmsg systemconf getconfigkey controllers.gamecon.enabled)"
             if [ "$settings_gamecon" = "1" ]; then
-                settings_gamecon_map="$(/usr/bin/system-settings-get controllers.gamecon.args)"
+                settings_gamecon_map="$(/usr/bin/regmsg systemconf getconfigkey controllers.gamecon.args)"
                 eval $config_script "module" "load" gamecon_gpio_rpi "$settings_gamecon_map" >> $log
             else
                 # no GPIO input enabled at all!

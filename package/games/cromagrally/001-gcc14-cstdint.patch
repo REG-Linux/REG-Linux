@@ -1,0 +1,10 @@
+--- a/extern/Pomme/src/PommeDebug.h
++++ b/extern/Pomme/src/PommeDebug.h
+@@ -3,6 +3,7 @@
+ #if __cplusplus
+
+ #include <string>
++#include <cstdint>
+ #include <sstream>
+
+ #define POMME_DEBUG_MEMORY

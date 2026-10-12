@@ -1,0 +1,51 @@
+From 43b34a1324ae1227c60a5c647b0ae6a4e8ac8f6d Mon Sep 17 00:00:00 2001
+From: REG-Linux <cjom@reglinux.org>
+Date: Tue, 29 Sep 2026 22:49:11 +0100
+Subject: [PATCH] GLES3: build GLideN64 against GLES-only headers
+
+The GLES3=1 path includes <GL/glcorearb.h> for GLideN64's PFNGL*PROC
+typedefs, but a GLES-only sysroot (Mesa built without desktop GL) has no
+GL/ headers. Fall back to the copy bundled in GLideN64's src/inc, after
+the system directories so a real one still wins.
+
+glcorearb.h also leaves out GL_EXT_direct_state_access, whose
+PFNGLTEXTURESTORAGE2DMULTISAMPLEEXTPROC GLFunctions uses; desktop builds
+get it from <GL/glext.h>. Declare it in the GLES3 branch.
+---
+ Makefile.common                                              | 3 +++
+ .../src/Graphics/OpenGLContext/GLFunctions.h                 | 5 +++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/Makefile.common b/Makefile.common
+index 05743eec..cd007640 100644
+--- a/Makefile.common
++++ b/Makefile.common
+@@ -687,6 +687,9 @@ ifeq ($(GLES3),1)
+ 	# enables the GLES3 wrappers in glsm.c; without it they compile to stubs.
+ 	GLFLAGS += -DHAVE_OPENGLES -DHAVE_OPENGLES3 -DDISABLE_3POINT
+ 	SOURCES_C += $(LIBRETRO_COMM_DIR)/glsym/glsym_es3.c
++	# GLideN64 includes <GL/glcorearb.h> for its PFNGL*PROC typedefs, which
++	# GLES-only sysroots lack; fall back to the copy bundled in its src/inc.
++	GLFLAGS += -idirafter $(VIDEODIR_GLIDEN64)/src/inc
+ else ifeq ($(GLES),1)
+ 	GLFLAGS += -DHAVE_OPENGLES -DHAVE_OPENGLES2 -DDISABLE_3POINT
+ 	SOURCES_C += $(LIBRETRO_COMM_DIR)/glsym/glsym_es2.c
+diff --git a/mupen64plus-video-gliden64/src/Graphics/OpenGLContext/GLFunctions.h b/mupen64plus-video-gliden64/src/Graphics/OpenGLContext/GLFunctions.h
+index b441b13b..b10816d0 100644
+--- a/mupen64plus-video-gliden64/src/Graphics/OpenGLContext/GLFunctions.h
++++ b/mupen64plus-video-gliden64/src/Graphics/OpenGLContext/GLFunctions.h
+@@ -25,6 +25,11 @@
+  * declarations. */
+ #include <glsym/rglgen_headers.h>
+ #include <GL/glcorearb.h>
++/* From GL_EXT_direct_state_access, which glcorearb.h leaves out; desktop
++ * builds get it through <GL/glext.h>. */
++#ifndef GL_EXT_direct_state_access
++typedef void (APIENTRYP PFNGLTEXTURESTORAGE2DMULTISAMPLEEXTPROC) (GLuint texture, GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
++#endif
+ #elif defined(OS_MAC_OS_X)
+ #include <OpenGL/OpenGL.h>
+ #include <stddef.h>
+-- 
+2.53.0
+

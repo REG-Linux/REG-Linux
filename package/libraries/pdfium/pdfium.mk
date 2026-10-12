@@ -10,6 +10,11 @@ PDFIUM_LICENSE_FILES = LICENSE
 PDFIUM_LIBC_SUFFIX =
 PDFIUM_ARCH =
 
+# This file is parsed for every target, whether or not the package is
+# selected, so the unsupported-configuration errors below must only fire
+# when PDFium is actually enabled.
+ifeq ($(BR2_PACKAGE_PDFIUM),y)
+
 ifeq ($(BR2_arm),y)
 PDFIUM_ARCH = arm
 else ifeq ($(BR2_aarch64),y)
@@ -28,6 +33,8 @@ else ifeq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
 PDFIUM_LIBC_SUFFIX =
 else
 $(error BR2_PACKAGE_PDFIUM requires a glibc or musl toolchain)
+endif
+
 endif
 
 PDFIUM_SOURCE = pdfium-linux$(PDFIUM_LIBC_SUFFIX)-$(PDFIUM_ARCH).tgz

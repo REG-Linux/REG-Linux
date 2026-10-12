@@ -1,0 +1,14 @@
+#!/bin/sh
+# reg-compat-resume — Called on resume from suspend.
+# Marks suspend as "works" (if we got here, resume worked).
+# Can be hooked into /usr/lib/pm-utils/sleep.d/ or called from
+# the suspend/resume handler directly.
+#
+# Usage: reg-compat-resume
+# Or as a pm-utils hook: ln -s /usr/bin/reg-compat-resume /usr/lib/pm-utils/sleep.d/99compat
+
+case "$1" in
+    resume|thaw|"")
+        /usr/bin/reg-compat-probe --suspend
+        ;;
+esac

@@ -1,0 +1,46 @@
+# Core metadata for the libretro frontend.
+#
+# RetroArch and Libra refuse to load a core they have no .info for -- the
+# launch dies with "missing core info file
+# /usr/share/libretro/info/jazz2_libretro.info" before the core is even opened.
+# The libretro-info package that ships the other ~308 of these is harvested from
+# upstream's database, which does not carry Jazz² Resurrection, so this one has
+# to come from the package that installs the core.
+#
+# display_version is substituted from LIBRETRO_JAZZ2_NATIVE_VERSION at install
+# time, so it cannot drift from the core actually shipped.
+
+# Software Information
+display_name = "Jazz Jackrabbit 2 (Jazz² Resurrection)"
+authors = "Dan R."
+corename = "Jazz² Resurrection"
+categories = "Game"
+license = "GPLv3"
+display_version = "@VERSION@"
+permissions = ""
+
+# The frontend never opens the content itself: the core resolves its own
+# Content/Source/Cache from the path it is handed (see the staging directory
+# regmsg's libretro/jazz2_paths.lua builds), which is why RetroArch logs
+# "Content loading skipped. Implementation will load it on its own".
+supported_extensions = "game"
+
+# Hardware Information
+systemname = "Jazz Jackrabbit 2"
+systemid = "jazz2"
+
+# Libretro Features
+supports_no_game = "true"
+single_purpose = "true"
+# retro_serialize() writes a real 2 MB snapshot, but it is checkpoint-grade:
+# the core refuses the frame-exact contexts outright rather than hand back a
+# state that would corrupt run-ahead or rollback netplay. So savestates work,
+# and "basic" is the honest feature level -- claiming "deterministic" here is
+# what would enable exactly the modes it rejects.
+savestate = "true"
+savestate_features = "basic"
+cheats = "false"
+# The core installs an input state callback but publishes no
+# SET_INPUT_DESCRIPTORS; it maps RETRO_DEVICE_ID_JOYPAD_* itself in
+# nCine/Backends/Libretro/LibretroInputManager.cpp.
+input_descriptors = "false"

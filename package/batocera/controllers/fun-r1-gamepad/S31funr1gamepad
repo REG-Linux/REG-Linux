@@ -12,9 +12,9 @@ case "$1" in
 		# assign the BACK key to 2P COIN button
 		# If the variable is not set, the default behavior is BACK is BTN_BACK
 		# If the variable is set to "2", the BACK button becomes 2P COIN button
-	
-    		BACK_IS_2P_COIN="$(/usr/bin/system-settings-get controllers.fun-r1-gamepad.back-is-2p-coin)"
-	
+
+    		BACK_IS_2P_COIN="$(/usr/bin/regmsg systemconf getconfigkey controllers.fun-r1-gamepad.back-is-2p-coin)"
+
 		if  [ "$BACK_IS_2P_COIN" != "2" ] || [ -z $BACK_IS_2P_COIN ]
 		then
 			echo "FUN R1: BACK button is BACK"
@@ -23,7 +23,7 @@ case "$1" in
 			echo "FUN R1: BACK button is 2P COIN"
 			BACK_IS_2P_COIN="2"
 		fi
-		
+
 		/usr/bin/fun_r1_gamepad $BACK_IS_2P_COIN &
 	fi
 	;;

@@ -1,0 +1,5 @@
+config BR2_PACKAGE_FIRMWARE_RTL8723FU
+	bool "firmware-rtl8723fu"
+	help
+	  Bluetooth firmware of the Realtek RTL8733BU WiFi/BT combo chip,
+	  as found in the Miyoo Flip.

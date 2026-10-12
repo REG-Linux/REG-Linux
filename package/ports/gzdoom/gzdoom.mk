@@ -37,14 +37,16 @@ GZDOOM_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-L$(STAGING_DIR)/usr/lib -lfts"
 endif
 
 # Enable vulkan only if we have it + Sway
-ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER)$(BR2_PACKAGE_SWAY),yyy)
+ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
+ifeq ($(BR2_PACKAGE_SWAY)$(BR2_PACKAGE_WESTON),y)
     GZDOOM_CONF_OPTS += -DHAVE_VULKAN=ON
     GZDOOM_DEPENDENCIES += vulkan-headers vulkan-loader
     ifeq ($(BR2_PACKAGE_REGLINUX_XWAYLAND),y)
         GZDOOM_CONF_OPTS += -DVULKAN_USE_XLIB=ON -DVULKAN_USE_WAYLAND=OFF
-    else ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY),yy)
+    else ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY)$(BR2_PACKAGE_WESTON),yy)
         GZDOOM_CONF_OPTS += -DVULKAN_USE_XLIB=OFF -DVULKAN_USE_WAYLAND=ON
     endif
+endif
 else
     GZDOOM_CONF_OPTS += -DHAVE_VULKAN=OFF
 endif
@@ -63,9 +65,6 @@ define GZDOOM_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 $(@D)/buildroot-build/*.pk3 $(TARGET_DIR)/usr/share/gzdoom
 	cp -pr $(@D)/buildroot-build/fm_banks $(TARGET_DIR)/usr/share/gzdoom
 	cp -pr $(@D)/buildroot-build/soundfonts $(TARGET_DIR)/usr/share/gzdoom
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/gzdoom/gzdoom.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

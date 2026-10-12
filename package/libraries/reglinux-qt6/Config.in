@@ -53,6 +53,16 @@ config BR2_PACKAGE_REGLINUX_QT6
 	select BR2_PACKAGE_QT6BASE_VULKAN		if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE && BR2_PACKAGE_REGLINUX_VULKAN
 	select BR2_PACKAGE_QT6DECLARATIVE		if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE
 	select BR2_PACKAGE_QT6MULTIMEDIA		if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE
+	# Without a media backend qt6multimedia builds libQt6Multimedia.so and no
+	# plugins at all, and every QMediaPlayer fails with "No QtMultimedia
+	# backends found". ffmpeg is the portable choice across all the prebuilt
+	# CPUs; it pulls in QT6MULTIMEDIA_PULSEAUDIO, QT6BASE_CONCURRENT and
+	# FFMPEG_SWSCALE itself. The extra conditions mirror the symbol's own
+	# "depends on", so this never selects something Kconfig would reject.
+	select BR2_PACKAGE_QT6MULTIMEDIA_FFMPEG		if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE && \
+						   BR2_PACKAGE_FFMPEG_ARCH_SUPPORTS && \
+						   BR2_PACKAGE_PULSEAUDIO_HAS_ATOMIC && \
+						   BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_2
 	select BR2_PACKAGE_QT6SHADERTOOLS		if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE
 	select BR2_PACKAGE_QT6SVG			if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE
 	select BR2_PACKAGE_QT6TOOLS			if BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE

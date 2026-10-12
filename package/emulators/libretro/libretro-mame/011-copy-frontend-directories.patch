@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: REG-Linux <cjom@reglinux.org>
+Date: Sun, 16 Aug 2026 00:00:00 +0000
+Subject: [PATCH] libretro: copy the directories the frontend hands back
+
+retro_init() stores the pointers returned by GET_SYSTEM_DIRECTORY,
+GET_SAVE_DIRECTORY and GET_CONTENT_DIRECTORY without copying them. The
+libretro API only guarantees those strings for the duration of the
+environment call, so keeping the pointers is wrong for any frontend that
+does not happen to own the buffers for the whole process.
+
+RetroArch does own them for the process, which is why this has never
+mattered there. A frontend that frees or reallocates its copy per launch
+leaves MAME reading freed memory, and Set_Path_Option() then builds every
+path out of it:
+
+  -cfg_directory system/mame/artwork/mame/cfg   (was /userdata/saves/...)
+  -artpath /mame/artwork                        (was /userdata/bios/mame/artwork)
+  -rompath /var/run/cmdfiles;/mame/bios;/mame/roms;...
+
+Keep private copies in static buffers instead. The three globals stay
+`const char *` so nothing else has to change, they just point at storage
+this file owns.
+
+Signed-off-by: REG-Linux <cjom@reglinux.org>
+---
+--- a/src/osd/libretro/libretro-internal/libretro.cpp
++++ b/src/osd/libretro/libretro-internal/libretro.cpp
+@@ -57,6 +57,19 @@
+ const char *retro_system_directory;
+ const char *retro_content_directory;
+ 
++/* The frontend only guarantees the strings handed back by
++ * GET_SYSTEM_DIRECTORY / GET_CONTENT_DIRECTORY / GET_SAVE_DIRECTORY for the
++ * duration of the environment call, so keep private copies of them. */
++static char retro_save_directory_buf[RETRO_PATH_MAX];
++static char retro_system_directory_buf[RETRO_PATH_MAX];
++static char retro_content_directory_buf[RETRO_PATH_MAX];
++
++static const char *copy_directory(char *dst, const char *src)
++{
++   snprintf(dst, RETRO_PATH_MAX, "%s", src ? src : "");
++   return dst;
++}
++
+ //FIXME: re-add way to handle 16/32 bit
+ #ifdef M16B
+ uint16_t videoBuffer[4096*3072];
+@@ -782,20 +795,20 @@
+    if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
+    {
+       /* if defined, use the system directory */
+-      retro_system_directory = system_dir;
++      retro_system_directory = copy_directory(retro_system_directory_buf, system_dir);
+    }
+ 
+    if (environ_cb(RETRO_ENVIRONMENT_GET_CONTENT_DIRECTORY, &content_dir) && content_dir)
+    {
+       /* if defined, use the content directory */
+-      retro_content_directory = content_dir;
++      retro_content_directory = copy_directory(retro_content_directory_buf, content_dir);
+    }
+ 
+    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
+    {
+       /* If save directory is defined use it,
+        * otherwise use system directory. */
+-      retro_save_directory = *save_dir ? save_dir : retro_system_directory;
++      retro_save_directory = *save_dir ? copy_directory(retro_save_directory_buf, save_dir) : retro_system_directory;
+    }
+    else
+    {

@@ -1,0 +1,59 @@
+Fix build against Boost < 1.86
+
+boost::container::erase_if() was only added in Boost 1.86, while Buildroot
+still ships Boost 1.83, so sanitizing the Vulkan instance layer list fails to
+compile. Use the portable erase-remove idiom instead, which works with any
+Boost version (std::erase_if is not an option here: it has no overload for
+boost::container::static_vector).
+
+Also include <algorithm> and <cstring> explicitly, as std::find_if and
+std::strcmp were only reached through the precompiled header.
+
+--- a/src/video_core/renderer_vulkan/vk_platform.cpp
++++ b/src/video_core/renderer_vulkan/vk_platform.cpp
+@@ -14,6 +14,8 @@
+ #define VK_USE_PLATFORM_XLIB_KHR
+ #endif
+ 
++#include <algorithm>
++#include <cstring>
+ #include <memory>
+ #include <vector>
+ #include <boost/container/static_vector.hpp>
+@@ -334,17 +336,25 @@
+         return {};
+     }
+ 
+-    boost::container::erase_if(layers, [&](const char* layer) -> bool {
+-        const auto it = std::find_if(
+-            layer_properties.begin(), layer_properties.end(),
+-            [layer](const auto& prop) { return std::strcmp(layer, prop.layerName) == 0; });
+-
+-        if (it == layer_properties.end()) {
+-            LOG_INFO(Render_Vulkan, "Candidate instance layer {} is not available", layer);
+-            return true;
+-        }
+-        return false;
+-    });
++    layers.erase(std::remove_if(layers.begin(), layers.end(),
++                                [&](const char* layer) -> bool {
++                                    const auto it =
++                                        std::find_if(layer_properties.begin(),
++                                                     layer_properties.end(),
++                                                     [layer](const auto& prop) {
++                                                         return std::strcmp(layer,
++                                                                            prop.layerName) == 0;
++                                                     });
++
++                                    if (it == layer_properties.end()) {
++                                        LOG_INFO(Render_Vulkan,
++                                                 "Candidate instance layer {} is not available",
++                                                 layer);
++                                        return true;
++                                    }
++                                    return false;
++                                }),
++                 layers.end());
+ 
+     vk::InstanceCreateInfo instance_ci = {
+         .flags = GetInstanceFlags(),

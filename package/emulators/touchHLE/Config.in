@@ -2,6 +2,9 @@ config BR2_PACKAGE_TOUCHHLE
 	bool "touchHLE"
 	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
 	select BR2_PACKAGE_HOST_RUSTC
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_SDL2
 
 	help
         touchHLE is a high-level emulator for iPhone OS apps. 

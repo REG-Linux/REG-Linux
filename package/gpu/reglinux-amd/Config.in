@@ -1,0 +1,6 @@
+config BR2_PACKAGE_REGLINUX_AMD
+    bool "reglinux-amd"
+    select BR2_PACKAGE_XWAYLAND
+    select BR2_PACKAGE_MESA3D
+    help
+      This package helps switch between the different mesa amd drivers

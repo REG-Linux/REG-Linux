@@ -3,11 +3,29 @@ config BR2_PACKAGE_LIBRETRO_MAME
 	depends on BR2_INSTALL_LIBSTDCPP
 	select BR2_PACKAGE_ALSA_LIB
 	select BR2_PACKAGE_HAS_LIBRETRO_MAME
+	help
+	  A libretro MAME core for arcade game emulation.
 
-      help
-        A libretro mame core for Mame.
+	  MAME (Multiple Arcade Machine Emulator) is a multi-purpose
+	  emulation framework that can emulate a wide variety of arcade
+	  games. This libretro core is a trimmed-down version focused
+	  on arcade games.
+
+	  Features:
+	  - Extensive arcade game library support
+	  - Accurate hardware emulation
+	  - Save states
+	  - Controller support
+	  - Shader support
+
+	  Note: Requires game ROMs and BIOS files.
+	  Hash files are installed to /usr/share/lr-mame/hash/
 
 	  http://www.libretro.com
+	  https://www.mamedev.org/
 
 comment "LIBRETRO_MAME needs a toolchain w/ C++"
 	depends on !BR2_INSTALL_LIBSTDCPP
+
+comment "LIBRETRO_MAME needs ALSA"
+	depends on !BR2_PACKAGE_ALSA_LIB

@@ -1,0 +1,45 @@
+#!/bin/dash
+# Starts audio services
+
+. /etc/profile.d/xdg.sh
+. /etc/profile.d/dbus.sh
+
+start_pipewire() {
+    printf "Starting pipewire: "
+    start-stop-daemon -S -b -q -m -p /var/run/pipewire.pid --exec /usr/bin/pipewire
+
+    #Wait till sinks are listed, this means PW is working
+    N=0
+    while [ "$N" -lt 50 ] && ! pactl list sinks-raw | grep -qo sink=
+    do
+        sleep 0.1
+        N=$((N+1))
+    done
+    { [ "$N" -lt 50 ] && echo OK; } || echo FAIL
+}
+
+stop_pipewire() {
+    printf "Stopping pipewire: "
+    start-stop-daemon -K -q -p /var/run/pipewire.pid
+    killall pipewire
+    echo "OK"
+}
+
+case "$1" in
+    start)
+        # Runs the card's UCM BootSequence. WirePlumber applies the verb and
+        # device sequences but never this one, so its gains stay unset without it.
+        alsactl init
+        start_pipewire
+    ;;
+    stop)
+        stop_pipewire
+    ;;
+    restart|reload)
+        stop_pipewire
+        start_pipewire
+    ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

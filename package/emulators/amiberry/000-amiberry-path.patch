@@ -1,15 +1,12 @@
 diff --git a/src/osdep/amiberry.cpp b/src/osdep/amiberry.cpp
-index d3ed355..6384193 100644
+index 1234567..abcdefg 100644
 --- a/src/osdep/amiberry.cpp
 +++ b/src/osdep/amiberry.cpp
-@@ -4398,8 +4398,8 @@ static bool locate_amiberry_conf(const bool portable_mode)
- 		if (!my_existsdir(xdg_config_home.c_str()))
- 			my_mkdir(xdg_config_home.c_str());
- 
--		amiberry_conf_file = xdg_config_home + "/amiberry.conf";
--		amiberry_ini_file = xdg_config_home + "/amiberry.ini";
-+		amiberry_conf_file = std::string("/userdata/system/configs/amiberry/conf/amiberry.conf");
-+		amiberry_ini_file = std::string("/userdata/system/configs/amiberry/conf/amiberry.ini");
- 	}
- 	return my_existsfile2(amiberry_conf_file.c_str());
- }
+@@ -7088,7 +7088,7 @@
+ static void resolve_bootstrap_settings_paths(const bool portable_mode, const bool ensure_settings_root)
+ {
+-	settings_dir = get_settings_directory(portable_mode);
++	settings_dir = "/userdata/system/configs/amiberry/conf";
+ 	if (ensure_settings_root)
+ 		ensure_directory_exists(settings_dir);
+ 	amiberry_ini_file = join_path(settings_dir, "amiberry.ini");

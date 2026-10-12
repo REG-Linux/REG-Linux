@@ -13,7 +13,7 @@ REGLINUX_SYSTEM_SOURCE=
 ### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
 ### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
 
-REGLINUX_SYSTEM_ID_VERSION = 26.01
+REGLINUX_SYSTEM_ID_VERSION = 26.06
 REGLINUX_SYSTEM_RELEASE_TYPE=dev
 REGLINUX_SYSTEM_VERSION = $(REGLINUX_SYSTEM_ID_VERSION)-$(REGLINUX_SYSTEM_RELEASE_TYPE)
 REGLINUX_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
@@ -38,6 +38,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
 	REGLINUX_SYSTEM_ARCH=rk3399
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3568),y)
 	REGLINUX_SYSTEM_ARCH=rk3568
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3576),y)
+	REGLINUX_SYSTEM_ARCH=rk3576
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
 	REGLINUX_SYSTEM_ARCH=rk3588
 # Allwinner targets
@@ -51,6 +53,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H616),y)
 	REGLINUX_SYSTEM_ARCH=h616
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
 	REGLINUX_SYSTEM_ARCH=h700
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A133),y)
+	REGLINUX_SYSTEM_ARCH=a133
 # Amlogic targets
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 	REGLINUX_SYSTEM_ARCH=s812
@@ -64,6 +68,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S922X),y)
 	REGLINUX_SYSTEM_ARCH=s922x
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
 	REGLINUX_SYSTEM_ARCH=a3gen2
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5),y)
+	REGLINUX_SYSTEM_ARCH=odroidc5
 # Samsung Exynos targets
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_XU4),y)
 	REGLINUX_SYSTEM_ARCH=odroidxu4
@@ -89,9 +95,15 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 	REGLINUX_SYSTEM_ARCH=sm8250
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
 	REGLINUX_SYSTEM_ARCH=sm8550
+# NVIDIA Tegra targets
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_L4T),y)
+	REGLINUX_SYSTEM_ARCH=l4t
 # RISC-V targets
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_K3)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
 	REGLINUX_SYSTEM_ARCH=riscv
+# Intel/Altera FPGA SoC targets
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_DE10NANO),y)
+	REGLINUX_SYSTEM_ARCH=de10nano
 else
 	REGLINUX_SYSTEM_ARCH=unknown
 endif
@@ -159,6 +171,12 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	# list of modules that doesnt like suspend
 	mkdir -p $(TARGET_DIR)/etc/pm/config.d
 	echo 'SUSPEND_MODULES="rtw88_8822ce snd_pci_acp5x"' > $(TARGET_DIR)/etc/pm/config.d/config
+
+	# disabled USB gadget on CHA (the USB port can be used with a third controller or an USB drive)
+	if [ "$(BR2_PACKAGE_SYSTEM_TARGET_CHA)" = "y" ]; then \
+		sed -i "s/^system\.usb\.gadget/#system\.usb\.gadget/" $(BINARIES_DIR)/system-boot.conf; \
+		sed -i "s/ USB_GADGET//" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf; \
+	fi
 endef
 
 $(eval $(generic-package))

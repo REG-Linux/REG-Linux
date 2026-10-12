@@ -1,9 +1,7 @@
 config BR2_PACKAGE_FELIX86
     bool "felix86"
     depends on BR2_riscv && BR2_RISCV_64
-    depends on BR2_PACKAGE_HAS_LIBGL
-    depends on BR2_PACKAGE_VULKAN_HEADERS
-    depends on BR2_PACKAGE_VULKAN_LOADER
+    depends on BR2_PACKAGE_HAS_LIBGL || (BR2_PACKAGE_VULKAN_HEADERS && BR2_PACKAGE_VULKAN_LOADER)
   
     help
       Felix86

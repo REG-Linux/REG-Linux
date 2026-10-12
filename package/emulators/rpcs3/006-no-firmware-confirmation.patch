@@ -2,22 +2,21 @@ diff --git a/rpcs3/rpcs3qt/main_window.cpp b/rpcs3/rpcs3qt/main_window.cpp
 index 8a67c71..d4eecbb 100644
 --- a/rpcs3/rpcs3qt/main_window.cpp
 +++ b/rpcs3/rpcs3qt/main_window.cpp
-@@ -1224,12 +1224,12 @@
+@@ -1400,7 +1400,7 @@
+ 		const QString path_last_pup = mw->m_gui_settings->GetValue(gui::fd_install_pup).toString();
+ 		file_path = QFileDialog::getOpenFileName(mw, tr("Select PS3UPDAT.PUP To Install"), path_last_pup, tr("PS3 update file (PS3UPDAT.PUP);;All pup files (*.pup *.PUP);;All files (*.*)"));
  	}
- 	else
+-	else if (mw)
++	/*else if (mw)
  	{
--		if (QMessageBox::question(this, tr("RPCS3 Firmware Installer"), tr("Install firmware: %1?").arg(file_path),
--			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
--		{
--			gui_log.notice("Firmware: Cancelled installation from drop. File: %s", file_path);
--			return;
--		}
-+		//if (QMessageBox::question(this, tr("RPCS3 Firmware Installer"), tr("Install firmware: %1?").arg(file_path),
-+		//	QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
-+		//{
-+		//	gui_log.notice("Firmware: Cancelled installation from drop. File: %s", file_path);
-+		//	return;
-+		//}
- 	}
+ 		if (QMessageBox::question(mw, tr("RPCS3 Firmware Installer"), tr("Install firmware: %1?").arg(file_path),
+ 			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+@@ -1408,7 +1408,7 @@
+ 			gui_log.notice("Firmware: Cancelled installation from drop. File: %s", file_path);
+ 			return;
+ 		}
+-	}
++	}*/
  
  	if (!file_path.isEmpty())
+ 	{

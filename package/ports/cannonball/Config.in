@@ -1,15 +1,16 @@
 config BR2_PACKAGE_CANNONBALL
 	bool "cannonball"
 	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_PACKAGE_HAS_LIBEGL
+	depends on BR2_PACKAGE_HAS_LIBGLES
 	select BR2_PACKAGE_SDL2
-	select BR2_PACKAGE_BOOST
 	select BR2_PACKAGE_TINYXML2
 	select BR2_PACKAGE_LIBEXECINFO	if BR2_TOOLCHAIN_USES_MUSL
 	select BR2_PACKAGE_LIBBACKTRACE	if BR2_TOOLCHAIN_USES_MUSL
 	help
-	  Cannonball - OutRun Engine
+	  Cannonball SE - OutRun Engine (SDL2/GLES2)
 
-	  https://github.com/djyt/cannonball
+	  https://github.com/J1mbo/cannonball-se
 
-comment "Cannonball needs a toolchain w/ C++, and following libraries : sdl2, boost"
-	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_BOOST
+comment "Cannonball needs a toolchain w/ C++, EGL, GLES2, and following libraries: sdl2, tinyxml2"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_HAS_LIBEGL || !BR2_PACKAGE_HAS_LIBGLES || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_TINYXML2

@@ -3,8 +3,8 @@
 # libretro-81
 #
 ################################################################################
-# Version.: Commits on Oct 21, 2024
-LIBRETRO_81_VERSION = ffc99f27f092addc9ddd34dd0e3a3d4d1c053cbf
+# Version.: Commits on Apr 20, 2026
+LIBRETRO_81_VERSION = fa7094910d040baa5fd8b11dbf6a1a618330ecd9
 LIBRETRO_81_SITE = $(call github,libretro,81-libretro,$(LIBRETRO_81_VERSION))
 LIBRETRO_81_LICENSE = GPLv3
 
@@ -27,12 +27,6 @@ endif
 define LIBRETRO_81_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/ \
 	    -f Makefile platform="$(LIBRETRO_81_PLATFORM)"
-endef
-
-define LIBRETRO_81_INSTALL_TARGET_CMDS
-	$(INSTALL) -D $(@D)/81_libretro.so $(TARGET_DIR)/usr/lib/libretro/81_libretro.so
-	$(INSTALL) -D -t $(TARGET_DIR)/usr/share/evmapy/ \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-81/zx81.keys
 endef
 
 $(eval $(generic-package))

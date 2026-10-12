@@ -1,0 +1,8 @@
+config BR2_PACKAGE_YQUAKE2_REF_VK
+	bool "yquake2-ref-vk"
+	depends on BR2_PACKAGE_REGLINUX_VULKAN
+
+	help
+	  Vulkan renderer for Yamagi Quake 2
+
+	  https://github.com/yquake2/ref_vk

@@ -6,4 +6,7 @@ config BR2_PACKAGE_HATARI
     select BR2_PACKAGE_LIBCAPSIMAGE
 
     help
-    	An Atari ST/STe/TT/Falcon emulator
+        An Atari ST/STe/TT/Falcon emulator
+
+        Requires TOS ROM image at /userdata/bios/tos.img
+        Configuration stored in /userdata/system/configs/hatari/

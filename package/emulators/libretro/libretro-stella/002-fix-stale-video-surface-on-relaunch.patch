@@ -1,0 +1,32 @@
+Reset the cached TIA-surface pointer when the console is destroyed.
+
+getVideoBuffer() memoizes the console's TIA-surface base pointer in the
+StellaLIBRETRO member render_surface (fetched once, on first call). The
+StellaLIBRETRO object is global and reused across game launches, so a frontend
+that keeps the core loaded and relaunches via retro_load_game without a fresh
+retro_init (e.g. REG-Station's in-process Libra player) never re-fetches it:
+after destroy()/create() builds a new FrameBuffer + TIA surface, render_surface
+still points at the previous, now-freed surface. The emulation then runs fine
+on the new console (RAM/TIA advance) but the frontend uploads the stale surface
+every frame, so video is frozen on the 2nd+ launch. Process-per-game frontends
+never hit this.
+
+Clear render_surface in destroy() so getVideoBuffer() re-fetches the live
+surface for the next console.
+
+--- a/src/os/libretro/StellaLIBRETRO.cxx
++++ b/src/os/libretro/StellaLIBRETRO.cxx
+@@ -121,6 +121,14 @@
+   video_ready = false;
+   audio_samples = 0;
+ 
++  // Invalidate the cached TIA-surface pointer: getVideoBuffer() memoizes it
++  // in render_surface, and myOSystem.reset() below frees the surface it points
++  // to. Frontends that reuse this (global) object across game launches without
++  // a fresh retro_init (e.g. REG-Station's in-process Libra player) would
++  // otherwise keep uploading the previous, now-stale surface every frame — the
++  // emulation runs but the video is frozen on the 2nd+ launch.
++  render_surface = nullptr;
++
+   myOSystem.reset();
+ }

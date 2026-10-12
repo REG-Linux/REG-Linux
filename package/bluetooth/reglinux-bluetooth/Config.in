@@ -1,0 +1,42 @@
+config BR2_PACKAGE_REGLINUX_BLUETOOTH
+	bool "reglinux-bluetooth"
+
+	select BR2_PACKAGE_BLUEZ5_UTILS
+	# btmon: HCI tracing, the only tool that shows why a pairing failed. It
+	# sits below both regmsgd and bluetoothd, so it is also the independent
+	# second opinion that bluetoothctl used to provide. No dependencies.
+	select BR2_PACKAGE_BLUEZ5_UTILS_MONITOR
+	# hciattach and hcitool, needed by S30bluetooth and wiimote3rdPartyConnect.
+	# DEPRECATED depends on CLIENT || TOOLS; CLIENT is gone (see below), so
+	# TOOLS is what keeps hciattach in the image -- dropping both silently
+	# removes the per-board firmware attach on all 8 board families.
+	select BR2_PACKAGE_BLUEZ5_UTILS_TOOLS
+	select BR2_PACKAGE_BLUEZ5_UTILS_DEPRECATED
+	select BR2_PACKAGE_BLUEZ5_UTILS_PLUGINS_SIXAXIS # sixaxis for PS3 controllers
+	select BR2_PACKAGE_UTIL_LINUX_RFKILL
+	help
+	  Bluetooth hardware bring-up: the per-board hciattach recipe in
+	  S30bluetooth, the org.bluez D-Bus policy, and the BlueZ packages.
+
+	  Everything above the controller -- bluetoothd's lifecycle, the pairing
+	  agent, discovery and the device operations -- lives in regmsgd.
+
+	  Dropped when that moved in, all unreferenced afterwards:
+	    BLUEZ_TOOLS              bt-agent and friends, 1.0 MB; bt-agent is
+	                             exactly what regmsgd's Agent1 replaced
+	    BLUEZ5_UTILS_TEST        34 Python scripts, 183 KB; keeping Python in
+	                             this path is what the migration removed
+
+	  CLIENT (bluetoothctl, 479 KB) is dropped for a second reason. It is the
+	  only thing that makes bluez probe for readline: configure.ac enables the
+	  READLINE conditional just for the client, and Makefile.am compiles
+	  src/shared/shell.c -- the sole caller of rl_message() -- only under it.
+	  readline.h declares that as `extern int rl_message ();`, and C23 reads
+	  empty parens as "no parameters", so GCC 16 rejects the call. Without
+	  CLIENT, shell.c never compiles, and that is what had Bluetooth and
+	  xpadneo switched off on K3 and TH1520 in reglinux-system/Config.in --
+	  both are selected there again now.
+
+	  Its three real uses are now regmsg commands: `bluetooth pairable`
+	  (the OrangePi step in S30bluetooth), `bluetooth info` and
+	  `bluetooth devices`.

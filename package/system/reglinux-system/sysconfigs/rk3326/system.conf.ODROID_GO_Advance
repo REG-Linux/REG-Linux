@@ -1,7 +1,7 @@
 # odroid-go advance default values
 
 # default wayland environment (rotate)
-system.es.environment=wayland
+system.rs.environment=wayland
 
 # Enable Suspend on handheld targets
 system.suspendmode=suspend

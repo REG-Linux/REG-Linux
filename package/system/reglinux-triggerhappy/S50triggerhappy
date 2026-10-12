@@ -1,0 +1,51 @@
+#!/bin/dash
+NAME=thd
+PIDFILE="/var/run/$NAME.pid"
+DAEMON="/usr/sbin/$NAME"
+[ -x "$DAEMON" ] || exit 1
+
+start() {
+    [ -r /etc/default/triggerhappy ] && . /etc/default/triggerhappy
+    . /etc/profile.d/xdg.sh
+    . /etc/profile.d/dbus.sh
+    . /etc/profile.d/50-board.sh
+
+    CONFPATH="/etc/triggerhappy/triggers.d/"
+    if [ "$(/usr/bin/regmsg systemconf getconfigkey system.multimediakeys.enabled)" = "0" ]; then
+        CONFFILE="multimedia_keys_disabled.conf"
+    else
+        CONFFILE="multimedia_keys.conf"
+        USER_CONFFILE="/userdata/system/configs/$CONFFILE"
+        if [ -e "$USER_CONFFILE" ]; then
+            CONFPATH="/userdata/system/configs/"
+        elif [ -n "${REG_BOARD_MODEL}" ]; then
+            # Per-device rules: multimedia_keys_<REG_BOARD_MODEL>.conf
+            BOARD_CONFFILE="multimedia_keys_${REG_BOARD_MODEL}.conf"
+            [ -e "${CONFPATH}${BOARD_CONFFILE}" ] && CONFFILE="$BOARD_CONFFILE"
+        fi
+    fi
+
+    DAEMON_ARGS="--daemon --triggers ${CONFPATH}${CONFFILE} --socket /var/run/thd.socket --pidfile $PIDFILE /dev/input/event*"
+
+    printf "Starting %s: " "$NAME"
+    { start-stop-daemon --start --quiet --pidfile "$PIDFILE" --exec "$DAEMON" -- $DAEMON_ARGS && echo "OK"; } || echo "FAIL"
+}
+
+stop() {
+    printf "Stopping %s: " "$NAME"
+    { start-stop-daemon --stop --quiet --retry 3 --remove-pidfile --pidfile "$PIDFILE" && echo "OK"; } || echo "FAIL"
+}
+
+case "$1" in
+    start) start ;;
+    stop)  stop  ;;
+    restart)
+        stop
+        sleep 1
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac

@@ -413,6 +413,7 @@
  czmon_8d
  czmon_8e
  czmon_8f
+ czmon_8g
  czmon_9a
  czmon_9b
  czmon_9c

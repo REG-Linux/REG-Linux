@@ -1,0 +1,194 @@
+Do not abort() when a shader fails to build.
+
+A libretro core runs in-process with its frontend, so abort() does not
+just end the emulator -- it takes the frontend down with it.  On
+Adreno/freedreno that is not hypothetical: the VDP2 blit shader wants up
+to 18 fragment texture samplers and the driver offers 16, so the link
+fails and REG-Station dies with the core.
+
+Treat a shader that will not build as a reason to draw nothing:
+
+  - compileVDP2Prog() returns int instead of aborting.  The failing
+    helper already clears _prgid[id], so the caller binds program 0 --
+    the frame is wrong, the emulator survives.
+  - setupVDP2Prog() and YglInitDrawFrameBufferShaders() propagate that
+    failure; Ygl_uniformVDP2DrawFramebuffer() gains the pgid < 0 guard it
+    needs now that setupVDP2Prog() can fail (it indexed _prgid[pgid]
+    unconditionally).
+  - initVDPProg() is void, so it logs, clears the program handle and
+    returns rather than aborting.
+  - The compile/link aborts in YglBlitSimple(), YglBlitVDP1() and
+    YglUpscaleFramebuffer() become "return -1"; all three already return
+    int.
+
+Also fixes an out-of-bounds read in YglInitDrawFrameBufferShaders(): it
+called compileVDP2Prog() -- which indexes pYglprg_vdp2_blit_f[arrayid] --
+*before* range-checking arrayid.  The check now runs first.
+
+The aborts left alone are in commongl.c: framebuffer-completeness checks,
+an allocation failure and a NULL Vdp2 regs guard.  Those are not shader
+build failures and giving each caller an error path is a separate job.
+
+--- a/yabause/src/core/video/opengl/common/include/common_glshader.h
++++ b/yabause/src/core/video/opengl/common/include/common_glshader.h
+@@ -16,7 +16,7 @@
+ 
+ extern int YglInitShader(int id, const GLchar * vertex[], int vcount, const GLchar * frag[], int fcount);
+ extern void initVDP2DrawCode(const GLchar* start[7], const GLchar* draw, const GLchar* end, const GLchar* final);
+-extern void compileVDP2Prog(int id, const GLchar **v, int CS);
++extern int compileVDP2Prog(int id, const GLchar **v, int CS);
+ extern int setupVDP2Prog(Vdp2* varVdp2Regs, int nb_screen, int CS);
+ 
+ #define QuoteIdent(ident) #ident
+--- a/yabause/src/core/video/opengl/common/src/common_glshader.c
++++ b/yabause/src/core/video/opengl/common/src/common_glshader.c
+@@ -1952,7 +1952,7 @@
+   if (_prgid[pgid] == 0) {
+    if (YglInitDrawFrameBufferShaders(pgid, CS) != 0) {
+      YuiMsg("Problem in CS YglInitDrawFrameBufferShaders\n");
+-     abort();
++     return -1;
+    }
+   }
+   GLUSEPROG(_prgid[pgid]);
+@@ -1989,13 +1989,19 @@
+ }
+ 
+ 
+-void compileVDP2Prog(int id, const GLchar **v, int CS){
++/* A shader that will not build is a reason to draw nothing, not a reason to
++   kill the process. This core runs in-process with the frontend, so abort()
++   here took the whole UI down -- see the 16-vs-18 texture sampler limit on
++   Adreno/freedreno. _prgid[id] is left at 0 by the failing helper, so the
++   caller ends up with GLUSEPROG(0): the frame is wrong, the emulator lives. */
++int compileVDP2Prog(int id, const GLchar **v, int CS){
+   YGLLOG("PG_VDP2_DRAWFRAMEBUFF_NONE --START [%d]--\n", arrayid);
+   LOG_SHADER("%d %d %d\n", id, PG_VDP2_DRAWFRAMEBUFF_NONE, id-PG_VDP2_DRAWFRAMEBUFF_NONE);
+   if (CS == 0) {
+-    if (YglInitShader(id, v, 1, pYglprg_vdp2_blit_f[id-PG_VDP2_DRAWFRAMEBUFF_NONE], 17) != 0) { YuiMsg("Error init prog %d\n",id); abort(); }
++    if (YglInitShader(id, v, 1, pYglprg_vdp2_blit_f[id-PG_VDP2_DRAWFRAMEBUFF_NONE], 17) != 0) { YuiMsg("Error init prog %d\n",id); return -1; }
+   } else {
+-    if (createCSProgram(id, 17, pYglprg_vdp2_blit_f[id-PG_VDP2_DRAWFRAMEBUFF_NONE])!= 0) { YuiMsg("Error init prog %d\n",id); abort(); }
++    if (createCSProgram(id, 17, pYglprg_vdp2_blit_f[id-PG_VDP2_DRAWFRAMEBUFF_NONE])!= 0) { YuiMsg("Error init prog %d\n",id); return -1; }
+   }
+   YGLLOG("PG_VDP2_DRAWFRAMEBUFF_NONE --DONE [%d]--\n", arrayid);
++  return 0;
+ }
+--- a/yabause/src/core/video/opengl/common/src/ogl_shader.c
++++ b/yabause/src/core/video/opengl/common/src/ogl_shader.c
+@@ -712,10 +712,15 @@
+  //printf ("Use prog %d\n", id); //16
+  int arrayid = id-PG_VDP2_DRAWFRAMEBUFF_NONE;
+  //printf ("getArray %d\n", arrayid); //16
+-  compileVDP2Prog(id, pYglprg_vdp2_blit_v, CS);
++  /* Range-check before compiling, not after: compileVDP2Prog() indexes
++     pYglprg_vdp2_blit_f[] with this same arrayid, so an out-of-range id read
++     out of bounds before the check could fire. */
+   if ( arrayid < 0 || arrayid >= MAX_FRAME_BUFFER_UNIFORM) {
+-    abort();
++    YuiMsg("YglInitDrawFrameBufferShaders: prog id %d out of range\n", id);
++    return -1;
+   }
++  if (compileVDP2Prog(id, pYglprg_vdp2_blit_v, CS) != 0)
++    return -1;
+   g_draw_framebuffer_uniforms[arrayid].idvdp1FrameBuffer = glGetUniformLocation(_prgid[id], (const GLchar *)"s_vdp1FrameBuffer");
+   g_draw_framebuffer_uniforms[arrayid].idvdp1Mesh = glGetUniformLocation(_prgid[id], (const GLchar *)"s_vdp1Mesh");
+   g_draw_framebuffer_uniforms[arrayid].idvdp2regs = glGetUniformLocation(_prgid[id], (const GLchar *)"s_vdp2reg");
+@@ -735,6 +740,9 @@
+ 
+    int pgid = setupVDP2Prog(varVdp2Regs, nb_screen, 0);
+ 
++  if (pgid < 0)
++    return -1;
++
+   arrayid = pgid - PG_VDP2_DRAWFRAMEBUFF_NONE;
+ 
+   if (_prgid[pgid] == 0) {
+@@ -837,8 +845,12 @@
+     YglInitShader(id, prg_input_v[id], 2, prg_input_f[id], 8);
+   }
+   if (_prgid[id] == 0) {
++    /* Draw nothing rather than kill the frontend. Leave the program handle
++       cleared so the caller binds nothing instead of a stale id. */
+     YuiMsg("Prog %d is not able to compile\n", id);
+-    abort();
++    prog->prgid = id;
++    prog->prg = 0;
++    return;
+   }
+   if (init == 1) {
+     _ids[id].sprite = glGetUniformLocation(_prgid[id], (const GLchar *)"u_sprite");
+@@ -1515,7 +1527,7 @@
+       YGLLOG("Compile error in fragment shader.\n");
+       Ygl_printShaderError(fshader);
+       winprio_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     glAttachShader(winprio_prg, vshader);
+@@ -1526,7 +1538,7 @@
+       YGLLOG("Link error..\n");
+       Ygl_printProgramError(winprio_prg);
+       winprio_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     GLUSEPROG(winprio_prg);
+@@ -1685,7 +1697,7 @@
+       YGLLOG("Compile error in fragment shader.\n");
+       Ygl_printShaderError(fshader);
+       vdp1_write_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     glAttachShader(vdp1_write_prg, vshader);
+@@ -1696,7 +1708,7 @@
+       YGLLOG("Link error..\n");
+       Ygl_printProgramError(vdp1_write_prg);
+       vdp1_write_prg = -1;
+-      abort();
++      return -1;
+     }
+     glUniform1i(glGetUniformLocation(vdp1_write_prg, "s_texture"), 0);
+   }
+@@ -1733,7 +1745,7 @@
+       YGLLOG("Compile error in fragment shader.\n");
+       Ygl_printShaderError(fshader);
+       vdp1_read_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     glAttachShader(vdp1_read_prg, vshader);
+@@ -1744,7 +1756,7 @@
+       YGLLOG("Link error..\n");
+       Ygl_printProgramError(vdp1_read_prg);
+       vdp1_read_prg = -1;
+-      abort();
++      return -1;
+     }
+     glUniform1i(glGetUniformLocation(vdp1_read_prg, "s_texture"), 0);
+   }
+--- a/yabause/src/core/video/opengl/common/src/upscale_shader.c
++++ b/yabause/src/core/video/opengl/common/src/upscale_shader.c
+@@ -140,7 +140,7 @@
+       printf("Compile error in fragment shader.\n");
+       Ygl_printShaderError(fshader);
+       up_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     glAttachShader(up_prg, vshader);
+@@ -151,7 +151,7 @@
+       printf("Link error..\n");
+       Ygl_printProgError(up_prg);
+       up_prg = -1;
+-      abort();
++      return -1;
+     }
+ 
+     glUseProgram(up_prg);

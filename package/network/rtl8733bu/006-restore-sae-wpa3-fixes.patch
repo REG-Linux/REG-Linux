@@ -1,0 +1,143 @@
+From: ROCKNIX
+Subject: [PATCH] cfg80211: make SAE work again on the 7.1-port tree
+
+These five fixes were carried as a local patch until the package moved to
+the 7.1-port tree, which was done on the understanding that the new tree
+already had them. It has the Kbuild rework and the compat fixes, but not
+these, so WPA3 regressed with the switch. The iwd SaeDisable quirk that
+used to cover the same ground had already been dropped once the driver
+handled SAE, which left nothing behind them.
+
+The symptom is a connect that never completes against an AP in WPA2/WPA3
+transition mode. iwd picks SAE, runs the exchange to completion, and then
+the association simply never starts:
+
+  event: connect-info, FullMAC driver: rtl8733bu using SAE. Expect EXTERNAL_AUTH
+  event: connect-info, ssid: <ap>, bss: <bssid>, signal: -82
+  event: connect-failed, status: 1
+
+NetworkManager reports that as "Secrets were required, but not provided",
+which sends you looking at the PSK, and the PSK is fine.
+
+The last hunk is the one that causes that. On the AP path the driver acts
+on the external-auth result, but in STA mode it only records the status
+and returns, so a successful SAE exchange is stored and forgotten. Calling
+start_clnt_assoc() is what the AP path effectively does and what the
+association is waiting for.
+
+The set_pmksa hunk has to go with it, not instead of it. iwd calls
+set_pmksa after the 4-way handshake, and the copy of start_clnt_assoc()
+sitting there fires a second association on a connection that already has
+one. That retries until REASSOC_LIMIT and drops the link, so associating
+from the right place is only a fix once the wrong place stops doing it.
+
+The other three are each enough to break SAE on their own:
+
+key_mgmt_suite was written as the pre-swapped constant 0x8ac0f00 because
+nl80211 used to take it in wire order. Since 6.9 the kernel does the swap
+itself, so the value arrives byte-reversed and the AKM is not recognised
+as SAE. Passing WLAN_AKM_SUITE_SAE in host order is what the kernel now
+expects; the old constant is kept for older kernels.
+
+cfg80211_external_auth_params was cast straight across to the driver's own
+struct. That was fair enough while the two matched, but 5.1 turned pmkid
+from an inline array into a pointer, so every field past it reads from the
+wrong offset. Copying the fields individually removes the assumption.
+
+mgmt_tx refused any frame with a NULL channel. iwd sends SAE commit and
+confirm without one, expecting the current operating channel, so the
+frames were rejected before they were ever transmitted. Fall back to the
+operating channel and only apply the channel-waiting check when a channel
+was actually given.
+
+Confirmed on a Miyoo Flip running 7.0.2 against a WPA2/WPA3 transition AP.
+
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -4778,12 +4778,6 @@
+ 
+ 	_rtw_set_pmksa(ndev, (u8 *)pmksa->bssid, (u8 *)pmksa->pmkid);
+ 
+-	if (sae_auth &&
+-		(psecuritypriv->extauth_status == WLAN_STATUS_SUCCESS)) {
+-		RTW_PRINT("SAE: auth success, start assoc\n");
+-		start_clnt_assoc(padapter);
+-	}
+-
+ 	return 0;
+ }
+ 
+@@ -7160,7 +7154,14 @@
+ 	params.ssid.ssid_len = pmlmeinfo->network.Ssid.SsidLength;
+ 	_rtw_memcpy(params.ssid.ssid, pmlmeinfo->network.Ssid.Ssid,
+ 		pmlmeinfo->network.Ssid.SsidLength);
++	/* nl80211 byte-swaps this itself from 6.9 on, so the pre-swapped
++	 * constant arrives reversed and the AKM is not read as SAE.
++	 */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0))
++	params.key_mgmt_suite = WLAN_AKM_SUITE_SAE;
++#else
+ 	params.key_mgmt_suite = 0x8ac0f00;
++#endif
+ 
+ 	RTW_INFO("external auth: use kernel API: cfg80211_external_auth_request()\n");
+ 	cfg80211_external_auth_request(netdev, &params, GFP_ATOMIC);
+@@ -8405,13 +8406,20 @@
+ #endif
+ 
+ 	if (chan == NULL) {
+-		ret = -EINVAL;
+-		goto exit;
++		/* iwd sends SAE commit and confirm with no channel and expects
++		 * the one we are already operating on.
++		 */
++		tx_ch = rtw_get_oper_ch(padapter);
++		if (tx_ch == 0) {
++			ret = -EINVAL;
++			goto exit;
++		}
++	} else {
++		tx_ch = (u8)ieee80211_frequency_to_channel(chan->center_freq);
+ 	}
+ 
+ 	rfctl = adapter_to_rfctl(padapter);
+-	tx_ch = (u8)ieee80211_frequency_to_channel(chan->center_freq);
+-	if (IS_CH_WAITING(rfctl)) {
++	if (chan && IS_CH_WAITING(rfctl)) {
+ 		#ifdef CONFIG_DFS_MASTER
+ 		if (rtw_rfctl_overlap_radar_detect_ch(rfctl, nl80211_band_to_rtw_band(chan->band), tx_ch, CHANNEL_WIDTH_20, HAL_PRIME_CHNL_OFFSET_DONT_CARE)) {
+ 			ret = -EINVAL;
+@@ -10642,11 +10650,22 @@
+ 	struct cfg80211_external_auth_params *params)
+ {
+ 	PADAPTER padapter = (_adapter *)rtw_netdev_priv(dev);
++	struct rtw_external_auth_params rtw_params = {0};
+ 
+ 	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(dev));
+ 
+-	rtw_cfg80211_external_auth_status(wiphy, dev,
+-		(struct rtw_external_auth_params *)params);
++	/* The two structs stopped matching when 5.1 turned pmkid into a
++	 * pointer, so everything after it reads from the wrong offset.
++	 */
++	rtw_params.action = params->action;
++	_rtw_memcpy(rtw_params.bssid, params->bssid, ETH_ALEN);
++	rtw_params.ssid = params->ssid;
++	rtw_params.key_mgmt_suite = params->key_mgmt_suite;
++	rtw_params.status = params->status;
++	if (params->pmkid)
++		_rtw_memcpy(rtw_params.pmkid, params->pmkid, PMKID_LEN);
++
++	rtw_cfg80211_external_auth_status(wiphy, dev, &rtw_params);
+ 
+ 	return 0;
+ }
+@@ -10728,6 +10747,8 @@
+ 	} else {
+ 		/* STA mode */
+ 		psecuritypriv->extauth_status = params->status;
++		if (params->status == WLAN_STATUS_SUCCESS)
++			start_clnt_assoc(padapter);
+ 	}
+ }
+ 

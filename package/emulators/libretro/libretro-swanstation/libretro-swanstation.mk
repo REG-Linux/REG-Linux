@@ -1,0 +1,46 @@
+################################################################################
+#
+# libretro-swanstation
+#
+################################################################################
+# Version: Commits on Aug 11, 2026
+LIBRETRO_SWANSTATION_VERSION = 7f69c199ed88d5723f71dd3a6e9c1b7a45b535a6
+LIBRETRO_SWANSTATION_SITE = $(call github,libretro,swanstation,$(LIBRETRO_SWANSTATION_VERSION))
+LIBRETRO_SWANSTATION_LICENSE = GPLv2
+LIBRETRO_SWANSTATION_DEPENDENCIES = fmt boost ffmpeg
+LIBRETRO_SWANSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
+
+LIBRETRO_SWANSTATION_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
+LIBRETRO_SWANSTATION_CONF_OPTS += -DBUILD_SHARED_LIBS=FALSE
+
+LIBRETRO_SWANSTATION_CONF_ENV += LDFLAGS=-lpthread
+
+ifeq ($(BR2_PACKAGE_WAYLAND),y)
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_WAYLAND=ON
+else
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_WAYLAND=OFF
+endif
+
+ifeq ($(BR2_PACKAGE_XORG7),y)
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_X11=ON
+else
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_X11=OFF
+endif
+
+# Use GLX on those targets
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550)$(BR2_PACKAGE_SYSTEM_TARGET_ASAHI)$(BR2_x86_64),y)
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_GLX=ON
+endif
+
+ifeq ($(BR2_PACKAGE_HAS_LIBEGL),y)
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_EGL=ON
+else
+  LIBRETRO_SWANSTATION_CONF_OPTS += -DUSE_EGL=OFF
+endif
+
+define LIBRETRO_SWANSTATION_INSTALL_TARGET_CMDS
+    $(INSTALL) -D $(@D)/buildroot-build/swanstation_libretro.so \
+	    $(TARGET_DIR)/usr/lib/libretro/swanstation_libretro.so
+endef
+
+$(eval $(cmake-package))

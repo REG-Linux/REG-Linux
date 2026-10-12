@@ -3,136 +3,85 @@
 # REGLINUX-MAME (Prebuilt MAME/GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.280
-REGLINUX_MAME_VERSION = 0.280
-REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
+# Version: GroovyMAME 0.289 / lr-mame 0289. The release tag is the 4-digit
+# form the build workflow derives from mame.mk's gmNNNN version string.
+REGLINUX_MAME_VERSION = 0289
+# Release ASSET, not the github() helper.
+REGLINUX_MAME_SITE = https://github.com/REG-Linux/REG-MAME/releases/download/$(REGLINUX_MAME_VERSION)
 REGLINUX_MAME_LICENSE = MAME
 
+# The prebuilt is chosen by CPU, not by board.
 REGLINUX_MAME_ARCH = unknown
-# Cortex A53
-ifeq ($(BR2_cortex_a53),y)
-REGLINUX_MAME_ARCH = h5
-# Cortex A35
-else ifeq ($(BR2_cortex_a35),y)
-REGLINUX_MAME_ARCH = rk3326
-# Cortex A55
+# Cortex A35 (rk3326, s9gen4)
+ifeq ($(BR2_cortex_a35),y)
+REGLINUX_MAME_ARCH = cortex_a35
+# Cortex A53 (a133, bcm2837, h616, h700, rk3328, s905, s905gen2, sun50i)
+else ifeq ($(BR2_cortex_a53),y)
+REGLINUX_MAME_ARCH = cortex_a53
+# Cortex A55 (odroidc5, rk3568, s905gen3, t527)
 else ifeq ($(BR2_cortex_a55),y)
-REGLINUX_MAME_ARCH = s905gen3
-# Cortex A72
+REGLINUX_MAME_ARCH = cortex_a55
+# Cortex A57 (l4t)
+else ifeq ($(BR2_cortex_a57),y)
+REGLINUX_MAME_ARCH = cortex_a57
+# Cortex A72 (bcm2711)
 else ifeq ($(BR2_cortex_a72),y)
-REGLINUX_MAME_ARCH = bcm2711
-# Cortex A72.A53
+REGLINUX_MAME_ARCH = cortex_a72
+# Cortex A72.A53 (rk3399, rk3576 and variants)
 else ifeq ($(BR2_cortex_a72_a53),y)
-REGLINUX_MAME_ARCH = rk3399
-# Cortex A73.A53
+REGLINUX_MAME_ARCH = cortex_a72_a53
+# Cortex A73.A53 (a3gen2, s922x, sm6115)
 else ifeq ($(BR2_cortex_a73_a53),y)
-REGLINUX_MAME_ARCH = s922x
-# Hack for ODIN
+REGLINUX_MAME_ARCH = cortex_a73_a53
+# Cortex A75.A55 (sdm845)
 else ifeq ($(BR2_cortex_a75_a55),y)
-REGLINUX_MAME_ARCH = s922x
-# Cortex A76
+REGLINUX_MAME_ARCH = cortex_a75_a55
+# Cortex A76 (bcm2712)
 else ifeq ($(BR2_cortex_a76),y)
-REGLINUX_MAME_ARCH = bcm2712
-# Cortex A76.A55
+REGLINUX_MAME_ARCH = cortex_a76
+# Cortex A76.A55 (mt8395, qcs6490, rk3588, sm8250)
 else ifeq ($(BR2_cortex_a76_a55),y)
-REGLINUX_MAME_ARCH = rk3588
-# SM8550
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
-REGLINUX_MAME_ARCH = sm8550
-# Asahi Linux
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
-REGLINUX_MAME_ARCH = asahi
-# RISC-V 64 (rv64gc, aka imafd)
+REGLINUX_MAME_ARCH = cortex_a76_a55
+# Cortex X3 (sm8550)
+else ifeq ($(BR2_cortex_x3),y)
+REGLINUX_MAME_ARCH = cortex_x3
+# Saphira (asahi)
+else ifeq ($(BR2_saphira),y)
+REGLINUX_MAME_ARCH = saphira
+# RISC-V has no CPU symbol that separates these two, and they are not interchangeable
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_K3),y)
+REGLINUX_MAME_ARCH = riscv_rvv
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
-REGLINUX_MAME_ARCH = jh7110
-# RISC-V 64 with vector extensions (aka imafdv)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
-REGLINUX_MAME_ARCH = k1
-# X86-64-v3 subarchitecture
+REGLINUX_MAME_ARCH = riscv
+# x86-64-v3 must be tested before x86_64: both are set on that board
 else ifeq ($(BR2_x86_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
-# X86_64 architecture
 else ifeq ($(BR2_x86_64),y)
 REGLINUX_MAME_ARCH = x86_64
 endif
 
 # Compute the archive source file name
-REGLINUX_MAME_SOURCE = reglinux-mame-$(REGLINUX_MAME_VERSION)-$(REGLINUX_MAME_ARCH).tar.gz
+REGLINUX_MAME_SOURCE = reglinux-mame-$(REGLINUX_MAME_VERSION)-$(REGLINUX_MAME_ARCH).tar.xz
 
-define REGLINUX_MAME_DOWNLOAD_ARCHIVE
-	echo "Downloading https://github.com/REG-Linux/REG-MAME/releases/download/$(REGLINUX_MAME_VERSION)/$(REGLINUX_MAME_SOURCE)"
-	cd $(@D) && wget https://github.com/REG-Linux/REG-MAME/releases/download/$(REGLINUX_MAME_VERSION)/$(REGLINUX_MAME_SOURCE)
-endef
-
-REGLINUX_MAME_POST_BUILD_HOOKS = REGLINUX_MAME_DOWNLOAD_ARCHIVE
+# This is a rootfs overlay rooted at target/, not a source tree, so skip the
+# extract step and untar straight into TARGET_DIR at install time. Buildroot
+# still downloads it to $(REGLINUX_MAME_DL_DIR), so it is cached across builds.
+REGLINUX_MAME_EXTRACT_CMDS =
 
 REGLINUX_MAME_CONF_INIT = $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/mame/
 
 define REGLINUX_MAME_INSTALL_TARGET_CMDS
-	# copy the prebuilt stuff to rootfs
-	tar --strip-components=5 -xzvf $(@D)/$(REGLINUX_MAME_SOURCE) -C $(TARGET_DIR)
+	# copy the prebuilt stuff to rootfs (members are rooted at target/)
+	tar -xJf $(REGLINUX_MAME_DL_DIR)/$(REGLINUX_MAME_SOURCE) -C $(TARGET_DIR)/../
 
 	# remove vgmplay.xml files, symlink hash files
 	rm -Rf $(TARGET_DIR)/usr/share/lr-mame/hash
 	rm $(TARGET_DIR)/usr/bin/mame/hash/vgmplay.xml
 	ln -s /usr/bin/mame/hash $(TARGET_DIR)/usr/share/lr-mame/hash
-	# delete the archive from this directory
-	rm $(@D)/$(REGLINUX_MAME_SOURCE)
 
-	# gameStop script when exiting a rotated screen
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
-
-	# Copy user -autoboot_command overrides (batocera.linux/batocera.linux#11706)
-	mkdir -p $(MAME_CONF_INIT)/autoload
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/autoload	$(MAME_CONF_INIT)
+	# Copy user -autoboot_command overrides
+	mkdir -p $(REGLINUX_MAME_CONF_INIT)
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/autoload	$(REGLINUX_MAME_CONF_INIT)
 endef
-
-define REGLINUX_MAME_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/adam.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/advision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apfm1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2gs.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/arcadia.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/archimedes.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/astrocde.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/atom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/bbc.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/camplynx.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/cdi.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/coco.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/crvision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/electron.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fm7.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fmtowns.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamate.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gameandwatch.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamecom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamepock.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gmaster.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gp32.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/lcdgames.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/laser310.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/macintosh.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/megaduck.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/neogeo.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pdp1.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/plugnplay.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pv1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/socrates.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/supracan.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/ti99.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
-endef
-
-REGLINUX_MAME_POST_INSTALL_TARGET_HOOKS += REGLINUX_MAME_EVMAPY
 
 $(eval $(generic-package))

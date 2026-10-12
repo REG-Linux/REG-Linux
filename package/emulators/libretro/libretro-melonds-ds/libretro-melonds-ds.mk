@@ -4,11 +4,8 @@
 #
 ################################################################################
 
-# Stable broken by developer
-#LIBRETRO_MELONDS_DS_VERSION = v1.2.0
-#LIBRETRO_MELONDS_DS_SITE = $(call github,JesseTG,melonds-ds,$(LIBRETRO_MELONDS_DS_VERSION))
+LIBRETRO_MELONDS_DS_VERSION = v1.4.0
 LIBRETRO_MELONDS_DS_SITE = https://github.com/JesseTG/melonds-ds.git
-LIBRETRO_MELONDS_DS_VERSION = e1391cc10a53b205963b7d1bd2b1f8d87d0d2cc7
 LIBRETRO_MELONDS_DS_SITE_METHOD = git
 LIBRETRO_MELONDS_DS_LICENSE = GPLv2
 LIBRETRO_MELONDS_DS_DEPENDENCIES = libpcap
@@ -19,7 +16,9 @@ LIBRETRO_MELONDS_DS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 LIBRETRO_MELONDS_DS_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 #LIBRETRO_MELONDS_DS_CONF_OPTS += -DBUILD_QT_SDL=OFF
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# OpenGL backend — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL rather than HAS_LIBGL (polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_MELONDS_DS_DEPENDENCIES += libgl
 endif
 

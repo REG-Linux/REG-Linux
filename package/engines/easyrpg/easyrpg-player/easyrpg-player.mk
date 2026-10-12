@@ -28,12 +28,4 @@ EASYRPG_PLAYER_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
 
 EASYRPG_PLAYER_CONF_ENV += LDFLAGS="-lpthread -fPIC" CFLAGS="-fPIC" CXX_FLAGS="-fPIC"
 
-define EASYRPG_PLAYER_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/easyrpg/easyrpg-player/easyrpg.easyrpg.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-EASYRPG_PLAYER_POST_INSTALL_TARGET_HOOKS += EASYRPG_PLAYER_EVMAPY
-
 $(eval $(cmake-package))

@@ -1,0 +1,22 @@
+From 8e9be57ae411c680e46dfae74bb089322a13a4cc Mon Sep 17 00:00:00 2001
+From: Andrey Akhmichin <15944199+nekonomicon@users.noreply.github.com>
+Date: Sun, 31 May 2026 16:55:25 +0500
+Subject: [PATCH] Add a missing stubs.
+
+---
+ cl_dll/hl/hl_baseentity.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cl_dll/hl/hl_baseentity.cpp b/cl_dll/hl/hl_baseentity.cpp
+index 4ae0b8e71..54353100d 100644
+--- a/cl_dll/hl/hl_baseentity.cpp
++++ b/cl_dll/hl/hl_baseentity.cpp
+@@ -108,6 +108,8 @@ Vector UTIL_VecToAngles( const Vector &vec ){ return 0; }
+ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, BOOL animate ) { return 0; }
+ void CBeam::PointEntInit( const Vector &start, int endIndex ) { }
+ CBeam *CBeam::BeamCreate( const char *pSpriteName, int width ) { return NULL; }
++const Vector &CBeam::GetStartPos( void ){ return g_vecZero; }
++const Vector &CBeam::GetEndPos( void ){ return g_vecZero; }
+ void CSprite::Expand( float scaleSpeed, float fadeSpeed ) { }
+ 
+ CBaseEntity* CBaseMonster::CheckTraceHullAttack( float flDist, int iDamage, int iDmgType ) { return NULL; }

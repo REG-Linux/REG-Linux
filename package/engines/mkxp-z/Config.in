@@ -1,0 +1,37 @@
+config BR2_PACKAGE_MKXP_Z
+	bool "mkxp-z"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS # SDL2
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	depends on BR2_PACKAGE_RUBY # needs MRI Ruby
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_SDL_SOUND
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_PHYSFS
+	select BR2_PACKAGE_PIXMAN
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBTHEORA
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_UCHARDET
+	select BR2_PACKAGE_GCOMPAT if BR2_TOOLCHAIN_USES_MUSL
+	help
+	  mkxp-z is an advanced player for RPG Maker XP, VX and VX Ace
+	  games. Heavy fork of Ancurio/mkxp with extended RGSS API,
+	  animated bitmaps, video support, and more.
+
+	  Reads mkxp.json (JSON5 format). Covers Hylics and other
+	  ports needing extended RGSS features.
+
+	  https://github.com/mkxp-z/mkxp-z
+
+comment "mkxp-z needs C++, OpenGL/GLES, dynamic libs, Ruby"
+	depends on !BR2_INSTALL_LIBSTDCPP || BR2_STATIC_LIBS \
+		|| !(BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES) \
+		|| !BR2_PACKAGE_RUBY

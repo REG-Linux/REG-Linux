@@ -3,14 +3,16 @@
 # libretro-vecx
 #
 ################################################################################
-# Version.: Commits on Apr 12, 2025
-LIBRETRO_VECX_VERSION = 841229a6a81a0461d08af6488f252dcec5266c6a
+# Version.: Commits on Apr 11, 2026
+LIBRETRO_VECX_VERSION = 8f671cc9d737f2890c3ce19e177e2984dcae121f
 LIBRETRO_VECX_SITE = $(call github,libretro,libretro-vecx,$(LIBRETRO_VECX_VERSION))
 LIBRETRO_VECX_LICENSE = GPLv2|LGPLv2.1
 
 LIBRETRO_VECX_PLATFORM = $(LIBRETRO_PLATFORM)
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# OpenGL backend — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL rather than HAS_LIBGL (polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_VECX_DEPENDENCIES += libgl
 else ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 LIBRETRO_VECX_DEPENDENCIES += libgles

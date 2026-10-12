@@ -7,7 +7,15 @@
 # When updating the version, please also update mesa3d-headers
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 IMG_MESA3D_VERSION = k1-bl-v2.2-release
-IMG_MESA3D_SITE = https://gitee.com/bianbu-linux/mesa3d.git
+IMG_MESA3D_SITE = https://github.com/spacemit-com/mesa3d.git
+IMG_MESA3D_SITE_METHOD = git
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K3),y)
+# K3 Mesa fork (carries the `pvr` gallium/DRI driver bound to the closed DDK
+# 23.2.6460340). From the bianbu k3-br-v1.0.y repo manifest:
+# project mesa @ spacemit-buildroot, branch k3-br-v1.0.y - fetched from
+# SpacemiT's GitHub org, which mirrors the same branch.
+IMG_MESA3D_VERSION = k3-br-v1.0.y
+IMG_MESA3D_SITE = https://github.com/spacemit-com/mesa.git
 IMG_MESA3D_SITE_METHOD = git
 else
 IMG_MESA3D_VERSION = 22.1.3
@@ -201,7 +209,7 @@ else
 IMG_MESA3D_CONF_OPTS += -Dgles1=disabled -Dgles2=disabled
 endif
 
-ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_K3),)
 ifeq ($(BR2_PACKAGE_IMG_MESA3D_XVMC),y)
 IMG_MESA3D_DEPENDENCIES += xlib_libXv xlib_libXvMC
 IMG_MESA3D_CONF_OPTS += -Dgallium-xvmc=enabled

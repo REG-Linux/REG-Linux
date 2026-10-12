@@ -2,8 +2,9 @@ config BR2_PACKAGE_LIBZEDMD
     bool "libzedmd"
     select BR2_PACKAGE_LIBSERIALPORT
     select BR2_PACKAGE_SOCKPP
+    select BR2_PACKAGE_CARGS
+    select BR2_PACKAGE_LIBGPIOD if BR2_ARCH_AARCH64
     help
       ZeDMD communication library.
-      
-      https://github.com/PPUC/libzedmd
 
+      https://github.com/PPUC/libzedmd

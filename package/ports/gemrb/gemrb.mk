@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GEMRB_VERSION = v0.9.4
+GEMRB_VERSION = v0.9.5
 GEMRB_SITE =  $(call github,gemrb,gemrb,$(GEMRB_VERSION))
 GEMRB_LICENSE = GPL-2.0
 GEMRB_LICENSE_FILE = LICENSE
@@ -35,14 +35,7 @@ define GEMRB_REMOVE_DEMO
 	rm -Rf $(TARGET_DIR)/usr/share/gemrb/demo
 endef
 
-define GEMRB_EVMAPY
-#	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-#	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/gemrb/gemrbkeys \
-#	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
 GEMRB_POST_INSTALL_TARGET_HOOKS += GEMRB_STRIP_BINARY
 GEMRB_POST_INSTALL_TARGET_HOOKS += GEMRB_REMOVE_DEMO
-GEMRB_POST_INSTALL_TARGET_HOOKS += GEMRB_EVMAPY
 
 $(eval $(cmake-package))

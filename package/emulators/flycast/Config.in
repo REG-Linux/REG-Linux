@@ -1,15 +1,23 @@
 config BR2_PACKAGE_FLYCAST
     bool "flycast"
     select BR2_PACKAGE_SDL2
-    select BR2_PACKAGE_LIBPNG
     select BR2_PACKAGE_LIBZIP
-    depends on BR2_GCC_ENABLE_OPENMP
-    select BR2_PACKAGE_BOOST
-    select BR2_PACKAGE_BOOST_NOWIDE
-    select BR2_PACKAGE_LIBAO
     select BR2_PACKAGE_LIBCURL
+    select BR2_PACKAGE_ALSA_LIB
+    select BR2_PACKAGE_LIBAO
     select BR2_PACKAGE_LIBMINIUPNPC
-    select BR2_PACKAGE_ELFUTILS
+    depends on BR2_GCC_ENABLE_OPENMP
     select BR2_PACKAGE_GLSLANG		if BR2_PACKAGE_REGLINUX_VULKAN
     help
-        Flycast is a multi-platform Sega Dreamcast, Naomi and Atomiswave emulator.
+      Flycast is a multi-platform Sega Dreamcast, Naomi and Atomiswave
+      emulator derived from reicast.
+
+      Features:
+      - OpenGL ES 2/3 or Desktop OpenGL rendering
+      - Vulkan support (optional, requires glslang)
+      - SDL2 for input/audio/windowing
+      - ALSA for audio output (PipeWire compatible)
+      - Netplay support
+      - Per-SoC optimizations (RK3399, RK3568, RPi4/5, S922X, etc.)
+
+      https://github.com/flyinghead/flycast

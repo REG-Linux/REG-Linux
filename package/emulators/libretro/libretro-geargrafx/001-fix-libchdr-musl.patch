@@ -1,11 +1,11 @@
 --- a/platforms/shared/dependencies/libchdr/src/libchdr_chd.c	2025-08-25 22:15:17.031716963 +0200
 +++ b/platforms/shared/dependencies/libchdr/src/libchdr_chd.c	2025-08-25 22:16:10.972555581 +0200
-@@ -3448,8 +3448,15 @@
+@@ -3485,8 +3485,15 @@
  	#define core_stdio_fseek_impl _fseeki64
  	#define core_stdio_ftell_impl _ftelli64
  #elif defined(_LARGEFILE_SOURCE) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
--	#define core_stdio_fseek_impl fseeko64
--	#define core_stdio_ftell_impl ftello64
+-	#define core_stdio_fseek_impl fseeko
+-	#define core_stdio_ftell_impl ftello
 +	#if defined(__GLIBC__)
 +		#define FTELLO ftello64
 +		#define FSEEKO fseeko64

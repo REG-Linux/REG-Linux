@@ -1,0 +1,28 @@
+[package]
+name = "mister-bridge"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0+"
+description = "MiSTer FPGA core bridge for REG-Linux on DE10-Nano"
+
+[[bin]]
+name = "mister-bridge"
+path = "src/main.rs"
+
+[dependencies]
+mister-fpga = "0.1"
+cyclone-v = "0.1"
+one-fpga = "0.1"
+evdev = "0.13"
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+roxmltree = "0.20"
+chd = { version = "0.3", default-features = false, features = ["std", "cd_full"] }
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[profile.release]
+opt-level = "s"
+strip = true
+lto = true

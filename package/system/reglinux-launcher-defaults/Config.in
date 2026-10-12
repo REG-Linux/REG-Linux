@@ -1,0 +1,12 @@
+config BR2_PACKAGE_REGLINUX_LAUNCHER_DEFAULTS
+	bool "reglinux launcher defaults"
+
+	help
+	  System -> (emulator, core) + options defaults for the REG-Linux
+	  launcher, plus the per-SoC overlay selected for this board.
+
+	  Installed as /usr/share/regmsg/launcher/launcher-defaults.yml and
+	  launcher-defaults-arch.yml. Read by regmsgd at runtime
+	  (launcher/system_map.rs) to resolve a system to an installed
+	  emulator/core pair, and by es-system at build time from staging to
+	  generate rs_systems.cfg / rs_features.json.

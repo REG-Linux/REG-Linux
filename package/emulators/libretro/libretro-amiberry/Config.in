@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBRETRO_AMIBERRY
+    bool "libretro-amiberry"
+    select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+
+    help
+	Amiberry Amiga emulator as libretro core

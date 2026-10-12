@@ -1,0 +1,8 @@
+config BR2_PACKAGE_UBOOT_ORANGEPI_RV2
+    bool "uboot for OrangePi RV2 / SpaceMiT K1 - built from source"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_K1
+    select BR2_PACKAGE_OPENSBI
+    help
+        U-Boot bootloader for OrangePi RV2 (SpaceMiT K1/X1),
+        built from source with sysboot/extlinux support.
+        MMC UHS disabled for RV2 hardware compatibility.

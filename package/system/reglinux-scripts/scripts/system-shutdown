@@ -1,17 +1,48 @@
-#!/bin/bash 
+#!/bin/bash
 #
 # Suspend or shutdown
 #
 
-SUSPEND_MODE="$(/usr/bin/system-settings-get-master system.suspendmode)"
+SUSPEND_MODE="$(/usr/bin/regmsg systemconf getconfigkey system.suspendmode)"
 # because on rg552, it is too easy to push on the shutdown button
-SHUTDOWNDELAY="$(/usr/bin/system-settings-get-master system.shutdowndelay)"
+SHUTDOWNDELAY="$(/usr/bin/regmsg systemconf getconfigkey system.shutdowndelay)"
 [ -z "${SHUTDOWNDELAY}" ] && SHUTDOWNDELAY=0
 
 ###############################
 # 1 when pressed
 # 0 when released
+# lid when a lid closes
 SETACTION=$1
+
+# suspend / hibernate / shutdown as configured by system.suspendmode
+power_action() {
+    ### callable only once every 5 seconds
+    ### because some boards (steamdeck) have 2 events reacting to the KEY_POWER
+    ### this is mainly for suspend to not call it 2 times
+    if [ -e "/var/run/shutdown-delay.last" ]; then
+        DELAY=$(($(date +%s) - $(date +%s -r "/var/run/shutdown-delay.last")))
+        if [ "${DELAY}" -lt 5 ]; then
+            echo "wait between 2 calls" >&2
+            exit 0
+        fi
+    fi
+    touch "/var/run/shutdown-delay.last"
+
+    case "${SUSPEND_MODE}" in
+        "suspend")
+            pm-is-supported --suspend && pm-suspend
+            ;;
+        "hybrid")
+            pm-is-supported --suspend-hybrid && pm-suspend-hybrid
+            ;;
+        "hibernate")
+            pm-is-supported --hibernate && pm-hibernate
+            ;;
+        *)
+            /sbin/shutdown -h now
+            ;;
+    esac
+}
 
 do_es_menu() {
     # display the menu only when es is up and no game is running
@@ -21,6 +52,12 @@ do_es_menu() {
 
     curl "http://localhost:1234/quit?confirm=menu"
 }
+
+# lid closed: no button to hold, so no shutdown delay
+if [ "${SETACTION}" = "lid" ]; then
+    power_action
+    exit 0
+fi
 
 if [ "${SETACTION}" = 1 ]; then
     ### when the button is pressed, if there is no configuration, shutdown immediatly, else wait the release event
@@ -48,33 +85,6 @@ else
             exit 0
 		fi
 
-		### callable only once every 7 seconds
-		### because some boards (steamdeck) have 2 events reacting to the KEY_POWER
-		### this is mainly for suspend to not call it 2 times
-		if [ -e "/var/run/shutdown-delay.last" ]; then
-			DELAY=$(($(date +%s) - $(date +%s -r "/var/run/shutdown-delay.last")))
-			if [ "${DELAY}" -lt 5 ]; then
-				echo "wait between 2 calls" >2&
-				exit 0
-			fi
-		fi
-		touch "/var/run/shutdown-delay.last"
-		########
-
-		# shutdown / suspend
-		case "${SUSPEND_MODE}" in
-			"suspend")
-				pm-is-supported --suspend && pm-suspend
-				;;
-			"hybrid")
-				pm-is-supported --suspend-hybrid && pm-suspend-hybrid
-				;;
-			"hibernate")
-				pm-is-supported --hibernate && pm-hibernate
-				;;
-			*)
-				/sbin/shutdown -h now
-				;;
-		esac
+		power_action
     fi
 fi

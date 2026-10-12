@@ -1,0 +1,26 @@
+config BR2_PACKAGE_LUANTI
+	bool "luanti"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	depends on BR2_PACKAGE_REGLINUX_LUAJIT_ARCH_SUPPORTS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_ZSTD
+	select BR2_PACKAGE_SQLITE
+	select BR2_PACKAGE_OPENSSL
+	select BR2_PACKAGE_GMP
+	select BR2_PACKAGE_JSONCPP
+	select BR2_PACKAGE_REGLINUX_LUAJIT
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_JPEG
+	help
+	  Luanti (formerly Minetest) is a free open-source voxel
+	  game engine. Fully free, no game data needed.
+
+	  https://github.com/minetest/minetest

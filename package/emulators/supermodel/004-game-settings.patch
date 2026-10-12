@@ -1,9 +1,9 @@
---- a/Src/OSD/DefaultConfigFile.h	2025-03-20 11:54:22.189803315 +0100
-+++ b/Src/OSD/DefaultConfigFile.h	2025-03-20 11:56:13.375929140 +0100
-@@ -61,6 +61,163 @@
-     ";\n"
-     "\n"
-     "\n"
+--- a/Src/OSD/ConfigFile.h
++++ b/Src/OSD/ConfigFile.h
+@@ -120,6 +120,163 @@
+ // DefaultConfigFileContents())
+ static const char s_defaultConfigFileSettings[] =
+ {
 +"[ daytona2 ]\n"
 +"MusicVolume = 120\n"
 +"SoundVolume = 100\n"
@@ -161,6 +161,6 @@
 +"WideScreen =0\n"
 +"WideBackground =0\n"
 +"\n"
-     "[ Global ]\n"
-     "\n"
-     "; Graphics\n"
+    "[ Global ]\n"
+    "\n"
+    "; Graphics\n"

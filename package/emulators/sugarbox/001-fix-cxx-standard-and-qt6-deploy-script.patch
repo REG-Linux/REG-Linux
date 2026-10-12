@@ -1,0 +1,31 @@
+diff --git a/Sugarbox/CMakeLists.txt b/Sugarbox/CMakeLists.txt
+index 390807f..547de59 100644
+--- a/Sugarbox/CMakeLists.txt
++++ b/Sugarbox/CMakeLists.txt
+@@ -128,7 +128,6 @@ IF(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")  
+ ENDIF(MSVC)
+ if(CMAKE_COMPILER_IS_GNUCXX)
+-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} --std=c++17)
+     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+         set(LIB_EXT pthread stdc++fs)
+     else()
+@@ -137,7 +136,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+ endif()
+ 
+ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} --std=c++17)
+     set(LIBZA libz.a pthread)
+ endif()
+ 
+@@ -209,8 +207,8 @@ endif()
+ 
+ qt_generate_deploy_app_script(
+     TARGET Sugarbox
+-	 FILENAME_VARIABLE deploy_script
+-    #OUTPUT_SCRIPT deploy_script
++    OUTPUT_SCRIPT deploy_script
++    #FILENAME_VARIABLE deploy_script
+     NO_UNSUPPORTED_PLATFORM_ERROR
+     #NO_COMPILER_RUNTIME
+ 	)

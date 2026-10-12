@@ -1,0 +1,40 @@
+From: REG-Linux <https://github.com/REG-Linux>
+Subject: Use REG-Linux's gamecontrollerdb.txt and don't ship our own copy
+
+REG-Linux ships a single SDL gamecontrollerdb.txt at
+/usr/share/regstation/gamecontrollerdb.txt, with an optional user
+override at /userdata/system/configs/regstation/gamecontrollerdb.txt.
+Drop the install of the bundled (build-time) copy and look up those
+paths at runtime instead.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -97,12 +97,6 @@ if(BUILD_SDL2_JSTEST)
+   file(COPY sdl2-jstest.1
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+-  file(COPY external/sdl_gamecontrollerdb/gamecontrollerdb.txt
+-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+-
+-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gamecontrollerdb.txt
+-    DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
+-
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sdl2-jstest.1
+     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+
+diff --git a/src/sdl2-jstest.c b/src/sdl2-jstest.c
+--- a/src/sdl2-jstest.c
++++ b/src/sdl2-jstest.c
+@@ -621,9 +621,9 @@ int main(int argc, char** argv)
+     atexit(SDL_Quit);
+
+     {
+-      int ret = SDL_GameControllerAddMappingsFromFile(SDL2_JSTEST_DATADIR "/gamecontrollerdb.txt");
++      int ret = SDL_GameControllerAddMappingsFromFile("/userdata/system/configs/regstation/gamecontrollerdb.txt");
+       if (ret < 0) {
+-        ret = SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
++        ret = SDL_GameControllerAddMappingsFromFile("/usr/share/regstation/gamecontrollerdb.txt");
+       }
+
+       if (ret < 0)

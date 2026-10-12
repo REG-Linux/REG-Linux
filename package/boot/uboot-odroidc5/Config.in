@@ -1,0 +1,4 @@
+config BR2_PACKAGE_UBOOT_ODROIDC5
+    bool "uboot files for ODROID C5"
+    help
+        uboot files for ODROID C5

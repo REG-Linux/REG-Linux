@@ -1,0 +1,167 @@
+script: change splash mode in place instead of restarting the theme
+
+`plymouth change-mode <mode>` tears the whole splash down and builds it again.
+ply_boot_splash_show() hides the splash before re-showing it whenever the mode
+differs:
+
+	} else if (splash->mode != PLY_BOOT_SPLASH_MODE_INVALID) {
+		splash->plugin_interface->hide_splash_screen (...);
+	}
+	ply_trace ("showing splash screen");
+	splash->plugin_interface->show_splash_screen (...);
+
+For the script plugin that hide clears plugin->is_animating, so the guard at
+the top of start_animation() no longer short-circuits and the theme is parsed
+and executed from scratch, destroying and recreating every sprite. Measured on
+an ODROID-C5 post-upgrade boot, from the plymouthd debug log:
+
+  04.262  start_animation: parsing script file     <- S002plymouth --show-splash
+  07.004  start_animation: parsing script file     <- change-mode --updates
+  22.987  start_animation: parsing script file     <- change-mode --reboot
+
+Each rebuild takes about 150 ms (07.004 -> 07.149 to re-render the labels),
+and for that whole window there are no sprites, so the screen falls back to
+the theme background. What the user sees is the logo disappearing and coming
+back twice during a single boot -- reported as a "double splash". Both mode
+changes come from one script, S12populateshare, and only on a boot where the
+share actually needs updating, which is why it looks intermittent.
+
+Themes cannot work around this. reglinux-arcade already carries a block
+headed "detect mode changes without resetting animation" that hides the
+outgoing mode's elements and skips the fade-in, and it is correct -- but it
+lives at top level, and by the time top level runs again the sprites it wanted
+to preserve have already been freed.
+
+Add an optional change_mode hook to the plugin interface. When the splash is
+already shown and the plugin implements it, ply_boot_splash_show() retargets
+the plugin and returns instead of hiding first. Plugins that leave the pointer
+NULL -- two-step, text, tribar, details, space-flares, fade-throbber -- keep
+the existing hide/show path exactly, so this cannot regress them.
+
+The script plugin updates the mode field -- the script only ever reads the
+mode through Plymouth.GetMode(), which returns script_lib_plymouth_data_t.mode
+-- and then drives one refresh. That last part matters: the hide/show path
+re-executed the script synchronously inside the change-mode request, so
+callers could rely on the new mode being on screen when plymouth answered.
+S31regstation depends on it, issuing "change-mode --reboot" and then
+"quit --retain-splash" about 18ms later; at 30Hz the next tick would usually
+lose that race and freeze the previous mode's frame on screen for the whole
+handover to the frontend. Themes that want to react to a mode change
+must poll GetMode() from their refresh callback, since top level no longer
+runs a second time; reglinux-arcade is updated to do that in the same change.
+
+The in-place path deliberately does not pump on_boot_progress.
+ply_boot_splash_update_progress() re-arms its own timeout on every call, and
+unlike the hide/show path we have not stopped the pending one, so calling it
+would leave two progress loops running -- doubling again at every subsequent
+mode change.
+
+Signed-off-by: REG-Linux <reglinux@reglinux.org>
+diff --git a/src/libply-splash-core/ply-boot-splash-plugin.h b/src/libply-splash-core/ply-boot-splash-plugin.h
+index d5cd05a7..27e6a59a 100644
+--- a/src/libply-splash-core/ply-boot-splash-plugin.h
++++ b/src/libply-splash-core/ply-boot-splash-plugin.h
+@@ -103,6 +103,16 @@ typedef struct
+         bool (*validate_input) (ply_boot_splash_plugin_t *plugin,
+                                 const char               *entry_text,
+                                 const char               *add_text);
++
++        /* Optional. Switch an already-shown splash to a new mode in place.
++         *
++         * Without this, ply_boot_splash_show() has to hide the splash and
++         * show it again, which for the script plugin means destroying every
++         * sprite and re-parsing the theme -- a visible gap. A plugin that can
++         * retarget itself implements this instead; leaving it NULL keeps the
++         * original hide/show behaviour. */
++        void (*change_mode)(ply_boot_splash_plugin_t *plugin,
++                            ply_boot_splash_mode_t    mode);
+ } ply_boot_splash_plugin_interface_t;
+ 
+ #endif /* PLY_BOOT_SPLASH_PLUGIN_H */
+diff --git a/src/libply-splash-core/ply-boot-splash.c b/src/libply-splash-core/ply-boot-splash.c
+index 217f455e..ab5fe31c 100644
+--- a/src/libply-splash-core/ply-boot-splash.c
++++ b/src/libply-splash-core/ply-boot-splash.c
+@@ -534,6 +534,22 @@ ply_boot_splash_show (ply_boot_splash_t     *splash,
+         if (splash->mode == mode) {
+                 ply_trace ("already set same splash screen mode");
+                 return true;
++        } else if (splash->mode != PLY_BOOT_SPLASH_MODE_INVALID &&
++                   splash->is_shown &&
++                   splash->plugin_interface->change_mode != NULL) {
++                /* The plugin can retarget itself, so leave the splash up.
++                 *
++                 * Deliberately no ply_boot_splash_update_progress() call
++                 * here. It re-arms its own timeout on every invocation, and
++                 * unlike the hide/show path below we have not stopped the
++                 * pending one, so calling it would leave two progress loops
++                 * running and double the rate again at each mode change. The
++                 * existing timeout keeps firing on schedule, which is the
++                 * point of not tearing the splash down. */
++                ply_trace ("changing splash screen mode in place");
++                splash->plugin_interface->change_mode (splash->plugin, mode);
++                splash->mode = mode;
++                return true;
+         } else if (splash->mode != PLY_BOOT_SPLASH_MODE_INVALID) {
+                 splash->plugin_interface->hide_splash_screen (splash->plugin,
+                                                               splash->loop);
+diff --git a/src/plugins/splash/script/plugin.c b/src/plugins/splash/script/plugin.c
+index a2e7443a..236485a0 100644
+--- a/src/plugins/splash/script/plugin.c
++++ b/src/plugins/splash/script/plugin.c
+@@ -512,6 +512,47 @@ show_splash_screen (ply_boot_splash_plugin_t *plugin,
+         return start_animation (plugin);
+ }
+ 
++/* Retarget a running splash at a new mode without restarting it.
++ *
++ * The script only reads the mode through Plymouth.GetMode(), which returns
++ * script_lib_plymouth_data_t.mode, so updating that field is what the theme
++ * sees. Themes that want to react have to poll GetMode() from their refresh
++ * callback rather than at top level, since top level no longer runs again.
++ *
++ * Drive one refresh here rather than waiting for the next tick. The hide/show
++ * path this replaces re-executed the script synchronously inside the
++ * change-mode request, so callers could rely on the new mode being on screen
++ * by the time plymouth answered them. S31regstation does exactly that: it
++ * issues "change-mode --reboot" and then "quit --retain-splash" ~18ms later,
++ * and at a 30Hz refresh rate the tick would usually lose that race, freezing
++ * the previous mode's frame on screen for the whole handover to the frontend.
++ *
++ * Refresh, do not call on_timeout(): that re-arms its own timeout, so using
++ * it here would leave two refresh loops running and double the animation rate
++ * at every mode change. */
++static void
++change_mode (ply_boot_splash_plugin_t *plugin,
++             ply_boot_splash_mode_t    mode)
++{
++        assert (plugin != NULL);
++
++        plugin->mode = mode;
++
++        if (plugin->script_plymouth_lib == NULL || plugin->script_state == NULL)
++                return;
++
++        plugin->script_plymouth_lib->mode = mode;
++
++        script_lib_plymouth_on_refresh (plugin->script_state,
++                                        plugin->script_plymouth_lib);
++
++        if (plugin->script_sprite_lib != NULL) {
++                pause_displays (plugin);
++                script_lib_sprite_refresh (plugin->script_sprite_lib);
++                unpause_displays (plugin);
++        }
++}
++
+ static void
+ system_update (ply_boot_splash_plugin_t *plugin,
+                int                       progress)
+@@ -767,6 +808,7 @@ ply_boot_splash_plugin_get_interface (void)
+                 .hide_message         = hide_message,
+                 .on_boot_output       = on_boot_output,
+                 .validate_input       = validate_input,
++                .change_mode          = change_mode,
+         };
+ 
+         return &plugin_interface;

@@ -1,0 +1,11 @@
+config BR2_PACKAGE_YATKA
+	bool "yatka"
+	select BR2_PACKAGE_SDL
+	select BR2_PACKAGE_SDL_IMAGE
+	select BR2_PACKAGE_SDL_MIXER
+	select BR2_PACKAGE_SDL_TTF
+	help
+	  Yatka is a modern Tetris implementation using SDL 1.2.
+	  Fully free, all assets included.
+
+	  https://github.com/szymor/yatka

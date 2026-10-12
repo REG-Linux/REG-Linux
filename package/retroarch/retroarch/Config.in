@@ -5,14 +5,26 @@ config BR2_PACKAGE_RETROARCH
 	select BR2_PACKAGE_RETROARCH_ASSETS
 	select BR2_PACKAGE_RETROARCH_JOYPAD_AUTOCONFIG
 	select BR2_PACKAGE_LIBRETRO_CORE_INFO
-	select BR2_PACKAGE_SLANG_SHADERS        if BR2_PACKAGE_REGLINUX_VULKAN
 	select BR2_PACKAGE_GAMEMODE
 	select BR2_PACKAGE_HIDAPI
 	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_ALSA_LIB
+	select BR2_PACKAGE_SLANG_SHADERS        if BR2_PACKAGE_REGLINUX_VULKAN
     help
-      A multi emulator frontend.
-	  
-	  http://www.libretro.com
+      RetroArch is a free, ad-free, spyware-free, and open source
+      cross platform frontend/framework for emulators, games, video
+      players, and media players.
+
+      Features:
+      - Multi-core support (libretro API)
+      - OpenGL/GLES/Vulkan rendering
+      - SDL2 input and audio support
+      - Network features (netplay, achievements)
+      - Shader support (GLSL, CG, Slang)
+      - Controller autoconfig
+      - Cheevos/RetroAchievements support
+
+      https://www.libretro.com/
 
 comment "Retroarch depends on EGL or OpenGLES"
 	depends on !(BR2_PACKAGE_HAS_LIBEGL || BR2_PACKAGE_HAS_LIBGLES || BR2_PACKAGE_HAS_LIBGL)

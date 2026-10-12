@@ -1,0 +1,23 @@
+Don't reference render_is_threaded_video() when building the libretro
+shared library — that symbol lives in render_sdl.c which is excluded
+from the libretro build, so the resulting .so loads with an unresolved
+symbol that the dynamic linker reports at first use:
+
+    symbol lookup error: undefined symbol: render_is_threaded_video
+
+The libretro path is single-threaded anyway (the threaded video path
+is already guarded out in 003-fix-vdp-nothread.patch); just skip the
+branch under IS_LIB so libdl never has to find the symbol.
+--- a/vdp.c
++++ b/vdp.c
+@@ -511,9 +511,11 @@ vdp_context *init_vdp_context(uint8_t region_pal, uint8_t has_max_vsram, uint8_t
+ {
+ 	vdp_context *context;
+ #ifndef _WIN32
++#ifndef IS_LIB
+ 	if (render_is_threaded_video()) {
+ 		context = ret->renderer = init_vdp_context_int(region_pal, has_max_vsram, type);
+ 	} else
++#endif
+ #endif
+ 	{

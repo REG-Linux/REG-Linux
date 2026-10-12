@@ -1,13 +1,20 @@
 config BR2_PACKAGE_LIBRETRO_PPSSPP
     bool "libretro-ppsspp"
-    
-    depends on BR2_INSTALL_LIBSTDCPP
-    select BR2_PACKAGE_LIBZIP
-      help
-        A libretro PSP core
 
-        http://www.libretro.com
+    depends on BR2_INSTALL_LIBSTDCPP
+    help
+      A libretro PSP core. PPSSPP is a portable PlayStation Portable
+      emulator that supports OpenGL, Vulkan, and software rendering.
+
+      Features:
+      - High-resolution rendering
+      - Save states
+      - Controller support
+      - Shader support
+      - Vulkan support (optional)
+
+      http://www.libretro.com
+      https://www.ppsspp.org/
 
 comment "LIBRETRO_PPSSPP needs a toolchain w/ C++"
     depends on !BR2_INSTALL_LIBSTDCPP
-

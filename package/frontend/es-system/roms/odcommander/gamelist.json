@@ -1,0 +1,22 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "desc": "A two-pane file manager, similar to Norton/Midnight commander, useful to manage all the /userdata files on your system.",
+          "developer": "glebm",
+          "genre": "File manager",
+          "image": "./images/od-commander-image.png",
+          "lang": "en",
+          "marquee": "./images/od-commander-marquee.png",
+          "name": "OD-Commander",
+          "players": "1",
+          "publisher": "https://github.com/od-contrib/commander",
+          "releasedate": "20200220T000000"
+        },
+        "path": "./od-commander.odc",
+        "type": "game"
+      }
+    ]
+  }
+}

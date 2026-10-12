@@ -15,6 +15,25 @@ MOUNTPOINT="$4"
 FSMOUNTOPT="noatime"
 TESTFILE="${MOUNTPOINT}/reglinux.fsrw.test"
 
+# checks can take a while, so they are written on the terminal, but not every
+# board has a tty0 and a failed redirection would silently skip the check
+CONSOLE="/dev/tty0"
+test -w "${CONSOLE}" || CONSOLE="/dev/null"
+
+# ext2/3/4 repair. -p only fixes what it considers safe and gives up with bit 2
+# set as soon as anything else is wrong. There is nobody to answer prompts on
+# an appliance, so escalate instead of leaving /userdata unusable.
+fsck_ext() {
+    command -v fsck.ext4 > /dev/null 2>&1 || return 1
+    fsck.ext4 -p "${MOUNTDEVICE}" > "${CONSOLE}" 2>&1
+    FSCKRET=$?
+    if test $((FSCKRET & 4)) -ne 0
+    then
+        fsck.ext4 -y "${MOUNTDEVICE}" > "${CONSOLE}" 2>&1
+    fi
+    return 0
+}
+
 do_mount() {
     case "${FSTYPE}" in
         ntfs)
@@ -23,40 +42,51 @@ do_mount() {
             fi
             if modprobe ntfs3; then
                 if ! mount -t ntfs3 "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                    exit 1
+                    return 1
                 fi
             else
                 if ! modprobe fuse || ! mount -t ntfs-3g "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                    exit 1
+                    return 1
                 fi
             fi
             ;;
         btrfs)
             modprobe btrfs
-            if mount -t btrfs "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                exit 0
-            fi
-            exit 1
+            mount -t btrfs "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}" || return 1
             ;;
         vfat|exfat)
             modprobe "${FSTYPE}"
-            FSMOUNTOPT="${FSMOUNTOPT},iocharset=utf8"
-            if ! mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                exit 1
+            if [ "${FSTYPE}" = "vfat" ]; then
+                FSMOUNTOPT="${FSMOUNTOPT},utf8=1"
+            else
+                FSMOUNTOPT="${FSMOUNTOPT},iocharset=utf8"
             fi
+            mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}" || return 1
             ;;
         *)
-            # ext4
-            if mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                exit 0
-            fi
-            exit 1
+            # ext2/ext3/ext4
+            mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}" || return 1
             ;;
     esac
+    return 0
 }
 
+# a fs flagged with errors still mounts read-write : the kernel only flips it
+# to read-only later, when it walks the damaged group, long after the rw test
+# below has passed. Look at the superblock while the fs is still unmounted.
+case "${FSTYPE}" in
+    "ext2"|"ext3"|"ext4")
+        if test "${RWREQUIRED}" = "1" && command -v dumpe2fs > /dev/null 2>&1 &&
+           dumpe2fs -h "${MOUNTDEVICE}" 2>/dev/null | grep -q "^Filesystem state:.*with errors"
+        then
+            echo "${MOUNTDEVICE} is flagged with errors, checking it" > "${CONSOLE}"
+            fsck_ext
+        fi
+        ;;
+esac
+
 # try to mount
-do_mount
+do_mount || exit 1
 
 if test "${RWREQUIRED}" != "1"; then
     exit 0 # success even if it's readonly
@@ -84,10 +114,13 @@ case "${FSTYPE}" in
     "ntfs")
         ntfsfix -d "${MOUNTDEVICE}" > /dev/tty0
     ;;
+    "ext2"|"ext3"|"ext4")
+        fsck_ext
+    ;;
 esac
 
 # try to mount again
-do_mount
+do_mount || exit 1
 
 # new try to write
 if touch "${TESTFILE}"; then

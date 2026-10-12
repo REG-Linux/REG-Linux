@@ -68,8 +68,6 @@ define OPENMSX_BUILD_CMDS
 endef
 
 define OPENMSX_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/openmsx/config/*.keys $(TARGET_DIR)/usr/share/evmapy/
     cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/openmsx/config/settings.xml $(TARGET_DIR)/usr/share/openmsx
 endef
 

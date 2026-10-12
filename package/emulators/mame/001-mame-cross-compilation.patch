@@ -1,6 +1,15 @@
-diff -ur ./3rdparty/minimp3/minimp3.h /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/3rdparty/minimp3/minimp3.h
---- a/3rdparty/minimp3/minimp3.h	2020-10-27 02:00:36.000000000 +0100
-+++ b/3rdparty/minimp3/minimp3.h	2020-11-10 17:13:17.377760626 +0100
+From: REG-Linux <cjom@reglinux.org>
+Subject: [PATCH] build: cross-compilation fixes
+
+Lets the MAME build be driven by an external toolchain: OVERRIDE_STRIP and
+CROSS_ARCH pass-through in the makefile, GENie/toolchain plumbing, a
+NO_USE_BGFX_KHRONOS switch, minimp3 HAVE_SSE guards, and an explicit emu.h
+include in drcfe.h for the no-precompiled-headers build.
+
+Refreshed against GroovyMAME 0.289 (all hunks previously applied with fuzz).
+
+--- a/3rdparty/minimp3/minimp3.h	2026-08-12 10:40:47.000000000 +0100
++++ b/3rdparty/minimp3/minimp3.h	2026-08-13 21:28:00.509007579 +0100
 @@ -84,6 +84,10 @@
  #define MINIMP3_MIN(a, b)           ((a) > (b) ? (b) : (a))
  #define MINIMP3_MAX(a, b)           ((a) < (b) ? (b) : (a))
@@ -11,7 +20,7 @@ diff -ur ./3rdparty/minimp3/minimp3.h /home/romain/batocera.linux/output/odroidn
 +
  #if !defined(MINIMP3_NO_SIMD)
  
- #if !defined(MINIMP3_ONLY_SIMD) && (defined(_M_X64) || defined(_M_ARM64) || defined(__x86_64__) || defined(__aarch64__))
+ #if !defined(MINIMP3_ONLY_SIMD) && (defined(_M_X64) || defined(__x86_64__) || defined(__aarch64__) || defined(_M_ARM64))
 @@ -96,6 +100,9 @@
  #include <intrin.h>
  #endif /* defined(_MSC_VER) */
@@ -22,26 +31,25 @@ diff -ur ./3rdparty/minimp3/minimp3.h /home/romain/batocera.linux/output/odroidn
  #define HAVE_SSE 1
  #define HAVE_SIMD 1
  #define VSTORE _mm_storeu_ps
-@@ -844,6 +851,7 @@
-         VSTORE(right + i, VSUB(vl, vr));
+@@ -899,6 +906,7 @@
+ #endif
      }
  #endif /* HAVE_SIMD */
 +    i = (n >> 2) << 2;
      for (; i < n; i++)
      {
          float a = left[i];
-diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/makefile
---- a/makefile	2020-10-27 02:00:36.000000000 +0100
-+++ b/makefile	2020-11-09 18:56:15.179960037 +0100
-@@ -32,6 +32,7 @@
+--- a/makefile	2026-08-12 10:40:47.000000000 +0100
++++ b/makefile	2026-08-13 21:28:00.509391273 +0100
+@@ -33,6 +33,7 @@
  # SDL2_MULTIAPI = 1
  # NO_USE_MIDI = 1
  # NO_USE_PORTAUDIO = 1
 +# NO_USE_BGFX_KHRONOS = 1
  # NO_USE_PULSEAUDIO = 1
+ # NO_USE_PIPEWIRE = 1
  # USE_TAPTUN = 1
- # USE_PCAP = 1
-@@ -87,11 +87,13 @@
+@@ -89,11 +90,13 @@
  # BUILDDIR = build
  # TARGETOS = windows
  # CROSS_BUILD = 1
@@ -55,8 +63,8 @@ diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0
  
  # DEPRECATED = 0
  # LTO = 1
-@@ -573,6 +581,12 @@
- LD := $(OVERRIDE_LD)
+@@ -561,6 +564,12 @@
+ AR := $(OVERRIDE_AR)
  endif
  endif
 +ifdef OVERRIDE_STRIP
@@ -68,7 +76,7 @@ diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0
  
  #-------------------------------------------------
  # sanity check the configuration
-@@ -740,6 +760,10 @@
+@@ -731,6 +740,10 @@
  PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
  endif
  
@@ -79,10 +87,9 @@ diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0
  ifdef NO_USE_PORTAUDIO
  PARAMS += --NO_USE_PORTAUDIO='$(NO_USE_PORTAUDIO)'
  endif
-diff -ur ./scripts/genie.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/genie.lua
---- a/scripts/genie.lua	2020-10-27 02:00:36.000000000 +0100
-+++ b/scripts/genie.lua	2020-11-09 19:09:38.958845876 +0100
-@@ -195,6 +195,16 @@
+--- a/scripts/genie.lua	2026-08-12 10:40:47.000000000 +0100
++++ b/scripts/genie.lua	2026-08-13 21:28:00.509653274 +0100
+@@ -192,6 +192,16 @@
  }
  
  newoption {
@@ -99,7 +106,7 @@ diff -ur ./scripts/genie.lua /home/romain/batocera.linux/output/odroidn2/build/m
  	trigger = "TOOLCHAIN",
  	description = "Toolchain prefix"
  }
-@@ -390,6 +400,11 @@
+@@ -397,6 +407,11 @@
  }
  
  newoption {
@@ -111,10 +118,9 @@ diff -ur ./scripts/genie.lua /home/romain/batocera.linux/output/odroidn2/build/m
  	trigger = "DEBUG_DIR",
  	description = "Default directory for debugger.",
  }
-diff -ur ./scripts/src/3rdparty.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/src/3rdparty.lua
---- a/scripts/src/3rdparty.lua	2020-10-27 02:00:36.000000000 +0100
-+++ b/scripts/src/3rdparty.lua	2020-11-09 18:03:17.288620257 +0100
-@@ -1346,9 +1346,14 @@ end
+--- a/scripts/src/3rdparty.lua	2026-08-12 10:40:47.000000000 +0100
++++ b/scripts/src/3rdparty.lua	2026-08-13 21:28:00.509912520 +0100
+@@ -1457,9 +1457,14 @@
  		MAME_DIR .. "3rdparty/bx/include",
  		MAME_DIR .. "3rdparty/bimg/include",
  		MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/directx",
@@ -130,10 +136,9 @@ diff -ur ./scripts/src/3rdparty.lua /home/romain/batocera.linux/output/odroidn2/
  	configuration { "android-*"}
  		buildoptions {
  			"-Wno-macro-redefined",
-diff -ur ./scripts/src/osd/modules.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/src/osd/modules.lua
---- a/scripts/src/osd/modules.lua	2020-10-27 02:00:36.000000000 +0100
-+++ b/scripts/src/osd/modules.lua	2020-11-09 17:59:35.068394429 +0100
-@@ -255,11 +255,16 @@
+--- a/scripts/src/osd/modules.lua	2026-08-12 10:40:47.000000000 +0100
++++ b/scripts/src/osd/modules.lua	2026-08-13 21:28:00.510068067 +0100
+@@ -294,11 +294,16 @@
  		MAME_DIR .. "3rdparty/bgfx/examples/common",
  		MAME_DIR .. "3rdparty/bgfx/include",
  		MAME_DIR .. "3rdparty/bgfx/3rdparty",
@@ -151,10 +156,9 @@ diff -ur ./scripts/src/osd/modules.lua /home/romain/batocera.linux/output/odroid
  	if _OPTIONS["NO_USE_PORTAUDIO"]=="1" then
  		defines {
  			"NO_USE_PORTAUDIO",
-diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/toolchain.lua
---- a/scripts/toolchain.lua	2020-10-27 02:00:36.000000000 +0100
-+++ b/scripts/toolchain.lua	2020-11-09 19:09:29.890677516 +0100
-@@ -737,6 +741,18 @@
+--- a/scripts/toolchain.lua	2026-08-12 10:40:47.000000000 +0100
++++ b/scripts/toolchain.lua	2026-08-13 21:28:00.510146948 +0100
+@@ -347,6 +347,18 @@
  	configuration { "linux-gcc", "x64", "Debug" }
  		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Debug")
  
@@ -173,7 +177,7 @@ diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/bui
  	configuration { "linux-clang", "x32" }
  		objdir (_buildDir .. "linux_clang" .. "/obj")
  		buildoptions {
-@@ -712,10 +712,17 @@
+@@ -593,10 +605,17 @@
  		}
  
  	configuration { "linux-*" }
@@ -191,3 +195,15 @@ diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/bui
  
  	configuration { "mingw*", "x64" }
  		postbuildcommands {
+--- a/src/devices/cpu/drcfe.h	2026-08-12 10:40:47.000000000 +0100
++++ b/src/devices/cpu/drcfe.h	2026-08-13 21:28:00.510227923 +0100
+@@ -37,6 +37,9 @@
+ #include <type_traits>
+ #include <vector>
+ 
++// Required for MAME types when precompiled headers are disabled (cross-compilation)
++#include "emu.h"
++
+ 
+ //**************************************************************************
+ //  CONSTANTS

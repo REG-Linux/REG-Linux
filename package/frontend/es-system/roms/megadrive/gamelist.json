@@ -1,0 +1,47 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Hayato's Journey v1_0-box.png",
+          "desc": "A homebrew game that works like an unofficial spiritual sucessor of Kenseiden, a cult-classic SEGA Master System game.",
+          "developer": "Master Linkuei",
+          "genre": "Action",
+          "image": "./images/Hayato's Journey v1_0-image.png",
+          "lang": "en",
+          "marquee": "./images/Hayato's Journey v1_0-marquee.png",
+          "name": "Hayato's Journey",
+          "players": "1",
+          "publisher": "https://master-linkuei.itch.io/hayatos-journey",
+          "releasedate": "20240726T000000",
+          "thumbnail": "./images/Hayato's Journey v1_0-thumb.png",
+          "video": "./videos/Hayato's Journey v1_0-video.mp4",
+          "wheel": "./images/Hayato's Journey v1_0-wheel.png"
+        },
+        "path": "./Hayato's Journey v1_0.bin",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "boxart": "./images/Old-Towers-box.png",
+          "desc": "You play as a little explorers in a towers full of deadly traps and ugly skullz. Your only weapons to help you win: quick-thinking and skill.",
+          "developer": "Denis Grachev",
+          "genre": "Puzzle",
+          "image": "./images/Old-Towers-image.png",
+          "lang": "en",
+          "marquee": "./images/Old-Towers-marquee.png",
+          "name": "Old Towers",
+          "players": "1",
+          "publisher": "https://retrosouls.itch.io/old-towers",
+          "rating": "0.9",
+          "releasedate": "20190318T000000",
+          "thumbnail": "./images/Old-Towers-thumb.png",
+          "video": "./videos/Old-Towers-video.mp4",
+          "wheel": "./images/Old-Towers-wheel.png"
+        },
+        "path": "./Old-Towers.bin",
+        "type": "game"
+      }
+    ]
+  }
+}

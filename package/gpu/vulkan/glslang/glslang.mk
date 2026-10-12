@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-GLSLANG_VERSION = 15.1.0
-GLSLANG_SITE =  $(call github,KhronosGroup,glslang,$(GLSLANG_VERSION))
+GLSLANG_VERSION = 1.4.357.0
+GLSLANG_SITE = $(call github,KhronosGroup,glslang,vulkan-sdk-$(GLSLANG_VERSION))
 GLSLANG_LICENSE = BSD-3-Clause
 GLSLANG_LICENSE_FILES = LICENSE.txt
 GLSLANG_DEPENDENCIES = spirv-tools

@@ -83,7 +83,7 @@ do_enable() {
     /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services "$new_services"
 
     # Notify service in case it needs to do something when enabled
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" enabled; done' sh {} + 2>/dev/null
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f; do "$f" enabled; done' sh {} + 2>/dev/null
 }
 
 do_disable() {
@@ -113,16 +113,16 @@ do_disable() {
         fi
 
         # Notify service in case it needs to do something when disabled
-        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" disabled; done' sh {} + 2>/dev/null
+        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f; do "$f" disabled; done' sh {} + 2>/dev/null
     fi
 }
 
 do_start() {
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" start; done' sh {} + 2>/dev/null
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f; do "$f" start; done' sh {} + 2>/dev/null
 }
 
 do_stop() {
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" stop; done' sh {} + 2>/dev/null
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f; do "$f" stop; done' sh {} + 2>/dev/null
 }
 
 ACTION=$1
@@ -150,7 +150,7 @@ case "$ACTION" in
         do_start "$1"
         ;;
     status)
-        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" status; done' sh {} + 2>/dev/null
+        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f; do "$f" status; done' sh {} + 2>/dev/null
         ;;
     *)
         do_help "${0}"

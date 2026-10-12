@@ -1,0 +1,8 @@
+config BR2_PACKAGE_REGLINUX_SHIM_SIGNED
+    bool "reglinux-shim-signed"
+    help
+      Microsoft-signed EFI shim binaries for Secure Boot support.
+      Downloads x64 shim from Ubuntu and ia32 shim + helpers from Debian.
+
+      Provides: shimx64.efi, mmx64.efi, fbx64.efi,
+                shimia32.efi, mmia32.efi, fbia32.efi

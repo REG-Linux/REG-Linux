@@ -1,0 +1,4 @@
+config BR2_PACKAGE_RETROACHIEVEMENTS_SOUNDS
+	bool "retroachievements sounds"
+	help
+	  Play a sound when a retroachievement is unlocked

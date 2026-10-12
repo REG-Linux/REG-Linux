@@ -1,0 +1,487 @@
+#!/bin/dash
+#
+# usbgadget - USB Gadget Mode Manager for REG-Linux
+#
+# Manages USB gadget configurations for MTP and ADB modes using ConfigFS.
+#
+# Supported modes:
+#   - mtp (file_transfer): Media Transfer Protocol for file access
+#   - adb: Android Debug Bridge for development
+#
+# Usage:
+#   usbgadget {start|stop|restart|trigger|status|adb}
+#   usbgadget mtp [/path]   # Default: /userdata
+#
+# trigger is called by 80-usbgadget.rules on extcon cable-state changes; it
+# is RK3566-only (dwc3 dr_mode="otg" boards) and a no-op everywhere else.
+#
+# Examples:
+#   usbgadget mtp                    # Start MTP with /userdata
+#   usbgadget mtp /                  # Start MTP with root filesystem
+#   usbgadget mtp /sdcard            # Start MTP with /sdcard
+#   usbgadget adb                    # Start ADB debugging
+#   usbgadget status                 # Check current USB mode
+#   usbgadget stop                   # Stop all USB gadgets
+#
+# Exit codes:
+#   0 - Success
+#   1 - Failure (missing resources, configuration errors)
+#
+# Files:
+#   /etc/umtprd/umtprd.conf          - MTP daemon configuration
+#   /sys/kernel/config/usb_gadget/   - USB gadget ConfigFS interface
+#   /userdata/system/.cache/         - Runtime cache and state
+#
+# Author: REG-Linux Team
+# License: GPL-2.0
+#
+
+set -u
+
+# =============================================================================
+# Configuration Paths
+# =============================================================================
+
+CACHEDIR="/userdata/system/.cache/usbgadget"           # Runtime cache directory
+GADGETCONF="${CACHEDIR}/usbgadget.conf"                # USB mode state file
+GADGET_MTP_DIR="/sys/kernel/config/usb_gadget/mtp"     # MTP gadget ConfigFS path
+GADGET_ADB_DIR="/sys/kernel/config/usb_gadget/adb"     # ADB gadget ConfigFS path
+MTP_MOUNT="/dev/ffs-umtp"                              # MTP FunctionFS mount point
+ADB_MOUNT="/dev/usb-ffs/adb"                           # ADB FunctionFS mount point
+UMTP_CONF="/etc/umtprd/umtprd.conf"                    # uMTP daemon configuration
+
+# =============================================================================
+# USB Device Identifiers
+# =============================================================================
+
+# USB IDs (Linux Foundation defaults)
+MTP_VENDOR_ID="0x1D6B"   # Linux Foundation
+MTP_PRODUCT_ID="0x0100"  # PTP Gadget
+MTP_DEV_VERSION="0x3008" # Matches umtprd.conf usb_dev_version
+
+# USB IDs for ADB mode - standard Android ADB identifiers
+ADB_VENDOR_ID="0x18D1"   # Google
+ADB_PRODUCT_ID="0x4EE2"  # Android ADB
+ADB_DEV_VERSION="0x0100"
+
+# Device identification strings
+SERIAL_VALUE="00000001"
+[ -r /etc/machine-id ] && SERIAL_VALUE="$(cat /etc/machine-id)"
+MANUFACTURER="REG-Linux"
+PRODUCT="REG-Linux Device"
+
+# =============================================================================
+# Binary Detection
+# =============================================================================
+
+# Detect umtprd binary location
+UMTPRD_BIN=""
+[ -x /usr/bin/umtprd ] && UMTPRD_BIN="/usr/bin/umtprd"
+[ -z "${UMTPRD_BIN}" ] && [ -x /usr/sbin/umtprd ] && UMTPRD_BIN="/usr/sbin/umtprd"
+
+# Detect adbd binary location
+ADBD_BIN=""
+[ -x /usr/bin/adbd ] && ADBD_BIN="/usr/bin/adbd"
+[ -z "${ADBD_BIN}" ] && [ -x /usr/sbin/adbd ] && ADBD_BIN="/usr/sbin/adbd"
+
+# =============================================================================
+# Hardware Detection
+# =============================================================================
+
+# Detect if running on RK3566 SoC (requires special USB handling)
+# Returns: 0 if RK3566, 1 otherwise
+is_rk3566() {
+    for compat in /proc/device-tree/compatible /sys/firmware/devicetree/base/compatible; do
+        [ -r "${compat}" ] || continue
+        tr -d '\0' < "${compat}" | grep -q "rockchip,rk3566" && return 0
+    done
+    return 1
+}
+
+
+# =============================================================================
+# USB Device Controller (UDC) Management
+# =============================================================================
+
+# Get the name of the first available USB Device Controller
+# Returns: UDC name via stdout (e.g., "dwc3", "musb-hdrc")
+udc_name() {
+    ls /sys/class/udc 2>/dev/null | head -n 1
+}
+
+# Set UDC_NAME global variable for use in gadget functions
+# Returns: 0 on success, 1 if no UDC found
+set_udc() {
+    UDC_NAME="$(udc_name)"
+    [ -n "${UDC_NAME}" ] || return 1
+}
+
+# =============================================================================
+# RK3566 Cable Detection (dwc3 dr_mode="otg" boards)
+# =============================================================================
+#
+# Anbernic RG353x / Powkiddy RK2023 run the dwc3 controller with
+# dr_mode="otg" instead of "peripheral" (linux_patches/linux-0012-rk3566-usb-otg.patch),
+# so the port is dual-role: which side (host/device) is active depends on
+# extcon cable-state reporting, not a fixed devicetree mode. The ConfigFS
+# gadget built by prepare_gadget() stays configured across cable events, but
+# its electrical visibility (the D+/D- pull-up) does not automatically track
+# a cable arriving after boot, or being pulled out. usb_trigger() re-syncs
+# that pull-up (via the UDC's "soft_connect" attribute) to match the real
+# cable state; 80-usbgadget.rules calls it on every udev "extcon"
+# subsystem "change" event.
+
+# Check whether a data-capable cable (SDP/CDP) is physically connected.
+# RK3566 exposes the relevant extcon device as a device-link "supplier" of
+# the UDC's companion usb2phy; fall back to a generic extcon scan for any
+# other board where this might be called.
+# Requires: UDC_NAME set (via set_udc)
+# Returns: 0 if a data cable is connected, 1 otherwise
+is_cable_connected() {
+    PHY_PATH="$(ls -d /sys/devices/platform/"${UDC_NAME}"/supplier:platform:*usb2phy 2>/dev/null | head -n 1)"
+    if [ -n "${PHY_PATH}" ]; then
+        found=0
+        for cable in "${PHY_PATH}"/extcon/*/cable.*; do
+            [ -f "${cable}/state" ] || continue
+            found=1
+            name=""
+            [ -f "${cable}/name" ] && name="$(cat "${cable}/name" 2>/dev/null)"
+            case "${name}" in
+                SDP|CDP|"")
+                    grep -q 1 "${cable}/state" 2>/dev/null && return 0
+                    ;;
+                *) ;;
+            esac
+        done
+        [ "${found}" -eq 1 ] && return 1
+    fi
+
+    # Generic fallback: any extcon device exposing a cable state directly
+    found=0
+    for cable in /sys/class/extcon/*/cable.*; do
+        [ -f "${cable}/state" ] || continue
+        found=1
+        grep -q 1 "${cable}/state" 2>/dev/null && return 0
+    done
+    [ "${found}" -eq 0 ] && return 0
+    return 1
+}
+
+# Re-sync the UDC's soft-connect state to the actual cable state.
+# RK3566-only (no-op elsewhere); called by 80-usbgadget.rules.
+usb_trigger() {
+    is_rk3566 || exit 0
+    set_udc || exit 0
+    SOFT_CONNECT="/sys/class/udc/${UDC_NAME}/soft_connect"
+    [ -e "${SOFT_CONNECT}" ] || exit 0
+    if is_cable_connected; then
+        echo "connect" > "${SOFT_CONNECT}" 2>/dev/null || true
+    else
+        echo "disconnect" > "${SOFT_CONNECT}" 2>/dev/null || true
+    fi
+}
+
+# =============================================================================
+# ConfigFS Management
+# =============================================================================
+
+# Ensure ConfigFS is mounted and gadget modules are loaded
+# Returns: 0 on success, 1 on failure
+ensure_configfs() {
+    [ -d /sys/kernel/config ] || return 1
+    grep -q " /sys/kernel/config " /proc/mounts || \
+        mount -t configfs none /sys/kernel/config || return 1
+    modprobe -q libcomposite 2>/dev/null || true       # Core composite USB gadget
+    modprobe -q usb_f_fs 2>/dev/null || true           # FunctionFS for MTP/ADB
+}
+
+# Set USB role (device/host) for the UDC
+# Args: $1 - role ("device" or "host")
+set_role() {
+    [ -z "${UDC_NAME:-}" ] && return 0
+    # Modern role-switch interface (dwc3, cdns3, etc.)
+    for sw in /sys/class/udc/"${UDC_NAME}"/device/usb_role/*/role; do
+        [ -e "${sw}" ] && echo "$1" > "${sw}" 2>/dev/null && return 0
+    done
+    # MUSB / legacy OTG controllers expose a "mode" attribute
+    mode_file="/sys/class/udc/${UDC_NAME}/device/mode"
+    if [ -w "${mode_file}" ]; then
+        case "$1" in
+            device)
+                echo peripheral > "${mode_file}" 2>/dev/null || true
+                ;;
+            host) echo host > "${mode_file}" 2>/dev/null || true ;;
+        esac
+    fi
+}
+
+# =============================================================================
+# Gadget Cleanup
+# =============================================================================
+
+# Clean up USB gadget configuration from ConfigFS
+# Unbinds UDC and removes gadget directory
+# Args: $1 - gadget directory path
+cleanup_gadget() {
+    dir="$1"
+    [ -d "${dir}" ] || return 0
+    # Unbind UDC first
+    [ -w "${dir}/UDC" ] && echo "" > "${dir}/UDC" 2>/dev/null || true
+    # Remove symlinks
+    rm -f "${dir}/configs/c.1/ffs."* 2>/dev/null || true
+    # Force remove directory tree
+    rm -rf "${dir}" 2>/dev/null || true
+}
+
+# =============================================================================
+# Gadget Preparation
+# =============================================================================
+
+# Prepare USB gadget configuration in ConfigFS
+# Creates complete USB gadget structure with FunctionFS
+# Args: $1 - gadget directory, $2 - function label (mtp/adb), $3 - vendor id, $4 - product id, $5 - device version
+# Returns: 0 on success, 1 on failure
+prepare_gadget() {
+    dir="$1"
+    label="$2"
+    vid="$3"
+    pid="$4"
+    dev_ver="$5"
+    ensure_configfs || return 1
+    [ -d /sys/kernel/config/usb_gadget ] || return 1
+
+    # Force cleanup existing gadget
+    if [ -d "${dir}" ]; then
+        [ -w "${dir}/UDC" ] && echo "" > "${dir}/UDC" 2>/dev/null || true
+        rm -f "${dir}/configs/c.1/ffs."* 2>/dev/null || true
+        sleep 0.2
+        rm -rf "${dir}" 2>/dev/null || true
+    fi
+
+    sleep 0.2
+    mkdir -p "${dir}" 2>/dev/null || true
+    mkdir -p "${CACHEDIR}" 2>/dev/null || true
+
+    # USB 2.0 configuration
+    echo "0x0200" > "${dir}/bcdUSB" 2>/dev/null || true           # USB 2.0
+    echo "0x00" > "${dir}/bDeviceClass" 2>/dev/null || true       # Per-interface class
+    echo "${vid}" > "${dir}/idVendor" 2>/dev/null || true         # Vendor ID
+    echo "${pid}" > "${dir}/idProduct" 2>/dev/null || true        # Product ID
+    echo "${dev_ver}" > "${dir}/bcdDevice" 2>/dev/null || true    # Device version
+
+    # Device strings (English US)
+    mkdir -p "${dir}/strings/0x409" 2>/dev/null || true
+    echo "${MANUFACTURER}" > "${dir}/strings/0x409/manufacturer" 2>/dev/null || true
+    echo "${PRODUCT}" > "${dir}/strings/0x409/product" 2>/dev/null || true
+    echo "${SERIAL_VALUE}" > "${dir}/strings/0x409/serialnumber" 2>/dev/null || true
+
+    # Configuration
+    mkdir -p "${dir}/configs/c.1" 2>/dev/null || true
+    # 0xE0 = self-powered + remote-wakeup capable. Needed on MUSB (H3/iMX6):
+    # if remote-wakeup is not advertised, the Linux host autosuspends the bus
+    # ~9 s after enumeration and the MUSB resume path drops the session.
+    echo "0xE0" > "${dir}/configs/c.1/bmAttributes" 2>/dev/null || true
+    echo "0x01" > "${dir}/configs/c.1/MaxPower" 2>/dev/null || true      # self-powered: advertise minimal bus draw
+    mkdir -p "${dir}/configs/c.1/strings/0x409" 2>/dev/null || true
+    echo "${label}" > "${dir}/configs/c.1/strings/0x409/configuration" 2>/dev/null || true
+
+    # FunctionFS function
+    mkdir -p "${dir}/functions/ffs.${label}" 2>/dev/null || true
+    ln -s "${dir}/functions/ffs.${label}" "${dir}/configs/c.1/ffs.${label}" 2>/dev/null || true
+}
+
+# =============================================================================
+# MTP Functions
+# =============================================================================
+
+# Start MTP USB gadget
+# Starts uMTP daemon for Media Transfer Protocol file access
+# Args: $1 - optional storage path (default: /userdata)
+# Returns: 0 on success, 1 on failure
+start_mtp() {
+    set_udc || { echo "No UDC found."; return 1; }
+    [ -z "${UMTPRD_BIN}" ] && { echo "umtprd not found."; return 1; }
+
+    # Handle storage path argument (default: /userdata)
+    storage_path="${1:-/userdata}"
+
+    # Update umtprd.conf storage path if writable
+    if [ -w "${UMTP_CONF}" ]; then
+        grep -q '^storage "' "${UMTP_CONF}" && \
+            sed -i "s|^storage \".*\".*|storage \"${storage_path}\"  \"Storage\"|" "${UMTP_CONF}"
+    fi
+
+    # Stop any running gadget before switching to MTP
+    stop_usbgadget
+
+    set_role device
+    prepare_gadget "${GADGET_MTP_DIR}" "mtp" "${MTP_VENDOR_ID}" "${MTP_PRODUCT_ID}" "${MTP_DEV_VERSION}" || { echo "Failed to prepare MTP."; return 1; }
+
+    # Mount FunctionFS
+    mkdir -p "${MTP_MOUNT}"
+    grep -q " ${MTP_MOUNT} " /proc/mounts || \
+        mount -t functionfs mtp "${MTP_MOUNT}" || { echo "Failed to mount."; return 1; }
+
+    # Start uMTP daemon
+    pidof umtprd >/dev/null 2>&1 || "${UMTPRD_BIN}" >/dev/null 2>&1 &
+
+    sleep 1
+    # Refresh UDC name: role switch may cause it to briefly disappear/reappear.
+    # Use a generous window (50×0.2 s = 10 s) so umtprd has time to complete its
+    # loop_on_disconnect cycle and re-write FFS descriptors if the first bind fails.
+    N=0
+    while [ "$N" -lt 50 ]; do
+        UDC_NAME="$(udc_name)"
+        [ -n "${UDC_NAME}" ] && [ -w "${GADGET_MTP_DIR}/UDC" ] && echo "${UDC_NAME}" > "${GADGET_MTP_DIR}/UDC" 2>/dev/null && break
+        sleep 0.2
+        N=$((N+1))
+    done
+    echo "USB_MODE=mtp" > "${GADGETCONF}"
+    echo "MTP started (${storage_path})"
+}
+
+# =============================================================================
+# ADB Functions
+# =============================================================================
+
+# Start ADB USB gadget
+# Starts adbd daemon for Android Debug Bridge access
+# Returns: 0 on success, 1 on failure
+start_adb() {
+    set_udc || { echo "No UDC found."; return 1; }
+    [ -z "${ADBD_BIN}" ] && { echo "adbd not found."; return 1; }
+
+    # Stop any running gadget before switching to ADB
+    stop_usbgadget
+    sleep 0.3
+
+    set_role device
+    prepare_gadget "${GADGET_ADB_DIR}" "adb" "${ADB_VENDOR_ID}" "${ADB_PRODUCT_ID}" "${ADB_DEV_VERSION}" || { echo "Failed to prepare ADB."; return 1; }
+
+    # Mount FunctionFS
+    mkdir -p "${ADB_MOUNT}"
+    grep -q " ${ADB_MOUNT} " /proc/mounts || \
+        mount -t functionfs adb "${ADB_MOUNT}" || { echo "Failed to mount."; return 1; }
+
+    # Start ADB daemon
+    "${ADBD_BIN}" >/dev/null 2>&1 &
+
+    sleep 1
+    # Refresh UDC name: role switch may cause it to briefly disappear/reappear.
+    # 50×0.2 s = 10 s window matches the MTP loop for consistency.
+    N=0
+    while [ "$N" -lt 50 ]; do
+        UDC_NAME="$(udc_name)"
+        [ -n "${UDC_NAME}" ] && [ -w "${GADGET_ADB_DIR}/UDC" ] && echo "${UDC_NAME}" > "${GADGET_ADB_DIR}/UDC" 2>/dev/null && break
+        sleep 0.2
+        N=$((N+1))
+    done
+    echo "USB_MODE=adb" > "${GADGETCONF}"
+    echo "ADB started"
+}
+
+# Stop all USB gadgets (MTP and ADB)
+# Stops all daemons, unmounts FunctionFS mounts, and cleans up ConfigFS
+stop_usbgadget() {
+    # Kill daemons with force
+    killall -9 umtprd 2>/dev/null || true
+    killall -9 adbd 2>/dev/null || true
+    sleep 0.5
+
+    # Unbind UDCs
+    UDC_NAME="$(udc_name)"
+    [ -n "${UDC_NAME}" ] && [ -w "${GADGET_MTP_DIR}/UDC" ] && \
+        echo "" > "${GADGET_MTP_DIR}/UDC" 2>/dev/null || true
+    [ -n "${UDC_NAME}" ] && [ -w "${GADGET_ADB_DIR}/UDC" ] && \
+        echo "" > "${GADGET_ADB_DIR}/UDC" 2>/dev/null || true
+
+    # Lazy unmount to avoid busy errors
+    if grep -q " ${MTP_MOUNT} " /proc/mounts; then
+        umount -l "${MTP_MOUNT}" 2>/dev/null || umount "${MTP_MOUNT}" 2>/dev/null || true
+    fi
+    rmdir "${MTP_MOUNT}" 2>/dev/null || true
+    if grep -q " ${ADB_MOUNT} " /proc/mounts; then
+        umount -l "${ADB_MOUNT}" 2>/dev/null || umount "${ADB_MOUNT}" 2>/dev/null || true
+    fi
+    rmdir "${ADB_MOUNT}" 2>/dev/null || true
+
+    # Force cleanup symlinks and directories
+    rm -f "${GADGET_MTP_DIR}/configs/c.1/ffs."* 2>/dev/null || true
+    cleanup_gadget "${GADGET_MTP_DIR}"
+    rm -f "${GADGET_ADB_DIR}/configs/c.1/ffs."* 2>/dev/null || true
+    cleanup_gadget "${GADGET_ADB_DIR}"
+
+    echo "USB_MODE=disabled" > "${GADGETCONF}" 2>/dev/null || true
+    echo "USB gadgets stopped"
+}
+
+# =============================================================================
+# Command Line Interface
+# =============================================================================
+
+case "${1:-}" in
+    start|mtp)
+        # Start MTP mode (default: /userdata)
+        # Usage: usbgadget mtp [/path]
+        start_mtp "${2:-}"
+        ;;
+    adb)
+        # Start ADB debug mode
+        start_adb
+        ;;
+    stop|disabled)
+        # Stop all USB gadgets, clean up ConfigFS, and restore host mode for
+        # pen drive access (OTG port switches back to host via set_role).
+        stop_usbgadget
+        set_role host
+        ;;
+    restart|reload)
+        # Restart gadgets
+        if [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
+            stop_usbgadget
+            sleep 0.5
+            start_adb
+        else
+            stop_usbgadget
+            sleep 0.5
+            start_mtp
+        fi
+        ;;
+    status)
+        # Show current USB gadget mode
+        if [ -r "${GADGET_MTP_DIR}/UDC" ] && [ -n "$(cat "${GADGET_MTP_DIR}/UDC" 2>/dev/null)" ]; then
+            echo "MTP mode active"
+        elif [ -r "${GADGET_ADB_DIR}/UDC" ] && [ -n "$(cat "${GADGET_ADB_DIR}/UDC" 2>/dev/null)" ]; then
+            echo "ADB mode active"
+        else
+            echo "USB gadgets disabled"
+        fi
+        ;;
+    trigger)
+        # Re-sync soft-connect to the physical cable state (RK3566 dual-role
+        # ports only, no-op elsewhere). Called by 80-usbgadget.rules.
+        usb_trigger
+        ;;
+    *)
+        # Show usage information
+        echo "Usage: $0 {start|stop|restart|trigger|status|adb}"
+        echo "       $0 mtp [/path]"
+        echo ""
+        echo "Commands:"
+        echo "  start, mtp     - Start MTP mode (default: /userdata)"
+        echo "  mtp /path      - Start MTP with custom storage path"
+        echo "  adb            - Start ADB debug mode"
+        echo "  stop           - Stop all USB gadgets"
+        echo "  restart        - Restart MTP mode"
+        echo "  trigger        - Re-sync soft-connect to cable state (RK3566 only)"
+        echo "  status         - Show current USB mode"
+        echo ""
+        echo "Examples:"
+        echo "  $0 mtp                   # MTP with /userdata"
+        echo "  $0 mtp /                 # MTP with root filesystem"
+        echo "  $0 mtp /sdcard           # MTP with /sdcard"
+        echo "  $0 adb                   # ADB debugging"
+        echo "  $0 status                # Check current mode"
+        exit 1
+        ;;
+esac

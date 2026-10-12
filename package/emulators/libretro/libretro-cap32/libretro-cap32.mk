@@ -3,8 +3,8 @@
 # libretro-cap32
 #
 ################################################################################
-# Version: Commits on May 7, 2025
-LIBRETRO_CAP32_VERSION = a5d96c5ebbda3bc89a3bd1c1691a20f5eacc232d
+# Version: Commits on Aug 30, 2026
+LIBRETRO_CAP32_VERSION = e9ad1826aafa458497eddc92d73491123b902fc0
 LIBRETRO_CAP32_SITE = $(call github,libretro,libretro-cap32,$(LIBRETRO_CAP32_VERSION))
 LIBRETRO_CAP32_LICENSE = GPLv2
 
@@ -39,9 +39,6 @@ define LIBRETRO_CAP32_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib/libretro
 	$(INSTALL) -D $(@D)/cap32_libretro.so \
 		$(TARGET_DIR)/usr/lib/libretro/cap32_libretro.so
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-cap32/amstradcpc.keys \
-	    $(TARGET_DIR)/usr/share/evmapy/
 endef
 
 $(eval $(generic-package))

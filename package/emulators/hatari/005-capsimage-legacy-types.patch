@@ -1,0 +1,12 @@
+--- a/src/floppy_ipf.c
++++ b/src/floppy_ipf.c
+@@ -31,6 +31,9 @@
+ #ifndef __cdecl
+ #define __cdecl  /* CAPS headers need this, but do not define it on their own */
+ #endif
++/* capsimage >= 5.21 hides the legacy UBYTE/UWORD/... typedefs used below
++ * behind this define (Core/CommonTypes.h) */
++#define COMMONTYPES_LEGACY
+ #include <caps/CapsLibAll.h>
+ #define CapsLong SDWORD
+ #define CapsULong UDWORD

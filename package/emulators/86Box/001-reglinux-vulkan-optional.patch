@@ -79,10 +79,10 @@
          emit rendererChanged();
 --- a/src/qt/qt_mainwindow.cpp	2024-07-27 12:49:33.561223257 +0200
 +++ b/src/qt/qt_mainwindow.cpp	2024-07-27 13:05:04.137542031 +0200
-@@ -85,10 +85,12 @@
- #include <QString>
+@@ -91,10 +91,12 @@
  #include <QDir>
  #include <QSysInfo>
+ #include <QEventLoop>
 +#if 0
  #if QT_CONFIG(vulkan)
  #    include <QVulkanInstance>
@@ -90,9 +90,9 @@
  #endif
 +#endif
  
- #include <array>
- #include <memory>
-@@ -376,6 +378,7 @@
+ void qt_set_sequence_auto_mnemonic(bool b);
+ 
+@@ -517,6 +519,7 @@
      ui->actionVNC->setVisible(false);
  #endif
  
@@ -100,15 +100,15 @@
  #if QT_CONFIG(vulkan)
      bool vulkanAvailable = false;
      {
-@@ -391,6 +394,7 @@
+@@ -532,6 +535,7 @@
      }
      if (!vulkanAvailable)
  #endif
 +#endif
      {
-         if (vid_api == 4)
-             vid_api = 0;
-@@ -520,9 +520,9 @@
+         if (vid_api == RENDERER_VULKAN)
+             vid_api = RENDERER_SOFTWARE;
+@@ -566,9 +570,9 @@
              case RENDERER_OPENGL3:
                  newVidApi = RendererStack::Renderer::OpenGL3;
                  break;

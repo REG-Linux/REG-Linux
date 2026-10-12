@@ -1,0 +1,370 @@
+#!/bin/sh
+
+# system-drivers-nvidia applies either the installed production or legacy driver(s)
+# if production we determine if we use the open source kernel drivers or proprietary ones.
+# driver can be detected 'auto' or also set using batocera-boot.conf
+
+# try to create the log dir
+mkdir -p "/var/log"
+mkdir -p "/var/tmp"
+log="/var/log/nvidia.log"
+
+MODE=$1
+
+printf "Probing NVIDIA driver..."
+
+if [ "${MODE}" = "auto" ]; then
+    echo "Detecting if we have an NVIDIA GPU" >> $log
+    NVIDIA_DEV=$(lspci -mn | awk '{ gsub("\"",""); if (($2 ~ "030[0-2]") && ($3 == "10de" || $3 == "12d2")) { print $1 } }')
+    if [ "$NVIDIA_DEV" ]; then
+        echo "Detected an NVIDIA GPU at $NVIDIA_DEV" >> "$log"
+        for d in $NVIDIA_DEV; do
+            # Get the PCI Device ID and convert it to the required format with "0x" prefix
+            PCIDEVID=$(lspci -mn -s "$d" | awk '{ gsub("\"",""); print "0x" toupper($4) }')
+            echo "Checking for supported card using ID: $PCIDEVID" >> "$log"
+            # Determine the mode and card name based on the JSON data
+            jq_output=$(jq -r --arg pcidevid "$PCIDEVID" '.chips[] |
+                select(.devid == $pcidevid) |
+                "\(.name)|\(.legacybranch // "null")|\(.features | contains(["kernelopen"]) | tostring)"' \
+                /usr/share/nvidia/supported-gpus.json | head -n 1)
+            
+            echo "Matched json query: $jq_output" >> $log
+            # Extract the card name and determine the driver mode
+            CARDNAME=$(echo "$jq_output" | cut -d'|' -f1)
+            LEGACYDRIVER=$(echo "$jq_output" | cut -d'|' -f2)
+            KERNELOPEN=$(echo "$jq_output" | cut -d'|' -f3)
+
+            if [ -z "$CARDNAME" ]; then
+                # If CARDNAME is empty or null, log it and set MODE to "open"
+                echo "No matching card name found for ID: $PCIDEVID" >> $log
+                MODE="open"
+            else
+                if [ "$LEGACYDRIVER" != "null" ]; then
+                    case $LEGACYDRIVER in
+                        470.*) MODE="legacy470" ;;
+                        580.*) MODE="legacy580" ;;
+                        *) MODE="nouveau" ;;
+                    esac
+                elif [ "$KERNELOPEN" = "true" ]; then
+                    MODE="open"
+                fi
+                echo "Found Nvidia GPU: $CARDNAME with ID: $PCIDEVID" >> $log
+                echo "Setting driver to: $MODE" >> $log
+            fi
+        done
+    else
+        echo "No NVIDIA GPU detected" >> $log
+        echo "Failing back to the OpenSource Mesa Nouveau driver" >> $log
+        test -e /var/run/nvidia/modprobe/blacklist-nouveau.conf && rm -f /var/run/nvidia/modprobe/blacklist-nouveau.conf
+        test -e /var/run/nvidia/modprobe/nvidia-drm.conf        && rm -f /var/run/nvidia/modprobe/nvidia-drm.conf
+        exit 0
+    fi
+fi
+
+LINUX_VER=$(uname -r)
+
+# Link one NVIDIA kernel module into the running kernel's updates/ dir.
+#   $1 = payload basename under /usr/share/nvidia/modules, no extension
+#        (e.g. nvidia580-legacy)
+#   $2 = module name modprobe will ask for, no extension (e.g. nvidia)
+nvidia_link_module() {
+    _src_base="$1"
+    _dst_base="$2"
+    rm -f "/var/run/nvidia/modules/${_dst_base}".ko "/var/run/nvidia/modules/${_dst_base}".ko.*
+    rm -f "/lib/modules/${LINUX_VER}/updates/${_dst_base}".ko "/lib/modules/${LINUX_VER}/updates/${_dst_base}".ko.*
+    for _ext in .ko.zst .ko.xz .ko.gz .ko; do
+        _src="/usr/share/nvidia/modules/${_src_base}${_ext}"
+        test -e "${_src}" || continue
+        ln -sf "${_src}" "/var/run/nvidia/modules/${_dst_base}${_ext}"
+        ln -sf "/var/run/nvidia/modules/${_dst_base}${_ext}" \
+            "/lib/modules/${LINUX_VER}/updates/${_dst_base}${_ext}"
+        echo "Linked ${_src_base}${_ext} as updates/${_dst_base}${_ext}" >> $log
+        return 0
+    done
+    echo "No payload for ${_src_base} (.ko.zst/.ko.xz/.ko.gz/.ko all absent)" >> $log
+    return 1
+}
+
+# Release the GPU before loading a different driver.
+#
+# nouveau is the one that matters. It binds the card early in boot (~7s here),
+# long before this script runs from S05, and a modprobe blacklist only affects
+# *future* loads - the already-bound driver keeps the device, so NVRM reports
+#   NVRM: GPU 0000:01:00.0 is already bound to nouveau.
+#   NVRM: No NVIDIA devices probed.
+# and modprobe fails with "could not insert 'nvidia': No such device".
+# This early nothing has opened the device yet (refcount 0), so it unloads
+# cleanly. nvidia_* first, in dependency order, then nouveau.
+nvidia_release_gpu() {
+    for _m in nvidia_drm nvidia_uvm nvidia_modeset nvidia nouveau ipmi_devintf; do
+        modprobe -r "${_m}" >> "$log" 2>&1
+    done
+}
+
+# production driver version
+NVIDIA_DRIVER_VERSION=$(cat /usr/share/nvidia/production.version)
+# legacy driver versions
+NVIDIA580_LEGACY_DRIVER_VERSION=$(cat /usr/share/nvidia/legacy580.version)
+NVIDIA470_LEGACY_DRIVER_VERSION=$(cat /usr/share/nvidia/legacy470.version)
+
+mkdir -p /var/run/nvidia/modprobe || exit 1
+
+if [ "$MODE" = "open" ]; then
+    echo "Using NVIDIA latest driver - ${NVIDIA_DRIVER_VERSION}" >> $log
+    echo "" >> $log
+    echo "" >> $log
+    # Blacklist the Nouveau driver
+    echo "blacklist nouveau" > /var/run/nvidia/modprobe/blacklist-nouveau.conf
+    echo "options nvidia-drm modeset=1" > /var/run/nvidia/modprobe/nvidia-drm.conf
+    # Point /var/run/nvidia/lib at the branch we selected.
+    #
+    # Each driver installs its libraries into its own /usr/lib/<branch>/ with
+    # the SONAME and base .so links already in place, so nothing NVIDIA sits
+    # directly in /usr/lib. That matters because ldconfig regenerates SONAME
+    # links from whatever it finds there and picks the highest version: with
+    # all three branches in /usr/lib it would resolve libGLX_nvidia.so.0 to the
+    # newest userspace regardless of which kernel module is loaded, and NVIDIA
+    # requires the two to match. S001populate also runs ldconfig in the
+    # background, so that race was not even ordered against this script.
+    #
+    # One directory symlink replaces the ~40 per-library links this used to do,
+    # and /var/run/nvidia/lib is on the loader path, so the glvnd and Vulkan
+    # JSONs resolve to the selected branch by construction.
+    rm -rf /var/run/nvidia/lib
+    ln -sfn /usr/lib/nvidia-production /var/run/nvidia/lib
+    echo "Userspace: /var/run/nvidia/lib -> /usr/lib/nvidia-production" >> $log
+
+    # 32-bit is optional (BR2_PACKAGE_REGLINUX_NVIDIA_32BIT); only link it if
+    # the branch actually shipped a /lib32 tree.
+    rm -rf /var/run/nvidia/lib32
+    if [ -d "/lib32/nvidia-production" ]; then
+        ln -sfn /lib32/nvidia-production /var/run/nvidia/lib32
+    fi
+
+    # Refresh the cache: S001populate's ldconfig ran before this link existed.
+    ldconfig >> "$log" 2>&1
+
+
+    # sym link Xorg libraries too
+    ln -sf libglxserver_nvidia.so.$NVIDIA_DRIVER_VERSION /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so
+    ln -sf libglxserver_nvidia.so.$NVIDIA_DRIVER_VERSION /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so.1
+    
+    # link Xorg driver
+    ln -sf nvidia_production_drv.so /usr/lib/xorg/modules/drivers/nvidia_drv.so
+    
+    # link GL config files
+    mkdir -p /var/run/nvidia/configs
+    ln -sf /usr/share/vulkan/implicit_layer.d/nvidia_production_layers.json /var/run/nvidia/configs/nvidia_layers.json
+    ln -sf /var/run/nvidia/configs/nvidia_layers.json /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+    ln -sf /usr/share/glvnd/egl_vendor.d/10_nvidia_production.json /var/run/nvidia/configs/10_nvidia.json
+    ln -sf /var/run/nvidia/configs/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+    ln -sf /usr/share/nvidia/X11/10-nvidia-production-drm-outputclass.conf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf
+    ln -sf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf /usr/share/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf
+    
+    # link Vulkan icd files
+    ln -sf /usr/share/vulkan/nvidia/nvidia_production_icd.x86_64.json /var/run/nvidia/configs/nvidia_icd.x86_64.json
+    ln -sf /var/run/nvidia/configs/nvidia_icd.x86_64.json /usr/share/vulkan/icd.d/nvidia_icd.x86_64.json
+    if [ -e "/usr/share/vulkan/nvidia/nvidia_production_icd.i686.json" ]; then
+        ln -sf /usr/share/vulkan/nvidia/nvidia_production_icd.i686.json /var/run/nvidia/configs/nvidia_icd.i686.json
+        ln -sf /var/run/nvidia/configs/nvidia_icd.i686.json /usr/share/vulkan/icd.d/nvidia_icd.i686.json
+    fi
+    
+    # finally link appropriate open kernel modules
+    mkdir -p /var/run/nvidia/modules
+    echo "Releasing the GPU (unloading nouveau and any NVIDIA modules)..." >> "$log"
+    nvidia_release_gpu
+    echo "Linking NVIDIA open modules" >> $log
+    nvidia_link_module nvidia-production nvidia
+    nvidia_link_module nvidia-modeset-production nvidia-modeset
+    nvidia_link_module nvidia-drm-production nvidia-drm
+    nvidia_link_module nvidia-uvm-production nvidia-uvm
+    # Refresh modules.dep so modprobe can resolve what was just linked.
+    depmod -a "$LINUX_VER" >> $log 2>&1
+    # enable kernel modules
+    for m in ipmi_devintf nvidia nvidia_modeset nvidia_uvm nvidia_drm; do
+        if modprobe $m >> "$log" 2>&1; then
+            echo "Module $m loaded successfully" >> "$log"
+        else
+            echo "Failed to load module $m" >> "$log"
+        fi
+    done
+
+elif [ "$MODE" = "legacy580" ]; then
+    echo "Using NVIDIA driver - ${NVIDIA580_LEGACY_DRIVER_VERSION}" >> $log
+    echo "" >> $log
+    echo "" >> $log
+    # Blacklist the Nouveau driver
+    echo "blacklist nouveau" > /var/run/nvidia/modprobe/blacklist-nouveau.conf
+    echo "options nvidia-drm modeset=1" > /var/run/nvidia/modprobe/nvidia-drm.conf
+    # Point /var/run/nvidia/lib at the branch we selected.
+    #
+    # Each driver installs its libraries into its own /usr/lib/<branch>/ with
+    # the SONAME and base .so links already in place, so nothing NVIDIA sits
+    # directly in /usr/lib. That matters because ldconfig regenerates SONAME
+    # links from whatever it finds there and picks the highest version: with
+    # all three branches in /usr/lib it would resolve libGLX_nvidia.so.0 to the
+    # newest userspace regardless of which kernel module is loaded, and NVIDIA
+    # requires the two to match. S001populate also runs ldconfig in the
+    # background, so that race was not even ordered against this script.
+    #
+    # One directory symlink replaces the ~40 per-library links this used to do,
+    # and /var/run/nvidia/lib is on the loader path, so the glvnd and Vulkan
+    # JSONs resolve to the selected branch by construction.
+    rm -rf /var/run/nvidia/lib
+    ln -sfn /usr/lib/nvidia-580-legacy /var/run/nvidia/lib
+    echo "Userspace: /var/run/nvidia/lib -> /usr/lib/nvidia-580-legacy" >> $log
+
+    # 32-bit is optional (BR2_PACKAGE_REGLINUX_NVIDIA_32BIT); only link it if
+    # the branch actually shipped a /lib32 tree.
+    rm -rf /var/run/nvidia/lib32
+    if [ -d "/lib32/nvidia-580-legacy" ]; then
+        ln -sfn /lib32/nvidia-580-legacy /var/run/nvidia/lib32
+    fi
+
+    # Refresh the cache: S001populate's ldconfig ran before this link existed.
+    ldconfig >> "$log" 2>&1
+
+
+    # sym link Xorg libraries too
+    ln -sf libglxserver_nvidia.so.$NVIDIA580_LEGACY_DRIVER_VERSION /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so
+    ln -sf libglxserver_nvidia.so.$NVIDIA580_LEGACY_DRIVER_VERSION /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so.1
+    
+    # link Xorg driver
+    ln -sf nvidia580_legacy_drv.so /usr/lib/xorg/modules/drivers/nvidia_drv.so
+    
+    # link GL config files
+    mkdir -p /var/run/nvidia/configs
+    ln -sf /usr/share/vulkan/implicit_layer.d/nvidia580_legacy_layers.json /var/run/nvidia/configs/nvidia_layers.json
+    ln -sf /var/run/nvidia/configs/nvidia_layers.json /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+    ln -sf /usr/share/glvnd/egl_vendor.d/10_nvidia580_legacy.json /var/run/nvidia/configs/10_nvidia.json
+    ln -sf /var/run/nvidia/configs/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+    ln -sf /usr/share/nvidia/X11/10-nvidia580-legacy-drm-outputclass.conf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf
+    ln -sf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf /usr/share/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf
+    
+    # link Vulkan icd files
+    ln -sf /usr/share/vulkan/nvidia/nvidia580_legacy_icd.x86_64.json /var/run/nvidia/configs/nvidia_icd.x86_64.json
+    ln -sf /var/run/nvidia/configs/nvidia_icd.x86_64.json /usr/share/vulkan/icd.d/nvidia_icd.x86_64.json
+    if [ -e "/usr/share/vulkan/nvidia/nvidia580_legacy_icd.i686.json" ]; then
+        ln -sf /usr/share/vulkan/nvidia/nvidia580_legacy_icd.i686.json /var/run/nvidia/configs/nvidia_icd.i686.json
+        ln -sf /var/run/nvidia/configs/nvidia_icd.i686.json /usr/share/vulkan/icd.d/nvidia_icd.i686.json
+    fi
+    
+    # finally link appropriate 580.xx kernel modules
+    mkdir -p /var/run/nvidia/modules
+    # Unload default/existing modules before symlinking
+    echo "Releasing the GPU (unloading nouveau and any NVIDIA modules)..." >> "$log"
+    nvidia_release_gpu
+    echo "Linking NVIDIA 580.xx kernel modules" >> $log
+    nvidia_link_module nvidia580-legacy nvidia
+    nvidia_link_module nvidia580-modeset-legacy nvidia-modeset
+    nvidia_link_module nvidia580-drm-legacy nvidia-drm
+    nvidia_link_module nvidia580-uvm-legacy nvidia-uvm
+    # Refresh modules.dep so modprobe can resolve what was just linked.
+    depmod -a "$LINUX_VER" >> $log 2>&1
+    # enable kernel modules
+    echo "Loading NVIDIA 580.xx kernel modules..." >> "$log"
+    for m in ipmi_devintf nvidia nvidia_modeset nvidia_uvm nvidia_drm; do
+        if modprobe $m >> "$log" 2>&1; then
+            echo "Module $m loaded successfully" >> "$log"
+        else
+            echo "Failed to load module $m" >> "$log"
+            [ "$m" = "nvidia" ] && dmesg | tail -n 15 >> "$log"
+        fi
+    done
+
+elif [ "$MODE" = "legacy470" ]; then
+    echo "Using NVIDIA driver - ${NVIDIA470_LEGACY_DRIVER_VERSION}" >> $log
+    echo "There may be driver issues due to lack of maintenance from Nvidia for modern kernels" >> $log
+    echo "" >> $log
+    echo "" >> $log
+    # Blacklist the Nouveau driver
+    echo "blacklist nouveau" > /var/run/nvidia/modprobe/blacklist-nouveau.conf
+    echo "options nvidia-drm modeset=1" > /etc/modprobe.d/nvidia-drm.conf
+    # Point /var/run/nvidia/lib at the branch we selected.
+    #
+    # Each driver installs its libraries into its own /usr/lib/<branch>/ with
+    # the SONAME and base .so links already in place, so nothing NVIDIA sits
+    # directly in /usr/lib. That matters because ldconfig regenerates SONAME
+    # links from whatever it finds there and picks the highest version: with
+    # all three branches in /usr/lib it would resolve libGLX_nvidia.so.0 to the
+    # newest userspace regardless of which kernel module is loaded, and NVIDIA
+    # requires the two to match. S001populate also runs ldconfig in the
+    # background, so that race was not even ordered against this script.
+    #
+    # One directory symlink replaces the ~40 per-library links this used to do,
+    # and /var/run/nvidia/lib is on the loader path, so the glvnd and Vulkan
+    # JSONs resolve to the selected branch by construction.
+    rm -rf /var/run/nvidia/lib
+    ln -sfn /usr/lib/nvidia-470-legacy /var/run/nvidia/lib
+    echo "Userspace: /var/run/nvidia/lib -> /usr/lib/nvidia-470-legacy" >> $log
+
+    # 32-bit is optional (BR2_PACKAGE_REGLINUX_NVIDIA_32BIT); only link it if
+    # the branch actually shipped a /lib32 tree.
+    rm -rf /var/run/nvidia/lib32
+    if [ -d "/lib32/nvidia-470-legacy" ]; then
+        ln -sfn /lib32/nvidia-470-legacy /var/run/nvidia/lib32
+    fi
+
+    # Refresh the cache: S001populate's ldconfig ran before this link existed.
+    ldconfig >> "$log" 2>&1
+
+
+    # sym link Xorg libraries too
+    ln -sf /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so.$NVIDIA470_LEGACY_DRIVER_VERSION \
+        /var/run/nvidia/lib/libglxserver_nvidia.so
+    ln -sf /var/run/nvidia/lib/libglxserver_nvidia.so /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so
+    ln -sf /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so.$NVIDIA470_LEGACY_DRIVER_VERSION \
+        /var/run/nvidia/lib/libglxserver_nvidia.so.1
+    ln -sf /var/run/nvidia/lib/libglxserver_nvidia.so.1 /usr/lib/xorg/modules/extensions/libglxserver_nvidia.so.1
+    
+    # [ Kernel modules ]
+    # link Xorg driver
+    ln -sf nvidia470_legacy_drv.so /usr/lib/xorg/modules/drivers/nvidia_drv.so
+        
+    # link GL config files
+    mkdir -p /var/run/nvidia/configs
+    ln -sf /usr/share/vulkan/implicit_layer.d/nvidia470_legacy_layers.json /var/run/nvidia/configs/nvidia_layers.json
+    ln -sf /var/run/nvidia/configs/nvidia_layers.json /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+    ln -sf /usr/share/glvnd/egl_vendor.d/10_nvidia470_legacy.json /var/run/nvidia/configs/10_nvidia.json
+    ln -sf /var/run/nvidia/configs/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+    ln -sf /usr/share/nvidia/X11/10-nvidia470-legacy-drm-outputclass.conf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf
+    ln -sf /var/run/nvidia/configs/10-nvidia-drm-outputclass.conf /usr/share/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf
+        
+    # link Vulkan icd files
+    ln -sf /usr/share/vulkan/nvidia/nvidia470_legacy_icd.x86_64.json /var/run/nvidia/configs/nvidia_icd.x86_64.json
+    ln -sf /var/run/nvidia/configs/nvidia_icd.x86_64.json /usr/share/vulkan/icd.d/nvidia_icd.x86_64.json
+    if [ -e "/usr/share/vulkan/nvidia/nvidia470_legacy_icd.i686.json" ]; then
+        ln -sf /usr/share/vulkan/nvidia/nvidia470_legacy_icd.i686.json /var/run/nvidia/configs/nvidia_icd.i686.json
+        ln -sf /var/run/nvidia/configs/nvidia_icd.i686.json /usr/share/vulkan/icd.d/nvidia_icd.i686.json
+    fi
+        
+    # finally link the kernel modules & run them
+    mkdir -p /var/run/nvidia/modules
+    # Unload default/existing modules before symlinking
+    echo "Releasing the GPU (unloading nouveau and any NVIDIA modules)..." >> "$log"
+    nvidia_release_gpu
+    echo "Linking NVIDIA 470.xx kernel modules" >> $log
+    nvidia_link_module nvidia470-legacy nvidia
+    nvidia_link_module nvidia470-modeset-legacy nvidia-modeset
+    nvidia_link_module nvidia470-drm-legacy nvidia-drm
+    nvidia_link_module nvidia470-uvm-legacy nvidia-uvm
+    # Refresh modules.dep so modprobe can resolve what was just linked.
+    depmod -a "$LINUX_VER" >> $log 2>&1
+    # enable kernel modules
+    echo "Loading NVIDIA 470.xx kernel modules..." >> "$log"
+    for m in ipmi_devintf nvidia nvidia_modeset nvidia_uvm nvidia_drm; do
+        if modprobe $m >> "$log" 2>&1; then
+            echo "Module $m loaded successfully" >> "$log"
+        else
+            echo "Failed to load module $m" >> "$log"
+            [ "$m" = "nvidia" ] && dmesg | tail -n 15 >> "$log"
+        fi
+    done
+
+elif test "${MODE}" = "nouveau"; then
+    echo "Using OpenSource Mesa Nouveau driver" >> $log
+    test -e /var/run/nvidia/modprobe/blacklist-nouveau.conf && rm -f /var/run/nvidia/modprobe/blacklist-nouveau.conf
+    test -e /var/run/nvidia/modprobe/nvidia-drm.conf        && rm -f /var/run/nvidia/modprobe/nvidia-drm.conf
+fi
+
+printf "Probing NVIDIA driver done"

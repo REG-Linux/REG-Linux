@@ -1,0 +1,13 @@
+Add missing SDL3 include in avp_menus.c
+
+avp_menus.c uses SDL_StartTextInput() but never includes SDL3/SDL.h,
+causing an implicit function declaration error with GCC 14.
+
+--- a/src/avp/win95/frontend/avp_menus.c
++++ b/src/avp/win95/frontend/avp_menus.c
+@@ -1,4 +1,5 @@
+ #include "3dc.h"
++#include <SDL3/SDL.h>
+ #include "inline.h"
+ #include "module.h"
+ #include "stratdef.h"

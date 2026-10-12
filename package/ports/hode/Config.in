@@ -1,0 +1,10 @@
+config BR2_PACKAGE_HODE
+	bool "hode"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	help
+	  hode is a reimplementation of the engine used in
+	  Heart of Darkness by Eric Chahi (Amazing Studio).
+	  By Gregory Montoir. Requires retail game data.
+
+	  https://github.com/cyxx/hode

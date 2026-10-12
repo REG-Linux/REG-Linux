@@ -1,0 +1,40 @@
+id: ipc_contract
+description: regmsgd IPC contract — error codes, JSON shapes, edge cases.
+requires_display: any
+
+steps:
+  # resolve a known-bad system → no_emulator
+  - ipc: launcher_resolve
+    args: ["__nonexistent_system__"]
+    fail_codes: [no_emulator]
+
+  # resolve a likely-installed system; do not fail if absent (some images
+  # only ship a subset of cores).
+  - ipc: launcher_resolve
+    args: ["megadrive"]
+    allow_fail: true
+    capture: resolved_md
+
+  # status on a never-spawned pid → no_such_pid
+  - ipc: launcher_status
+    args: [999999]
+    fail_codes: [no_such_pid]
+
+  # stop on a never-spawned pid → no_such_pid
+  - ipc: launcher_stop
+    args: [999999]
+    fail_codes: [no_such_pid]
+
+  # generate on bad system → no_emulator
+  - ipc: launcher_generate
+    args: ["__nonexistent_system__", "/tmp/none.bin"]
+    fail_codes: [no_emulator]
+
+  # malformed argv via shell (valid subcommand, missing required
+  # system+rom args) — clap rejects with rc=2, daemon must stay up
+  - run: regmsg launcher launch
+    expect_rc: 2
+    allow_fail: true
+
+  - probe: is_process_alive
+    target: regmsgd

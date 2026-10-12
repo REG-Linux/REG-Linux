@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBRASHADER_VERSION = librashader-v0.8.1
+LIBRASHADER_VERSION = librashader-v0.12.0
 LIBRASHADER_SITE = $(call github,SnowflakePowered,librashader,$(LIBRASHADER_VERSION))
 LIBRASHADER_LICENSE = GPLv3
 

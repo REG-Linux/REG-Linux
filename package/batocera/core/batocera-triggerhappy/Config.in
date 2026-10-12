@@ -1,4 +1,0 @@
-config BR2_PACKAGE_BATOCERA_TRIGGERHAPPY
-	bool "batocera-triggerhappy"
-
-	select BR2_PACKAGE_TRIGGERHAPPY

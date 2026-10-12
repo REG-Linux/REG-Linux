@@ -3,8 +3,8 @@
 # libretro-parallel-n64
 #
 ################################################################################
-# Version.: Commits on Mar 2, 2025
-LIBRETRO_PARALLEL_N64_VERSION = f8605345e13c018a30c8f4ed03c05d8fc8f70be8
+# Version.: Commits on Sep 28, 2026
+LIBRETRO_PARALLEL_N64_VERSION = a8395f2a6b1f7615ed0739c22e5b4f96c6636135
 LIBRETRO_PARALLEL_N64_SITE = $(call github,libretro,parallel-n64,$(LIBRETRO_PARALLEL_N64_VERSION))
 LIBRETRO_PARALLEL_N64_LICENSE = GPLv2
 
@@ -17,15 +17,20 @@ LIBRETRO_PARALLEL_N64_EXTRA_ARGS += WITH_DYNAREC=aarch64 CPUFLAGS=-DARM_FIX
 else ifeq ($(BR2_arm),y)
 LIBRETRO_PARALLEL_N64_EXTRA_ARGS += WITH_DYNAREC=arm CPUFLAGS=-DARM_FIX
 else ifeq ($(BR2_x86_64),y)
-LIBRETRO_PARALLEL_N64_EXTRA_ARGS += WITH_DYNAREC=x86_64
+# Ari64 and Hacktarux dynarecs are assembled with nasm
+LIBRETRO_PARALLEL_N64_EXTRA_ARGS += WITH_DYNAREC=x86_64 NASM=$(HOST_DIR)/bin/nasm
+LIBRETRO_PARALLEL_N64_DEPENDENCIES += host-nasm
 endif
 
-# OpenGL backend
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# OpenGL backend — must match RetroArch's API selection.
+# Key off HAS_DESKTOP_OPENGL (real GL >= 3.3 driver) rather than
+# HAS_LIBGL (only "libGL.so.1 exists on disk", polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
 LIBRETRO_PARALLEL_N64_EXTRA_ARGS += FORCE_GLES=0
 LIBRETRO_PARALLEL_N64_DEPENDENCIES += libgl
 else
-LIBRETRO_PARALLEL_N64_EXTRA_ARGS += FORCE_GLES=1
+# GLES3 path: GLideN64 (the default plugin) needs GLES 3.x
+LIBRETRO_PARALLEL_N64_EXTRA_ARGS += FORCE_GLES=1 GLES3=1
 LIBRETRO_PARALLEL_N64_DEPENDENCIES += libgles
 endif
 

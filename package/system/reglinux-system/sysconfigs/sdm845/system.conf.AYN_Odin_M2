@@ -1,0 +1,17 @@
+# AYN Odin M2 (v2 screen) default values
+
+# default wayland environment (rotate)
+system.rs.environment=wayland
+
+# default suspend on handled boards
+system.suspendmode=suspend
+
+# default refresh rate
+rs.resolution=1080x1920@60
+
+# default brightness
+display.brightness=80
+
+# Default audio output: the speakers (UCM HiFi). The profile is left on auto so
+# WirePlumber can switch to the headphones profile when a jack is plugged in.
+audio.device=alsa_output._sys_devices_platform_sound_sound_card2.HiFi__Speaker__sink

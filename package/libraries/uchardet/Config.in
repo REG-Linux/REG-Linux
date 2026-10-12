@@ -1,0 +1,9 @@
+config BR2_PACKAGE_UCHARDET
+	bool "uchardet"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  uchardet is an encoding detector library ported from
+	  Mozilla's Universal Charset Detector. It detects the
+	  encoding of text in a buffer.
+
+	  https://gitlab.freedesktop.org/uchardet/uchardet

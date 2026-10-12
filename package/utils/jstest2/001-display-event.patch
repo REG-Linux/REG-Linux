@@ -1,0 +1,11 @@
+diff --git a/src/sdl2-jstest.c b/src/sdl2-jstest.c
+--- a/src/sdl2-jstest.c
++++ b/src/sdl2-jstest.c
+@@ -68,6 +68,7 @@ static void print_joystick_info(int joy_idx, SDL_Joystick* joy, SDL_GameControll
+   SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
+
+   printf("Joystick Name:     '%s'\n", SDL_JoystickName(joy));
++  printf("Joystick Path:     '%s'\n", SDL_JoystickPathForIndex(joy_idx));
+   printf("Joystick GUID:     %s\n", guid_str);
+   printf("Joystick Number:   %2d\n", joy_idx);
+   printf("Number of Axes:    %2d\n", SDL_JoystickNumAxes(joy));

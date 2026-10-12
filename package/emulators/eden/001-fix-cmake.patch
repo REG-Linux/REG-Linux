@@ -1,0 +1,34 @@
+--- a/src/video_core/CMakeLists.txt	2025-08-08 10:39:13.465439536 +0200
++++ b/src/video_core/CMakeLists.txt	2025-08-08 10:39:44.402253686 +0200
+@@ -369,7 +369,8 @@
+             $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-shadow>
+             $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-unused-local-typedef>)
+     else()
+-        target_compile_options(video_core PRIVATE $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=conversion>)
++        # REG HACK
++	# target_compile_options(video_core PRIVATE $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=conversion>)
+     endif()
+ 
+     target_compile_options(video_core PRIVATE $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-sign-conversion>)
+--- a/src/CMakeLists.txt	2025-08-08 10:47:50.085503680 +0200
++++ b/src/CMakeLists.txt	2025-08-08 10:48:06.300451785 +0200
+@@ -138,7 +138,8 @@
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=all>
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=extra>
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=missing-declarations>
+-        $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=shadow>
++        # REG HACK
++	# $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=shadow>
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=unused>
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-attributes>
+         $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-invalid-offsetof>
+@@ -148,7 +149,8 @@
+     if (CXX_CLANG OR CXX_ICC OR CXX_APPLE) # Clang, AppleClang, or Intel C++
+         if (NOT MSVC)
+             add_compile_options(
+-                $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=shadow-uncaptured-local>
++                # REG HACK
++		# $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=shadow-uncaptured-local>
+                 $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=implicit-fallthrough>
+                 $<$<COMPILE_LANGUAGE:C,CXX>:-Werror=type-limits>)
+         endif()

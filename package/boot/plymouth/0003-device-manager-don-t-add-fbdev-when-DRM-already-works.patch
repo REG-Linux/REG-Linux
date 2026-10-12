@@ -1,0 +1,59 @@
+From: REG-Linux
+Subject: [PATCH] device-manager: don't add fbdev when DRM already drives the display
+
+create_devices_from_udev() runs on the device timeout and enumerates the
+frame buffer subsystem unconditionally, even when the initial scan already
+brought up a DRM renderer for the same output.
+
+ply_device_manager_watch_devices() deliberately scans SUBSYSTEM_INPUT and
+SUBSYSTEM_DRM only, so the timeout path is the only place fbdev is added. On
+a machine whose DRM driver also exposes fbdev emulation, that re-adds the
+very same CRTC a second time and plymouth ends up with two pixel displays:
+
+    adding 1920x1080 pixel display     <- drm,   /dev/dri/card1
+    adding 3840x2160 pixel display     <- fbdev, /dev/fb0
+
+The splash is then painted once per display. This normally goes unnoticed
+because both renderers agree on the geometry and the two copies land on top
+of each other.
+
+On Amlogic they do not agree. meson's fbdev node keeps the mode U-Boot left
+behind -- the ODROID-C5 bootloader sets fb_width=3840 / display_width=3840
+for its own logo -- so /dev/fb0 reports 3840x2160 with rowstride 15360 while
+the connector is running at 1920x1080. The splash is drawn once centred for
+a 1920-wide surface and once centred for a 3840-wide one, producing two side
+by side copies aligned to the top of the screen. It is invisible on a 4K
+panel, where the two geometries happen to coincide.
+
+Guard the fallback on found_drm_device, which is already maintained for
+exactly this kind of decision and is consulted three lines further down.
+
+Signed-off-by: REG-Linux <contact@reglinux.org>
+diff --git a/src/libply-splash-core/ply-device-manager.c b/src/libply-splash-core/ply-device-manager.c
+index 016ac332..4a6437cd 100644
+--- a/src/libply-splash-core/ply-device-manager.c
++++ b/src/libply-splash-core/ply-device-manager.c
+@@ -1252,7 +1252,22 @@ create_devices_from_udev (ply_device_manager_t *manager)
+ 
+         create_devices_for_subsystem (manager, SUBSYSTEM_INPUT);
+         create_devices_for_subsystem (manager, SUBSYSTEM_DRM);
+-        create_devices_for_subsystem (manager, SUBSYSTEM_FRAME_BUFFER);
++
++        /* Only fall back to fbdev when nothing is already driving the display
++         * through DRM. The initial scan in ply_device_manager_watch_devices()
++         * deliberately looks at DRM alone; enumerating the frame buffer here
++         * unconditionally re-adds the very same CRTC a second time, through
++         * its fbdev emulation, and plymouth then paints the splash once per
++         * display.
++         *
++         * That stays invisible only while both agree on the geometry. On
++         * Amlogic the fbdev node keeps the mode U-Boot left behind (3840x2160
++         * on the ODROID-C5), so with the panel at 1920x1080 the splash is
++         * drawn once centred for DRM and once centred for a 3840-wide surface,
++         * giving two side by side copies aligned to the top of the screen.
++         */
++        if (!manager->found_drm_device)
++                create_devices_for_subsystem (manager, SUBSYSTEM_FRAME_BUFFER);
+ 
+         if (manager->found_drm_device || manager->found_fb_device)
+                 return;

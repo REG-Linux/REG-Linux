@@ -1,0 +1,27 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/MrBoom-box.png",
+          "desc": "Mr.Boom is an 8 player Bomberman clone.\nThe goal of the game is to bomb away your enemies and other players.\nBomberman is controlled with the keyboard or with (up to 8) joypads.",
+          "developer": "Remdy Software",
+          "genre": "Action",
+          "image": "./images/MrBoom-image.png",
+          "lang": "en",
+          "marquee": "./images/MrBoom-marquee.png",
+          "name": "MrBoom",
+          "players": "1-8",
+          "publisher": "https://github.com/Javanaise/mrboom-libretro",
+          "rating": "0.9",
+          "releasedate": "19990101T000000",
+          "thumbnail": "./images/MrBoom-thumb.png",
+          "video": "./videos/MrBoom-video.mp4",
+          "wheel": "./images/MrBoom-wheel.png"
+        },
+        "path": "./MrBoom.libretro",
+        "type": "game"
+      }
+    ]
+  }
+}

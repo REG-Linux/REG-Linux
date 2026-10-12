@@ -1,0 +1,9 @@
+config BR2_PACKAGE_REGLINUX_COMPAT
+	bool "reglinux-compat"
+	help
+	  Hardware compatibility auto-probe and reporting scripts.
+	  Probes device features (WiFi, BT, GPU, display, etc.) at boot,
+	  registers the device with compat.reglinux.org, and submits
+	  compatibility reports when network is available.
+
+	  https://compat.reglinux.org

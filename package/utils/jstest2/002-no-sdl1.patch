@@ -1,0 +1,16 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -26,10 +26,10 @@ option(WARNINGS "Switch on extra warnings" OFF)
+ option(WERROR "Turn warnings into errors" OFF)
+ option(BUILD_TESTS "Build test cases" OFF)
+ option(BUILD_NETWORK_TESTS "Build test cases using the network" OFF)
+-option(BUILD_SDL_JSTEST "Build sdl-jstest" ON)
++option(BUILD_SDL_JSTEST "Build sdl-jstest" OFF)
+ option(BUILD_SDL2_JSTEST "Build sdl2-jstest" ON)
+
+-include(GetProjectVersion)
++#include(GetProjectVersion)
+ include(GNUInstallDirs)
+
+ add_definitions(-DSDL_JSTEST_VERSION="${PROJECT_VERSION}")

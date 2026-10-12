@@ -1,0 +1,27 @@
+Use system zstd via pkg-config (no zstdConfig.cmake shipped) and build the
+miniz dependency from the bundled libchdr/deps/miniz-3.1.1 sources instead
+of looking for an external vcpkg miniz package.
+
+--- a/vendor/libchdr/CMakeLists.txt
++++ b/vendor/libchdr/CMakeLists.txt
+@@ -2,9 +2,19 @@
+     add_subdirectory(libchdr/deps/miniz-3.1.1 EXCLUDE_FROM_ALL)
+     add_subdirectory(libchdr/deps/zstd-1.5.7 EXCLUDE_FROM_ALL)
+ else ()
+-    find_package(miniz CONFIG REQUIRED)
++    if (NOT TARGET miniz)
++        add_subdirectory(libchdr/deps/miniz-3.1.1 EXCLUDE_FROM_ALL)
++    endif()
++    if (NOT TARGET miniz::miniz)
++        add_library(miniz::miniz ALIAS miniz)
++    endif()
+     find_package(ZLIB REQUIRED)
+-    find_package(zstd REQUIRED)
++    find_package(PkgConfig REQUIRED)
++    pkg_check_modules(ZSTD REQUIRED IMPORTED_TARGET libzstd)
++    if (NOT TARGET zstd::libzstd_static)
++        add_library(zstd::libzstd_static INTERFACE IMPORTED)
++        target_link_libraries(zstd::libzstd_static INTERFACE PkgConfig::ZSTD)
++    endif()
+ endif ()
+ add_subdirectory(libchdr/deps/lzma-25.01 EXCLUDE_FROM_ALL)

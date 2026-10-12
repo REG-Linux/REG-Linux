@@ -3,8 +3,8 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.285 - Switchres 2.21f
-MAME_VERSION = gm0285sr221f
+# Version: GroovyMAME 0.289 - Switchres 2.22e
+MAME_VERSION = gm0289sr222e
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
@@ -55,7 +55,13 @@ ifeq ($(BR2_x86_64),y)
 MAME_CROSS_ARCH = x86_64
 else ifeq ($(BR2_aarch64),y)
 MAME_CROSS_ARCH = arm64
-# AArch64 CPU flags
+# AArch64 CPU flags. These are a backstop for boards whose
+# BR2_TARGET_OPTIMIZATION carries no -mtune/-mcpu of its own: the toolchain
+# wrapper already injects that string into every compile, so a board that
+# states its tuning needs nothing here. Deliberately NOT listed: cortex_a57
+# (l4t), cortex_x3 (sm8550) and saphira (asahi) all set -mtune/-mcpu at board
+# level, and for asahi a later -mtune=saphira would override the tuning half
+# of its -mcpu=apple-m1 and make the build worse.
 ifeq ($(BR2_cortex_a53),y)
 MAME_CFLAGS += -mtune=cortex-a53
 else ifeq ($(BR2_cortex_a35),y)
@@ -64,6 +70,10 @@ else ifeq ($(BR2_cortex_a55),y)
 MAME_CFLAGS += -mtune=cortex-a55
 else ifeq ($(BR2_cortex_a73_a53),y)
 MAME_CFLAGS += -mtune=cortex-a73.cortex-a53
+else ifeq ($(BR2_cortex_a72_a53),y)
+MAME_CFLAGS += -mtune=cortex-a72.cortex-a53
+else ifeq ($(BR2_cortex_a75_a55),y)
+MAME_CFLAGS += -mtune=cortex-a75.cortex-a55
 else ifeq ($(BR2_cortex_a72),y)
 MAME_CFLAGS += -mtune=cortex-a72
 else ifeq ($(BR2_cortex_a76),y)
@@ -87,8 +97,10 @@ MAME_LDFLAGS += -mcmodel=large
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 # Tune for SiFive U74 cores
 MAME_CFLAGS += -march=rv64gc_zba_zbb -mcpu=sifive-u74 -mtune=sifive-u74
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
-# Make use of RVV (Risc-V Vector Instructions)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_K3),y)
+# Make use of RVV (Risc-V Vector Instructions). K3 has the same ISA as K1 and
+# reuses its prebuilt, so it needs the same flags - including the no-relax
+# workaround below, which it was silently missing.
 MAME_CFLAGS += -march=rv64imafdv
 # Workaround a known binutils/gcc/ld bug
 MAME_CFLAGS += -mno-relax
@@ -241,60 +253,9 @@ define MAME_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/history
 	gunzip -c $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/history/history.xml.gz > $(TARGET_DIR)/usr/bin/mame/history/history.xml
 
-	# gameStop script when exiting a rotated screen
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
-
 	# Copy user -autoboot_command overrides (batocera.linux/batocera.linux#11706)
 	mkdir -p $(MAME_CONF_INIT)/autoload
 	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/autoload			$(MAME_CONF_INIT)
 endef
-
-define MAME_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/adam.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/advision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apfm1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2gs.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/arcadia.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/archimedes.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/astrocde.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/atom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/bbc.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/camplynx.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/cdi.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/coco.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/crvision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/electron.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fm7.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fmtowns.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamate.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gameandwatch.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamecom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamepock.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gmaster.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gp32.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/lcdgames.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/laser310.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/macintosh.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/megaduck.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/neogeo.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pdp1.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/plugnplay.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pv1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/socrates.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/supracan.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/ti99.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
-endef
-
-MAME_POST_INSTALL_TARGET_HOOKS += MAME_EVMAPY
 
 $(eval $(generic-package))

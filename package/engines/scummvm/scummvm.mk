@@ -3,8 +3,8 @@
 # scummvm
 #
 ################################################################################
-# Version: 2026.1.0
-SCUMMVM_VERSION = v2026.1.0
+# Version: 2026.3.0
+SCUMMVM_VERSION = v2026.3.0
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
 SCUMMVM_DEPENDENCIES += sdl2 zlib libpng freetype libjpeg-bato
@@ -132,11 +132,23 @@ define SCUMMVM_ADD_VIRTUAL_KEYBOARD
         $(TARGET_DIR)/usr/share/scummvm
     cp -f $(@D)/backends/vkeybd/packs/vkeybd_small.zip \
         $(TARGET_DIR)/usr/share/scummvm
-    mkdir -p $(TARGET_DIR)/usr/share/evmapy/
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/scummvm/scummvm.keys \
-        $(TARGET_DIR)/usr/share/evmapy/
 endef
 
 SCUMMVM_POST_INSTALL_TARGET_HOOKS += SCUMMVM_ADD_VIRTUAL_KEYBOARD
+
+# MT-32/CM-32L ROM sets are user-supplied (copyrighted, not shippable), so they
+# live on /userdata/bios - the same folder the DOS system uses for them,
+# but ScummVM only ever looks for them in its extrapathwhich is /usr/share/scummvm.
+# Left dangling until the user supplies the files, which is harmless,
+# and starts working as soon as the ROM appears.
+#
+define SCUMMVM_LINK_BIOS_MIDI_ROMS
+    ln -sf /userdata/bios/MT32_CONTROL.ROM $(TARGET_DIR)/usr/share/scummvm/MT32_CONTROL.ROM
+    ln -sf /userdata/bios/MT32_PCM.ROM $(TARGET_DIR)/usr/share/scummvm/MT32_PCM.ROM
+    ln -sf /userdata/bios/CM32L_CONTROL.ROM $(TARGET_DIR)/usr/share/scummvm/CM32L_CONTROL.ROM
+    ln -sf /userdata/bios/CM32L_PCM.ROM $(TARGET_DIR)/usr/share/scummvm/CM32L_PCM.ROM
+endef
+
+SCUMMVM_POST_INSTALL_TARGET_HOOKS += SCUMMVM_LINK_BIOS_MIDI_ROMS
 
 $(eval $(autotools-package))

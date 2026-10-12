@@ -1,0 +1,39 @@
+#!/bin/dash
+# S98compat — Run compat probe at boot, sync when network is ready.
+# Installed to /etc/init.d/S98compat
+# Runs after S45connman (network) and S31regstation (ES), before S99userservices.
+
+PROBE="/usr/bin/reg-compat-probe"
+SYNC="/usr/bin/reg-compat-sync"
+
+case "$1" in
+    start)
+        printf 'Starting compat probe: '
+        if [ -x "$PROBE" ]; then
+            # Full hardware probe (runs fast, no network needed)
+            "$PROBE" &
+            echo "done."
+
+            # Schedule a sync attempt after network settles (30s delay)
+            if [ -x "$SYNC" ]; then
+                (sleep 30 && "$SYNC") &
+            fi
+        else
+            echo "skipped (probe not found)."
+        fi
+        ;;
+    stop)
+        # Sync on shutdown if connected (best-effort, don't block)
+        if [ -x "$SYNC" ]; then
+            "$SYNC" --force &
+        fi
+        ;;
+    restart|reload)
+        "$0" stop
+        "$0" start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload}" >&2
+        exit 1
+        ;;
+esac

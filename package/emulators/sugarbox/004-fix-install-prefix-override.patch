@@ -1,0 +1,19 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e831d43..e5f652a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.16)
+ 
+ project(SugarboxV2 LANGUAGES CXX C)
+ 
+-if (MSVC)
+-   set (CMAKE_INSTALL_BINDIR .)
+-   set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install)
+-else()
+-   set (CMAKE_INSTALL_BINDIR .)
+-   set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install)
+-endif()
+-
+ #no config util
+ set ( ALSOFT_NO_CONFIG_UTIL ON CACHE BOOL "" FORCE)
+ set ( ALSOFT_EXAMPLES OFF CACHE BOOL "" FORCE)

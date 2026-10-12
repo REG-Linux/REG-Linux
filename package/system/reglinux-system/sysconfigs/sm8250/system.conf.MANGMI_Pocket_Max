@@ -1,0 +1,4 @@
+# MANGMI Pocket Max default values
+
+# default wayland environment (rotate)
+system.rs.environment=wayland

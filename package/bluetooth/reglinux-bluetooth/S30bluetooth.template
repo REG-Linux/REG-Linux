@@ -1,0 +1,93 @@
+#!/bin/sh
+# Bluetooth hardware bring-up.
+
+BOARD=$(cat /boot/boot/system.board)
+
+case "$1" in
+    start)
+        enabled="$(/usr/bin/regmsg systemconf getconfigkey controllers.bluetooth.enabled)"
+        [ "$enabled" = "1" ] || exit 0
+
+        # Before the attach loop: the K1 case below loads hci_uart only once the
+        # chip is powered, and regmsgd unblocks again later anyway.
+        rfkill unblock bluetooth
+
+        #Start hciattach for applicable boards
+        bluetoothstack="@INTERNAL_BLUETOOTH_STACK@"
+        for i in $bluetoothstack
+        do
+            case $i in
+                kvim1s|kvim4)
+                    /usr/bin/hciattach -s 115200 /dev/ttyS1 bcm43xx 2000000
+                    sleep 3 # Give hciattach a few seconds to finish attaching firmware
+                    /usr/bin/hciconfig hci0 up
+                ;;
+                rfkreset)
+                    echo 0 > /sys/class/rfkill/rfkill0/state
+                    sleep 1
+                    echo 1 > /sys/class/rfkill/rfkill0/state
+                    sleep 1
+                ;;
+                bcm150)
+                    # Bluetooth on the OrangePi 4-LTS board is handled by a Spreadtrum (sprd) chip
+                    # and requires a custom hciattach_opi binary
+                    if [ ${BOARD} = "orangepi-4-lts" ] || [ ${BOARD} = "orangepi-800" ]
+                    then
+                        /usr/bin/hciattach_opi -n -s 1500000 /dev/ttyBT0 sprd &
+                    else
+                        /usr/bin/hciattach /dev/ttyS0 bcm43xx 1500000 flow nosleep &
+                    fi
+                    sleep 2 # Give hciattach a few seconds to finish attaching firmware
+                ;;
+                rtk115)
+                    /usr/bin/hciattach -n /dev/ttyS0 rtk_h5 115200 & # specific to Tinkerboard
+                    sleep 2 # Give hciattach a few seconds to finish attaching firmware
+                ;;
+                bcm921)
+                    /usr/bin/hciattach /dev/ttyAMA0 bcm43xx 921600 # specific rpi0, rpi3
+                ;;
+                piscan)
+                    /usr/bin/hciconfig hci0 up piscan # specific rpi
+                    sleep 2 # without the sleep, on rpi4, the agent fails on startup complaining the device is not here
+                ;;
+                sprd)
+                    /usr/bin/hciattach_opi -s 1500000 /dev/ttyBT0 sprd & # specific for certain orangepi boards
+                    sleep 2
+                ;;
+                k1bt)
+                    # SpaceMiT K1: hci_uart is blacklisted to prevent early
+                    # loading by eudev. Load it now after rfkill unblock so
+                    # the RTL8852BS firmware downloads with the chip powered on.
+                    modprobe hci_uart
+                    sleep 3
+                ;;
+            esac
+        done
+
+        # Storage, adapter address, bluetoothd, pairing agent, reconnect.
+        /usr/bin/regmsg bluetooth start
+
+        # for OrangePi LTS devices we need to put the controller in pairable mode
+        if [ ${BOARD} = "orangepi-4-lts" ] || [ ${BOARD} = "orangepi-3-lts" ] || [ ${BOARD} = "orangepi-zero2" ] || [ ${BOARD} = "orangepi-800" ]
+        then
+            /usr/bin/regmsg bluetooth pairable on
+        fi
+    ;;
+
+    stop)
+        /usr/bin/regmsg bluetooth stop
+        killall hciattach >/dev/null 2>&1
+        killall hciattach_opi >/dev/null 2>&1
+    ;;
+
+    restart|reload)
+        "$0" stop
+        "$0" start
+    ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

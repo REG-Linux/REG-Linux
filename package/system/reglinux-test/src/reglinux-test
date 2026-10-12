@@ -1,202 +1,171 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+# reglinux-test: black-box test + fuzz harness for REG-Linux.
+# Spawns existing CLIs only (regmsg, regstation, libra_test, /dev/uinput).
 
-import xml.etree.ElementTree as ET
-import os
-import requests
-import time
-import yaml
-import sys
 import argparse
-import subprocess
-from datetime import datetime
+import os
+import sys
+from pathlib import Path
 
-# input:
-# no input required, one game by system will be tested. you can choose a list if you create a file /userdata/reportTest/gamesToTest.yml, example:
-# fbneo: [
-#     "/userdata/roms/fbneo/dino.zip",
-#     "/userdata/roms/fbneo/sfa3.zip"
-#   ]
-# megadrive: [
-#     "/userdata/roms/megadrive/Sonic The Hedgehog.md",
-#     "/userdata/roms/megadrive/Bonanza Bros.md",
-#     "/userdata/roms/megadrive/Comix Zone.md"
-#   ]
-# psx: [
-#     "/userdata/roms/psx/Road Rash.PBP"
-#   ]
-#
-# output:
-# /userdata/reportTest/system-test_22-07-03_18h34.42/report.txt
+LIB_DIR = "/usr/lib/reglinux-test"
+SHARE_DIR = "/usr/share/reglinux-test"
+
+# Allow running from source tree for development.
+_here = Path(__file__).resolve().parent
+if (_here / "lib" / "engine.py").exists():
+    LIB_DIR = str(_here)
+    SHARE_DIR = str(_here)
+
+sys.path.insert(0, LIB_DIR)
+
+from lib.engine import Engine
+from lib.env import build_env
+from lib.report import write_reports
+
+DEFAULT_SCENARIO_DIR = f"{SHARE_DIR}/scenarios"
+DEFAULT_OUT_DIR = "/userdata/reportTest"
 
 
-class SystemTest:
-    @staticmethod
-    def run(args):
-        timeGame = 10
-        screenshot = False
-        outputDir = "/userdata/reportTest/"
-        configFile = "/userdata/reportTest/gamesToTest.yml"
+def cmd_env(args):
+    env = build_env()
+    import json
+    print(json.dumps(env, indent=2, default=str))
+    return 0
 
-        args = SystemTest.parseCommandLine(args)
 
-        if args.time:
-            timeGame = args.time[0]
+def cmd_list(args):
+    sdir = Path(args.scenario_dir)
+    for p in sorted(sdir.glob("*.yml")):
+        print(p.stem)
+    return 0
 
-        if args.screenshot:
-            screenshot = args.screenshot
 
-        emulators = SystemTest.findEmulators()
+def cmd_run(args):
+    env = build_env()
+    if args.force_backend and env["display"]["backend"] != args.force_backend:
+        print(f"ERROR: backend is {env['display']['backend']}, "
+              f"--force-backend={args.force_backend}", file=sys.stderr)
+        return 2
 
-        if os.path.exists(configFile):
-            games = SystemTest.findGamesForEmulatorsFromFile(emulators, configFile)
-        else:
-            games = SystemTest.findGamesForEmulators(emulators)
+    eng = Engine(env=env, out_root=args.out, time_per_game=args.time,
+                 screenshot=args.screenshot, keep_going=args.keep_going,
+                 backend_filter=args.backend_filter, case_filter=args.filter,
+                 seed=args.seed)
 
-        resultName = "system-test_" + datetime.now().strftime("%y-%m-%d_%Hh%M.%S")
-        resultDir = os.path.join(outputDir, resultName)
-        os.makedirs(resultDir, exist_ok=True)
+    scenarios = _resolve_scenarios(args)
+    if not scenarios:
+        print("no scenarios match", file=sys.stderr)
+        return 2
 
-        results = []
-        for system in games:
-            for game in games[system]:
-                if SystemTest.runTest(system, game, resultDir, timeGame, screenshot):
-                    print("Status: \033[01;32mSUCCESS\033[00;37m\n")
-                    results.append({"system": system, "game": game, "status": True})
-                else:
-                    print("Status: \033[01;31mFAILED\033[00;37m\n")
-                    results.append({"system": system, "game": game, "status": False})
+    run = eng.run_all(scenarios)
+    write_reports(run)
+    print(f"\nReport: {run['run_dir']}")
+    return 0 if run["summary"]["fail"] == 0 else 1
 
-        SystemTest.gameReport(resultDir, results)
 
-    @staticmethod
-    def gameReport(resultDir, results):
-        with open(os.path.join(resultDir, "report.txt"), "w") as f:
-            f.write("  Status      System            Game\n")
-            f.write(
-                "=======================================================================\n"
-            )
-            for result in results:
-                status = "[SUCCESS]" if result["status"] else "[FAILED]"
-                f.write(
-                    f"{status}   {result['system']:17} {os.path.basename(result['game'])}\n"
-                )
+def _resolve_scenarios(args):
+    sdir = Path(args.scenario_dir)
+    if args.scenario:
+        paths = []
+        for name in args.scenario:
+            p = sdir / f"{name}.yml" if not name.endswith(".yml") else Path(name)
+            if not p.exists():
+                print(f"scenario not found: {p}", file=sys.stderr)
+                return []
+            paths.append(p)
+        return paths
+    return sorted(sdir.glob("*.yml"))
 
-    @staticmethod
-    def runTest(system, game, resultDir, timeGame, screenshot):
-        print(f"System: {system}")
-        print(f"Game: {os.path.basename(game)}")
 
-        try:
-            x = requests.post("http://localhost:1234/launch", data=game)
-            x.raise_for_status()
-        except requests.RequestException as e:
-            print(f"Error launching game: {e}")
-            return False
+def cmd_replay(args):
+    case_dir = Path(args.case_dir)
+    cmd_log = case_dir / "cmd.log"
+    if not cmd_log.exists():
+        print(f"no cmd.log in {case_dir}", file=sys.stderr)
+        return 2
+    print(cmd_log.read_text())
+    return 0
 
-        time.sleep(timeGame)
 
-        try:
-            x = requests.get("http://localhost:1234/runningGame")
-            x.raise_for_status()
-            xj = x.json()
-            stillRunning = xj.get("systemName") == system
-        except (requests.RequestException, ValueError):
-            stillRunning = False
+def cmd_fuzz(args):
+    from lib import fuzz
+    return fuzz.run(args)
 
-        if stillRunning and screenshot:
-            SystemTest.screenshot(resultDir, system)
-            time.sleep(2)
 
-        subprocess.run(["system-es-swissknife", "--emukill"], check=False)
-        return stillRunning
+def main(argv):
+    p = argparse.ArgumentParser(prog="reglinux-test",
+                                description="REG-Linux test + fuzz harness")
+    p.add_argument("--scenario-dir", default=DEFAULT_SCENARIO_DIR)
+    p.add_argument("--out", default=DEFAULT_OUT_DIR,
+                   help="output root (default /userdata/reportTest)")
 
-    @staticmethod
-    def findEmulators():
-        emulators = {}
-        paths = [
-            "/userdata/system/configuration/emulationstation/es_systems.cfg",
-            "/usr/share/emulationstation/es_systems.cfg",
-        ]
+    sub = p.add_subparsers(dest="cmd")
 
-        for path in paths:
-            if os.path.exists(path):
-                tree = ET.parse(path)
-                break
-        else:
-            raise Exception("es_system.cfg not found")
+    pr = sub.add_parser("run", help="run scenarios")
+    pr.add_argument("scenario", nargs="*", help="scenario name(s); empty = all")
+    _common_run_args(pr)
+    pr.set_defaults(func=cmd_run)
 
-        systemList = tree.getroot()
-        if systemList.tag != "systemList":
-            raise Exception("root tag is not systemList")
+    pl = sub.add_parser("list", help="list available scenarios")
+    pl.set_defaults(func=cmd_list)
 
-        for system in systemList:
-            if system.tag == "system":
-                infos = {
-                    systemInfo.tag: systemInfo.text
-                    for systemInfo in system
-                    if systemInfo.tag in ["name", "path", "extension"]
-                }
-                if "name" in infos and "path" in infos and "extension" in infos:
-                    emulators[infos["name"]] = {
-                        "path": infos["path"],
-                        "extensions": infos["extension"].split(" "),
-                    }
+    pe = sub.add_parser("env", help="print detected environment as JSON")
+    pe.set_defaults(func=cmd_env)
 
-        return emulators
+    prp = sub.add_parser("replay", help="show cmd.log of a case")
+    prp.add_argument("case_dir")
+    prp.set_defaults(func=cmd_replay)
 
-    @staticmethod
-    def findGamesForEmulators(emulators):
-        games = {}
-        for emulator, info in emulators.items():
-            game = SystemTest.findGamesForEmulator(info)
-            if game:
-                games[emulator] = [game]
-        return games
+    pf = sub.add_parser("fuzz", help="fuzzing harness")
+    pf.add_argument("target", choices=["rom", "cli", "lifecycle"])
+    pf.add_argument("-t", "--time", type=int, default=60,
+                    help="duration seconds")
+    pf.add_argument("--seed", type=int, default=0)
+    pf.add_argument("--filter", default=None)
+    pf.add_argument("--backend-filter", default=None)
+    pf.add_argument("--force-backend", default=None)
+    pf.add_argument("--keep-going", action="store_true")
+    pf.add_argument("-s", "--screenshot", action="store_true")
+    pf.set_defaults(func=cmd_fuzz)
 
-    @staticmethod
-    def findGamesForEmulator(infos):
-        for root, _, files in os.walk(infos["path"]):
-            if "/roms/" in root:
-                for file in files:
-                    if any(file.endswith(ext) for ext in infos["extensions"]):
-                        return os.path.join(root, file)
-        return None
+    # convenience aliases
+    for alias in ("frontend", "ipc", "libra"):
+        sp = sub.add_parser(alias, help=f"run {alias}-related scenarios")
+        _common_run_args(sp)
+        sp.set_defaults(func=lambda a, _alias=alias: _alias_dispatch(a, _alias))
 
-    @staticmethod
-    def findGamesForEmulatorsFromFile(emulators, file):
-        with open(file, "r") as f:
-            testgames = yaml.safe_load(f) or {}
-        return {system: testgames.get(system, []) for system in emulators}
+    args = p.parse_args(argv)
+    if not args.cmd:
+        p.print_help()
+        return 1
+    return args.func(args)
 
-    @staticmethod
-    def screenshot(resultDir, name):
-        screenshotDir = os.path.join(resultDir, "screenshots")
-        os.makedirs(screenshotDir, exist_ok=True)
-        screenshotPath = os.path.join(screenshotDir, f"{name}.png")
-        subprocess.run(["regmsg screen getscreenshot", screenshotPath], check=False)
-        print("Screenshot captured")
 
-    @staticmethod
-    def parseCommandLine(args):
-        parser = argparse.ArgumentParser(
-            description="Testing Batocera emulation systems."
-        )
-        parser.add_argument(
-            "-t",
-            "--time",
-            nargs=1,
-            type=int,
-            help="Time in seconds that the game runs. (default=10)",
-        )
-        parser.add_argument(
-            "-s",
-            "--screenshot",
-            dest="screenshot",
-            action="store_true",
-            help="Screenshot of the game running. (default=false)",
-        )
-        return parser.parse_args(args)
+def _alias_dispatch(args, alias):
+    args.scenario = {
+        "frontend": ["frontend_lifecycle"],
+        "ipc": ["ipc_contract", "launcher_smoke"],
+        "libra": ["core_matrix"],  # libra path inside scenario via backend flag
+    }[alias]
+    return cmd_run(args)
+
+
+def _common_run_args(p):
+    p.add_argument("-t", "--time", type=int, default=10,
+                   help="seconds the game runs (default 10)")
+    p.add_argument("-s", "--screenshot", action="store_true")
+    p.add_argument("--filter", default=None,
+                   help="case-id glob filter (e.g. 'L3/megadrive/*')")
+    p.add_argument("--backend-filter", default=None,
+                   help="run only scenarios matching detected backend "
+                        "(sway|weston|kms|any)")
+    p.add_argument("--force-backend", default=None,
+                   help="abort if detected backend != this (CI guard)")
+    p.add_argument("--keep-going", action="store_true",
+                   help="continue after failures")
+    p.add_argument("--seed", type=int, default=0,
+                   help="random seed for matrix shuffling + fuzzing")
 
 
 if __name__ == "__main__":
-    SystemTest.run(sys.argv[1:])
+    sys.exit(main(sys.argv[1:]))

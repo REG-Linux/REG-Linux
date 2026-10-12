@@ -1,0 +1,14 @@
+config BR2_PACKAGE_BERMUDA
+	bool "bermuda"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_ZLIB
+	help
+	  Reimplementation of the engine used in Bermuda Syndrome
+	  (1995 adventure game). By Gregory Montoir.
+	  Requires retail game data.
+
+	  https://github.com/cyxx/bermuda

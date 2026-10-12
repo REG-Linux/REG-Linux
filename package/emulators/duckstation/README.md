@@ -1,10 +1,5 @@
-# DuckStation
+# duckstation
 
-DuckStation is REG-Linux's Qt-backed PlayStation 1 emulator with a polished UI and robust compatibility.
+PlayStation 1 emulator (Qt AppImage). Upstream: https://github.com/stenzek/duckstation
 
-## Build notes
-
-- `Version`: v0.1-9669
-- `Dependencies`: `BR2_x86_64` or `BR2_arm` or `BR2_aarch64`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: copies `psx.duckstation.keys` into `/usr/share/evmapy` (or the equivalent key directory)
+Ships as a pre-built AppImage: `DuckStation-x64.AppImage` for x86_64_v3, `DuckStation-x64-SSE2.AppImage` for generic x86_64, `DuckStation-arm64.AppImage` for AArch64, `DuckStation-armhf.AppImage` for ARM. Installed to `/usr/duckstation/DuckStation.AppImage`.

@@ -1,0 +1,12 @@
+diff --git a/src/osdep/amiberry.cpp b/src/osdep/amiberry.cpp
+index 1234567..abcdefg 100644
+--- a/src/osdep/amiberry.cpp
++++ b/src/osdep/amiberry.cpp
+@@ -7088,7 +7088,7 @@
+ static void resolve_bootstrap_settings_paths(const bool portable_mode, const bool ensure_settings_root)
+ {
+-	settings_dir = get_settings_directory(portable_mode);
++	settings_dir = "/userdata/system/configs/amiberry/conf";
+ 	if (ensure_settings_root)
+ 		ensure_directory_exists(settings_dir);
+ 	amiberry_ini_file = join_path(settings_dir, "amiberry.ini");

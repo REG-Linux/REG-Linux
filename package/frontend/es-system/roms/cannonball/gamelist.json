@@ -1,0 +1,24 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "desc": "Cannonball is an enhanced OutRun engine",
+          "developer": "Chris White",
+          "genre": "Racing",
+          "image": "./images/Cannonball-image.png",
+          "lang": "en",
+          "marquee": "./images/Cannonball-marquee.png",
+          "name": "Cannonball",
+          "players": "1",
+          "publisher": "Chris White",
+          "rating": "0.9",
+          "thumbnail": "./images/Cannonball-thumb.png",
+          "video": "./videos/Cannonball-video.mp4"
+        },
+        "path": "./Cannonball.cannonball",
+        "type": "game"
+      }
+    ]
+  }
+}

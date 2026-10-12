@@ -12,7 +12,7 @@ index 304b89a9..0d0092b5 100644
 -char screenShotsDir[MAX_FILENAME_LEN] = {"ScreenShots"};
 +char paksDir[MAX_FILENAME_LEN] = {"/userdata/roms/openbor"};
 +char savesDir[MAX_FILENAME_LEN] = {"/userdata/saves/openbor"};
-+char logsDir[MAX_FILENAME_LEN] = {"/userdata/system/logs/openbor"};
++char logsDir[MAX_FILENAME_LEN] = {"/var/log/openbor"};
 +char screenShotsDir[MAX_FILENAME_LEN] = {"/userdata/screenshots/openbor"};
  
  // sleeps for the given number of microseconds
@@ -31,10 +31,10 @@ index bf90c12d..8b5b93ec 100644
 -#define READ_LOGFILE(type)   type ? fopen("./Logs/OpenBorLog.txt", "rt") : fopen("./Logs/ScriptLog.txt", "rt")
 -#define COPY_ROOT_PATH(buf, name) strcpy(buf, "./"); strcat(buf, name); strcat(buf, "/");
 -#define COPY_PAKS_PATH(buf, name) strcpy(buf, "./Paks/"); strcat(buf, name);
-+#define CHECK_LOGFILE(type)  type ? fileExists("/userdata/system/logs/openbor/OpenBorLog.txt") : fileExists("/userdata/system/logs/openbor/ScriptLog.txt")
-+#define OPEN_LOGFILE(type)   type ? fopen("/userdata/system/logs/openbor/OpenBorLog.txt", "wt") : fopen("/userdata/system/logs/openbor/ScriptLog.txt", "wt")
-+#define APPEND_LOGFILE(type) type ? fopen("/userdata/system/logs/openbor/OpenBorLog.txt", "at") : fopen("/userdata/system/logs/openbor/ScriptLog.txt", "at")
-+#define READ_LOGFILE(type)   type ? fopen("/userdata/system/logs/openbor/OpenBorLog.txt", "rt") : fopen("/userdata/system/logs/openbor/ScriptLog.txt", "rt")
++#define CHECK_LOGFILE(type)  type ? fileExists("/var/log/openbor/OpenBorLog.txt") : fileExists("/var/log/openbor/ScriptLog.txt")
++#define OPEN_LOGFILE(type)   type ? fopen("/var/log/openbor/OpenBorLog.txt", "wt") : fopen("/var/log/openbor/ScriptLog.txt", "wt")
++#define APPEND_LOGFILE(type) type ? fopen("/var/log/openbor/OpenBorLog.txt", "at") : fopen("/var/log/openbor/ScriptLog.txt", "at")
++#define READ_LOGFILE(type)   type ? fopen("/var/log/openbor/OpenBorLog.txt", "rt") : fopen("/var/log/openbor/ScriptLog.txt", "rt")
 +#define COPY_ROOT_PATH(buf, name) strcpy(buf, "/userdata/system/configs/openbor"); strcat(buf, name); strcat(buf, "/");
 +#define COPY_PAKS_PATH(buf, name) strcpy(buf, "/userdata/roms/openbor/"); strcat(buf, name);
  #endif

@@ -1,0 +1,10 @@
+config BR2_PACKAGE_HCI_UART_RTK
+	bool "hci-uart-rtk"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Realtek Bluetooth HCI UART driver with H5 protocol
+	  and BT-WiFi coexistence support. Replaces in-tree
+	  hci_uart for Realtek combo chips (RTL8852BS etc).
+
+	  This driver handles firmware loading via rtk_hciattach
+	  and provides H4/H5 protocol + BT coexistence.

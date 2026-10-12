@@ -1,0 +1,9 @@
+config BR2_PACKAGE_SWITCH_ATF
+	bool "switch-atf"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	depends on BR2_aarch64
+	help
+	  ARM Trusted Firmware (BL31) for the Nintendo Switch Tegra T210 SoC.
+	  Builds bl31.bin from the Switchroot ATF fork.
+
+	  https://gitlab.com/switchroot/bootstack/switch-atf

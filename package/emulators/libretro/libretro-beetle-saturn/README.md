@@ -1,9 +1,5 @@
-# Libretro Beetle Saturn
+# libretro-beetle-saturn
 
-The `libretro-beetle-saturn` core provides Sega Saturn emulation for REG-Linux within the libretro ecosystem.
+Sega Saturn libretro core (Beetle Saturn). Upstream: https://github.com/libretro/beetle-saturn-libretro
 
-## Build notes
-
-- `Version`: a4dbc878928e1a2f7857f64ee2af782078fc150c
-- `Dependencies`: supports `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
+On GLES-only platforms the platform suffix `-gles` is appended to `LIBRETRO_PLATFORM`.

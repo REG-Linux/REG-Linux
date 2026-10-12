@@ -1,0 +1,58 @@
+Fall back to find_program() when pkg-config's wayland_scanner var is unusable
+
+wx_protocols codegen (wxWidgets' vendored pointer-warp-v1 cursor support,
+build/cmake/init.cmake:462-500) resolves wayland-scanner via
+pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner). Under
+this cross build that pc var resolves against the *target* sysroot's
+wayland-scanner.pc (found via Buildroot's target pkg-config wrapper, which
+is what everything else in this tree - gtk3, X11, wayland-client itself -
+correctly resolves through). That .pc's `wayland_scanner` var is written
+bare (${bindir}/wayland-scanner, no ${pc_sysrootdir} prefix, unlike
+pkgdatadir a few lines above it in the same file), so it comes back as a
+literal /usr/bin/wayland-scanner - a path on the build machine, not
+anywhere in this tree.
+
+Verified this is really what's happening, without executing anything
+inside the build container (RUNPATH there is container-absolute, not
+reproducible from outside it - confirmed unreliable the hard way first):
+reproduced the same pkg-config variable lookup by hand against the
+host-side mirror of xenia-edge's own per-package sysroot with
+PKG_CONFIG_LIBDIR/PKG_CONFIG_SYSROOT_DIR set to match, and it printed
+exactly /usr/bin/wayland-scanner.
+
+`if(WAYLAND_SCANNER)` only checks the variable is a non-empty string, not
+that the path exists, and none of the execute_process() calls that follow
+pass RESULT_VARIABLE/ERROR_VARIABLE - so running a nonexistent (or
+wrong-distro) /usr/bin/wayland-scanner fails completely silently at
+configure time, and the only symptom is a much later hard compile error:
+  wx/gtk/private/wayland.h:32:10: fatal error:
+    'wx/protocols/pointer-warp-v1-client-protocol.h' file not found
+
+The actual usable wayland-scanner is the one this package already builds
+and stages at $(HOST_DIR)/bin/wayland-scanner (xenia-edge.mk's
+BUILD_CMDS puts $(HOST_DIR)/bin first on PATH, and
+002-cmake-find-root-path.patch already sets
+CMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER, so find_program() here searches
+PATH instead of the target sysroot and lands on it). Make the pc-var path
+a first choice but not the only one: fall back to find_program() when it
+doesn't exist, and turn the truthiness check into an existence check so a
+failed find_program() (empty result) can't silently fall through into the
+same failure mode this patch exists to fix.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+--- a/third_party/wxWidgets/build/cmake/init.cmake
++++ b/third_party/wxWidgets/build/cmake/init.cmake
+@@ -466,7 +466,11 @@
+                 pkg_check_modules(WAYLAND_CLIENT wayland-client)
+                 if(WAYLAND_CLIENT_FOUND)
+                     pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
+-                    if(WAYLAND_SCANNER)
++                    if(NOT EXISTS "${WAYLAND_SCANNER}")
++                        find_program(wx_wayland_scanner NAMES wayland-scanner)
++                        set(WAYLAND_SCANNER "${wx_wayland_scanner}")
++                    endif()
++                    if(EXISTS "${WAYLAND_SCANNER}")
+                         set(wx_protocols_input_dir ${wxSOURCE_DIR}/src/unix/protocols)
+                         set(wx_protocols_temp_dir ${wxOUTPUT_DIR}/wx/protocols)
+                         set(wx_protocols_output_dir ${wxSETUP_HEADER_PATH}/wx/protocols)

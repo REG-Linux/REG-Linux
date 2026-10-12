@@ -17,6 +17,7 @@ config BR2_PACKAGE_OPENMW
 	select BR2_PACKAGE_LUA
 	select BR2_PACKAGE_LIBRSVG
 	select BR2_PACKAGE_FLTK
+	select BR2_PACKAGE_ICU
 
 	help
 	  OpenMW is a free and open-source game engine recreation 

@@ -2,9 +2,9 @@
 # LED Rainbow effect when retroachievement unlocked
 #
 # To enable it, SSH into Batocera and type the 3 commands:
-#   mkdir -p /userdata/system/configs/emulationstation/scripts/achievements/
-#   echo "/usr/bin/system-led-effects" > /userdata/system/configs/emulationstation/scripts/achievements/leds.sh
-#   chmod +x /userdata/system/configs/emulationstation/scripts/achievements/leds.sh
+#   mkdir -p /userdata/system/scripts/achievements/
+#   echo "/usr/bin/system-led-effects" > /userdata/system/scripts/achievements/leds.sh
+#   chmod +x /userdata/system/scripts/achievements/leds.sh
 # 
 
 # Function to check if led module is loaded

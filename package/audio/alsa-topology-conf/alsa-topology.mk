@@ -10,7 +10,7 @@ ALSA_TOPOLOGY_CONF_LICENSE = BSD-3-Clause
 ALSA_TOPOLOGY_CONF_LICENSE_FILES = LICENSE
 
 define ALSA_TOPOLOGY_CONF_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/share/alsa
+	mkdir -p $(TARGET_DIR)/usr/share/alsa
 	rsync -arv $(@D)/topology/* $(TARGET_DIR)/usr/share/alsa/topology/
 endef
 

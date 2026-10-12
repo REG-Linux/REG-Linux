@@ -1,0 +1,8 @@
+config BR2_PACKAGE_USB_GADGET_SCRIPTS
+	bool "usb-gadget-scripts"
+	depends on BR2_PACKAGE_SYSTEM_TARGET_L4T
+	select BR2_PACKAGE_UMTP_RESPONDER
+	help
+	  USB gadget configuration scripts for the Nintendo Switch.
+	  Sets up USB-C port as a USB gadget for MTP file transfer
+	  and serial console when not docked.

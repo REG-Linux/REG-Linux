@@ -1,0 +1,26 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Dinoforce-box.jpg",
+          "desc": "Take control of the DINO-JAEGER and battle an army of alien invaders. Your ship is equipped with the DELTA IMPULSE NUCLEAR OVERDRIVE, an energy weapon that's neurally linked to the ship's pilot and will transform into countless weapon variations in a blink of an eye.\nEnjoy a tactical horizontal shoot-em up with lots of secrets to discover. \n\n- Number of Players: 1\n- Number of Stages: 7 (+1)\n - Special Features: Hidden Bosses, Hidden Bonus Stage, 25 Extra Weapons and Special Items\n- Ages: 10 years and up",
+          "developer": "PCE Works",
+          "genre": "Shooter",
+          "image": "./images/Dinoforce-image.png",
+          "lang": "en",
+          "marquee": "./images/Dinoforce-marquee.png",
+          "name": "Dinoforce",
+          "players": "1",
+          "publisher": "https://dinoforce.pceworks.net/",
+          "releasedate": "20230317T000000",
+          "thumbnail": "./images/Dinoforce-thumb.png",
+          "video": "./videos/Dinoforce-video.mp4",
+          "wheel": "./images/Dinoforce-wheel.png"
+        },
+        "path": "./Dinoforce.pce",
+        "type": "game"
+      }
+    ]
+  }
+}

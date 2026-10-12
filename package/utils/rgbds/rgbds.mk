@@ -3,7 +3,7 @@
 # RGBDS
 #
 ################################################################################
-RGBDS_VERSION = v0.9.1
+RGBDS_VERSION = v1.0.4
 RGBDS_SITE = $(call github,gbdev,rgbds,$(RGBDS_VERSION))
 RGBDS_LICENSE = MIT
 RGBDS_SUPPORTS_IN_SOURCE_BUILD = NO

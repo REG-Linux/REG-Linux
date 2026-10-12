@@ -60,7 +60,7 @@ do_enable() {
 
     if test "${STATUS}" = "off"
     then
-	/etc/init.d/S32bluetooth stop
+	/etc/init.d/S30bluetooth stop
 	/etc/init.d/S08connman   stop
     fi
 }
@@ -70,7 +70,7 @@ do_disable() {
 
     if test "${STATUS}" = "on"
     then
-	/etc/init.d/S32bluetooth start
+	/etc/init.d/S30bluetooth start
 	/etc/init.d/S08connman   start
     fi
 }

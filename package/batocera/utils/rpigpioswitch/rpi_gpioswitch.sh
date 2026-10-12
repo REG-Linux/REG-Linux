@@ -58,7 +58,7 @@ function powerdevice_dialog()
     local switch cmd button #dialog variabels
     local currentswitch #show current switch
 
-    currentswitch="$(/usr/bin/system-settings-get system.power.switch)"
+    currentswitch="$(/usr/bin/regmsg systemconf getconfigkey system.power.switch)"
     [[ -z "$currentswitch" ]] && currentswitch="disabled"
 
     cmd=(dialog --ascii-lines --backtitle "BATOCERA Power Switch Selection Toolset" \
@@ -616,7 +616,7 @@ PIBOY=true
 
 function piboy_stop()
 {
-    /etc/init.d/S31emulationstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now
+    /etc/init.d/S31regstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now
 }
 
 function piboy_config()
@@ -861,7 +861,7 @@ case "$CONFVALUE" in
         [[ $? -eq 0 ]] && info_msg="No error! Everything went okay!" || info_msg="An error occurred!"
         dialog --ascii-lines --backtitle "BATOCERA Power Switch Selection Toolkit" \
                --title " STATUS OF NEW VALUE " \
-               --msgbox "${info_msg}\n\n$(/usr/bin/system-settings-get system.power.switch)" 0 0
+               --msgbox "${info_msg}\n\n$(/usr/bin/regmsg systemconf getconfigkey system.power.switch)" 0 0
     ;;
     --HELP)
         echo "Try: $(basename "$0") {start|stop|config} <value>"

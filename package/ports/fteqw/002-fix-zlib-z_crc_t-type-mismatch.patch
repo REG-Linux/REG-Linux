@@ -1,0 +1,22 @@
+diff --git a/engine/common/fs_zip.c b/engine/common/fs_zip.c
+index 1111111..2222222 100644
+--- a/engine/common/fs_zip.c
++++ b/engine/common/fs_zip.c
+@@ -88,7 +88,16 @@
+ # endif
+ 
+ #ifndef Z_U4
+-#define z_crc_t uLongf
++/* REG-Linux: this zlib (see zconf.h) unconditionally typedefs its own
++ * z_crc_t as `unsigned int` and no longer defines Z_U4 at all (the
++ * detection macro this fallback was written against), so the ifndef
++ * is always true here and this line clobbers the real, correctly
++ * sized typedef with a stale 32-bit-assumption `uLongf` (`unsigned
++ * long`, 8 bytes on LP64) -- get_crc_table() still returns the real
++ * zlib's `const unsigned int *`, so the mismatch is a hard
++ * -Wincompatible-pointer-types error, not just a warning, on GCC 14+.
++ */
++//#define z_crc_t uLongf
+ #endif
+ 
+ //#pragma comment(lib, MSVCLIBSPATH "zlib.lib")

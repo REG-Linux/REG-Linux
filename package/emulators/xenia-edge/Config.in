@@ -1,0 +1,22 @@
+config BR2_PACKAGE_XENIA_EDGE
+    bool "xenia-edge"
+    depends on BR2_x86_64 || BR2_aarch64
+    depends on BR2_PACKAGE_LLVM
+    depends on BR2_PACKAGE_CLANG
+    select BR2_PACKAGE_PYTHON_TOML
+    select BR2_PACKAGE_LIBGTK3
+    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_BINUTILS
+    select BR2_PACKAGE_LIBUNWIND
+    help
+        Xenia Edge is a community fork of Xenia Canary (which itself
+        forks the original Xenia Xbox 360 Emulator Research Project),
+        focused on Vulkan renderer, GUI, and Linux compatibility
+        improvements. Experimental package: sits alongside
+        xenia-canary for a build/runtime bake-off, not a replacement
+        yet.
+
+        aarch64 support (the a64 JIT backend) is experimental - no
+        upstream Linux-ARM CI covers it, unlike x86_64.
+
+        https://github.com/has207/xenia-edge

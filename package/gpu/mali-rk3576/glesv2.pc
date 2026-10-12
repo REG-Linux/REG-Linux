@@ -1,0 +1,9 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: glesv2
+Description: Mali Bifrost G52 OpenGL ES 2.0 library
+Version: 21.0
+Libs: -L${libdir} -lGLESv2
+Cflags: -I${includedir}

@@ -1,3 +1,9 @@
+From 001-use-system-sdl3: Force use of system SDL3 instead of bundled version
+
+This patch forces CMake to find and use the system-installed SDL3
+instead of the bundled submodule version.
+
+---
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 90d32811f2..2f91d074d0 100644
 --- a/CMakeLists.txt
@@ -5,10 +11,9 @@ index 90d32811f2..2f91d074d0 100644
 @@ -87,6 +87,9 @@ else ()
      message(STATUS "IPO / LTO not supported: ${IPO_ERROR}")
  endif ()
- 
+
 +# force system sdl3
 +find_package(SDL3 REQUIRED)
 +
  ## Include third-party libraries
  add_subdirectory(vendor)
- 

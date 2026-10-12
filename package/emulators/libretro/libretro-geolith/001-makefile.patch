@@ -104,18 +104,6 @@
  	export INCLUDE := $(INCLUDE);$(WindowsSDKSharedIncludeDir);$(WindowsSDKUCRTIncludeDir);$(WindowsSDKUMIncludeDir)
  	export LIB := $(LIB);$(WindowsSDKUCRTLibDir);$(WindowsSDKUMLibDir)
  	TARGET := $(TARGET_NAME)_libretro.dll
-@@ -670,9 +680,9 @@
- endif
- 
- LDFLAGS += $(fpic) $(SHARED)
--FLAGS += $(fpic) 
-+FLAGS += $(fpic)
- FLAGS += $(INCFLAGS)
--FLAGS += $(EXTRA_INCLUDES) 
-+FLAGS += $(EXTRA_INCLUDES)
- FLAGS += $(INCFLAGS_PLATFORM)
- 
- ifeq ($(OLD_GCC), 1)
 @@ -707,7 +717,7 @@
  endif
  else

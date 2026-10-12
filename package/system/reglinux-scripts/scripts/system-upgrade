@@ -1,7 +1,16 @@
 #!/bin/dash
 
+LOGFILE="/userdata/system/logs/system-upgrade.log"
+
+# Append a timestamped line to the persistent upgrade log
+log() {
+    mkdir -p "$(dirname "$LOGFILE")" 2>/dev/null
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOGFILE" 2>/dev/null
+}
+
 # Create upgrade messages for the badge (TERMINAL=0) or plain text output
 do_upgmsg() {
+    log "$1"
     if [ "$TERMINAL" -eq 0 ]; then
         echo "$1" > "/tmp/upgrade_message.txt"
         [ -n "$2" ] && sleep "$2"
@@ -71,7 +80,9 @@ do_download() {
         echo "Checking integrity of downloaded file... please wait"
     fi
 
-    # try to download an md5 checksum, delete possible leftover if any error
+    # try to download a sha256 checksum (preferred) and an md5 one (fallback),
+    # delete possible leftovers if any error
+    curl -A "system-upgrade.sha256" -sfL "${url}.sha256" -o "${UPGRADEFILE}.sha256" || rm -f "${UPGRADEFILE}.sha256"
     curl -A "system-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
 }
 
@@ -153,18 +164,27 @@ esac
 newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/system.board' 2>/dev/null)
 if [ "$board" = "$newboard" ]; then
 
-    if [ -e "${UPGRADEFILE}.md5" ]; then
-        DISTMD5=$(cat "${UPGRADEFILE}.md5")
+    if [ -e "${UPGRADEFILE}.sha256" ]; then
+        DISTSUM=$(cat "${UPGRADEFILE}.sha256")
         # Extract just the hash part, handling potential filenames with spaces
-        CURRMD5=$(md5sum "$UPGRADEFILE" | { read -r hash rest; echo "$hash"; })
-        if [ "${DISTMD5}" = "${CURRMD5}" ]; then
-            do_upgmsg "Checksum validated ..." 2
+        CURRSUM=$(sha256sum "$UPGRADEFILE" | { read -r hash rest; echo "$hash"; })
+        if [ "${DISTSUM}" = "${CURRSUM}" ]; then
+            do_upgmsg "Checksum validated (sha256) ..." 2
+        else
+            do_upgmsg "Checksum error!" 5
+            quit_script 1
+        fi
+    elif [ -e "${UPGRADEFILE}.md5" ]; then
+        DISTSUM=$(cat "${UPGRADEFILE}.md5")
+        CURRSUM=$(md5sum "$UPGRADEFILE" | { read -r hash rest; echo "$hash"; })
+        if [ "${DISTSUM}" = "${CURRSUM}" ]; then
+            do_upgmsg "Checksum validated (md5) ..." 2
         else
             do_upgmsg "Checksum error!" 5
             quit_script 1
         fi
     else
-        do_upgmsg "Missing md5 file - proceeding ..." 2
+        do_upgmsg "Missing checksum file - proceeding ..." 2
     fi
 
     if [ "$1" = "manual" ] && [ "$SHAREMOUNT" != "/userdata" ]; then
@@ -197,10 +217,11 @@ if [ "$board" = "$newboard" ]; then
     # In case of tar error we don't know if is tar corrupted or non existing file to extract (assuming an upgrade could not include all files)
     # First get the list of available files of those we want to extract (also is kind of a test for corrupted tar file)
     # tar --no-same-owner is needed because fat partition does not support owner attributes
-    if tar --zstd --exclude='system-boot.conf' --exclude='config.txt' -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" 2>/dev/null > /tmp/upgrade.list && sed -i '\%/$%d' /tmp/upgrade.list && [ -s /tmp/upgrade.list ]; then
+    # -tv (not -tf) so we also capture each member's size for the space preflight and post-extraction check below
+    if tar --zstd --exclude='system-boot.conf' --exclude='config.txt' -tvf "${UPGRADEFOLDER}/boot-${board}.tar.zst" 2>>"$LOGFILE" > /tmp/upgrade.listing && awk '{print $3, $NF}' /tmp/upgrade.listing > /tmp/upgrade.sizes && awk '{print $NF}' /tmp/upgrade.listing > /tmp/upgrade.list && sed -i '\%/$%d' /tmp/upgrade.list && [ -s /tmp/upgrade.list ]; then
         # /tmp/upgrade.list has one file per line and we deleted lines with only folders
         if grep -q -m 1 'runbeforeupgrade.sh' /tmp/upgrade.list; then
-            if tar -C /tmp/ --no-same-owner --zstd -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" runbeforeupgrade.sh &>/dev/null; then
+            if tar -C /tmp/ --no-same-owner --zstd -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" runbeforeupgrade.sh >/dev/null 2>&1; then
                 do_upgmsg "Running /tmp/runbeforeupgrade.sh"
                 . /tmp/runbeforeupgrade.sh
                 sed -i '/runbeforeupgrade.sh/d' /tmp/upgrade.list
@@ -212,16 +233,62 @@ if [ "$board" = "$newboard" ]; then
         fi
 
         rescuelist=''
-        grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' /tmp/upgrade.list > /tmp/rescue_files_list
+        # Match any initrd extension (boards vary: initrd.lz4 vs initrd.gz) instead of hardcoding one
+        grep -E 'boot/firmware\.update|boot/initrd\.|boot/linux|boot/modules\.update|boot/rescue\.update' /tmp/upgrade.list > /tmp/rescue_files_list
         while read -r line ; do
             [ -n "$line" ] || continue  # Skip empty lines
             rescuelist="${rescuelist} ${line}"
             sed -i "\%${line}%d" /tmp/upgrade.list
-            [ "${line}" = "boot/rescue.update" ] && rm -f /boot/boot/rescue        # Free some space before extracting rescue.update
         done < /tmp/rescue_files_list
         rm -f /tmp/rescue_files_list
 
-        if tar --zstd -C /boot/ --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" ${rescuelist} && mv /tmp/upgrade.list /boot/upgrade.list && touch /boot/REG_UPDATE; then
+        # Preflight: make sure /boot has room for a staged copy of the rescue files
+        # (old copies are left in place until the new ones are verified, see below)
+        neededbytes=0
+        for f in ${rescuelist}; do
+            fsize=$(awk -v f="$f" '$2==f{print $1; exit}' /tmp/upgrade.sizes)
+            neededbytes=$((neededbytes + ${fsize:-0}))
+        done
+        neededmb=$(( (neededbytes / 1024 / 1024) + 1 ))
+        if ! bootfree=$(df -m /boot | tail -1 | awk '{print $4}'); then
+            do_upgmsg "Could not get free space on /boot" 5
+            mount -o remount,ro /boot
+            quit_script 1
+        fi
+        if [ "${neededmb}" -ge "${bootfree}" ]; then
+            do_upgmsg "Not enough space on /boot to perform the update" 5
+            mount -o remount,ro /boot
+            quit_script 1
+        fi
+
+        # Extract to a staging dir first and verify sizes before touching the live files,
+        # so a corrupted/truncated extraction never leaves a half-written boot/kernel/initrd/rescue file
+        STAGING="/boot/.upgrade_staging"
+        rm -rf "$STAGING"
+        mkdir -p "$STAGING"
+
+        okextract=0
+        if tar --zstd -C "$STAGING" --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" ${rescuelist} 2>>"$LOGFILE"; then
+            okextract=1
+            for f in ${rescuelist}; do
+                expected=$(awk -v f="$f" '$2==f{print $1; exit}' /tmp/upgrade.sizes)
+                actual=$(stat --printf="%s" "${STAGING}/${f}" 2>/dev/null)
+                if [ -z "${expected}" ] || [ "${expected}" != "${actual}" ]; then
+                    log "Size mismatch for ${f}: expected ${expected:-?}, got ${actual:-?}"
+                    okextract=0
+                    break
+                fi
+            done
+        fi
+
+        if [ "${okextract}" -eq 1 ]; then
+            for f in ${rescuelist}; do
+                mv "${STAGING}/${f}" "/boot/${f}" || okextract=0
+            done
+        fi
+        rm -rf "$STAGING"
+
+        if [ "${okextract}" -eq 1 ] && mv /tmp/upgrade.list /boot/upgrade.list && touch /boot/REG_UPDATE; then
             do_upgmsg "Reboot to apply update..." 3
         else
             do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15

@@ -3,8 +3,8 @@
 # SugarBoxV2
 #
 ################################################################################
-# Version: Release on Nov 29, 2024
-SUGARBOX_VERSION = v2.0.4
+# Version: Release on Sep 5, 2026
+SUGARBOX_VERSION = v2.1.1
 SUGARBOX_SITE = https://github.com/Tom1975/SugarboxV2.git
 SUGARBOX_SITE_METHOD=git
 SUGARBOX_GIT_SUBMODULES=YES
@@ -28,10 +28,10 @@ SUGARBOX_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/sugarbox/"
 
 SUGARBOX_CONF_ENV += LDFLAGS=-lpthread
 
-define SUGARBOX_QT6_FIX_CMAKE
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/sugarbox/CMakeLists.txt $(@D)/Sugarbox/CMakeLists.txt
-endef
+#define SUGARBOX_QT6_FIX_CMAKE
+#    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/sugarbox/CMakeLists.txt $(@D)/Sugarbox/CMakeLists.txt
+#endef
 
-SUGARBOX_PRE_CONFIGURE_HOOKS += SUGARBOX_QT6_FIX_CMAKE
+#SUGARBOX_PRE_CONFIGURE_HOOKS += SUGARBOX_QT6_FIX_CMAKE
 
 $(eval $(cmake-package))

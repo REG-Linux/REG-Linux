@@ -3,8 +3,8 @@
 # libretro-fbneo
 #
 ################################################################################
-# Version: Commits on Nov 23, 2025
-LIBRETRO_FBNEO_VERSION = ff295ebb49dbe5f2aa8b245c09b90db8b3d20669
+# Version: Commits on Sep 4, 2026
+LIBRETRO_FBNEO_VERSION = a251c76229f1637e433b93e29845039752771b6d
 LIBRETRO_FBNEO_SITE = $(call github,libretro,FBNeo,$(LIBRETRO_FBNEO_VERSION))
 LIBRETRO_FBNEO_LICENSE = Non-commercial
 
@@ -73,11 +73,14 @@ define LIBRETRO_FBNEO_INSTALL_TARGET_CMDS
 	cp -r $(@D)/metadata/* \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo
 
-    # Copy only relevant DAT files
-	rsync -a $(@D)/dats/*Arcade* \
-		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo --exclude light
-	rsync -a $(@D)/dats/*Megadrive* \
-		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo --exclude light
+	# ClrMamePro DATs, read by regmsgd for arcade names: gzipped into bios/databases.
+	rm -rf $(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo/*ClrMame*.dat \
+		$(TARGET_DIR)/usr/share/regmsg/data/fbneo \
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/databases/fbneo
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/databases
+	for f in $(@D)/dats/*Arcade* $(@D)/dats/*Megadrive*; do \
+		gzip -9nc "$$f" > "$(TARGET_DIR)/usr/share/reglinux/datainit/bios/databases/$$(basename "$$f").gz"; \
+	done
 endef
 
 $(eval $(generic-package))

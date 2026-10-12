@@ -1,9 +1,3 @@
-# Libretro VBA-M
+# libretro-vba-m
 
-The `libretro-vba-m` core integrates VBA-M Game Boy Advance emulation into REG-Linux with the usual libstdc++ build modes.
-
-## Build notes
-
-- `Version`: v2.2.3
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
+Game Boy Advance libretro core (VBA-M). Upstream: https://github.com/visualboyadvance-m/visualboyadvance-m

@@ -1,0 +1,11 @@
+--- a/Makefile.common	2026-02-22 22:51:07.563920257 +0100
++++ b/Makefile.common	2026-02-22 22:51:17.132569838 +0100
+@@ -25,7 +25,7 @@
+ #TAPEDIR = tape/
+ 
+ CFLAGS += -DROM_DIR='"$(ROMDIR)"' -DDISK_DIR='"$(DISKDIR)"' -DTAPE_DIR='"$(TAPEDIR)"' \
+-   -DQUASI88_MINI -DCLIB_DECL='' -DUSE_SOUND=1 -DUSE_FMGEN=1
++   -DQUASI88_MINI -DCLIB_DECL='' -DUSE_SOUND=1 -DUSE_FMGEN=1 -Wno-incompatible-pointer-types
+ 
+ CXXFLAGS += -DCLIB_DECL=''
+ 

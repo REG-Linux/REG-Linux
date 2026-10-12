@@ -1,0 +1,9 @@
+config BR2_PACKAGE_CCLESTE
+	bool "ccleste"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	help
+	  C source port of the original Celeste (PICO-8 version).
+	  Tiny platformer — fully free, no game data needed.
+
+	  https://github.com/lemon32767/ccleste

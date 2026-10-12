@@ -12,26 +12,22 @@ Signed-off-by: Nicolas Adenis-Lamarre <nicolas.adenis.lamarre@gmail.com>
  4 files changed, 394 insertions(+)
  create mode 100644 src/osd/modules/input/input_udev.cpp
 
-diff --git a/scripts/src/main.lua b/scripts/src/main.lua
-index 32d5b7c..13e9f73 100644
---- a/scripts/src/main.lua
-+++ b/scripts/src/main.lua
-@@ -166,6 +166,7 @@ end
- 	links {
+--- a/scripts/src/main.lua	2026-08-13 21:27:07.877804514 +0100
++++ b/scripts/src/main.lua	2026-08-13 21:27:07.891153267 +0100
+@@ -179,6 +179,7 @@
  		ext_lib("zlib"),
+ 		ext_lib("zstd"),
  		ext_lib("flac"),
 +		ext_lib("udev"),
  		ext_lib("utf8proc"),
  	}
  if (STANDALONE~=true) then
-diff --git a/scripts/src/osd/modules.lua b/scripts/src/osd/modules.lua
-index 4bbd42b..b7fa7ef 100644
---- a/scripts/src/osd/modules.lua
-+++ b/scripts/src/osd/modules.lua
-@@ -87,6 +87,7 @@ function osdmodulesbuild()
- 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
- 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
- 		MAME_DIR .. "src/osd/modules/input/input_sdl.cpp",
+--- a/scripts/src/osd/modules.lua	2026-08-13 21:27:07.879167158 +0100
++++ b/scripts/src/osd/modules.lua	2026-08-13 21:27:07.891237127 +0100
+@@ -97,6 +97,7 @@
+ 		MAME_DIR .. "src/osd/modules/input/input_sdl3.cpp",
+ 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.cpp",
+ 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.h",
 +		MAME_DIR .. "src/osd/modules/input/input_udev.cpp",
  		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
  		MAME_DIR .. "src/osd/modules/input/input_wincommon.h",
@@ -176,7 +172,7 @@ index 0000000..ad7a63c
 +    while ((len = read(m_fd, input_events, sizeof(input_events))) > 0) {
 +      len /= sizeof(*input_events);
 +      for (j = 0; j < len; j++) {
-+    	queue_events(&(input_events[j]), 1);
++    	queue_event(input_events[j]);
 +      }
 +    }
 +  }
@@ -433,13 +429,11 @@ index 0000000..ad7a63c
 +#endif // !defined(SDLMAME_WIN32)
 +
 +MODULE_DEFINITION(LIGHTGUN_UDEV, udev_lightgun_module)
-diff --git a/src/osd/modules/lib/osdobj_common.cpp b/src/osd/modules/lib/osdobj_common.cpp
-index d2fb751..1e785d1 100644
---- a/src/osd/modules/lib/osdobj_common.cpp
-+++ b/src/osd/modules/lib/osdobj_common.cpp
-@@ -348,6 +348,7 @@ void osd_common_t::register_options()
- 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
- 
+--- a/src/osd/modules/lib/osdobj_common.cpp	2026-08-13 21:27:07.879956727 +0100
++++ b/src/osd/modules/lib/osdobj_common.cpp	2026-08-13 21:27:07.891344622 +0100
+@@ -373,6 +373,7 @@
+ 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
+ #endif
  	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
 +	REGISTER_MODULE(m_mod_man, LIGHTGUN_UDEV);
  	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
@@ -447,4 +441,3 @@ index d2fb751..1e785d1 100644
  	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 -- 
 2.34.1
-

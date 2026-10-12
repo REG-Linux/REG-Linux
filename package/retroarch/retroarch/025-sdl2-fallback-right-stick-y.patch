@@ -1,0 +1,19 @@
+The SDL2 fallback ("Standard Gamepad") binds the right stick Y the wrong
+way round: up reads as down. SDL gamepad axes are negative upwards, as
+the left stick binds in the same block already assume (+1 plus, -1
+minus). The XInput-style blocks elsewhere use up-positive axes and are
+left alone.
+
+--- a/input/input_autodetect_builtin.c
++++ b/input/input_autodetect_builtin.c
+@@ -63,8 +63,8 @@
+ DECL_AXIS(l_y_minus, -1) \
+ DECL_AXIS(r_x_plus,  +2) \
+ DECL_AXIS(r_x_minus, -2) \
+-DECL_AXIS(r_y_plus,  -3) \
+-DECL_AXIS(r_y_minus, +3)
++DECL_AXIS(r_y_plus,  +3) \
++DECL_AXIS(r_y_minus, -3)
+ 
+ #if defined(DINGUX) && defined(HAVE_SDL_DINGUX)
+ #define DINGUX_SDL_DEFAULT_BINDS \

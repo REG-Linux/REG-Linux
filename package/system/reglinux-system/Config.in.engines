@@ -20,7 +20,7 @@ config BR2_PACKAGE_REGLINUX_FLASH_SYSTEMS
 	select BR2_PACKAGE_RUFFLE		if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && !BR2_arm1176jzf_s)) && !BR2_TOOLCHAIN_USES_MUSL
 
 	# Lightspark implementation in C/C++
-	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
+	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s))) && !BR2_PACKAGE_SYSTEM_TARGET_DE10NANO
 
 #### Moonlight / Gamestream ####
 config BR2_PACKAGE_REGLINUX_GAMESTREAM_SYSTEMS
@@ -67,3 +67,21 @@ config BR2_PACKAGE_REGLINUX_HOMEBREW_SYSTEMS
 
 	# SMBX engine
 	select BR2_PACKAGE_THEXTECH		# ALL
+
+#### Steam ####
+# TODO: package/engines/steam/ doesn't exist yet -- re-enable once it's
+# committed (also re-enable the source line in the top-level Config.in).
+# config BR2_PACKAGE_REGLINUX_STEAM_SYSTEMS
+# 	bool "REG-Linux Steam support"
+#
+# 	# Steam (x86/x86_64 client + Proton) via FEX-Emu.
+# 	# Needs a 4K-page, Vulkan-class aarch64 SoC. ASAHI is excluded: its
+# 	# kernel uses 16K pages and FEX-Emu requires 4K.
+# 	select BR2_PACKAGE_STEAM		if BR2_PACKAGE_REGLINUX_VULKAN && ( \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_RK3588  || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_QCS6490 || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_SM8250  || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_SM8550  || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_SDM845  || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712 || \
+# 						   BR2_PACKAGE_SYSTEM_TARGET_MT8395 )

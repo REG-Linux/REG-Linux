@@ -1,0 +1,14 @@
+From: REG-Linux <reg@linux>
+Subject: [PATCH] rpmalloc: add RISC-V get_thread_id() using tp register
+
+--- a/core/common/rpmalloc.c
++++ b/core/common/rpmalloc.c
+@@ -812,6 +812,8 @@
+ #    else
+ 	__asm__ volatile ("mrs %0, tpidr_el0" : "=r" (tid));
+ #    endif
++#  elif defined(__riscv)
++	__asm__ volatile ("mv %0, tp" : "=r" (tid));
+ #  else
+ #    error This platform needs implementation of get_thread_id()
+ #  endif

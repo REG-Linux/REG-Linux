@@ -1,0 +1,45 @@
+From: Carlos Martins <cjom@reglinux.org>
+Subject: [PATCH] cmake: detect Linux by CMAKE_SYSTEM_NAME as well as LINUX
+
+The LINUX variable is computed once, while CMake determines the system,
+from the CMAKE_SYSTEM_NAME the toolchain file asked for. Buildroot's
+toolchain file asks for a system named "Buildroot" so that its own
+Platform/Buildroot.cmake gets picked up, and that module then does
+
+    # Impersonate a Linux system. After all, that's what we are...
+    set(CMAKE_SYSTEM_NAME Linux)
+    include(Platform/Linux)
+
+By then LINUX has already been decided and is false, so the platform
+dispatch falls through to the else branch and aborts with the (rather
+confusing) message
+
+    CMake Error at CMakeLists.txt:172 (message):
+      Unknown system Linux
+
+naming the very system it just failed to recognise.
+
+Accept either spelling, and set LINUX in that branch too: it is not only a
+dispatch flag but is exported to dosbox_config.h as a #cmakedefine, where
+it gates cdrom_ioctl_linux.cpp in its entirety, the Linux branch of
+dos_mscdex.cpp, and part of sdl_gui.cpp. Leaving it false builds and links
+fine but silently drops the host CD-ROM ioctl support.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+---
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8d6208e..a44a621 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -165,7 +165,10 @@ elseif (APPLE)
+   set(DOSBOX_PLATFORM_MACOS ON)
+   set(MACOSX ON)
+ 
+-elseif (LINUX)
++elseif (LINUX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
++  # Also normalise LINUX itself: it is exported to dosbox_config.h via
++  # #cmakedefine and gates real code (cdrom_ioctl_linux.cpp, mscdex).
++  set(LINUX ON)
+   set(DOSBOX_PLATFORM_LINUX ON)
+ 
+ else()

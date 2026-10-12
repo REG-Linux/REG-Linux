@@ -3,12 +3,30 @@
 # flycast
 #
 ################################################################################
-FLYCAST_VERSION = v2.6
+FLYCAST_VERSION = v2.7
 FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 FLYCAST_SITE_METHOD=git
 FLYCAST_GIT_SUBMODULES=YES
 FLYCAST_LICENSE = GPLv2
-FLYCAST_DEPENDENCIES = boost sdl2 libpng libzip libcurl libao libminiupnpc elfutils
+FLYCAST_LICENSE_FILES = LICENSE
+
+# Required dependencies
+# - sdl2: input, audio, windowing
+# - libzip: archive handling (USE_HOST_LIBZIP=ON)
+# - libcurl: network features (REQUIRED in CMake)
+# - alsa-lib: audio output on Linux (USE_ALSA=ON by default)
+# Optional dependencies:
+# - libpulse: PulseAudio support (not needed with PipeWire)
+# - libao: audio output abstraction
+# - libminiupnpc: UPnP networking
+# - glslang: Vulkan shader compilation (when USE_VULKAN=ON)
+# Removed:
+# - elfutils: libelf is bundled in core/deps/libelf/
+# - libpng: not directly used
+# - boost: only for profiler (disabled by default)
+# - libpulse: PipeWire provides PulseAudio compatibility
+FLYCAST_DEPENDENCIES = sdl2 libzip libcurl alsa-lib
+FLYCAST_DEPENDENCIES += libao libminiupnpc
 
 FLYCAST_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -16,6 +34,21 @@ FLYCAST_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 FLYCAST_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 FLYCAST_CONF_OPTS += -DLIBRETRO=OFF
 FLYCAST_CONF_OPTS += -DUSE_HOST_SDL=ON
+
+# Audio options (enabled by default upstream)
+# PipeWire provides PulseAudio compatibility, no need for libpulse
+FLYCAST_CONF_OPTS += -DUSE_ALSA=ON
+FLYCAST_CONF_OPTS += -DUSE_PULSEAUDIO=OFF
+
+# Use system libzip instead of bundled
+FLYCAST_CONF_OPTS += -DUSE_HOST_LIBZIP=ON
+
+# Disable optional features we don't package
+FLYCAST_CONF_OPTS += -DUSE_LIBCDIO=OFF
+FLYCAST_CONF_OPTS += -DUSE_LUA=OFF
+FLYCAST_CONF_OPTS += -DENABLE_FC_PROFILER=OFF
+FLYCAST_CONF_OPTS += -DUSE_DISCORD=OFF
+FLYCAST_CONF_OPTS += -DUSE_LIBCDIO=OFF
 
 # Musl breaks on (old) breakpad, disable it
 ifeq ($(BR2_PACKAGE_MUSL),y)
@@ -54,9 +87,6 @@ endif
 
 define FLYCAST_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/buildroot-build/flycast $(TARGET_DIR)/usr/bin/flycast
-	# evmapy files
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/flycast/*.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

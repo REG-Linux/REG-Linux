@@ -3,8 +3,8 @@
 # etlegacy
 #
 ################################################################################
-# Version: Commits on Jan 19, 2025
-ETLEGACY_VERSION = v2.83.2
+
+ETLEGACY_VERSION = v2.86.1
 ETLEGACY_SITE = https://github.com/etlegacy/etlegacy.git
 ETLEGACY_SITE_METHOD = git
 ETLEGACY_GIT_SUBMODULES = YES
@@ -75,18 +75,10 @@ endif
 
 define ETLEGACY_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/share/etlegacy
-	cp $(@D)/buildroot-build/legacy/legacy_2.83-dirty.pk3 \
+	cp $(@D)/buildroot-build/legacy/legacy_2.86-dirty.pk3 \
 	    $(TARGET_DIR)/usr/share/etlegacy
     cp $(@D)/buildroot-build/etl \
 	    $(TARGET_DIR)/usr/bin/etl
 endef
-
-define ETLEGACY_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/etlegacy/etlegacy.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
-ETLEGACY_POST_INSTALL_TARGET_HOOKS += ETLEGACY_EVMAPY
 
 $(eval $(cmake-package))

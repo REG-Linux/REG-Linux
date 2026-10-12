@@ -1,0 +1,24 @@
+################################################################################
+#
+# reglinux-amd
+#
+################################################################################
+
+REGLINUX_AMD_VERSION = 1.0
+REGLINUX_AMD_SOURCE =
+
+define REGLINUX_AMD_INSTALL_TARGET_CMDS
+	mkdir -p $(TARGET_DIR)/etc/init.d
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/gpu/reglinux-amd/S05amd-check \
+	    $(TARGET_DIR)/etc/init.d/S001amd-check
+	# List
+	mkdir -p $(TARGET_DIR)/usr/share/amd
+	install -m 0644 $(BR2_EXTERNAL_REGLINUX_PATH)/package/gpu/reglinux-amd/islands.list \
+	    $(TARGET_DIR)/usr/share/amd
+	# Modules
+	mkdir -p $(TARGET_DIR)/etc/modprobe.d
+	ln -sf /var/run/amd/modprobe/amdgpu.conf $(TARGET_DIR)/etc/modprobe.d/amdgpu.conf
+	ln -sf /var/run/amd/modprobe/radeon.conf $(TARGET_DIR)/etc/modprobe.d/radeon.conf
+endef
+
+$(eval $(generic-package))

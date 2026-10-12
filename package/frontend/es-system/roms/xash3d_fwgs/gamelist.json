@@ -1,0 +1,71 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "desc": "Classic Sci-Fi FPS",
+          "developer": "Valve",
+          "genre": "FPS",
+          "image": "./images/half-life.jpg",
+          "name": "Half-Life",
+          "players": "1",
+          "releasedate": "19981119T000000"
+        },
+        "path": "./valve.game",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "desc": "Return to the Black Mesa Research Facility as one of the military specialists assigned to eliminate Gordon Freeman. Experience an entirely new episode of single player action. Meet fierce alien opponents, and experiment with new weaponry.",
+          "developer": "Gearbox Software, Valve",
+          "genre": "FPS",
+          "image": "./images/half-life_opposing-force.jpg",
+          "name": "Half-Life: Opposing Force",
+          "players": "1",
+          "releasedate": "19991119T000000"
+        },
+        "path": "./gearbox.game",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "desc": "Return to the Black Mesa Research Facility as Barney Calhoun, the secuity guard sidekick who helped Gordon out of so many sticky situations.",
+          "developer": "Gearbox Software, Valve",
+          "genre": "FPS",
+          "image": "./images/half-life_blue-shift.jpg",
+          "name": "Half-Life: Blue Shift",
+          "players": "1",
+          "releasedate": "20010612T000000"
+        },
+        "path": "./bshift.game",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "desc": "Classic online PvP FPS",
+          "developer": "Valve",
+          "genre": "PvP multiplayer FPS",
+          "image": "./images/cstrike.jpg",
+          "name": "Counter-Strike",
+          "players": "1",
+          "releasedate": "20001109T000000"
+        },
+        "path": "./cstrike.game",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "desc": "Valve's tribute to the work of id software, DMC invites players to grab their rocket launchers and put their reflexes to the test in a collection of futuristic settings.",
+          "developer": "Valve",
+          "genre": "PvP multiplayer FPS",
+          "image": "./images/dmc.jpg",
+          "name": "Deathmatch Classic",
+          "players": "1",
+          "releasedate": "20010607T000000"
+        },
+        "path": "./dmc.game",
+        "type": "game"
+      }
+    ]
+  }
+}

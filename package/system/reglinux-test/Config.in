@@ -1,4 +1,27 @@
 config BR2_PACKAGE_REGLINUX_TEST
 	bool "reglinux-test"
+	select BR2_PACKAGE_PYTHON3
+	select BR2_PACKAGE_PYTHON_PYYAML
+	select BR2_PACKAGE_PYTHON_PILLOW
+	help
+	  System-level test + fuzz harness for REG-Linux.
+	  Validates frontend (REG-Station) lifecycle, regmsgd IPC launcher,
+	  and in-process libra runs. Black-box: only spawns existing CLIs.
 
-    select BR2_PACKAGE_PYTHON_REQUESTS
+if BR2_PACKAGE_REGLINUX_TEST
+
+config BR2_PACKAGE_REGLINUX_TEST_WL_PROBE
+	bool "build wl-probe (Wayland window enumerator)"
+	default y if BR2_PACKAGE_WAYLAND
+	depends on BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_WAYLAND_PROTOCOLS
+	help
+	  Small helper binary that enumerates Wayland toplevels via the
+	  ext_foreign_toplevel_list_v1 / zwlr_foreign_toplevel_manager_v1
+	  protocols. Required for window_exists + assert_focused probes
+	  on weston, sway, and any wlroots-based compositor.
+
+	  Disable on bare KMS targets (no compositor) to skip the
+	  wayland-protocols + host-wayland-scanner build.
+
+endif

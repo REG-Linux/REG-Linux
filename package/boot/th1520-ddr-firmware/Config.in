@@ -1,0 +1,6 @@
+config BR2_PACKAGE_TH1520_DDR_FIRMWARE
+    bool "TH1520 DDR firmware"
+    depends on BR2_PACKAGE_SYSTEM_TARGET_TH1520
+    help
+        DDR initialization firmware for the T-Head TH1520 SoC.
+        Generated from the th1520-firmware repository using Lua.

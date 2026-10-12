@@ -1,16 +1,24 @@
 ################################################################################
 #
-# KDDockWigets
+# KDDockWidgets
 #
 ################################################################################
 
-KDDOCKWIDGETS_VERSION = v2.4.0
+KDDOCKWIDGETS_VERSION = v2.4.1
 KDDOCKWIDGETS_SITE = $(call github,KDAB,KDDockWidgets,$(KDDOCKWIDGETS_VERSION))
-KDDOCKWIDGETS_DEPENDENCIES = reglinux-qt6 spdlog fmt json-for-modern-cpp
+KDDOCKWIDGETS_DEPENDENCIES = reglinux-qt6 spdlog fmt json-for-modern-cpp zstd
 KDDOCKWIDGETS_SUPPORTS_IN_SOURCE_BUILD = NO
 KDDOCKWIDGETS_INSTALL_STAGING = YES
 
 KDDOCKWIDGETS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_QT6=true
+KDDOCKWIDGETS_CONF_OPTS += -DBUILD_SHARED_LIBS=ON
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_BUILD_EXAMPLES=OFF
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_BUILD_TESTS=OFF
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_BUILD_DOCS=OFF
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_BUILD_WITH_RPATH=ON
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_X11EXTRAS=OFF
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_XLib=OFF
+KDDOCKWIDGETS_CONF_OPTS += -DKDDockWidgets_DEVELOPER_MODE=OFF
 
 $(eval $(cmake-package))

@@ -1,0 +1,106 @@
+From: ROCKNIX
+Subject: [PATCH] cfg80211: indicate a disconnect once, not once per path
+
+003 fixed the double release on the shutdown path, but the same fault is
+reachable from an ordinary userspace disconnect, with no poweroff involved.
+`nmcli device disconnect wlan1` is enough to take the board down:
+
+  Internal error: Oops: 0000000096000021 [#1] SMP
+  RTW: netdev_vir_if_close(wlan1) , bup=1
+  Workqueue: cfg80211 cfg80211_event_work
+  pc : cfg80211_unhold_bss+0x2c/0xa0
+  lr : cfg80211_wdev_release_bsses+0x38/0xc0
+  x19: 0000000000000000
+
+x19 is the BSS being released and it is NULL, because a previous release
+already cleared it.
+
+The driver tells cfg80211 about a disconnect from more than one place. A
+single `nmcli device disconnect` produces two indications, roughly a tenth
+of a second apart -- one from _rtw_disconnect() under cfg80211_rtw_disconnect(),
+and one from the netdev_close() that follows when the interface is taken
+down:
+
+  RTW: rtw_cfg80211_indicate_disconnect(wlan0) call cfg80211_disconnected, reason:0
+  RTW: netdev_close(wlan0) , bup=1
+  RTW: rtw_cfg80211_indicate_disconnect(wlan0) call cfg80211_disconnected, reason:0
+  RTW: Free disconnecting network of scanned_queue failed due to pwlan == NULL
+
+__cfg80211_disconnected() does not defend itself. It calls
+cfg80211_wdev_release_bsses() unconditionally, having only checked the
+iftype, so the second indication releases BSSes the first one already put
+and cfg80211_put_bss() faults. The pwlan == NULL line above is the driver
+noticing the same thing one layer up.
+
+So the indication has to be idempotent, and the natural test is whether
+cfg80211 still believes it is connected. wdev->connected is what
+__cfg80211_disconnected() clears, so checking it lets whichever path gets
+there first do the teardown and makes the rest no-ops.
+
+An earlier version of this patch instead set
+RTW_CFG80211_BLOCK_DISCON_WHEN_DISCONNECT so that cfg80211_rtw_disconnect()
+suppressed the indication for the duration of _rtw_disconnect(). That
+stopped the oops, but it silenced the wrong one of the two: the suppression
+is lifted before netdev_close() runs, so the surviving indication was the
+one from interface-down. That is fine when the interface does go down, but
+a plain disconnect that leaves it up produced no indication at all, and
+wdev->connected stayed set on an interface that was already down with
+NO-CARRIER. iw dev wlan0 info still printed an ssid line for it.
+
+That is not cosmetic, because nl80211_check_scan_flags() refuses a scan
+carrying NL80211_SCAN_FLAG_RANDOM_ADDR while the wdev is connected:
+
+	if (!(wiphy->features & randomness_flag) ||
+	    (wdev && wdev->connected))
+		return -EOPNOTSUPP;
+
+iwd randomizes scans when it is not associated, so every scan after such a
+disconnect came back -EOPNOTSUPP, it never got a fresh BSS list, and it
+could not associate again until it was restarted. NetworkManager reports
+that as "Secrets were required, but not provided", which points at the PSK
+and wastes a lot of time.
+
+The second hunk is unrelated to the count and was in the original patch.
+valid_links is the MLO link bitmap and is 0 for an ordinary non-MLO
+connection, which still uses links[0]. Gating the current_bss teardown on
+it means the branch never runs, so rtw_wdev_unregister() leaves current_bss
+set on a wdev that is going away -- the pre-5.19 code it replaced
+(`if (wdev->current_bss)`) had no such condition.
+
+Confirmed on a Miyoo Flip running 7.0.2: disconnect and reconnect cycles
+complete, wdev->connected clears, randomized scans are accepted again, and
+suspend/resume no longer trips the release.
+
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -1041,6 +1041,16 @@
+ 			rtw_cfg80211_connect_result(pwdev, NULL, NULL, 0, NULL, 0,
+ 				reason?reason:WLAN_STATUS_UNSPECIFIED_FAILURE,
+ 				GFP_ATOMIC);
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
++		} else if (!pwdev->connected) {
++			/* Already torn down in cfg80211. __cfg80211_disconnected()
++			 * releases the BSSes unconditionally, so a second
++			 * indication releases them again and faults in
++			 * cfg80211_put_bss(). Both an explicit disconnect and the
++			 * netdev_close that follows it land here.
++			 */
++			RTW_INFO(FUNC_ADPT_FMT" skip cfg80211_disconnected, already disconnected\n", FUNC_ADPT_ARG(padapter));
++#endif
+ 		} else {
+ 			RTW_INFO(FUNC_ADPT_FMT" call cfg80211_disconnected, reason:%d\n", FUNC_ADPT_ARG(padapter), reason);
+ 			rtw_cfg80211_disconnected(pwdev, reason, NULL, 0, locally_generated, GFP_ATOMIC);
+@@ -11180,7 +11190,12 @@
+ 
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
+ 	#if (defined(CONFIG_ACK_5_15_LTS_KERNEL) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
+-	if (wdev->valid_links && wdev->links[0].client.current_bss)
++	/* valid_links is the MLO link bitmap and stays 0 for an ordinary
++	 * connection, which link 0 is still used for. Requiring it here meant the
++	 * branch never ran and current_bss was left set on a wdev about to go
++	 * away, unlike the pre-5.19 code this replaced.
++	 */
++	if (wdev->links[0].client.current_bss)
+ 	#else
+ 	if (wdev->current_bss)
+ 	#endif

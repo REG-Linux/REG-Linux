@@ -1,0 +1,6 @@
+# Default to a Wayland session so S31regstation starts sway.
+system.rs.environment=wayland
+
+# Audio: handled by the AML-AUGESOUND UCM2 (fsoverlay .../ucm2/conf.d/AML-AUGESOUND).
+# WirePlumber auto-selects the UCM HiFi profile -> Speaker sink on hw:0,2.
+# No pro-audio / pinned pro-output sink needed.

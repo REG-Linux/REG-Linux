@@ -1,0 +1,53 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1111111..2222222 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -185,8 +185,26 @@
+ IF(OpenGL_FOUND)
+ 	SET(FTE_LIB_DEFINES ${FTE_LIB_DEFINES};GLQUAKE)
+ ELSE()
+-	MESSAGE(WARNING "opengl library NOT available. Will depend upon vulkan.")
+-	SET(FTE_LIB_DEFINES ${FTE_LIB_DEFINES};NO_OPENGL)
++	# REG-Linux: no desktop GL/GLX found -- typical of GLES-only embedded
++	# Linux mesa builds (Panfrost/freedreno/lima/etc with no GLX/OSMesa
++	# enabled, so there's no GL/gl.h in the sysroot at all). The SDL3
++	# renderer path (engine/gl/gl_vidsdl.c) never links against
++	# libGL/libGLESv2 directly -- every GL entrypoint is resolved at
++	# runtime via SDL_GL_GetProcAddress() -- so all that's actually
++	# needed at compile time is a header providing GLES2 types/constants,
++	# exactly what glquake.h's existing Android/Emscripten GLES2-only
++	# branches already use. Fall back to that instead of silently
++	# leaving the engine with no renderer at all (Vulkan headers aren't
++	# even a build dependency here, so that path isn't available either).
++	FIND_PATH(GLES2_INCLUDE_DIR GLES2/gl2.h)
++	IF(GLES2_INCLUDE_DIR)
++		MESSAGE(STATUS "desktop opengl NOT available, but GLES2 headers found -- using GLES2.")
++		INCLUDE_DIRECTORIES(${GLES2_INCLUDE_DIR})
++		SET(FTE_LIB_DEFINES ${FTE_LIB_DEFINES};GLQUAKE;FTE_GLES)
++	ELSE()
++		MESSAGE(WARNING "opengl library NOT available. Will depend upon vulkan.")
++		SET(FTE_LIB_DEFINES ${FTE_LIB_DEFINES};NO_OPENGL)
++	ENDIF()
+ ENDIF()
+ 
+ SET(FTE_DEP_JPEG true CACHE BOOL "Link against libjpeg.")
+diff --git a/engine/gl/glquake.h b/engine/gl/glquake.h
+index 1111111..2222222 100644
+--- a/engine/gl/glquake.h
++++ b/engine/gl/glquake.h
+@@ -60,6 +60,15 @@
+ 		#include <GLES2/gl2.h>
+ 		#define GLclampd GLclampf
+ 		#define GLdouble GLfloat
++	#elif defined(FTE_GLES)
++		/* REG-Linux: generic Linux target with GLES2 headers but no
++		 * desktop GL (see CMakeLists.txt -- this is only defined when
++		 * FIND_PACKAGE(OpenGL) found no desktop GL/GLX but GLES2/gl2.h
++		 * was found instead). Same GLES2-only handling as the
++		 * Android/Emscripten branches above. */
++		#include <GLES2/gl2.h>
++		#define GLclampd GLclampf
++		#define GLdouble GLfloat
+ 	#else
+ 		#ifdef _WIN32	//windows might use the standard header filename, but it still requires that we manually include windows.h first.
+ 			#if !defined(WIN32_BLOATED) && !defined(WIN32_LEAN_AND_MEAN)

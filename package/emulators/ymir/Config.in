@@ -2,6 +2,7 @@ config BR2_PACKAGE_YMIR
     bool "ymir"
     depends on BR2_PACKAGE_CLANG
     depends on BR2_PACKAGE_HAS_LIBEGL
+    depends on BR2_x86_64 || BR2_aarch64
     select BR2_PACKAGE_CEREAL
     select BR2_PACKAGE_CXXOPTS
     select BR2_PACKAGE_DATE
@@ -17,8 +18,17 @@ config BR2_PACKAGE_YMIR
     select BR2_PACKAGE_TOMLPLUSPLUS
     select BR2_PACKAGE_WAYLAND
     select BR2_PACKAGE_WAYLAND_PROTOCOLS
+    select BR2_PACKAGE_ZSTD
+    select BR2_PACKAGE_MINIZIP_ZLIB
 
     help
       A work-in-progress Sega Saturn emulator.
+
+      Features:
+      - Sega Saturn emulation with accurate timing
+      - SDL3 frontend for Wayland/X11
+      - OpenGL/Vulkan graphics backends
+      - CHD, BIN+CUE, IMG+CCD, MDF+MDS, ISO support
+      - Requires Sega Saturn IPL BIOS
 
       https://github.com/StrikerX3/Ymir

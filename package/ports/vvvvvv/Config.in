@@ -1,0 +1,10 @@
+config BR2_PACKAGE_VVVVVV
+	bool "vvvvvv"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	help
+	  VVVVVV is a puzzle platformer by Terry Cavanagh.
+	  Source code released by the author. Requires data.zip
+	  from a retail purchase (Steam/itch.io).
+
+	  https://github.com/TerryCavanagh/VVVVVV

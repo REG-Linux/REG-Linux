@@ -1,0 +1,23 @@
+config BR2_PACKAGE_MALI_RK3576
+	bool "mali-rk3576"
+	depends on BR2_aarch64
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	select BR2_PACKAGE_HAS_LIBEGL
+	select BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_HAS_LIBGBM
+	help
+	  Install userspace Rockchip Mali Bifrost G52 MC3 (g24p0)
+	  libraries for RK3576 (Anbernic RG Vita Pro).
+
+if BR2_PACKAGE_MALI_RK3576
+
+config BR2_PACKAGE_PROVIDES_LIBEGL
+	default "mali-rk3576"
+
+config BR2_PACKAGE_PROVIDES_LIBGLES
+	default "mali-rk3576"
+
+config BR2_PACKAGE_PROVIDES_LIBGBM
+	default "mali-rk3576"
+
+endif

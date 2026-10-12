@@ -1,0 +1,15 @@
+--- a/src/common/settings.h	2026-01-08 12:35:03.037751185 +0100
++++ b/src/common/settings.h	2026-01-08 12:36:07.948483961 +0100
+@@ -54,6 +54,12 @@
+     PortraitOriginal
+ };
+ 
++// X11 defines `None` as a macro (0L). This breaks enums using `None` as an identifier.
++// SDL_syswm.h may include Xlib.h, so protect ourselves here.
++#ifdef None
++#undef None
++#endif
++
+ enum class SecondaryDisplayLayout : u32 { None, TopScreenOnly, BottomScreenOnly, SideBySide };
+ /** Defines where the small screen will appear relative to the large screen
+  * when in Large Screen mode

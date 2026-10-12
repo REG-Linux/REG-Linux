@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-WSDD_NATIVE_VERSION = 1.22
-WSDD_NATIVE_SITE = $(call github,gershnik,wsdd-native,v$(WSDD_NATIVE_VERSION))
+WSDD_NATIVE_VERSION = v1.27
+WSDD_NATIVE_SITE = $(call github,gershnik,wsdd-native,$(WSDD_NATIVE_VERSION))
 WSDD_NATIVE_LICENSE = BSD
 
 WSDD_NATIVE_DEPENDENCIES += host-libxml2 libxml2
-WSDD_NATIVE_CONF_OPTS += -DWSDDN_PREFER_SYSTEM=ON -DWSDDN_WITH_SYSTEMD="no" -DCMAKE_BUILD_TYPE=Release
+WSDD_NATIVE_CONF_OPTS += -DWSDDN_PREFER_SYSTEM_LIBXML2=ON -DWSDDN_WITH_SYSTEMD="no" -DCMAKE_BUILD_TYPE=Release
 
 define WSDD_NATIVE_INSTALL_TARGET_CMDS
         $(INSTALL) -Dm755 $(@D)/wsddn $(TARGET_DIR)/usr/bin/wsdd

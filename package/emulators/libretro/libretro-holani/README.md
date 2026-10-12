@@ -1,9 +1,5 @@
-# Libretro Holani
+# libretro-holani
 
-The `libretro-holani` core merges the Rust-based SH/SCS emulation stack into REG-Linux, requiring Rust/LLVM tooling for build.
+Atari Lynx libretro core (Holani). Upstream: https://github.com/lleny/holani-retro
 
-## Build notes
-
-- `Version`: 0.9.6-1
-- `Dependencies`: `BR2_PACKAGE_HOST_RUSTC`, `BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS`, `BR2_PACKAGE_LLVM`, `BR2_PACKAGE_CLANG`
-- `Build helper`: Custom build (see mk)
+Uses `cargo-package`; requires `host-rustc`, `clang`, and `llvm`. `BINDGEN_EXTRA_CLANG_ARGS` and `LIBCLANG_PATH` are set explicitly to point bindgen at the host clang headers.

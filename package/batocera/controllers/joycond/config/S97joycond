@@ -19,7 +19,7 @@
 # A new input device will be created called "Nintendo Switch Combined Joy-Cons".
 
 # Note: When using a virtual combined controller, Batocera will see three controllers (Left, Right & Virtual)
-#       You may need to manually assign the controller number in EmulationStation for emulator compatibility.
+#       You may need to manually assign the controller number in REG-Station for emulator compatibility.
 
 if test "$1" = "start"
 then

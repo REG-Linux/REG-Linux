@@ -1,10 +1,5 @@
-# Libretro Genesis Plus GX
+# libretro-genesisplusgx
 
-The `libretro-genesisplusgx` core maintains REG-Linux’s Sega 8/16-bit compatibility layer on ARM with the upstream Genesis Plus GX renderer.
+Sega 8/16-bit libretro core (Genesis Plus GX). Upstream: https://github.com/ekeeke/Genesis-Plus-GX
 
-## Build notes
-
-- `Version`: eca60fff0d097150e0d8ec3a160543ca2c31a74a
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
-- `Extras`: applies `000-makefile-additions.patch`
+Platform string maps Cortex-A7 to `rpi2`, Cortex-A53 to `rpi3_64`, and Cortex-A72 to `rpi4`.

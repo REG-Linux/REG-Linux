@@ -1,0 +1,23 @@
+--- a/build.rs
++++ b/build.rs
+@@ -153,11 +153,6 @@
+         println!("cargo:rustc-link-lib=static=clang_rt.osx");
+     }
+ 
+-    volk_build.flag("-flto=thin");
+-    rdp_build.flag("-flto=thin");
+-    simd_build.flag("-flto=thin");
+-    retroachievements_build.flag("-flto=thin");
+-
+     volk_build.compile("volk");
+     rdp_build.compile("parallel-rdp");
+     retroachievements_build.compile("retroachievements");
+@@ -297,7 +292,7 @@
+             String::from_utf8(git_output.stdout).unwrap()
+         )
+     } else {
+-        panic!("Failed to get git describe");
++        format!("v{}", env!("CARGO_PKG_VERSION"))
+     };
+     println!("cargo:rustc-env=GIT_DESCRIBE={git_describe}");
+ 

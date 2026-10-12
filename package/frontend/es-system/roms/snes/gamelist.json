@@ -1,0 +1,47 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Dottie Flowers (v1.1)-box.png",
+          "desc": "A charming platformer game created as a tribute to the fantastic SNES community and an homage to the German 16-bit video game developers of the early nineties. In this game, players step into the shoes - or rather, fly on the broom - of a witch named Dottie Flowers. Dottie has the critical task of saving her city using her magical powers and trusty broom.",
+          "developer": "Goldlocke",
+          "genre": "Platformer",
+          "image": "./images/Dottie Flowers (v1.1)-image.png",
+          "lang": "en",
+          "marquee": "./images/Dottie Flowers (v1.1)-marquee.png",
+          "name": "Dottie Flowers",
+          "players": "1",
+          "publisher": "https://goldlocke.itch.io/dottie-flowers",
+          "releasedate": "20231231T000000",
+          "thumbnail": "./images/Dottie Flowers (v1.1)-thumb.png",
+          "video": "./videos/Dottie Flowers (v1.1)-video.mp4",
+          "wheel": "./images/Dottie Flowers (v1.1)-wheel.png"
+        },
+        "path": "./Dottie Flowers (v1.1).sfc",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "boxart": "./images/Super Boss Gaiden (v1.2)-box.png",
+          "desc": "Humorous beat'em up game, where the fictional President of a video game company gets angry when his executives deliver the news that the last remaining prototype has fallen into the hands of the general public and has been emulated. Being a very hands-on executive, instead of calmly discussing the situation and planning out the proper legal counter action, the titular Boss takes on employees and resources with both fists and feet.",
+          "developer": "Dieter von Laser; Chrono Moogle",
+          "genre": "Beat'em up",
+          "image": "./images/Super Boss Gaiden (v1.2)-image.png",
+          "lang": "en",
+          "manual": "./manuals/Super Boss Gaiden (v1.2)-manual.pdf",
+          "marquee": "./images/Super Boss Gaiden (v1.2)-marquee.png",
+          "name": "Super Boss Gaiden",
+          "players": "1",
+          "publisher": "https://superbossgaiden.superfamicom.org/",
+          "releasedate": "20180812T000000",
+          "thumbnail": "./images/Super Boss Gaiden (v1.2)-thumb.png",
+          "video": "./videos/Super Boss Gaiden (v1.2)-video.mp4",
+          "wheel": "./images/Super Boss Gaiden (v1.2)-wheel.png"
+        },
+        "path": "./Super Boss Gaiden (v1.2).sfc",
+        "type": "game"
+      }
+    ]
+  }
+}

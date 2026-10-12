@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Starts LED driver for handheld devices
+#
+
+PROCESS="/usr/bin/reglinux-led-handheld"
+PID="/var/run/led-handheld.pid"
+
+# Exit if device not supported
+$PROCESS detect >/dev/null 2>&1 || exit 0
+
+start() {
+	printf "Starting LED handheld daemon: "
+	start-stop-daemon -S -b -q -m -p "$PID" --exec $PROCESS -- start
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+stop() {
+	printf "Stopping LED handheld daemon: "
+	start-stop-daemon -K -q -p "$PID" 2>/dev/null
+	rm -f "$PID"
+	$PROCESS stop 2>/dev/null
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

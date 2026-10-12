@@ -3,8 +3,8 @@
 # TYRIAN
 #
 ################################################################################
-# Version: Commits from Nov 23, 2022
-TYRIAN_VERSION = v2.1.20221123
+# Version: Release from Sep 13, 2026
+TYRIAN_VERSION = v2.1.20260913
 TYRIAN_SITE = $(call github,opentyrian,opentyrian,$(TYRIAN_VERSION))
 
 TYRIAN_DEPENDENCIES = sdl2 sdl2_net
@@ -23,9 +23,6 @@ endef
 
 define TYRIAN_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/opentyrian $(TARGET_DIR)/usr/bin/
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/tyrian/tyrian.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(generic-package))

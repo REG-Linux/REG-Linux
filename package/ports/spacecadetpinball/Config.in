@@ -1,0 +1,10 @@
+config BR2_PACKAGE_SPACECADETPINBALL
+	bool "spacecadetpinball"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	help
+	  Reverse-engineered Space Cadet Pinball from Windows.
+	  Requires original game data files from Windows 95/XP.
+
+	  https://github.com/k4zmu2a/SpaceCadetPinball

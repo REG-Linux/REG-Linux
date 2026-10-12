@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-OPENMW_VERSION = openmw-0.50.0
+OPENMW_VERSION = openmw-0.51.0
 OPENMW_SITE = https://github.com/OpenMW/openmw
 OPENMW_SITE_METHOD = git
 OPENMW_DEPENDENCIES = libgl lz4 yaml-cpp bullet ffmpeg openal sqlite
 OPENMW_DEPENDENCIES += sdl2 librsvg boost fontconfig freetype cairo
-OPENMW_DEPENDENCIES += lua
+OPENMW_DEPENDENCIES += lua icu
 #OPENMW_DEPENDENCIES += reglinux-luajit
 
 OPENMW_SUPPORTS_IN_SOURCE_BUILD = NO

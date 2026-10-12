@@ -1,4 +1,0 @@
-config BR2_PACKAGE_BATOCERA_RETROACHIEVEMENTS_SOUNDS
-        bool "batocera retroachievements sounds"
-        help
-          Play a sound when a retroachievement is unlocked

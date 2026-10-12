@@ -4,11 +4,15 @@
 #
 ################################################################################
 
-LIBRETRO_PPSSPP_VERSION = v1.19.3
+LIBRETRO_PPSSPP_VERSION = v1.20.4
 LIBRETRO_PPSSPP_SITE = https://github.com/hrydgard/ppsspp.git
 LIBRETRO_PPSSPP_SITE_METHOD=git
 LIBRETRO_PPSSPP_GIT_SUBMODULES=YES
 LIBRETRO_PPSSPP_LICENSE = GPLv2
+LIBRETRO_PPSSPP_LICENSE_FILES = LICENSE.txt
+
+# Note: libretro build uses bundled dependencies (libzip, zlib, etc.)
+# Only external dependency is libgl/libgles for graphics
 
 LIBRETRO_PPSSPP_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 LIBRETRO_PPSSPP_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF

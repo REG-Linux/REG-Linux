@@ -1,9 +1,5 @@
-# Libretro ClownMDEmu
+# libretro-clownmdemu
 
-The `libretro-clownmdemu` core provides Sega Mega Drive (Genesis) emulation under REG-Linux’s libretro pipeline.
+Sega Mega Drive libretro core (ClownMDEmu). Upstream: https://github.com/Clownacy/clownmdemu-libretro
 
-## Build notes
-
-- `Version`: v1.5
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: CMake-based (`cmake-package`)
+Uses cmake-package (unlike most Makefile-based libretro cores).

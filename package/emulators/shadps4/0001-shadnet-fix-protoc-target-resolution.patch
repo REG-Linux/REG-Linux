@@ -1,0 +1,36 @@
+From: REG-Linux <romain.tisserand@gmail.com>
+Subject: [PATCH] shadnet: fix protoc target resolution with Makefiles generator
+
+With the CMake "Unix Makefiles" generator, add_custom_command's bare
+"COMMAND protobuf::protoc" fails to resolve to the actual executable
+path for the shadnet_proto_gen/shadnet.pb.cc generation step: the
+literal string "protobuf::protoc" ends up in build.make instead of
+the resolved binary path, and make fails with:
+
+  make[3]: protobuf::protoc: No such file or directory
+  make[3]: *** [CMakeFiles/shadps4.dir/build.make:74: shadnet_proto_gen/shadnet.pb.cc] Error 127
+
+even though the bundled externals/protobuf protoc target builds fine.
+
+Use the $<TARGET_FILE:...> generator expression to force explicit
+path resolution, and add protobuf::protoc to DEPENDS so the target
+dependency is never left implicit.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1214,12 +1214,13 @@
+     OUTPUT
+         "${SHADNET_PROTO_OUT}/shadnet.pb.cc"
+         "${SHADNET_PROTO_OUT}/shadnet.pb.h"
+-    COMMAND protobuf::protoc
++    COMMAND $<TARGET_FILE:protobuf::protoc>
+         "--proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/shadnet"
+         "--cpp_out=${SHADNET_PROTO_OUT}"
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shadnet/shadnet.proto"
+     DEPENDS
+         "${CMAKE_CURRENT_SOURCE_DIR}/src/shadnet/shadnet.proto"
++        protobuf::protoc
+     COMMENT "Generating shadnet protobuf sources"
+     VERBATIM
+ )

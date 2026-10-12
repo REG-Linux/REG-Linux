@@ -1,0 +1,8 @@
+config BR2_PACKAGE_LIBMIKMOD
+	bool "libmikmod"
+	help
+	  Libmikmod is a portable sound library capable of playing samples as
+	  well as module files. It supports many module formats including MOD,
+	  S3M, XM, and IT.
+
+	  https://github.com/sezero/mikmod

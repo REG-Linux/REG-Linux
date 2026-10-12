@@ -25,12 +25,4 @@ define BIGPEMU_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/* $(TARGET_DIR)/usr/bigpemu/
 endef
 
-define BIGPEMU_EVMAP
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/bigpemu/evmapy/* \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-BIGPEMU_POST_INSTALL_TARGET_HOOKS = BIGPEMU_EVMAP
-
 $(eval $(generic-package))

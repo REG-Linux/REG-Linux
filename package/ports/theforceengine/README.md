@@ -1,9 +1,5 @@
-# TheForceEngine (Dark Forces)
+# TheForceEngine
 
-Modernized Jedi engine that supports Dark Forces and mods.
+Jedi Engine (Dark Forces) reimplementation. Upstream: https://github.com/luciusDXL/TheForceEngine
 
-## Build notes
-- **Version:** v1.22.420 release with the `df_patch4` extra content.
-- **Config:** selects SDL2, SDL2_image, GL/libs, and optionally RtMidi when available; musl toolchains add `libexecinfo`.
-- **Build system:** CMake release build that enables the script engine, downloads the patch zip into `reglinux/datainit`, and copies the `theforceengine.keys` into `/usr/share/evmapy`.
-- **Extras:** copies documentation assets, fonts, shaders, soundfonts, and mods into `/usr/share/reglinux/datainit/system/configs/theforceengine/` during install.
+The `df_patch4` zip is downloaded separately and placed in the Mods directory at install time. All UI assets (shaders, fonts, soundfonts, mods) install to `/usr/share/reglinux/datainit/system/configs/theforceengine/`. RtMidi for system MIDI is optional. Adds `libexecinfo` on musl.

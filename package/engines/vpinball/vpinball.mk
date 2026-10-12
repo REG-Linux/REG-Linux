@@ -70,15 +70,7 @@ define VPINBALL_INSTALL_TARGET_CMDS
     cp -R $(@D)/buildroot-build/shader10.8.0 $(TARGET_DIR)/usr/bin/vpinball/
 endef
 
-define VPINBALL_EVMAPY
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/vpinball/vpinball.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
-endef
-
 VPINBALL_PRE_CONFIGURE_HOOKS += VPINBALL_CUSTOM_CMAKE
-
 VPINBALL_POST_EXTRACT_HOOKS += VPINBALL_FIX_LINE_ENDINGS
-VPINBALL_POST_INSTALL_TARGET_HOOKS += VPINBALL_EVMAPY
 
 $(eval $(cmake-package))

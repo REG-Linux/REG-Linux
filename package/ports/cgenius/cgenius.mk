@@ -4,10 +4,14 @@
 #
 ################################################################################
 
-CGENIUS_VERSION = v3.6.1
-CGENIUS_SITE = $(call github,gerstrong,Commander-Genius,$(CGENIUS_VERSION))
-CGENIUS_CONF_LICENSE = GPL-2.0
-CGENIUS_CONF_LICENSE_FILES = LICENSE
+CGENIUS_VERSION = v3.6.4
+CGENIUS_SITE = https://github.com/gerstrong/Commander-Genius.git
+CGENIUS_SITE_METHOD = git
+# The Cosmos engine is a submodule (src/engine/cosmos, Dringgstein/cosmos
+# "testing" branch), fetched at the commit this release pins
+CGENIUS_GIT_SUBMODULES = YES
+CGENIUS_LICENSE = GPL-2.0
+CGENIUS_LICENSE_FILES = LICENSE
 CGENIUS_DEPENDENCIES += sdl2 sdl2_mixer sdl2_image sdl2_ttf
 CGENIUS_DEPENDENCIES += boost libcurl host-xxd python3-configobj
 
@@ -27,22 +31,5 @@ CGENIUS_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 
 # compile the cosmos engine too
 CGENIUS_CONF_OPTS += -DBUILD_COSMOS=1
-
-define CGENIUS_GET_COSMOS
-    cd $(@D); \
-        git clone https://gitlab.com/Dringgstein/cosmos.git src/engine/cosmos; \
-        cd src/engine/cosmos; \
-        git checkout d25d1923656341bda6a40a76769eb699a67816d5; \
-        cd ../../..
-endef
-
-define CGENIUS_POST_PROCESS
-        mkdir -p $(TARGET_DIR)/usr/share/evmapy
-        cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cgenius/cgenius.cgenius.keys \
-        $(TARGET_DIR)/usr/share/evmapy
-endef
-
-CGENIUS_POST_EXTRACT_HOOKS += CGENIUS_GET_COSMOS
-CGENIUS_POST_INSTALL_TARGET_HOOKS += CGENIUS_POST_PROCESS
 
 $(eval $(cmake-package))

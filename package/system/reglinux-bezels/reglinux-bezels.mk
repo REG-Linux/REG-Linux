@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_BEZELS_VERSION = cd66547a3bfef579c5e93a78e156b962adf87b4f
+REGLINUX_BEZELS_VERSION = 1caf673120f990ed50b7d21dcf83f12cc6a32e49
 REGLINUX_BEZELS_SITE = $(call github,REG-Linux,REG-bezel,$(REGLINUX_BEZELS_VERSION))
 
 define REGLINUX_BEZELS_INSTALL_TARGET_CMDS

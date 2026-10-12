@@ -1,0 +1,34 @@
+################################################################################
+#
+# libretro-uzem
+#
+################################################################################
+# Version: Commits on Aug 23, 2026
+LIBRETRO_UZEM_VERSION = d991ee94547c8294abc1c4cb73d63116aa58b5bc
+LIBRETRO_UZEM_SITE = $(call github,libretro,libretro-uzem,$(LIBRETRO_UZEM_VERSION))
+LIBRETRO_UZEM_LICENSE = MIT
+
+LIBRETRO_UZEM_PLATFORM = $(LIBRETRO_PLATFORM)
+
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835),y)
+LIBRETRO_UZEM_PLATFORM = rpi1
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
+LIBRETRO_UZEM_PLATFORM = rpi2
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)
+LIBRETRO_UZEM_PLATFORM = rpi3_64
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
+LIBRETRO_UZEM_PLATFORM = rpi4
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
+LIBRETRO_UZEM_PLATFORM = rpi5
+endif
+
+define LIBRETRO_UZEM_BUILD_CMDS
+	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/ -f Makefile.libretro platform="$(LIBRETRO_UZEM_PLATFORM)"
+endef
+
+define LIBRETRO_UZEM_INSTALL_TARGET_CMDS
+	$(INSTALL) -D $(@D)/uzem_libretro.so \
+		$(TARGET_DIR)/usr/lib/libretro/uzem_libretro.so
+endef
+
+$(eval $(generic-package))

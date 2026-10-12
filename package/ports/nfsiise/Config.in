@@ -1,0 +1,12 @@
+config BR2_PACKAGE_NFSIISE
+	bool "nfsiise"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_SDL2
+	help
+	  Reimplementation of Need for Speed II Special Edition.
+	  Uses C++ translation on non-x86 architectures.
+	  Requires original game data files.
+
+	  https://github.com/zaps166/NFSIISE

@@ -1,0 +1,46 @@
+{
+  "gameList": {
+    "entries": [
+      {
+        "metadata": {
+          "boxart": "./images/Relentless64-box.png",
+          "desc": "Similar to the original, Relentless 64 is a high speed, non-stop score-chasing shmup with some neat score chaining mechanics. The enemy waves come at you thick and fast, and taking out an entire wave rewards you with an increasing score multipler, resetting back to 1x should you miss a ship or crash.",
+          "developer": "RGCD.DEV",
+          "genre": "Shooter",
+          "image": "./images/Relentless64-image.png",
+          "lang": "en",
+          "marquee": "./images/Relentless64-marquee.png",
+          "name": "Relentless 64",
+          "players": "1",
+          "publisher": "https://rgcddev.itch.io/relentless-64",
+          "releasedate": "20190601T000000",
+          "thumbnail": "./images/Relentless64-thumb.png",
+          "video": "./videos/Relentless64-video.mp4",
+          "wheel": "./images/Relentless64-wheel.png"
+        },
+        "path": "./Relentless64.d64",
+        "type": "game"
+      },
+      {
+        "metadata": {
+          "boxart": "./images/Showdown-box.png",
+          "desc": "A game is inspired by a host of older titles with the same theme, going all the way back to Gun Fight from 1975. You play a cowboy out to win a fierce gun duel. The first one to outwit and knock down the opponent 5 times is the winner of the duel.\n\nInstructions:\nEach gun can carry 5 bullets. You reload by manually replacing the bullets with a click of the joystick button, or you can pick up bullet packs from the ground. But beware! If your opponent catches you out of the safety of the cacti, then you might get knocked down!\nExplosive crates appear around the play area. They explode when shot, so better stay away from them if you value you life, cowboy!",
+          "developer": "Badgerpunch Games; Henning Ludvigsen",
+          "genre": "Shooter",
+          "image": "./images/Showdown-image.png",
+          "lang": "en",
+          "marquee": "./images/Showdown-marquee.png",
+          "name": "Showdown",
+          "players": "1-2",
+          "publisher": "https://www.badgerpunch.com/title/showdown/",
+          "releasedate": "20201106T000000",
+          "thumbnail": "./images/Showdown-thumb.png",
+          "video": "./videos/Showdown-video.mp4",
+          "wheel": "./images/Showdown-wheel.png"
+        },
+        "path": "./Showdown.d64",
+        "type": "game"
+      }
+    ]
+  }
+}

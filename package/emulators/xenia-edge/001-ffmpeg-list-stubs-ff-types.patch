@@ -1,0 +1,70 @@
+Use the FF* internal types in the pre-generated FFmpeg list stubs
+
+xenia-canary hand-writes the files that FFmpeg's build system would normally
+generate (third_party/ffmpeg-xenia/lib*/*_list.c), and they still declare
+their arrays with the public AVCodec / AVBitStreamFilter / AVCodecParser /
+AVInputFormat / AVOutputFormat types. The pinned FFmpeg submodule is
+libavcodec 62, where those tables have long held the internal FFCodec,
+FFBitStreamFilter, FFCodecParser, FFInputFormat and FFOutputFormat types
+instead, and the extern declarations right above each #include say so:
+
+    libavcodec/allcodecs.c:509:  extern const FFCodec ff_mp3float_decoder;
+    libavformat/allformats.c:83: extern const FFInputFormat ff_asf_demuxer;
+
+Each FF* struct starts with its AV* counterpart as member `p`, so the pointer
+values are identical and the mismatch was harmless at runtime -- it merely
+raised -Wincompatible-pointer-types, which the build silences with -w.
+
+Clang 21 promoted -Wincompatible-pointer-types from a warning to an error by
+default, so with LLVM 22 the build now fails:
+
+    ../third_party/ffmpeg-xenia/libavcodec/codec_list.c:2:5: error:
+      incompatible pointer types initializing 'const AVCodec *const' with an
+      expression of type 'const FFCodec *' [-Wincompatible-pointer-types]
+
+Declare the arrays with the types FFmpeg actually uses. protocol_list.c needs
+no change: url_protocols[] is still URLProtocol upstream.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+
+diff --git a/third_party/ffmpeg-xenia/libavcodec/codec_list.c b/third_party/ffmpeg-xenia/libavcodec/codec_list.c
+--- a/third_party/ffmpeg-xenia/libavcodec/codec_list.c
++++ b/third_party/ffmpeg-xenia/libavcodec/codec_list.c
+@@ -1,4 +1,4 @@
+-static const AVCodec * const codec_list[] = {
++static const FFCodec * const codec_list[] = {
+     &ff_mp3float_decoder,
+     &ff_mp3_decoder,
+     &ff_wmapro_decoder,
+diff --git a/third_party/ffmpeg-xenia/libavcodec/bsf_list.c b/third_party/ffmpeg-xenia/libavcodec/bsf_list.c
+--- a/third_party/ffmpeg-xenia/libavcodec/bsf_list.c
++++ b/third_party/ffmpeg-xenia/libavcodec/bsf_list.c
+@@ -1,3 +1,3 @@
+-static const AVBitStreamFilter * const bitstream_filters[] = {
++static const FFBitStreamFilter * const bitstream_filters[] = {
+     &ff_null_bsf,
+     NULL };
+diff --git a/third_party/ffmpeg-xenia/libavcodec/parser_list.c b/third_party/ffmpeg-xenia/libavcodec/parser_list.c
+--- a/third_party/ffmpeg-xenia/libavcodec/parser_list.c
++++ b/third_party/ffmpeg-xenia/libavcodec/parser_list.c
+@@ -1,3 +1,3 @@
+-static const AVCodecParser * const parser_list[] = {
++static const FFCodecParser * const parser_list[] = {
+     &ff_mpegaudio_parser,
+     NULL };
+diff --git a/third_party/ffmpeg-xenia/libavformat/demuxer_list.c b/third_party/ffmpeg-xenia/libavformat/demuxer_list.c
+--- a/third_party/ffmpeg-xenia/libavformat/demuxer_list.c
++++ b/third_party/ffmpeg-xenia/libavformat/demuxer_list.c
+@@ -1,4 +1,4 @@
+-static const AVInputFormat * const demuxer_list[] = {
++static const FFInputFormat * const demuxer_list[] = {
+     &ff_asf_demuxer,
+     &ff_mp3_demuxer,
+     NULL };
+diff --git a/third_party/ffmpeg-xenia/libavformat/muxer_list.c b/third_party/ffmpeg-xenia/libavformat/muxer_list.c
+--- a/third_party/ffmpeg-xenia/libavformat/muxer_list.c
++++ b/third_party/ffmpeg-xenia/libavformat/muxer_list.c
+@@ -1,2 +1,2 @@
+-static const AVOutputFormat * const muxer_list[] = {
++static const FFOutputFormat * const muxer_list[] = {
+     NULL };

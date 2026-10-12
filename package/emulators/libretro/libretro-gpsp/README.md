@@ -1,9 +1,5 @@
-# Libretro GPsp
+# libretro-gpsp
 
-The `libretro-gpsp` core runs the Game Boy Advance emulator within REG-Linux’s libretro ecosystem, supporting both libstdc++ build paths for ARM hosts.
+Game Boy Advance libretro core (gpSP). Upstream: https://github.com/libretro/gpsp
 
-## Build notes
-
-- `Version`: a545aafaf4e654a488f4588f4f302d8413a58066
-- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
-- `Build helper`: Generic/Makefile (`generic-package`)
+Platform defaults to `unix`; RPi1 maps to `rpi1`, JZ4770 to `jz4770`, and Cortex-A7 to `classic_armv7_a7`.

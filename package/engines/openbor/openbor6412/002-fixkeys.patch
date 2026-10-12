@@ -329,7 +329,7 @@ index a820fef..e313f06 100644
 +#if !WIN
 +	// FCA
 +	strcpy(savesDir, "/userdata/saves/openbor");
-+	strcpy(logsDir, "/userdata/system/configs/openbor/Logs");
++	strcpy(logsDir, "/var/log/openbor");
 +	strcpy(screenShotsDir, "/userdata/screenshots");
 +#endif
 +
@@ -364,10 +364,10 @@ index 8a0dcfc..f8fc940 100644
 -#define OPEN_LOGFILE(type)   type ? fopen("./Logs/OpenBorLog.txt", "wt") : fopen("./Logs/ScriptLog.txt", "wt")
 -#define APPEND_LOGFILE(type) type ? fopen("./Logs/OpenBorLog.txt", "at") : fopen("./Logs/ScriptLog.txt", "at")
 -#define READ_LOGFILE(type)   type ? fopen("./Logs/OpenBorLog.txt", "rt") : fopen("./Logs/ScriptLog.txt", "rt")
-+#define CHECK_LOGFILE(type)  type ? fileExists("/userdata/system/configs/openbor/Logs/OpenBorLog.txt") : fileExists("/userdata/system/configs/openbor/Logs/ScriptLog.txt")
-+#define OPEN_LOGFILE(type)   type ? fopen("/userdata/system/configs/openbor/Logs/OpenBorLog.txt", "wt") : fopen("/userdata/system/configs/openbor/Logs/ScriptLog.txt", "wt")
-+#define APPEND_LOGFILE(type) type ? fopen("/userdata/system/configs/openbor/Logs/OpenBorLog.txt", "at") : fopen("/userdata/system/configs/openbor/Logs/ScriptLog.txt", "at")
-+#define READ_LOGFILE(type)   type ? fopen("/userdata/system/configs/openbor/Logs/OpenBorLog.txt", "rt") : fopen("/userdata/system/configs/openbor/Logs/ScriptLog.txt", "rt")
++#define CHECK_LOGFILE(type)  type ? fileExists("/var/log/openbor/OpenBorLog.txt") : fileExists("/var/log/openbor/ScriptLog.txt")
++#define OPEN_LOGFILE(type)   type ? fopen("/var/log/openbor/OpenBorLog.txt", "wt") : fopen("/var/log/openbor/ScriptLog.txt", "wt")
++#define APPEND_LOGFILE(type) type ? fopen("/var/log/openbor/OpenBorLog.txt", "at") : fopen("/var/log/openbor/ScriptLog.txt", "at")
++#define READ_LOGFILE(type)   type ? fopen("/var/log/openbor/OpenBorLog.txt", "rt") : fopen("/var/log/openbor/ScriptLog.txt", "rt")
  #define COPY_ROOT_PATH(buf, name) strcpy(buf, "./"); strcat(buf, name); strcat(buf, "/");
  #define COPY_PAKS_PATH(buf, name) strcpy(buf, "./Paks/"); strcat(buf, name);
  #endif

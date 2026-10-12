@@ -1,0 +1,9 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: gbm
+Description: Mali Bifrost G52 GBM library
+Version: 21.0
+Libs: -L${libdir} -lgbm
+Cflags: -I${includedir}

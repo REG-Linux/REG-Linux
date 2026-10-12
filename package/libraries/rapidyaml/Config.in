@@ -1,0 +1,9 @@
+config BR2_PACKAGE_RAPIDYAML
+	bool "rapidyaml"
+
+	help
+	  Rapid YAML (ryml) is a library to parse and emit YAML,
+	  aimed at speed and low memory footprint. It is written
+	  in C++.
+
+	  https://github.com/biojppm/rapidyaml

@@ -1,0 +1,36 @@
+Reset first_run in retro_unload_game so emulation restarts on relaunch.
+
+retro_run() starts the emulator only `if (first_run)`, and first_run is
+reset to true only by retro_init()/retro_deinit(). Frontends that keep the
+core loaded across games and drive relaunch with retro_unload_game() +
+retro_load_game() (no deinit/init) — e.g. REG-Station's in-process Libra
+player — therefore leave first_run == false after the first game, so
+emu.start() is never called on the second game: only the (frontend-drawn)
+bezel appears, with no audio or video.
+
+Reset first_run in retro_unload_game(). Harmless under RetroArch, which
+closes the core the normal way and so already gets this from retro_deinit().
+
+Anchored on the retro_unload_game() function header rather than on
+`emu.unloadGame();` alone: that call appears in retro_reset() too, a few
+lines above an equally plausible run of context, and an earlier version of
+this patch applied cleanly there instead — leaving the real relaunch path
+untouched and the bug fully intact (verified on hardware: every flycast game
+after the first showed bezel only, no audio, no video, while the core's own
+log was byte-identical to the working first launch).
+
+--- a/shell/libretro/libretro.cpp
++++ b/shell/libretro/libretro.cpp
+@@ -2437,6 +2437,12 @@
+ void retro_unload_game()
+ {
+ 	INFO_LOG(COMMON, "Flycast unloading game");
++
++	// REG-Linux: reset first_run so the next retro_run() calls emu.start()
++	// again. Libra keeps the core loaded across games (no retro_deinit/init),
++	// and emu.start() is gated on first_run — only retro_init/deinit reset it.
++	first_run = true;
++
+ 	emu.unloadGame();
+ 	dreampotato::term();
+ 	game_data.clear();

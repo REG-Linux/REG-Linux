@@ -1,0 +1,19 @@
+# Anbernic RG DS default values
+
+# Default audio device
+audio.device=alsa_output._sys_devices_platform_sound_sound_card0.HiFi__Speaker__sink
+
+# Suspend on handheld boards
+system.suspendmode=suspend 
+
+# Shutdown delay for suspend
+system.shutdowndelay=1
+
+# Sway: stacks both panels so DraStic can span them
+system.rs.environment=wayland
+
+# melonDS: top and bottom screens in separate windows, one per panel
+nds.melonds_dual_screen=1
+
+# Bottom (touch) panel by default; dual-screen emulators use both
+global.videooutput=DSI-1

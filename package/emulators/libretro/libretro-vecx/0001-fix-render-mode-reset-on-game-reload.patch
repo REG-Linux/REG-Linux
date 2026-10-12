@@ -1,0 +1,70 @@
+Fix: re-resolve vecx_use_hw (and every other check_variables() option)
+when a new ROM is loaded into an already-running core instance.
+
+retro_load_game() decides which rendering context to (re-)request purely
+from the CURRENT value of the static `usingHWContext` — it never consults
+the vecx_use_hw core option itself. That option is only actually read by
+check_variables(), which otherwise runs just twice: once from retro_init()
+(process start) and from retro_run()'s GET_VARIABLE_UPDATE poll during
+gameplay.
+
+On a frontend that re-executes its process per game launch (e.g. running
+retroarch -L core.so rom as a fresh process each time), this is harmless:
+retro_init() always runs first, so usingHWContext always starts at its
+compiled default before retro_load_game() ever reads it.
+
+On a frontend that keeps one core instance loaded across multiple ROMs in
+the same process (REG-Station/Libra's "in-process" launcher, and likely
+any other embedding frontend that avoids the overhead of re-executing/
+re-dlopen'ing per launch) — retro_set_environment()/retro_init() are
+deliberately skipped on reuse, since re-running retro_init() crashes or
+corrupts some stateful cores (e.g. FBNeo). retro_load_game() is NOT
+skipped — it runs fresh for every launch, exactly per the libretro
+convention that it alone is responsible for resetting per-content state.
+vecx's retro_load_game() does reset the emulated machine (vecx_reset())
+but does not re-derive its own rendering-mode decision from the current
+config; it just perpetuates whatever the PREVIOUS game in this process
+happened to leave usingHWContext at.
+
+Confirmed on-device: game A (its own vecx_use_hw resolves to Software)
+launched first, ends its session in SW/CPU rendering. Game B (whose own
+config/default is Hardware, and which renders correctly in HW/GPU mode
+when launched as the only/first game in a process) launched second in
+the SAME process inherits game A's leftover usingHWContext=false and
+requests SW rendering again — never consulting its own vecx_use_hw value
+at all. Every other check_variables()-derived per-game setting (WIDTH/
+HEIGHT, SCALEX/SHIFTX/SCALEY/SHIFTY, line/bloom brightness+width, line
+color) has the exact same staleness exposure.
+
+Fix: call check_variables() at the top of retro_load_game(), before the
+existing (idempotent) render-context re-confirmation logic. This mirrors
+what retro_init() already does on a fresh process, so a reused core now
+gets the same fresh, correct per-game resolution a brand-new process
+would — regardless of what the previous game in this process left
+behind.
+
+--- a/libretro.c
++++ b/libretro.c
+@@ -695,6 +695,22 @@
+
+    if (!info)
+       return false;
++
++   /* check_variables() otherwise only runs from retro_init() (once, at
++    * first load) and from retro_run()'s GET_VARIABLE_UPDATE poll. Libra
++    * (and any frontend that keeps a core loaded across multiple ROMs
++    * instead of re-executing the process per game) skips retro_init() on
++    * reuse to avoid crashing stateful cores, so without this call
++    * usingHWContext — and every other option below: WIDTH/HEIGHT, SCALEX/
++    * SHIFTX, line/bloom brightness+width, line color — stays at whatever
++    * the PREVIOUS game left it at. The very next block decides this game's
++    * render context purely from usingHWContext's CURRENT value, with no
++    * reference to this game's own vecx_use_hw setting; on a fresh process
++    * that's harmless (usingHWContext starts at its default), but on reuse
++    * it silently carries the last game's renderer choice into a new one
++    * that never asked for it. */
++   check_variables();
++
+ #ifdef HAS_GPU
+    if (usingHWContext)
+       usingHWContext = set_rendering_context(true);

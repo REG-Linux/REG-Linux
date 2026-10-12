@@ -1,8 +1,5 @@
 # ioquake3
 
-Community continuation of the Quake III Arena engine with SDL2 and modular codecs.
+Quake III Arena engine community continuation. Upstream: https://github.com/ioquake/ioq3
 
-## Build notes
-- **Version:** commit `3d8979f...` from `ioquake/ioq3`.
-- **Config:** selects SDL2, SDL2_net, libogg/vorbis, Opus/Opusfile, JPEG, libcurl, and toggles OpenGL/GLES depending on the target (`BR2_PACKAGE_HAS_LIBGL` vs GLES support).
-- **Build system:** CMake release build that disables server builds, staticizes libs, and installs the client binary plus the `quake3` keys under `/usr/share/evmapy`.
+Installs via the `datainit` tree, so the binary, renderer plugins, and per-mod cgame/qagame/ui modules land directly in `/userdata/roms/quake3` on first boot (see `board/fsoverlay/etc/init.d/S12populateshare`); `/usr/bin/ioquake3` is a symlink into that eventual location so regmsgd's launcher resolver can detect the emulator. On RISC-V, `-mno-relax` is added to work around a GCC 15 LTO bug. `USE_INTERNAL_LIBS=OFF` forces use of the sysroot-provided libraries.

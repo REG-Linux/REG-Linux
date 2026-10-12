@@ -1,120 +1,59 @@
 ################################################################################
 #
-# REG-Linux shaders
+# reglinux-shaders
+#
+# Installs a curated, tier-aware shortlist of RetroArch shader presets into
+# /usr/share/reglinux/shaders. The per-tier shortlist lives in
+# shaders-per-tier.json; see CLAUDE.md for the design rationale.
+#
+# T0-T3 boards use the `gl` RetroArch backend and install `.glslp` presets.
+# T4 boards (Vulkan / desktop GL3.1+) install BOTH `.slangp` (preferred,
+# for glcore/vulkan backends) AND `.glslp` (so the same image still
+# serves cores running on the gl backend).
 #
 ################################################################################
 
-REGLINUX_SHADERS_VERSION = 1.1
-REGLINUX_SHADERS_SOURCE =
-REGLINUX_SHADERS_DEPENDENCIES = glsl-shaders
+# --- glsl-shaders (primary source, always downloaded) ---
+REGLINUX_SHADERS_VERSION = ebe123c55fa8538ec6abfa3eaa22d87f91e36679
+REGLINUX_SHADERS_SITE    = https://github.com/libretro/glsl-shaders/archive
+REGLINUX_SHADERS_SOURCE  = $(REGLINUX_SHADERS_VERSION).tar.gz
+REGLINUX_SHADERS_LICENSE = GPL-2.0+
+REGLINUX_SHADERS_LICENSE_FILES = LICENSE
 
-REGLINUX_GPU_SYSTEM = none
+# --- slang-shaders (extra download, only materialised at T4) ---
+REGLINUX_SHADERS_SLANG_VERSION = 11c7f492a07e4fd8940a7d6b367f85ef7effabea
+REGLINUX_SHADERS_SLANG_TARBALL = slang-shaders-$(REGLINUX_SHADERS_SLANG_VERSION).tar.gz
+REGLINUX_SHADERS_SLANG_URL     = https://github.com/libretro/slang-shaders/archive/$(REGLINUX_SHADERS_SLANG_VERSION)/$(REGLINUX_SHADERS_SLANG_TARBALL)
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86)$(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
-	REGLINUX_GPU_SYSTEM = x86
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_K1)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
-	REGLINUX_GPU_SYSTEM = riscv
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835)$(BR2_PACKAGE_SYSTEM_TARGET_BCM2836)$(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)
-	REGLINUX_GPU_SYSTEM = vc4
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711)$(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
-	REGLINUX_GPU_SYSTEM = vc5
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H3)$(BR2_PACKAGE_SYSTEM_TARGET_RK3128)$(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
-	REGLINUX_GPU_SYSTEM = mali-400
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812)$(BR2_PACKAGE_SYSTEM_TARGET_S905)$(BR2_PACKAGE_SYSTEM_TARGET_RK3328),y)
-	REGLINUX_GPU_SYSTEM = mali-450
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_XU4),y)
-	REGLINUX_GPU_SYSTEM = mali-t628
-# Note: SUN50I covers H5/H6, H5 is mali-450, H6 is mali-t720 but that does not make a big difference
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SUN50I),y)
-	REGLINUX_GPU_SYSTEM = mali-450
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3288),y)
-	REGLINUX_GPU_SYSTEM = mali-t760
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
-	REGLINUX_GPU_SYSTEM = mali-t860
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3326)$(BR2_PACKAGE_SYSTEM_TARGET_S905GEN2)$(BR2_PACKAGE_SYSTEM_TARGET_S905GEN3)$(BR2_PACKAGE_SYSTEM_TARGET_H616)$(BR2_PACKAGE_SYSTEM_TARGET_H700)$(BR2_PACKAGE_SYSTEM_TARGET_S9GEN4),y)
-	REGLINUX_GPU_SYSTEM = mali-g31
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S922X)$(BR2_PACKAGE_SYSTEM_TARGET_RK3568)$(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
-	REGLINUX_GPU_SYSTEM = mali-g52
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
-	REGLINUX_GPU_SYSTEM = mali-g610
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SDM845),y)
-	REGLINUX_GPU_SYSTEM = adreno-630
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115),y)
-	REGLINUX_GPU_SYSTEM = adreno-610
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
-	REGLINUX_GPU_SYSTEM = adreno-650
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
-	REGLINUX_GPU_SYSTEM = adreno-740
-# We would need a separate s912 target to take advantage of the more powerful T820 GPU instead of G31
-#else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S912),y)
-#	REGLINUX_GPU_SYSTEM = mali-t820
+ifeq ($(BR2_PACKAGE_REGLINUX_SHADERS_GPU_TIER),"T4")
+REGLINUX_SHADERS_EXTRA_DOWNLOADS = $(REGLINUX_SHADERS_SLANG_URL)
 endif
 
-REGLINUX_SHADERS_DIRIN=$(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-shaders/configs
+REGLINUX_SHADERS_INSTALL_STAGING = NO
+REGLINUX_SHADERS_INSTALL_TARGET  = YES
 
-ifeq ($(REGLINUX_GPU_SYSTEM),x86)
-	REGLINUX_SHADERS_SETS=sharp-bilinear-simple retro scanlines enhanced curvature zfast flatten-glow mega-bezel mega-bezel-lite mega-bezel-ultralite
-else
-	REGLINUX_SHADERS_SETS=sharp-bilinear-simple retro scanlines enhanced curvature zfast flatten-glow
-endif
+REGLINUX_SHADERS_DEPENDENCIES = host-python3
+
+REGLINUX_SHADERS_GPU_TIER = $(call qstrip,$(BR2_PACKAGE_REGLINUX_SHADERS_GPU_TIER))
+REGLINUX_SHADERS_DESTDIR  = $(TARGET_DIR)/usr/share/reglinux/shaders
+
+# T4 needs the slang-shaders tarball extracted alongside the glsl-shaders tree.
+define REGLINUX_SHADERS_EXTRACT_SLANG
+	$(if $(filter T4,$(REGLINUX_SHADERS_GPU_TIER)),\
+		mkdir -p $(@D)/slang-shaders && \
+		$(TAR) -C $(@D)/slang-shaders --strip-components=1 \
+			-xf $($(PKG)_DL_DIR)/$(REGLINUX_SHADERS_SLANG_TARBALL))
+endef
+REGLINUX_SHADERS_POST_EXTRACT_HOOKS += REGLINUX_SHADERS_EXTRACT_SLANG
 
 define REGLINUX_SHADERS_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-shaders/presets-batocera/* $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
-
-	# general
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/configs; \
-	if test -e $(REGLINUX_SHADERS_DIRIN)/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml; then \
-		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/rendering-defaults.yml; \
-	else \
-		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults.yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/; \
-	fi
-
-	# sets
-	for set in $(REGLINUX_SHADERS_SETS); do \
-		mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set; \
-		if test -e $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml; then \
-			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set/rendering-defaults.yml; \
-		else \
-			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults.yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set/; \
-		fi \
-	done
+	mkdir -p $(REGLINUX_SHADERS_DESTDIR)
+	$(HOST_DIR)/bin/python3 $(REGLINUX_SHADERS_PKGDIR)/curate-install.py \
+		--manifest   $(REGLINUX_SHADERS_PKGDIR)/shaders-per-tier.json \
+		--tier       $(REGLINUX_SHADERS_GPU_TIER) \
+		--glsl-root  $(@D) \
+		--slang-root $(@D)/slang-shaders \
+		--destdir    $(REGLINUX_SHADERS_DESTDIR)
 endef
-
-define REGLINUX_SHADERS_SLANG
-    # Some shaders got the .slan(g) variants moved
-    cd $(TARGET_DIR)/usr/share/reglinux/shaders/ && cp -f pixel-art-scaling/sharp-bilinear-simple.slangp ./interpolation/ && \
-		cp -f pixel-art-scaling/shaders/sharp-bilinear-simple.slang ./interpolation/shaders/
-    cd $(TARGET_DIR)/usr/share/reglinux/shaders/ && cp -f edge-smoothing/scalehq/2xScaleHQ.slangp ./scalehq/ && \
-		cp -f ./edge-smoothing/scalehq/shaders/2xScaleHQ.slang ./scalehq/shaders/
-endef
-
-ifeq ($(BR2_PACKAGE_SLANG_SHADERS),y)
-    REGLINUX_SHADERS_DEPENDENCIES += slang-shaders
-    REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS = REGLINUX_SHADERS_SLANG
-endif
-
-# No Mega Bezel / koko-aio for non-x86 systems
-define REGLINUX_SHADERS_DELETE_BEZEL
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/koko-aio
-endef
-
-# No beefy shaders for weak devices (can be improved)
-define REGLINUX_SHADERS_DELETE_BEEFY_SHADERS
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-royale
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-yo6
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/procedural
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/handheld/console-border
-    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/handheld/shaders/simpletex_lcd
-endef
-
-ifneq ($(REGLINUX_GPU_SYSTEM),x86)
-    REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS += REGLINUX_SHADERS_DELETE_BEZEL
-endif
-
-ifeq ($(BR2_arm)$(BR2_mipsel)$(BR2_riscv),y)
-    REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS += REGLINUX_SHADERS_DELETE_BEEFY_SHADERS
-endif
 
 $(eval $(generic-package))

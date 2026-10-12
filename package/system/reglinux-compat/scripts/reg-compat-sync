@@ -1,0 +1,267 @@
+#!/bin/sh
+# reg-compat-sync — Sync the local compat report to compat.reglinux.org
+# Runs when network becomes available, or manually.
+# Handles device registration (token) and submission.
+#
+# Usage:
+#   reg-compat-sync              # sync if report exists and network is up
+#   reg-compat-sync --force      # sync even if recently synced
+
+# Opt-out: if user sets compat.reporting=0 in system.conf, do nothing
+CONF_FILE="/userdata/system/system.conf"
+if [ -f "$CONF_FILE" ]; then
+    OPT_OUT=$(awk -F= '/^[[:space:]]*compat\.reporting[[:space:]]*=/ { gsub(/[[:space:]]/, "", $2); print $2 }' "$CONF_FILE")
+    if [ "$OPT_OUT" = "0" ]; then
+        exit 0
+    fi
+fi
+
+API="https://compat.reglinux.org"
+REPORT_FILE="/userdata/system/.compat-report.json"
+TOKEN_FILE="/userdata/system/.compat-token"
+LAST_SYNC_FILE="/userdata/system/.compat-last-sync"
+SYNC_INTERVAL=86400  # 24 hours between syncs (unless --force)
+
+# --- Helpers ---
+
+log() {
+    logger -t reg-compat-sync "$1"
+}
+
+die() {
+    log "ERROR: $1"
+    exit 1
+}
+
+# Check network connectivity
+check_network() {
+    # Try a lightweight HEAD request
+    wget -q --spider --timeout=5 "$API/api/matrix" 2>/dev/null && return 0
+    # Fallback: try curl if available
+    curl -sf --max-time 5 -o /dev/null "$API/api/matrix" 2>/dev/null && return 0
+    return 1
+}
+
+# HTTP POST with JSON body — prints the HTTP status on the first line, then the
+# response body. Use http_post_into, which splits the two apart for you.
+# $1 = URL, $2 = JSON body, $3 = optional auth header
+#
+# Deliberately NOT `curl -f`: with -f curl prints nothing and exits 22 on any
+# 4xx/5xx, so a server that answered with a perfectly clear reason was reported
+# here as "no response" and read like a network fault. A CHA logged
+# "Device registration failed — no response" on every attempt while the server
+# was in fact answering 429 {"error":"rate_limit_exceeded","detail":"max 5
+# registrations per device model"} -- a quota question misread as a dead link.
+# The status is "000" when the transport itself failed, and empty when we went
+# through the wget fallback, which cannot report one.
+http_post() {
+    URL="$1"
+    BODY="$2"
+    AUTH="$3"
+
+    if command -v curl >/dev/null 2>&1; then
+        if [ -n "$AUTH" ]; then
+            OUT=$(curl -s -w '\n%{http_code}' --max-time 15 \
+                -H "Content-Type: application/json" \
+                -H "Authorization: $AUTH" \
+                -d "$BODY" \
+                "$URL" 2>/dev/null)
+        else
+            OUT=$(curl -s -w '\n%{http_code}' --max-time 15 \
+                -H "Content-Type: application/json" \
+                -d "$BODY" \
+                "$URL" 2>/dev/null)
+        fi
+        # -w appended the status as a final line; move it to the front.
+        printf '%s\n' "$OUT" | tail -n 1
+        printf '%s\n' "$OUT" | sed '$d'
+    elif command -v wget >/dev/null 2>&1; then
+        echo ""  # no status available from the wget fallback
+        if [ -n "$AUTH" ]; then
+            echo "$BODY" | wget -qO- --timeout=15 \
+                --header="Content-Type: application/json" \
+                --header="Authorization: $AUTH" \
+                --post-data="$BODY" \
+                "$URL" 2>/dev/null
+        else
+            echo "$BODY" | wget -qO- --timeout=15 \
+                --header="Content-Type: application/json" \
+                --post-data="$BODY" \
+                "$URL" 2>/dev/null
+        fi
+    else
+        die "No curl or wget available"
+    fi
+}
+
+# Run http_post and split its output into $HTTP_STATUS and $RESPONSE.
+# Command substitution runs in a subshell, so http_post cannot just set a global
+# -- the status has to ride back on stdout with the body, and be split here, in
+# the caller's own scope.
+HTTP_STATUS=""
+RESPONSE=""
+http_post_into() {
+    _raw=$(http_post "$1" "$2" "$3")
+    HTTP_STATUS=$(printf '%s\n' "$_raw" | head -n 1)
+    RESPONSE=$(printf '%s\n' "$_raw" | sed '1d')
+}
+
+# Simple JSON value extractor (no jq needed)
+json_get() {
+    # $1 = JSON string, $2 = key
+    echo "$1" | grep -o "\"$2\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*: *"\([^"]*\)"/\1/'
+}
+
+# Escape a string for safe JSON embedding
+json_escape() {
+    printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/	/\\t/g' | tr -d '\n'
+}
+
+# --- Pre-checks ---
+
+[ -f "$REPORT_FILE" ] || die "No report file at $REPORT_FILE — run reg-compat-probe first"
+
+# Check if we synced recently (unless --force)
+if [ "$1" != "--force" ] && [ -f "$LAST_SYNC_FILE" ]; then
+    LAST_SYNC=$(cat "$LAST_SYNC_FILE" 2>/dev/null)
+    NOW=$(date +%s)
+    ELAPSED=$((NOW - LAST_SYNC))
+    if [ "$ELAPSED" -lt "$SYNC_INTERVAL" ]; then
+        log "Skipping sync — last sync ${ELAPSED}s ago (interval: ${SYNC_INTERVAL}s)"
+        exit 0
+    fi
+fi
+
+# Check network
+if ! check_network; then
+    log "No network — will retry later"
+    exit 0
+fi
+
+# --- Read report ---
+
+REPORT=$(cat "$REPORT_FILE")
+DEVICE_ID=$(json_get "$REPORT" "device_id")
+SYSTEM_UUID=$(json_get "$REPORT" "system_uuid")
+BOARD_HASH=$(json_get "$REPORT" "board_file_hash")
+REG_VERSION=$(json_get "$REPORT" "reg_version")
+ARCH=$(json_get "$REPORT" "arch")
+KERNEL=$(json_get "$REPORT" "kernel")
+BUILD_DATE=$(json_get "$REPORT" "build_date")
+
+[ -z "$DEVICE_ID" ] && die "No device_id in report"
+[ -z "$SYSTEM_UUID" ] && die "No system_uuid in report"
+
+# --- Get or create token ---
+
+TOKEN=""
+if [ -f "$TOKEN_FILE" ]; then
+    TOKEN=$(cat "$TOKEN_FILE" 2>/dev/null)
+fi
+
+if [ -z "$TOKEN" ]; then
+    log "No token found — registering device..."
+
+    REG_BODY=$(printf '{"device_id":"%s","arch":"%s","kernel":"%s","board_file_hash":"%s","system_uuid":"%s","reg_version":"%s"}' \
+        "$(json_escape "$DEVICE_ID")" "$(json_escape "$ARCH")" "$(json_escape "$KERNEL")" \
+        "$(json_escape "$BOARD_HASH")" "$(json_escape "$SYSTEM_UUID")" "$(json_escape "$REG_VERSION")")
+
+    http_post_into "$API/api/device-register" "$REG_BODY"
+
+    TOKEN=$(json_get "$RESPONSE" "token")
+
+    if [ -z "$TOKEN" ]; then
+        ERROR=$(json_get "$RESPONSE" "error")
+        DETAIL=$(json_get "$RESPONSE" "detail")
+        die "Device registration failed (HTTP ${HTTP_STATUS:-?}): ${ERROR:-no response body}${DETAIL:+ — $DETAIL}"
+    fi
+
+    # Save token
+    mkdir -p "$(dirname "$TOKEN_FILE")"
+    echo "$TOKEN" > "$TOKEN_FILE"
+    chmod 600 "$TOKEN_FILE"
+    log "Device registered — token saved"
+fi
+
+# --- Build submission payload ---
+
+# Extract non-null results from the report
+# Build a results JSON object with only probed features
+RESULTS="{"
+FIRST=1
+
+ALL_FEATURES="boot rescue_mode display hdmi_out audio hdmi_audio wifi bluetooth ethernet usb_host usb_otg sd_card suspend thermal battery buttons analog_sticks controller_hotplug rumble gpu_accel vulkan gles"
+
+for feat in $ALL_FEATURES; do
+    VAL=$(json_get "$REPORT" "$feat")
+    # Only include non-null, non-empty values
+    if [ -n "$VAL" ] && [ "$VAL" != "null" ]; then
+        [ "$FIRST" = "1" ] && FIRST=0 || RESULTS="${RESULTS},"
+        RESULTS="${RESULTS}\"${feat}\":\"${VAL}\""
+    fi
+done
+
+RESULTS="${RESULTS}}"
+
+# Skip if no results to submit
+if [ "$RESULTS" = "{}" ]; then
+    log "No probed features to submit — skipping"
+    exit 0
+fi
+
+# Build date — must be ISO format YYYY-MM-DD
+# The probe's BUILD_DATE might be in YY.MM format (from version string)
+# Convert to ISO date, or fall back to today
+SUBMIT_DATE=""
+case "$BUILD_DATE" in
+    [0-9][0-9].[0-9][0-9])
+        # YY.MM → 20YY-MM-01
+        YEAR="20$(echo "$BUILD_DATE" | cut -d. -f1)"
+        MONTH="$(echo "$BUILD_DATE" | cut -d. -f2)"
+        SUBMIT_DATE="${YEAR}-${MONTH}-01"
+        ;;
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+        # Already ISO format
+        SUBMIT_DATE="$BUILD_DATE"
+        ;;
+esac
+[ -z "$SUBMIT_DATE" ] && SUBMIT_DATE=$(date +%Y-%m-%d)
+
+SUBMIT_BODY=$(printf '{"device_id":"%s","build_date":"%s","results":%s,"notes":"auto-probe %s"}' \
+    "$(json_escape "$DEVICE_ID")" "$(json_escape "$SUBMIT_DATE")" "$RESULTS" "$(json_escape "$REG_VERSION")")
+
+# --- Submit ---
+
+log "Submitting compat report for $DEVICE_ID..."
+
+http_post_into "$API/api/submit" "$SUBMIT_BODY" "Bearer device:$TOKEN"
+
+if [ -z "$RESPONSE" ]; then
+    # Do NOT clear the token here. Only an auth rejection means it is actually
+    # bad, and that case is handled below by matching the server's error string.
+    # Dropping it on every empty reply turned a transient 5xx — or a rate-limited
+    # one — into a forced re-registration, which then runs into the registration
+    # rate limit and locks the device out of syncing for good.
+    log "Submission failed (HTTP ${HTTP_STATUS:-?}) — no response body"
+    exit 1
+fi
+
+OK=$(json_get "$RESPONSE" "ok")
+ERROR=$(json_get "$RESPONSE" "error")
+
+if [ "$OK" = "true" ]; then
+    INSERTED=$(echo "$RESPONSE" | grep -o '"inserted":[0-9]*' | grep -o '[0-9]*')
+    log "Submitted $INSERTED results for $DEVICE_ID"
+    # Save sync timestamp
+    date +%s > "$LAST_SYNC_FILE"
+else
+    log "Submission failed: $ERROR"
+    # If auth error, clear token
+    case "$ERROR" in
+        *not_authenticated*|*invalid_token*)
+            rm -f "$TOKEN_FILE"
+            log "Token invalidated — will re-register next sync"
+            ;;
+    esac
+    exit 1
+fi

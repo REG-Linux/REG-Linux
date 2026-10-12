@@ -1,0 +1,52 @@
+From: Carlos Martins <cjom@reglinux.org>
+Subject: [PATCH] cmake: honour OPT_OPENGL and OPT_MT32EMU when probing
+
+Both options already gate the feature defines (C_OPENGL, C_MT32EMU) and
+the conditional link generator expressions, but the matching find_package
+calls are unconditional and marked REQUIRED. Turning an option off
+therefore still fails the configure step on a system that lacks the
+library -- the switch only ever removes code, never the requirement.
+
+libdosboxcommon also links OpenGL::GL unconditionally while gating only
+libglad next to it, so -DOPT_OPENGL=OFF still needs libGL at link time.
+It has it backwards: the render headers include glad/gl.h whatever the
+option, so libglad (a runtime loader that needs no libGL) must always be
+linked for its include path, and only OpenGL::GL depends on C_OPENGL.
+
+Guard the probes and the link, matching what the meson build allows via
+-Duse_opengl=false / -Duse_mt32emu=false. This lets GLES-only targets,
+which have no desktop libGL at all, build with -DOPT_OPENGL=OFF.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+---
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 679470e..8d6208e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -461,8 +461,12 @@ find_package(SDL2 CONFIG REQUIRED)
+ find_package(SDL2_image CONFIG REQUIRED)
+ find_package(iir REQUIRED)
+ find_package(PNG REQUIRED)
+-find_package(OpenGL REQUIRED)
+-find_package(MT32Emu REQUIRED)
++if (OPT_OPENGL)
++  find_package(OpenGL REQUIRED)
++endif()
++if (OPT_MT32EMU)
++  find_package(MT32Emu REQUIRED)
++endif()
+ find_package(FluidSynth REQUIRED CONFIG)
+ if (C_ALSA)
+   find_package(ALSA REQUIRED)
+diff --git a/src/gui/CMakeLists.txt b/src/gui/CMakeLists.txt
+index a1813a0..6500981 100644
+--- a/src/gui/CMakeLists.txt
++++ b/src/gui/CMakeLists.txt
+@@ -17,5 +17,5 @@ target_sources(libdosboxcommon PRIVATE
+ )
+ 
+ target_link_libraries(libdosboxcommon PRIVATE
+-  OpenGL::GL
+-  $<IF:$<BOOL:${C_OPENGL}>,libglad,>)
++  $<IF:$<BOOL:${C_OPENGL}>,OpenGL::GL,>
++  libglad)

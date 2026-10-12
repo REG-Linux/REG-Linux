@@ -1,0 +1,43 @@
+id: stress_kill_loop
+description: Rapid launch/stop cycle. Detects ProcessManager slot leaks + orphans.
+requires_display: any
+
+matrix:
+  iteration: [1, 2, 3, 4, 5]
+  system: [megadrive]
+
+steps:
+  - run: |
+      cfg=/usr/share/regstation/rs_systems.cfg
+      python3 -c "
+      import xml.etree.ElementTree as ET, os, sys
+      t = ET.parse('$cfg').getroot()
+      for s in t.findall('system'):
+          if (s.findtext('name') or '') == '{system}':
+              p = s.findtext('path') or ''
+              exts = (s.findtext('extension') or '').split()
+              for r,_,fs in os.walk(p):
+                  for f in fs:
+                      if any(f.endswith(e) for e in exts):
+                          print(os.path.join(r,f)); raise SystemExit
+              sys.exit(1)
+      sys.exit(1)"
+    capture: rom_pick
+    timeout: 30
+    allow_fail: true
+
+  - ipc: launcher_launch
+    args: ["{system}", "{rom_pick}"]
+    capture: launch
+    fail_codes: [no_emulator, spawn_failed]
+  - sleep: 3
+  - ipc: launcher_stop
+    args: ["{launch.pid}"]
+  - sleep: 1
+  - probe: no_orphan_emulator
+  - probe: is_process_alive
+    target: regmsgd
+
+cleanup:
+  - frontend: emukill
+    allow_fail: true

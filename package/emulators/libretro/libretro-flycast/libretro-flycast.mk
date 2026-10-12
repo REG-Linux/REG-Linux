@@ -18,7 +18,12 @@ LIBRETRO_FLYCAST_CONF_OPTS += -DUSE_OPENMP=ON
 LIBRETRO_FLYCAST_CONF_OPTS += -DBUILD_EXTERNAL=OFF
 
 # OpenGL backend
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# Must stay in sync with RetroArch's own API selection in
+# package/retroarch/retroarch/retroarch.mk — libretro cores run
+# in-process with RA and their hw_render_callback context_type must
+# match what RA was built with. Key off HAS_DESKTOP_OPENGL rather
+# than HAS_LIBGL (which is polluted by XWayland).
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
     LIBRETRO_FLYCAST_DEPENDENCIES += libgl
     LIBRETRO_FLYCAST_CONF_OPTS += -DUSE_OPENGL=ON
 else ifeq ($(BR2_PACKAGE_HAS_GLES3),y)

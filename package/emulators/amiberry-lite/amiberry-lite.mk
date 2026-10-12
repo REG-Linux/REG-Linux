@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AMIBERRY_LITE_VERSION = v5.9.1
+AMIBERRY_LITE_VERSION = v5.9.4
 AMIBERRY_LITE_SITE = $(call github,BlitterStudio,amiberry-lite,$(AMIBERRY_LITE_VERSION))
 AMIBERRY_LITE_LICENSE = GPLv3
 AMIBERRY_LITE_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
@@ -35,13 +35,5 @@ define AMIBERRY_LITE_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/data $(TARGET_DIR)/usr/share/amiberry/
 	cp -p $(@D)/data/AmigaTopaz.ttf $(TARGET_DIR)/usr/share/amiberry/data
 endef
-
-define AMIBERRY_LITE_EVMAP
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/evmapy/* \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-AMIBERRY_LITE_POST_INSTALL_TARGET_HOOKS = AMIBERRY_LITE_EVMAP
 
 $(eval $(cmake-package))

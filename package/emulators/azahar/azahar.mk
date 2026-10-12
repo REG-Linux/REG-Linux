@@ -4,15 +4,40 @@
 #
 ################################################################################
 
-AZAHAR_VERSION = 2124.3
+AZAHAR_VERSION = 2126.2
 AZAHAR_SITE = https://github.com/azahar-emu/azahar.git
 AZAHAR_SITE_METHOD = git
-AZAHAR_GIT_SUBMODULES=YES
+AZAHAR_GIT_SUBMODULES = YES
 AZAHAR_LICENSE = GPLv2
-AZAHAR_DEPENDENCIES += fmt boost ffmpeg sdl2 fdk-aac
 AZAHAR_SUPPORTS_IN_SOURCE_BUILD = NO
 
-AZAHAR_GIT_SUBMODULES = YES
+# Core dependencies
+AZAHAR_DEPENDENCIES += fmt boost ffmpeg sdl2 fdk-aac cubeb
+AZAHAR_DEPENDENCIES += openssl libzip lz4 zstd
+AZAHAR_DEPENDENCIES += libdrm libinput libxkbcommon
+
+# Qt6 is the only frontend: upstream dropped the SDL2 one (citra_meta,
+# which produces the azahar binary, is only built with ENABLE_QT)
+AZAHAR_DEPENDENCIES += reglinux-qt6
+
+# Vulkan and graphics dependencies
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
+    AZAHAR_DEPENDENCIES += vulkan-headers vulkan-loader
+endif
+
+# Not needed since 2126.1
+#ifeq ($(BR2_PACKAGE_XWAYLAND),y)
+#    AZAHAR_DEPENDENCIES += xwayland
+#endif
+
+ifeq ($(BR2_PACKAGE_WAYLAND),y)
+    AZAHAR_DEPENDENCIES += wayland wayland-protocols
+endif
+
+# OpenGL dependencies
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+    AZAHAR_DEPENDENCIES += libgl
+endif
 
 AZAHAR_BUILD_TYPE = Release
 
@@ -23,59 +48,40 @@ AZAHAR_CONF_OPTS += -DENABLE_TESTS=OFF
 AZAHAR_CONF_OPTS += -DENABLE_ROOM_STANDALONE=OFF
 AZAHAR_CONF_OPTS += -DENABLE_WEB_SERVICE=OFF
 AZAHAR_CONF_OPTS += -DENABLE_OPENAL=OFF
+AZAHAR_CONF_OPTS += -DENABLE_CUBEB=ON
 AZAHAR_CONF_OPTS += -DUSE_DISCORD_PRESENCE=OFF
-AZAHAR_CONF_OPTS += -DAZAHAR_WARNINGS_AS_ERRORS=OFF
-AZAHAR_CONF_OPTS += -DAZAHAR_ENABLE_COMPATIBILITY_REPORTING=ON
-AZAHAR_CONF_OPTS += -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
 AZAHAR_CONF_OPTS += -DUSE_SYSTEM_BOOST=ON
 AZAHAR_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON
-AZAHAR_CONF_OPTS += -DCITRA_ENABLE_BUNDLE_TARGET=ON
-AZAHAR_CONF_OPTS += -DCITRA_WARNINGS_AS_ERRORS=OFF
-AZAHAR_CONF_OPTS += -DDYNARMIC_WARNINGS_AS_ERRORS=OFF
 AZAHAR_CONF_OPTS += -DENABLE_LTO=ON
 
 # Use SSE 4.2 code paths on x86_64_v3 build
 ifeq ($(BR2_x86_x86_64_v3),y)
-AZAHAR_CONF_OPTS += -DENABLE_SSE42=ON
+    AZAHAR_CONF_OPTS += -DENABLE_SSE42=ON
 else
-AZAHAR_CONF_OPTS += -DENABLE_SSE42=OFF
+    AZAHAR_CONF_OPTS += -DENABLE_SSE42=OFF
 endif
 
-# Qt vs SDL frontend
+# Qt frontend (SDL2 stays enabled above for input)
 AZAHAR_BIN = azahar
-ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
-    AZAHAR_DEPENDENCIES += reglinux-qt6
-    AZAHAR_CONF_OPTS += -DENABLE_QT=ON
-    AZAHAR_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
-    AZAHAR_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
-else
-    AZAHAR_CONF_OPTS += -DENABLE_QT=OFF
-    AZAHAR_CONF_OPTS += -DENABLE_SDL2_FRONTEND=ON
-endif
+AZAHAR_CONF_OPTS += -DENABLE_QT=ON
+AZAHAR_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
+AZAHAR_CONF_OPTS += -DENABLE_QT_UPDATE_CHECKER=OFF
 
 # Vulkan support
-ifeq ($(BR2_PACKAGE_XWAYLAND)$(BR2_PACKAGE_REGLINUX_VULKAN),yy)
-    AZAHAR_DEPENDENCIES += vulkan-headers xwayland
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     AZAHAR_CONF_OPTS += -DENABLE_VULKAN=ON
 else
     AZAHAR_CONF_OPTS += -DENABLE_VULKAN=OFF
 endif
 
-AZAHAR_CONF_ENV += LDFLAGS=-lpthread
+# Silence Qt private module warning (we know about the version coupling)
+AZAHAR_CONF_ENV += QT_NO_PRIVATE_MODULE_WARNING=ON
+
+AZAHAR_CONF_ENV += LDFLAGS="-lpthread -ldl"
 
 define AZAHAR_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/bin
-    mkdir -p $(TARGET_DIR)/usr/lib
-	$(INSTALL) -D $(@D)/buildroot-build/bin/$(AZAHAR_BUILD_TYPE)/$(AZAHAR_BIN) \
-		$(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D $(@D)/buildroot-build/bin/$(AZAHAR_BUILD_TYPE)/$(AZAHAR_BIN) \
+    	$(TARGET_DIR)/usr/bin/
 endef
-
-define AZAHAR_EVMAP
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/azahar/3ds.azahar.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-endef
-
-AZAHAR_POST_INSTALL_TARGET_HOOKS = AZAHAR_EVMAP
 
 $(eval $(cmake-package))

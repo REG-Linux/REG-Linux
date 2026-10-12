@@ -3,8 +3,7 @@
 # izapple2
 #
 ################################################################################
-# Version: Release on Jan 25, 2025
-IZAPPLE2_VERSION = v2.2
+IZAPPLE2_VERSION = v2.5.0
 IZAPPLE2_SITE = $(call github,ivanizag,izapple2,$(IZAPPLE2_VERSION))
 IZAPPLE2_LICENSE = GPLv3
 IZAPPLE2_DEPENDENCIES = sdl2
@@ -29,10 +28,6 @@ define IZAPPLE2_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
 	$(INSTALL) -D $(@D)/frontend/a2sdl/a2sdl $(TARGET_DIR)/usr/bin/izapple2
 	$(TARGET_STRIP) $(TARGET_DIR)/usr/bin/izapple2
-	# evmapy
-	#mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	#cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/izapple2/izapple2.keys \
-	#    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(golang-package))

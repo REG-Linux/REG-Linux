@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SDL3_VERSION = 3.2.30
+SDL3_VERSION = 3.4.16
 SDL3_SOURCE = SDL3-$(SDL3_VERSION).tar.gz
 SDL3_SITE = http://www.libsdl.org/release
 SDL3_LICENSE = Zlib
@@ -24,6 +24,12 @@ endif
 # reglinux - RISC-V depend on custom mesa to enable wayland properly
 ifeq ($(BR2_PACKAGE_IMG_GPU_POWERVR),y)
 SDL3_DEPENDENCIES += img-gpu-powervr img-mesa3d
+endif
+
+# reglinux - Mali fbdev driver for PowerVR GE8300 (A133 / TrimUI)
+ifeq ($(BR2_PACKAGE_SDL3_MALI),y)
+SDL3_DEPENDENCIES += powervr-ge8300-driver
+SDL3_CONF_OPTS += -DSDL_MALI=ON -DSDL_KMSDRM=OFF -DSDL_UNIX_CONSOLE_BUILD=ON
 endif
 
 # reglinux - depend on mesa3d for kmsdrm (gbm+egl) if enabled
@@ -52,6 +58,9 @@ SDL3_DEPENDENCIES += xlib_libX11 xlib_libXext
 ifeq ($(BR2_PACKAGE_XLIB_LIBXCURSOR),y)
 SDL3_DEPENDENCIES += xlib_libXcursor
 endif
+ifeq ($(BR2_PACKAGE_XLIB_LIBXTST),y)
+SDL3_DEPENDENCIES += xlib_libXtst
+endif
 ifeq ($(BR2_PACKAGE_XLIB_LIBXI),y)
 SDL3_DEPENDENCIES += xlib_libXi
 endif
@@ -65,10 +74,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_SDL3_OPENGL),y)
 SDL3_DEPENDENCIES += libgl
+SDL3_CONF_OPTS += -DSDL_RENDER_OPENGL=ON
 endif
 
 ifeq ($(BR2_PACKAGE_SDL3_OPENGLES),y)
 SDL3_DEPENDENCIES += libgles
+SDL3_CONF_OPTS += -DSDL_RENDER_OPENGLES2=ON
 endif
 
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)

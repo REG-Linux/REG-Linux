@@ -1,0 +1,36 @@
+diff --git a/tools/build/compile_shader_spirv.py b/tools/build/compile_shader_spirv.py
+index abc123..def456 100644
+--- a/tools/build/compile_shader_spirv.py
++++ b/tools/build/compile_shader_spirv.py
+@@ -107,17 +107,17 @@ def main():
+         if result.returncode != 0:
+             print(f"ERROR: glslangValidator failed for {src_name}", file=sys.stderr)
+             if result.stderr:
+-                sys.stderr.write(result.stderr)
++                sys.stderr.write(result.stderr.decode('utf-8') if isinstance(result.stderr, bytes) else result.stderr)
+             return 1
+ 
+         # Step 2: spirv-opt
+         result = subprocess.run([
+-            spirv_opt, "-O", "-O", "--canonicalize-ids",
++            spirv_opt, "-O", "-O",
+             glslang_spv, "-o", opt_spv,
+         ], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+         if result.returncode != 0:
+             print(f"ERROR: spirv-opt failed for {src_name}", file=sys.stderr)
+             if result.stderr:
+-                sys.stderr.write(result.stderr)
++                sys.stderr.write(result.stderr.decode('utf-8') if isinstance(result.stderr, bytes) else result.stderr)
+             return 1
+ 
+         # Step 3: spirv-dis
+         result = subprocess.run([spirv_dis, "-o", dis_txt, opt_spv],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+         if result.returncode != 0:
+             print(f"ERROR: spirv-dis failed for {src_name}", file=sys.stderr)
+             if result.stderr:
+-                sys.stderr.write(result.stderr)
++                sys.stderr.write(result.stderr.decode('utf-8') if isinstance(result.stderr, bytes) else result.stderr)
+             return 1
+ 
+         # Step 4: Generate header

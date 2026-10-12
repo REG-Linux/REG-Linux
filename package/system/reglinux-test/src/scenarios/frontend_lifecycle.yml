@@ -1,0 +1,45 @@
+id: frontend_lifecycle
+description: Start REG-Station, wait until visible, inject input, stop cleanly.
+requires_display: any
+
+defaults:
+  app_id: regstation
+
+steps:
+  - frontend: stop
+    allow_fail: true
+  - sleep: 1
+
+  - frontend: start
+  - probe: wait_visible
+    target: regstation
+    save: "{case_dir}/boot.png"
+    timeout: 45
+
+  - probe: assert_not_black
+    path: "{case_dir}/boot.png"
+
+  - probe: window_exists
+    target: "{app_id}"
+    only_if_backend: [sway]
+    fallback: is_process_alive
+
+  - inject: button
+    button: south
+    holdms: 80
+  - sleep: 1
+  - probe: screenshot
+    save: "{case_dir}/after-input.png"
+
+  - frontend: stop
+  - sleep: 2
+  - probe: is_process_alive
+    target: regstation
+    expect: false
+    allow_fail: true
+
+  - probe: no_orphan_emulator
+
+cleanup:
+  - frontend: emukill
+    allow_fail: true

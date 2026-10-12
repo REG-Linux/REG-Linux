@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: REG-Linux <cjom@reglinux.org>
+Date: Fri, 21 Aug 2026 00:00:00 +0000
+Subject: [PATCH] libretro: don't reassign inputs when no driver is active
+
+retro_load_game_common() returns true on its error path so the core can
+draw its own message screen, but it leaves nBurnDrvActive == ~0U. A
+frontend that calls retro_set_controller_port_device() after loading
+content - RetroArch does, and so does any other frontend following it -
+then reaches RefreshControllers() -> GameInpReassign(), which walks the
+driver tables through nBurnDrvActive and segfaults.
+
+RetroArch never sees it because it reloads the shared object for every
+content load, so bControllersSetOnce is back to false and the refresh is
+skipped. A frontend that keeps the core loaded across games hits it as
+soon as one game has run: the flag is still set from that game, so the
+failed load takes the branch.
+
+Guard the setter on having a driver, and reset the two refresh flags in
+InputExit() so unloading really does restore the pre-game state.
+
+--- a/src/burner/libretro/retro_input.cpp
++++ b/src/burner/libretro/retro_input.cpp
+@@ -3557,6 +3557,11 @@
+ 
+ 	bInputInitialized = false;
+ 	bLibretroSupportsBitmasks = false;
++	// Put the controller refresh state back the way it is on a fresh
++	// dlopen(), so a frontend which keeps the core loaded between games
++	// starts the next one from the same state as one which reloads it.
++	bControllersNeedRefresh = true;
++	bControllersSetOnce = false;
+ }
+ 
+ void retro_set_input_state(retro_input_state_t cb) { input_cb = cb; }
+@@ -3606,6 +3611,14 @@
+ 		}
+ 	}
+ 
++	// Without an active driver there is nothing to reassign: the device was
++	// not sanitized above, and RefreshControllers() -> GameInpReassign()
++	// would read the driver tables through nBurnDrvActive == ~0U. That is
++	// reachable because retro_load_game_common() returns true on its error
++	// path so the core can show its own message screen.
++	if (nBurnDrvActive == ~0U)
++		return;
++
+ 	if (port < nMaxControllers && nDeviceType[port] != device)
+ 	{
+ 		nDeviceType[port] = device;

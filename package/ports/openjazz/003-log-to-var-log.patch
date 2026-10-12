@@ -1,0 +1,11 @@
+--- a/src/io/log.cpp
++++ b/src/io/log.cpp
+@@ -51,7 +51,7 @@
+
+ 	level = LL_DEBUG;
+ 	quiet = false;
+-	logfile = fopen("openjazz.log", "w");
++	logfile = fopen("/var/log/openjazz.log", "w");
+ 	color_stdout = false;
+ 	color_stderr = false;
+

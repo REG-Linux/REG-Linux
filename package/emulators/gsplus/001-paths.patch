@@ -1,0 +1,13 @@
+--- a/gsplus/src/config.c	2026-08-14 02:36:21.925876656 +0200
++++ b/gsplus/src/config.c	2026-08-14 02:37:07.560356185 +0200
+@@ -147,7 +147,9 @@
+ 
+ char *g_argv0_path = ".";
+ 
+-const char *g_kegs_default_paths[] = { "", "./", "${HOME}/",
++const char *g_kegs_default_paths[] = {
++	"/userdata/system/configs/GSplus/", "/userdata/bios/",
++	"./", "${HOME}/",
+ 	"${HOME}/Library/KEGS/", "${0}/../", "${0}/",
+ 	"${0}/Contents/Resources/", 0 };
+ 

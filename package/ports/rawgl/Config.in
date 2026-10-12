@@ -1,0 +1,17 @@
+config BR2_PACKAGE_RAWGL
+	bool "rawgl"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on !BR2_STATIC_LIBS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBGL if BR2_PACKAGE_HAS_LIBGL
+	help
+	  rawgl is a reimplementation of the engine used in the game
+	  Another World / Out of This World by Eric Chahi.
+
+	  Supports: DOS, Amiga, Atari, 3DO, Windows 3.1,
+	  15th Anniversary, and 20th Anniversary (DotEmu) editions.
+	  Requires original game data files.
+
+	  https://github.com/cyxx/rawgl

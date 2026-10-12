@@ -10,8 +10,6 @@ RETROARCH_SOURCE = retroarch-sourceonly-$(RETROARCH_VERSION).tar.xz
 RETROARCH_LICENSE = GPLv3+
 RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets
 RETROARCH_DEPENDENCIES += libusb hidapi gamemode
-# install in staging for debugging (gdb)
-RETROARCH_INSTALL_STAGING = YES
 
 RETROARCH_CONF_OPTS =   --disable-oss 		\
 			--disable-qt  		\
@@ -27,8 +25,8 @@ RETROARCH_CONF_OPTS =   --disable-oss 		\
 			--enable-xdelta 	\
 			--enable-lua 		\
 			--enable-networking	\
-			--enable-translate	\
-			--enable-rgui
+			--enable-rgui		\
+			--enable-alsa
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
     RETROARCH_CONF_OPTS += --enable-debug
@@ -62,7 +60,10 @@ else
 endif
 
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
+# PowerVR GE8300 is fbdev-only — no GBM, so KMS context cannot be built
+ifneq ($(BR2_PACKAGE_POWERVR_GE8300_DRIVER),y)
     RETROARCH_CONF_OPTS += --enable-kms
+endif
 endif
 
 ifeq ($(BR2_ARM_FPU_NEON_VFPV4)$(BR2_ARM_FPU_NEON)$(BR2_ARM_FPU_NEON_FP_ARMV8),y)
@@ -71,13 +72,6 @@ endif
 
 ifeq ($(BR2_GCC_TARGET_FLOAT_ABI),hard)
     RETROARCH_CONF_OPTS += --enable-floathard
-endif
-
-ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
-    RETROARCH_CONF_OPTS += --enable-alsa
-    RETROARCH_DEPENDENCIES += alsa-lib
-else
-    RETROARCH_CONF_OPTS += --disable-alsa
 endif
 
 ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
@@ -95,18 +89,32 @@ else
     RETROARCH_CONF_OPTS += --disable-pipewire
 endif
 
-# REG: OpenGL (desktop) support
-# Enable Ozone menu for desktop GL
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-  RETROARCH_CONF_OPTS += --enable-opengl --disable-opengl1 --disable-glx
-  RETROARCH_CONF_OPTS += --enable-ozone
-  RETROARCH_DEPENDENCIES += libglvnd
-endif
-
-# REG: OpenGL ES support
-# Enable Ozone menu only for GLES 3.0+ (crash on lima)
-ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
-    RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
+# REG: GL / GLES API selection.
+#
+# RetroArch's desktop OpenGL and OpenGL ES paths are mutually exclusive
+# in a single binary (upstream qb/config.libs.sh silently drops OpenGL
+# when OpenGLES is yes, which used to leave us with both --enable-opengl
+# and --enable-opengles3 passed to configure and the GL side silently
+# dropped — causing libretro cores requesting RETRO_HW_CONTEXT_OPENGL*
+# to be rejected at load time with "Requesting OpenGL context, but
+# RetroArch is compiled against OpenGLES").
+#
+# We make the decision explicit here with a three-way mutually
+# exclusive chain, gated by BR2_PACKAGE_HAS_DESKTOP_OPENGL rather than
+# BR2_PACKAGE_HAS_LIBGL. HAS_LIBGL is polluted by XWayland (it only
+# means libGL.so.1 is on disk), while HAS_DESKTOP_OPENGL means the GPU
+# driver actually exposes GL >= 3.3 core profile. Every libretro core
+# .mk that picks a GL vs GLES build path keys off the same symbol, so
+# RetroArch and its in-process libretro cores always agree on the API.
+ifeq ($(BR2_PACKAGE_HAS_DESKTOP_OPENGL),y)
+    RETROARCH_CONF_OPTS += --enable-opengl --disable-opengl1 --disable-glx
+    RETROARCH_CONF_OPTS += --disable-opengles --disable-opengles3 \
+                           --disable-opengles3_1 --disable-opengles3_2
+    RETROARCH_CONF_OPTS += --enable-ozone
+    RETROARCH_DEPENDENCIES += libglvnd
+else ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
+    RETROARCH_CONF_OPTS += --disable-opengl
+    RETROARCH_CONF_OPTS += --enable-opengles --enable-opengles3 --enable-opengles3_1
     RETROARCH_CONF_OPTS += --enable-ozone --disable-xmb
     RETROARCH_DEPENDENCIES += libgles
 # Panfrost and v3d do NOT support OpenGL ES 3.2 (so only Qualcomm and Asahi targets so far)
@@ -114,7 +122,7 @@ ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR
     RETROARCH_CONF_OPTS += --enable-opengles3_2
 endif
 else ifeq ($(BR2_PACKAGE_HAS_GLES2),y)
-    RETROARCH_CONF_OPTS += --enable-opengles
+    RETROARCH_CONF_OPTS += --disable-opengl --enable-opengles
     RETROARCH_CONF_OPTS += --disable-ozone --enable-xmb
     RETROARCH_DEPENDENCIES += libgles
 endif
@@ -158,15 +166,16 @@ ifeq ($(BR2_riscv),y)
 	RETROARCH_TARGET_CFLAGS += -DMESA_EGL_NO_X11_HEADERS=1
 endif
 
-ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY),yy)
+ifeq ($(BR2_PACKAGE_WAYLAND),y)
     RETROARCH_CONF_OPTS += --enable-wayland
+    RETROARCH_DEPENDENCIES += wayland wayland-protocols libxkbcommon
 else
     RETROARCH_CONF_OPTS += --disable-wayland
 endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     RETROARCH_CONF_OPTS += --enable-vulkan
-    RETROARCH_DEPENDENCIES += vulkan-headers vulkan-loader slang-shaders
+    RETROARCH_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
 
 define RETROARCH_CONFIGURE_CMDS

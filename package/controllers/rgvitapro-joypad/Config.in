@@ -1,0 +1,7 @@
+config BR2_PACKAGE_RGVITAPRO_JOYPAD
+	bool "rgvitapro-joypad"
+	depends on BR2_LINUX_KERNEL
+	help
+	  RG Vita Pro GPIO joypad driver.
+	  Reads D-pad, face buttons, shoulders, start/select,
+	  and thumbstick clicks from the singleadc-joypad DT node.

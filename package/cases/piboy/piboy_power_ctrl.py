@@ -21,11 +21,11 @@ try:
         if abs(pwrctrl - pwrctrlOld) > hyst:
             if pwrctrl == 6:
                 os.system(
-                    "/etc/init.d/S31emulationstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
+                    "/etc/init.d/S31regstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
                 )
             if pwrctrl == 134:
                 os.system(
-                    "/etc/init.d/S31emulationstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
+                    "/etc/init.d/S31regstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
                 )
         pwrctrlOld = pwrctrl
         # Read Battery < 5% shutdown
@@ -39,7 +39,7 @@ try:
                 )
             if battctrl <= 5:
                 os.system(
-                    "/etc/init.d/S31emulationstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
+                    "/etc/init.d/S31regstation stop && echo 0 > /sys/kernel/xpi_gamecon/flags && /sbin/rmmod xpi_gamecon && shutdown -h now"
                 )
         battctrlOld = battctrl
         # Wait until next refresh
