@@ -1,0 +1,29 @@
+diff --git a/boot/grub2/grub2.mk b/boot/grub2/grub2.mk
+index 5de2afcc32..7b80b59800 100644
+--- a/boot/grub2/grub2.mk
++++ b/boot/grub2/grub2.mk
+@@ -75,6 +75,7 @@ GRUB2_TARGET_i386-efi = i386
+ GRUB2_PLATFORM_i386-efi = efi
+ GRUB2_BUILTIN_CONFIG_i386-efi = $(GRUB2_BUILTIN_CONFIG_EFI)
+ GRUB2_BUILTIN_MODULES_i386-efi = $(GRUB2_BUILTIN_MODULES_EFI)
++GRUB2_SBAT_CSV_i386-efi = $(BR2_EXTERNAL_REGLINUX_PATH)/board/x86_64/boot/sbat.csv
+ GRUB2_TUPLES-$(BR2_TARGET_GRUB2_I386_EFI) += i386-efi
+ 
+ GRUB2_IMAGE_x86_64-efi = $(BINARIES_DIR)/efi-part/EFI/BOOT/bootx64.efi
+@@ -84,6 +85,7 @@ GRUB2_TARGET_x86_64-efi = x86_64
+ GRUB2_PLATFORM_x86_64-efi = efi
+ GRUB2_BUILTIN_CONFIG_x86_64-efi = $(GRUB2_BUILTIN_CONFIG_EFI)
+ GRUB2_BUILTIN_MODULES_x86_64-efi = $(GRUB2_BUILTIN_MODULES_EFI)
++GRUB2_SBAT_CSV_x86_64-efi = $(BR2_EXTERNAL_REGLINUX_PATH)/board/x86_64/boot/sbat.csv
+ GRUB2_TUPLES-$(BR2_TARGET_GRUB2_X86_64_EFI) += x86_64-efi
+ 
+ GRUB2_IMAGE_arm-uboot = $(BINARIES_DIR)/boot-part/grub/grub.img
+@@ -195,6 +197,8 @@ define GRUB2_INSTALL_IMAGES_CMDS
+ 			-p "$(GRUB2_PREFIX_$(tuple))" \
+ 			$(if $(GRUB2_BUILTIN_CONFIG_$(tuple)), \
+ 				-c $(GRUB2_BUILTIN_CONFIG_$(tuple))) \
++			$(if $(GRUB2_SBAT_CSV_$(tuple)), \
++				--sbat $(GRUB2_SBAT_CSV_$(tuple))) \
+ 			$(GRUB2_BUILTIN_MODULES_$(tuple))
+ 		$(INSTALL) -D -m 0644 boot/grub2/grub.cfg $(GRUB2_CFG_$(tuple))
+ 		$(if $(findstring $(GRUB2_PLATFORM_$(tuple)), pc), \

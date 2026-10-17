@@ -185,9 +185,9 @@ QT6BASE_DEPENDENCIES += freetype
 
 ifeq ($(BR2_PACKAGE_QT6BASE_VULKAN),y)
 QT6BASE_DEPENDENCIES   += vulkan-headers vulkan-loader
-QT6BASE_CONFIGURE_OPTS += -DFEATURE_vulkan=ON
+QT6BASE_CONF_OPTS += -DFEATURE_vulkan=ON
 else
-QT6BASE_CONFIGURE_OPTS += -DFEATURE_vulkan=OFF
+QT6BASE_CONF_OPTS += -DFEATURE_vulkan=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_QT6BASE_LINUXFB),y)
@@ -282,13 +282,8 @@ endif
 ifeq ($(BR2_PACKAGE_QT6BASE_WIDGETS),y)
 QT6BASE_CONF_OPTS += -DFEATURE_widgets=ON
 
-# only enable gtk support if libgtk3 X11 backend is enabled
-ifeq ($(BR2_PACKAGE_LIBGTK3)$(BR2_PACKAGE_LIBGTK3_X11),yy)
-QT6BASE_CONF_OPTS += -DFEATURE_gtk3=ON
-QT6BASE_DEPENDENCIES += libgtk3
-else
+# REG disable gtk3 support
 QT6BASE_CONF_OPTS += -DFEATURE_gtk3=OFF
-endif
 
 else
 QT6BASE_CONF_OPTS += -DFEATURE_widgets=OFF

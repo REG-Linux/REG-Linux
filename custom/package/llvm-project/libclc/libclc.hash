@@ -1,3 +1,5 @@
+# From https://github.com/llvm/llvm-project/releases/tag/llvmorg-22.1.7
+sha256  5cc4a3f12bba50b6bdfb4b61bdc852117a0ff2517807c3902fc13267fb93562e  llvm-project-22.1.7.src.tar.xz
 # locally calculated
 sha256  77e2d71f5cea1d0b1014ba88186299d1a0848eb3dc20948baae649db9e7641cb  libclc-19.1.7.src.tar.xz
 sha256  35731fea7be224f21acf5bf3cd9f0ed058bf4ada5eceaf7f10ee96e139bd3389  libclc-15.0.7.src.tar.xz

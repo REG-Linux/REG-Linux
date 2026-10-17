@@ -1,5 +1,5 @@
 diff --git a/package/dropbear/dropbear.mk b/package/dropbear/dropbear.mk
-index d57d6b6e37..98774a85fd 100644
+index e4e42cf994..0c3ec5a856 100644
 --- a/package/dropbear/dropbear.mk
 +++ b/package/dropbear/dropbear.mk
 @@ -108,8 +108,8 @@ endef
@@ -13,3 +13,12 @@ index d57d6b6e37..98774a85fd 100644
  endef
  else
  define DROPBEAR_DISABLE_STANDALONE
+@@ -139,7 +139,7 @@ define DROPBEAR_INSTALL_TARGET_CMDS
+ 	for f in $(DROPBEAR_TARGET_BINS); do \
+ 		ln -snf ../sbin/dropbear $(TARGET_DIR)/usr/bin/$$f ; \
+ 	done
+-	ln -snf /var/run/dropbear $(TARGET_DIR)/etc/dropbear
++	ln -snf /userdata/system/.ssh $(TARGET_DIR)/etc/dropbear
+ endef
+ 
+ $(eval $(autotools-package))

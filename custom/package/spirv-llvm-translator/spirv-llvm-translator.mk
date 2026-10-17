@@ -4,28 +4,54 @@
 #
 ################################################################################
 
-# Generate version string using:
-#   git describe --tags --match 'v18*' --abbrev=40 origin/llvm_release_180
-# reglinux - 19.1.4 update
-SPIRV_LLVM_TRANSLATOR_VERSION = v19.1.4
-SPIRV_LLVM_TRANSLATOR_SITE = $(call github,KhronosGroup,SPIRV-LLVM-Translator,$(SPIRV_LLVM_TRANSLATOR_VERSION))
+# reglinux - keep this on the same LLVM release as llvm-project.
+#
+# mesa is the constraint: its meson.build requires
+#   LLVMSPIRVLib >= <llvm_major>.<llvm_minor>  and  < <llvm_major>.<llvm_minor+1>
+# so the major MUST track llvm-project, and it is taken from
+# LLVM_PROJECT_VERSION_MAJOR below so it cannot silently drift. Before this the
+# two were pinned independently and had already diverged (translator 19.1.4
+# against LLVM 19.1.7).
+#
+# The patch level still has to be pinned by hand: KhronosGroup normally tags one
+# release per LLVM patch release, but it can lag - at LLVM 22.1.7 the newest tag
+# on the 22 line is 22.1.5. When bumping LLVM, check
+#   https://github.com/KhronosGroup/SPIRV-LLVM-Translator/tags
+# and set the patch level to the newest tag on that major. Only the major is
+# load-bearing for mesa; the patch level is free.
+SPIRV_LLVM_TRANSLATOR_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).1.5
+SPIRV_LLVM_TRANSLATOR_SITE = $(call github,KhronosGroup,SPIRV-LLVM-Translator,v$(SPIRV_LLVM_TRANSLATOR_VERSION))
+
+ifeq ($(BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR_BUILD_FROM_SOURCE),y)
 SPIRV_LLVM_TRANSLATOR_LICENSE = NCSA
 SPIRV_LLVM_TRANSLATOR_LICENSE_FILES = LICENSE.TXT
 
 # reglinux we need target package for some mesa targets
 SPIRV_LLVM_TRANSLATOR_INSTALL_STAGING = YES
-SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-spirv-llvm-translator llvm clang spirv-headers
+# No clang either way: the translator's CMakeLists only calls
+# find_package(LLVM) and find_package(SPIRV-Tools) - it never references clang,
+# and upstream buildroot does not list it. Naming it dragged the 340 MB
+# target-clang payload onto boards whose kconfig has BR2_PACKAGE_CLANG=n, where
+# CLANG_FILES_TO_REMOVE and target-finalize then delete every file of it.
+SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-spirv-llvm-translator host-clang host-llvm llvm spirv-headers
 SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
 	-DLLVM_BUILD_TOOLS=ON \
-	-DLLVM_DIR=$(STAGING_DIR)/lib/cmake/llvm \
+	-DLLVM_DIR=$(STAGING_DIR)/usr/lib/cmake/llvm \
 	-DLLVM_SPIRV_BUILD_EXTERNAL=YES \
 	-DLLVM_SPIRV_INCLUDE_TESTS=OFF \
 	-DLLVM_EXTERNAL_PROJECTS="SPIRV-Headers" \
-	-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_DIR)/include
+	-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_DIR)/usr/include
 $(eval $(cmake-package))
 
 # reglinux define both host and targets
-HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = llvm clang host-spirv-headers
+#
+# This builds against $(HOST_DIR)/lib/cmake/llvm (see the conf opts below), so
+# it depends on the host packages, not the target ones. That only became sayable
+# once llvm.mk's prebuilt branch started evaluating host-generic-package as
+# well: before that the prebuilt path defined only the target `llvm` package,
+# whose extract step populated HOST_DIR, so everything wanting the host compiler
+# had to name `llvm` and dragged its rootfs payload along with it.
+HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-clang host-llvm host-spirv-headers
 HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
 	-DLLVM_BUILD_TOOLS=ON \
 	-DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \
@@ -34,26 +60,104 @@ HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
 	-DLLVM_EXTERNAL_PROJECTS="SPIRV-Headers" \
 	-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(HOST_DIR)/include
 
-# reglinux fix for prebuilt llvm/clang
-#HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib"
-# -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
-HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES += host-patchelf
-define HOST_SPIRV_LLVM_TRANSLATOR_FIX_RPATH
-    for f in $(HOST_DIR)/bin/llvm-* $(HOST_DIR)/bin/*ll*; do \
-        $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $$f || true; \
-    done
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/yaml2obj || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/opt || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/sancov || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/verify-uselistorder || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/dsymutil || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/sanstats || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/reduce-chunk-list || true;
-    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/bugpoint || true;
-endef
-
-HOST_SPIRV_LLVM_TRANSLATOR_POST_INSTALL_HOOKS += HOST_SPIRV_LLVM_TRANSLATOR_FIX_RPATH
+# The RPATH fixup for LLVM's own host binaries used to live here, as a
+# POST_INSTALL hook running patchelf over $(HOST_DIR)/bin/llvm-* and friends.
+# It has moved to llvm.mk's prebuilt branch, where those files actually come
+# from. Keeping it here corrupted the prebuilt harvest: buildroot derives
+# .files-list-host.txt by diffing a find snapshot taken around the install, so
+# every binary patchelf rewrote was recorded as installed by *this* package -
+# 81 llvm host tools, 21 MB, landing in the translator's own bundle.
 
 $(eval $(host-cmake-package))
 
+else
+
+# Prebuilt, published on REG-llvm-binaries under its own release tag,
+# spirv-llvm-translator-$(LLVM_VERSION)-$(SPIRV_HEADERS_VERSION).
+#
+# TWO-version key. This artifact is compiled against both the LLVM major (it
+# links LLVM and its soname carries the major - libLLVMSPIRVLib.so.<major>.1)
+# and spirv-headers (the SPIR-V opcode definitions are header-only and get
+# compiled in). Those two move on different cadences - REG tracks spirv-headers
+# on the Vulkan SDK cadence and is routinely many releases ahead of the LLVM
+# bump - so keying on only one of them would let a bump of the other slip past
+# the CI skip-check and hand every board a translator built against stale
+# definitions. Both versions are in the name so that cannot happen.
+SPIRV_LLVM_TRANSLATOR_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/spirv-llvm-translator-$(LLVM_VERSION)-$(SPIRV_HEADERS_VERSION)
+SPIRV_LLVM_TRANSLATOR_SOURCE = reglinux-spirv-llvm-translator-target-$(LLVM_VERSION)-$(SPIRV_HEADERS_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
+SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-spirv-llvm-translator llvm spirv-headers
+SPIRV_LLVM_TRANSLATOR_INSTALL_STAGING = YES
+
+HOST_SPIRV_LLVM_TRANSLATOR_SITE = $(SPIRV_LLVM_TRANSLATOR_SITE)
+HOST_SPIRV_LLVM_TRANSLATOR_SOURCE = reglinux-spirv-llvm-translator-host-$(LLVM_VERSION)-$(SPIRV_HEADERS_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
+HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-llvm host-spirv-headers
+
+define DISABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
+		mkdir -p $(dir)/tmp_disabled_patches ; mv -v $(dir)/*.patch $(dir)/tmp_disabled_patches/ ; \
+	)
+endef
+define ENABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
+		mv -v $(dir)/tmp_disabled_patches/* $(dir)/ ; rmdir $(dir)/tmp_disabled_patches ; \
+	)
+endef
+SPIRV_LLVM_TRANSLATOR_PRE_PATCH_HOOKS += DISABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+SPIRV_LLVM_TRANSLATOR_POST_PATCH_HOOKS += ENABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_SPIRV_LLVM_TRANSLATOR_PRE_PATCH_HOOKS += DISABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_SPIRV_LLVM_TRANSLATOR_POST_PATCH_HOOKS += ENABLE_SPIRV_LLVM_TRANSLATOR_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+
+# Both variants patch the SAME shared directories (package/spirv-llvm-translator/ and board/patches/spirv-llvm-translator/),
+# outside the per-package dirs, so under PARALLEL_BUILD=y their PRE hooks
+# race: whichever patches first moves the *.patch files aside and the
+# other's mv dies with "cannot stat ... No such file or directory",
+# failing .stamp_patched. Guarding the mv would only hide it - the first
+# package's POST hook would then restore the patches while the second is
+# still patching, and a source patch would land on a prebuilt tarball.
+# Order the two patch steps instead; buildroot turns this into an
+# order-only dependency on host-spirv-llvm-translator-patch (pkg-generic.mk), so each
+# move-aside/restore pair runs to completion before the next begins.
+SPIRV_LLVM_TRANSLATOR_PATCH_DEPENDENCIES = host-spirv-llvm-translator
+
+# The prebuilt tarball is per-CPU, so it cannot have a hash entry. Tell
+# buildroot's check-hash to skip it by name (support/download/check-hash matches
+# the basename against BR_NO_CHECK_HASH_FOR) instead of moving the .hash file
+# aside around the download. The old PRE/POST_DOWNLOAD rename hooks were not
+# failure-safe: a download error - a 404 for an unpublished asset, say - aborts
+# between the two, leaving the .hash renamed to .hash.bak and the next build
+# unable to find it.
+BR_NO_CHECK_HASH_FOR += $(SPIRV_LLVM_TRANSLATOR_SOURCE) $(HOST_SPIRV_LLVM_TRANSLATOR_SOURCE)
+
+define HOST_SPIRV_LLVM_TRANSLATOR_EXTRACT_CMDS
+endef
+define HOST_SPIRV_LLVM_TRANSLATOR_INSTALL_CMDS
+	tar -C $(HOST_DIR)/../ -xf $(HOST_SPIRV_LLVM_TRANSLATOR_DL_DIR)/$(HOST_SPIRV_LLVM_TRANSLATOR_SOURCE) host
+endef
+
+# llvm-spirv and libLLVMSPIRVLib.so.22.1 carry the RUNPATH of the board this
+# CPU's bundle was harvested on, which no other board has. This is not a return
+# of the fixup the source branch above says moved to llvm.mk: that one rewrote
+# LLVM's binaries from here and mis-attributed them to this package. This one
+# touches only the two files this bundle itself ships. See
+# REGLINUX_PREBUILT_HOST_FIX_RPATH in llvm-project.mk.
+HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES += host-patchelf
+define HOST_SPIRV_LLVM_TRANSLATOR_FIX_RPATH
+	$(call REGLINUX_PREBUILT_HOST_FIX_RPATH,\
+		$(HOST_SPIRV_LLVM_TRANSLATOR_DL_DIR)/$(HOST_SPIRV_LLVM_TRANSLATOR_SOURCE),$(HOST_DIR))
+endef
+HOST_SPIRV_LLVM_TRANSLATOR_POST_INSTALL_HOOKS += HOST_SPIRV_LLVM_TRANSLATOR_FIX_RPATH
+
+define SPIRV_LLVM_TRANSLATOR_EXTRACT_CMDS
+endef
+define SPIRV_LLVM_TRANSLATOR_INSTALL_STAGING_CMDS
+	mkdir -p $(STAGING_DIR)
+	tar -C $(STAGING_DIR) --strip-components=1 -xf $(SPIRV_LLVM_TRANSLATOR_DL_DIR)/$(SPIRV_LLVM_TRANSLATOR_SOURCE) target/usr
+endef
+define SPIRV_LLVM_TRANSLATOR_INSTALL_TARGET_CMDS
+	mkdir -p $(TARGET_DIR)
+	tar -C $(TARGET_DIR)/../ -xf $(SPIRV_LLVM_TRANSLATOR_DL_DIR)/$(SPIRV_LLVM_TRANSLATOR_SOURCE) target
+endef
+
+$(eval $(generic-package))
+$(eval $(host-generic-package))
+endif

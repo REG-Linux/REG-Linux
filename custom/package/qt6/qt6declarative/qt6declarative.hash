@@ -1,5 +1,5 @@
-# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qtdeclarative-everywhere-src-6.10.1.tar.xz.sha256
-sha256  4fb4efb894e0b96288543505d69794d684bcfbe4940ce181d3e6817bda54843e  qtdeclarative-everywhere-src-6.10.1.tar.xz
+# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.3/submodules/qtdeclarative-everywhere-src-6.10.3.tar.xz.sha256
+sha256  dadf80d43b8e08ca63aa65d46859a42b920a7777cf7e0ecfcb4c4537f9e65c76  qtdeclarative-everywhere-src-6.10.3.tar.xz
 
 # Hashes for license files:
 sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt

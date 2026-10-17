@@ -1,0 +1,13 @@
+diff --git a/package/eudev/eudev.mk b/package/eudev/eudev.mk
+index 99c9f0dcab..0c98fd04ab 100644
+--- a/package/eudev/eudev.mk
++++ b/package/eudev/eudev.mk
+@@ -52,7 +52,7 @@ EUDEV_CONF_OPTS += --disable-selinux
+ endif
+ 
+ define EUDEV_INSTALL_INIT_SYSV
+-	$(INSTALL) -D -m 0755 package/eudev/S10udev $(TARGET_DIR)/etc/init.d/S10udev
++	$(INSTALL) -D -m 0755 package/eudev/S10udev $(TARGET_DIR)/etc/init.d/S001udev
+ endef
+ 
+ # Avoid installing S10udev with openrc, as the service is started by a unit

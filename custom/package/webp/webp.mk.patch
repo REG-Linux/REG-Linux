@@ -1,0 +1,20 @@
+diff --git a/package/webp/webp.mk b/package/webp/webp.mk
+index 83d5506c0f..b708eff504 100644
+--- a/package/webp/webp.mk
++++ b/package/webp/webp.mk
+@@ -16,13 +16,14 @@ WEBP_INSTALL_STAGING = YES
+ WEBP_CONF_OPTS += \
+ 	--disable-sdl
+ 
++HOST_WEBP_DEPENDENCIES += host-libpng
+ HOST_WEBP_CONF_OPTS += \
+ 	--enable-libwebpdemux \
+ 	--enable-libwebpmux \
+ 	--disable-gif \
+ 	--disable-gl \
+ 	--disable-jpeg \
+-	--disable-png \
++	--enable-png \
+ 	--disable-sdl \
+ 	--disable-tiff
+ 

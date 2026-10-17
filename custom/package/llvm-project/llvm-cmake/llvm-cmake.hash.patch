@@ -1,8 +1,11 @@
 diff --git a/package/llvm-project/llvm-cmake/llvm-cmake.hash b/package/llvm-project/llvm-cmake/llvm-cmake.hash
-index 756404cdd9..14ca9a26a9 100644
+index 756404cdd9..b68cdb59d5 100644
 --- a/package/llvm-project/llvm-cmake/llvm-cmake.hash
 +++ b/package/llvm-project/llvm-cmake/llvm-cmake.hash
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,6 @@
++# From https://github.com/llvm/llvm-project/releases/tag/llvmorg-22.1.7
++sha256  5cc4a3f12bba50b6bdfb4b61bdc852117a0ff2517807c3902fc13267fb93562e  llvm-project-22.1.7.src.tar.xz
  # locally calculated
  sha256  8986f29b634fdaa9862eedda78513969fe9788301c9f2d938f4c10a3e7a3e7ea  cmake-15.0.7.src.tar.xz
 +sha256  11c5a28f90053b0c43d0dec3d0ad579347fc277199c005206b963c19aae514e3  cmake-19.1.7.src.tar.xz
++sha256  404c54c2df45a307331eba1372917ec480addf3b77ca9943ed4d7ea445efb08f  runtimes-19.1.7.src.tar.xz

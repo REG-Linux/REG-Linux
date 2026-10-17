@@ -1,5 +1,5 @@
 diff --git a/package/alsa-lib/alsa-lib.mk b/package/alsa-lib/alsa-lib.mk
-index 6272fa69df..50e54712d0 100644
+index 6272fa69df..b6000b3cf3 100644
 --- a/package/alsa-lib/alsa-lib.mk
 +++ b/package/alsa-lib/alsa-lib.mk
 @@ -4,7 +4,7 @@
@@ -7,7 +7,7 @@ index 6272fa69df..50e54712d0 100644
  ################################################################################
  
 -ALSA_LIB_VERSION = 1.2.13
-+ALSA_LIB_VERSION = 1.2.15.3
++ALSA_LIB_VERSION = 1.2.16.1
  ALSA_LIB_SOURCE = alsa-lib-$(ALSA_LIB_VERSION).tar.bz2
  ALSA_LIB_SITE = https://www.alsa-project.org/files/pub/lib
  ALSA_LIB_LICENSE = LGPL-2.1+ (library), GPL-2.0+ (aserver)

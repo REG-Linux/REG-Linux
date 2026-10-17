@@ -38,6 +38,10 @@ NCURSES_CONF_OPTS = \
 	--without-manpages \
 	--with-termlib=tinfo
 
+# reglinux - C23 (GCC 15+ default) has builtin bool, so configure skips
+# stdbool.h and curses.h then does "#define bool int", breaking C++ (gdb)
+NCURSES_CONF_ENV = cf_cv_header_stdbool_h=1
+
 ifeq ($(BR2_STATIC_LIBS),y)
 NCURSES_CONF_OPTS += --without-shared --with-normal
 else ifeq ($(BR2_SHARED_LIBS),y)

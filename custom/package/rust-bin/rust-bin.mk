@@ -6,7 +6,7 @@
 
 # When updating this version, check whether support/download/cargo-post-process
 # still generates the same archives.
-RUST_BIN_VERSION = 1.93.0
+RUST_BIN_VERSION = 1.98.1
 RUST_BIN_SITE = https://static.rust-lang.org/dist
 RUST_BIN_LICENSE = Apache-2.0 or MIT
 RUST_BIN_LICENSE_FILES = LICENSE-APACHE LICENSE-MIT
@@ -15,7 +15,11 @@ HOST_RUST_BIN_PROVIDES = host-rustc
 
 HOST_RUST_BIN_SOURCE = rust-$(RUST_BIN_VERSION)-$(RUSTC_HOST_NAME).tar.xz
 
-ifeq ($(BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS),y)
+# Only when rust-bin is the selected compiler: host-rust (built from source)
+# pulls host-rust-bin in purely as its bootstrap and builds the target std
+# itself. Tier 3 targets such as mipsel-unknown-linux-musl have no published
+# rust-std tarball at all, so fetching one here 404s the build.
+ifeq ($(BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS)-$(BR2_PACKAGE_HOST_RUST_BIN),y-y)
 HOST_RUST_BIN_EXTRA_DOWNLOADS += rust-std-$(RUST_BIN_VERSION)-$(RUSTC_TARGET_NAME).tar.xz
 endif
 
@@ -28,8 +32,8 @@ define HOST_RUST_BIN_LIBSTD_EXTRACT
 			$(TAR) -C $(@D)/std $(TAR_OPTIONS) -
 	)
 	mkdir -p $(@D)/rustc/lib/rustlib/$(RUSTC_HOST_NAME)/lib
-	cd $(@D)/rustc/lib/rustlib/$(RUSTC_HOST_NAME)/lib; \
-		ln -sf ../../../../../$(HOST_RUST_BIN_LIBSTD_HOST_PREFIX)/lib/rustlib/$(RUSTC_HOST_NAME)/lib/* .
+	cp -al $(@D)/$(HOST_RUST_BIN_LIBSTD_HOST_PREFIX)/lib/rustlib/$(RUSTC_HOST_NAME)/lib/* \
+		$(@D)/rustc/lib/rustlib/$(RUSTC_HOST_NAME)/lib/
 endef
 
 HOST_RUST_BIN_POST_EXTRACT_HOOKS += HOST_RUST_BIN_LIBSTD_EXTRACT
@@ -47,7 +51,7 @@ define HOST_RUST_BIN_INSTALL_RUSTC
 		./install.sh $(HOST_RUST_BIN_INSTALL_OPTS))
 endef
 
-ifeq ($(BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS),y)
+ifeq ($(BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS)-$(BR2_PACKAGE_HOST_RUST_BIN),y-y)
 define HOST_RUST_BIN_INSTALL_LIBSTD_TARGET
 	(cd $(@D)/std/rust-std-$(RUST_BIN_VERSION)-$(RUSTC_TARGET_NAME); \
 		./install.sh $(HOST_RUST_BIN_INSTALL_COMMON_OPTS))

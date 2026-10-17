@@ -1,5 +1,5 @@
---- a/CMakeLists.txt	2025-02-25 14:18:42.913273107 +0100
-+++ b/CMakeLists.txt	2025-02-25 14:18:37.657177922 +0100
+--- a/clang/CMakeLists.txt	2025-02-25 14:18:42.913273107 +0100
++++ b/clang/CMakeLists.txt	2025-02-25 14:18:37.657177922 +0100
 @@ -2,7 +2,7 @@
  set(LLVM_SUBPROJECT_TITLE "Clang")
  

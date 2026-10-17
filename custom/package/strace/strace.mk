@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# REG bump to 6.18 for kernel up to 6.18
-STRACE_VERSION = 6.18
+# REG bump to 7.2 for kernel up to 7.2
+STRACE_VERSION = 7.2
 STRACE_SOURCE = strace-$(STRACE_VERSION).tar.xz
 STRACE_SITE = https://github.com/strace/strace/releases/download/v$(STRACE_VERSION)
 STRACE_LICENSE = LGPL-2.1+

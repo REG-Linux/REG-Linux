@@ -1,8 +1,8 @@
 diff --git a/package/libcec/libcec.mk b/package/libcec/libcec.mk
-index 33e0463eb8..33b70eeb7d 100644
+index 49b5c619c5..cc8cf17ce0 100644
 --- a/package/libcec/libcec.mk
 +++ b/package/libcec/libcec.mk
-@@ -37,6 +37,16 @@ ifeq ($(BR2_PACKAGE_XLIB_LIBXRANDR),y)
+@@ -33,6 +33,16 @@ ifeq ($(BR2_PACKAGE_XLIB_LIBXRANDR),y)
  LIBCEC_DEPENDENCIES += xlib_libXrandr
  endif
  

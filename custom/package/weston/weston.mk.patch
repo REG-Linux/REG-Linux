@@ -1,0 +1,75 @@
+diff --git a/package/weston/weston.mk b/package/weston/weston.mk
+index 1d55a1fcba..cdc9d60f0d 100644
+--- a/package/weston/weston.mk
++++ b/package/weston/weston.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-WESTON_VERSION = 14.0.1
++WESTON_VERSION = 15.0.1
+ WESTON_SITE = https://gitlab.freedesktop.org/wayland/weston/-/releases/$(WESTON_VERSION)/downloads
+ WESTON_SOURCE = weston-$(WESTON_VERSION).tar.xz
+ WESTON_LICENSE = MIT
+@@ -70,6 +70,15 @@ WESTON_CONF_OPTS += \
+ 	-Dbackend-pipewire=false
+ endif
+ 
++# weston 15.0.1 added a Vulkan renderer (default-on). Needs vulkan loader/
++# headers at link time and glslangValidator at build time.
++ifeq ($(BR2_PACKAGE_VULKAN_LOADER),y)
++WESTON_CONF_OPTS += -Drenderer-vulkan=true
++WESTON_DEPENDENCIES += vulkan-headers vulkan-loader host-glslang
++else
++WESTON_CONF_OPTS += -Drenderer-vulkan=false
++endif
++
+ WESTON_CONF_OPTS += -Dsimple-clients=$(subst $(space),$(comma),$(strip $(WESTON_SIMPLE_CLIENTS)))
+ 
+ ifeq ($(BR2_PACKAGE_WESTON_RDP),y)
+@@ -115,10 +124,10 @@ WESTON_CONF_OPTS += -Dxwayland=false
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBVA),y)
+-WESTON_CONF_OPTS += -Dbackend-drm-screencast-vaapi=true
++WESTON_CONF_OPTS += -Ddeprecated-backend-drm-screencast-vaapi=true
+ WESTON_DEPENDENCIES += libva
+ else
+-WESTON_CONF_OPTS += -Dbackend-drm-screencast-vaapi=false
++WESTON_CONF_OPTS += -Ddeprecated-backend-drm-screencast-vaapi=false
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LCMS2),y)
+@@ -149,9 +158,9 @@ WESTON_CONF_OPTS += -Dshell-desktop=false
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_WESTON_SHELL_FULLSCREEN),y)
+-WESTON_CONF_OPTS += -Dshell-fullscreen=true
++WESTON_CONF_OPTS += -Ddeprecated-shell-fullscreen=true
+ else
+-WESTON_CONF_OPTS += -Dshell-fullscreen=false
++WESTON_CONF_OPTS += -Ddeprecated-shell-fullscreen=false
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_WESTON_SHELL_IVI),y)
+@@ -166,10 +175,18 @@ else
+ WESTON_CONF_OPTS += -Dshell-kiosk=false
+ endif
+ 
++# weston 15.0.1 added a Lua-scripted shell (default-on, requires Lua >= 5.4).
++ifeq ($(BR2_PACKAGE_LUA_5_4),y)
++WESTON_CONF_OPTS += -Dshell-lua=true
++WESTON_DEPENDENCIES += luainterpreter
++else
++WESTON_CONF_OPTS += -Dshell-lua=false
++endif
++
+ ifeq ($(BR2_PACKAGE_WESTON_SCREENSHARE),y)
+-WESTON_CONF_OPTS += -Dscreenshare=true
++WESTON_CONF_OPTS += -Ddeprecated-screenshare=true
+ else
+-WESTON_CONF_OPTS += -Dscreenshare=false
++WESTON_CONF_OPTS += -Ddeprecated-screenshare=false
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_WESTON_DEMO_CLIENTS),y)

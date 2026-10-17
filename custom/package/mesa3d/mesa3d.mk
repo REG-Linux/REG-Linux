@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 26.0.0-rc2
+MESA3D_VERSION = 26.2.4
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
@@ -27,8 +27,11 @@ MESA3D_DEPENDENCIES = \
 	host-python3 \
 	host-python-pyyaml
 
-# Always build mesa3d host-side to get working clc compilers if needed
+# Build mesa3d host-side for clc compilers (needed by x86, asahi, panfrost, imagination, opencl)
+#MESA3D_NEEDS_HOST_MESA3D = $(or $(BR2_x86_64),$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST),$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_IMAGINATION),$(BR2_PACKAGE_MESA3D_OPENCL))
+#ifneq ($(MESA3D_NEEDS_HOST_MESA3D),)
 MESA3D_DEPENDENCIES += host-mesa3d
+#endif
 
 # need host-python-pycparser built for etnaviv
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ETNAVIV),y)
@@ -67,8 +70,13 @@ MESA3D_DEPENDENCIES += clang libclc
 MESA3D_CONF_OPTS += -Dgallium-rusticl=true
 endif
 
-# prebuilt compilers
+# prebuilt compilers from host-mesa3d - but only where host-mesa3d actually
+# installs them, see HOST_MESA3D_CONF_OPTS below. Asking for =system elsewhere
+# points meson at compilers that were never built. Omitting the options leaves
+# them at their meson default of 'auto' ('disabled' is not a valid choice).
+ifeq ($(BR2_PACKAGE_LLVM_ARCH_SUPPORTS),y)
 MESA3D_CONF_OPTS += -Dmesa-clc=system -Dprecomp-compiler=system
+endif
 
 # x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
 ifeq ($(BR2_x86_64),y)
@@ -80,10 +88,31 @@ ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST),y)
 MESA3D_DEPENDENCIES += libclc spirv-llvm-translator spirv-tools
 endif
 
+# imagination needs libclc, llvm and spirv-llvm-translator
+ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_IMAGINATION),y)
+MESA3D_DEPENDENCIES += libclc spirv-llvm-translator spirv-tools
+endif
+
 # asahi needs libclc spirv-tools
 # specify extra binaries to cross-compile asahi clc
 ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 MESA3D_DEPENDENCIES += libclc spirv-tools spirv-llvm-translator clang host-glslang
+endif
+
+# spirv-tools is a meson `feature`, so leaving it unset means auto: meson takes
+# SPIRV-Tools if pkg-config finds it, whether or not buildroot asked for it, and
+# libgallium then carries a NEEDED on libSPIRV-Tools.so. On a board that never
+# enabled the target package nothing installs that library, so every GL client
+# dies at load time and the device boots to a black screen - which is what a
+# stray SPIRV-Tools.pc in the sysroot did to cha. Say what we mean, and depend
+# on the package here rather than relying on the per-driver blocks above to
+# have named it (BR2_PACKAGE_SPIRV_TOOLS is also selected for plain x86_64,
+# where none of them fires).
+ifeq ($(BR2_PACKAGE_SPIRV_TOOLS),y)
+MESA3D_DEPENDENCIES += spirv-tools
+MESA3D_CONF_OPTS += -Dspirv-tools=enabled
+else
+MESA3D_CONF_OPTS += -Dspirv-tools=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_NEEDS_ELFUTILS),y)
@@ -136,7 +165,8 @@ MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_BROADCOM)  += broadcom
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST)  += panfrost
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_FREEDRENO) += freedreno
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_ASAHI)     += asahi
-MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_LAVAPIPE)  += swrast
+MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_LAVAPIPE)      += swrast
+MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_IMAGINATION)  += imagination
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_VC1DEC)        += vc1dec
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_H264DEC)       += h264dec
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_H264ENC)       += h264enc
@@ -328,8 +358,24 @@ endif
 $(eval $(meson-package))
 
 # "just" need various clc compilers / host tools
-HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
-HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=disabled -Dgallium-rusticl=false -Dcpp_rtti=false -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dinstall-precomp-compiler=true
+HOST_MESA3D_DEPENDENCIES = host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml
+HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=disabled -Dgallium-rusticl=false -Dcpp_rtti=false
+
+# mesa-clc compiles OpenCL C kernels, so it needs clang/LLVM: libclc and
+# spirv-llvm-translator drag in the whole stack (spirv-llvm-translator -> clang
+# -> llvm). These are make-level dependencies, which buildroot honours whatever
+# the kconfig symbol says, so on an arch missing from
+# BR2_PACKAGE_LLVM_ARCH_SUPPORTS (i386/x86_64/aarch64/arm/riscv - mipsel is not
+# there) this built an LLVM that kconfig deliberately leaves unset. With
+# BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE off that means downloading a prebuilt that
+# was never published for the CPU, and the build dies on a 404.
+#
+# Every driver that needs mesa-clc (asahi, panfrost, imagination) is on an arch
+# that does support LLVM. etnaviv, the only mipsel user, never references it.
+ifeq ($(BR2_PACKAGE_LLVM_ARCH_SUPPORTS),y)
+HOST_MESA3D_DEPENDENCIES += host-libclc host-spirv-llvm-translator
+HOST_MESA3D_CONF_OPTS += -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dinstall-precomp-compiler=true
+endif
 ifeq ($(BR2_x86_64),y)
 # LLVM RTTI is enabled on x86_64 build
 HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
@@ -340,6 +386,9 @@ HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
 endif
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 HOST_MESA3D_CONF_OPTS += -Dtools=asahi
+endif
+ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_IMAGINATION),y)
+HOST_MESA3D_CONF_OPTS += -Dtools=imagination
 endif
 
 # reglinux hack to fix prebuilt llvm/clang

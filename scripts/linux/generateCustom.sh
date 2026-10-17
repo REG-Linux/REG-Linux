@@ -124,11 +124,24 @@ writeHashFileHeader
 
 # Process added files
 listGitChanges '^??' | while read -r filePath; do
-[ ! -d "$(dirname "${CUSTOM_DIR}/${filePath}")" ] && mkdir -p "$(dirname "${CUSTOM_DIR}/${filePath}")"
-  echo -e "${c_green}[added]${c_reset}    ${BUILDROOT_DIR}/${filePath}"
-  cp -p "${BUILDROOT_DIR}/${filePath}" "${CUSTOM_DIR}/${filePath}"
-  echo "++++++++++++++++++++++++++++++++  ${filePath}" >> "${hashFile}"
-  chmod 644 "${CUSTOM_DIR}/${filePath}"
+  # If it's a directory, find all files inside it
+  if [[ -d "${BUILDROOT_DIR}/${filePath}" ]]; then
+    find "${BUILDROOT_DIR}/${filePath}" -type f | while read -r file; do
+      relativePath="${file#${BUILDROOT_DIR}/}"
+      echo -e "${c_green}[added]${c_reset}    ${BUILDROOT_DIR}/${relativePath}"
+      mkdir -p "$(dirname "${CUSTOM_DIR}/${relativePath}")"
+      cp -p "${BUILDROOT_DIR}/${relativePath}" "${CUSTOM_DIR}/${relativePath}"
+      echo "++++++++++++++++++++++++++++++++  ${relativePath}" >> "${hashFile}"
+      chmod 644 "${CUSTOM_DIR}/${relativePath}"
+    done
+  else
+    # It's a file, process it directly
+    echo -e "${c_green}[added]${c_reset}    ${BUILDROOT_DIR}/${filePath}"
+    mkdir -p "$(dirname "${CUSTOM_DIR}/${filePath}")"
+    cp -p "${BUILDROOT_DIR}/${filePath}" "${CUSTOM_DIR}/${filePath}"
+    echo "++++++++++++++++++++++++++++++++  ${filePath}" >> "${hashFile}"
+    chmod 644 "${CUSTOM_DIR}/${filePath}"
+  fi
 done
 
 # Process removed files

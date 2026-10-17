@@ -1,3 +1,10 @@
+config BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR_BUILD_FROM_SOURCE
+	bool "spirv-llvm-translator-build-from-source"
+	default n
+	help
+	  Build spirv-llvm-translator from source instead of downloading the
+	  prebuilt tarball published beside LLVM on REG-llvm-binaries.
+
 config BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR
 	bool "spirv-llvm-translator"
 	depends on BR2_INSTALL_LIBSTDCPP

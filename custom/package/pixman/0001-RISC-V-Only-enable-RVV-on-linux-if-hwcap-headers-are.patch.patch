@@ -1,0 +1,13 @@
+diff --git a/package/pixman/0001-RISC-V-Only-enable-RVV-on-linux-if-hwcap-headers-are.patch b/package/pixman/0001-RISC-V-Only-enable-RVV-on-linux-if-hwcap-headers-are.patch
+index ad1a0902e2..6c4c270b19 100644
+--- a/package/pixman/0001-RISC-V-Only-enable-RVV-on-linux-if-hwcap-headers-are.patch
++++ b/package/pixman/0001-RISC-V-Only-enable-RVV-on-linux-if-hwcap-headers-are.patch
+@@ -31,7 +31,7 @@ index fdea28f..cb10931 100644
+ +      #if defined(__linux__)
+ +      #include <asm/hwcap.h>
+ +      #include <sys/auxv.h>
+-+      COMPAT_HWCAP_ISA_V
+++      int x = COMPAT_HWCAP_ISA_V;
+ +      #endif
+ +      ''',
+ +      args : rvv_flags,

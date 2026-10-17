@@ -1,0 +1,23 @@
+diff --git a/package/fluidsynth/fluidsynth.mk b/package/fluidsynth/fluidsynth.mk
+index bde3f416a7..0b4af0fe18 100644
+--- a/package/fluidsynth/fluidsynth.mk
++++ b/package/fluidsynth/fluidsynth.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-FLUIDSYNTH_VERSION = 2.4.3
++FLUIDSYNTH_VERSION = 2.5.7
+ FLUIDSYNTH_SITE = $(call github,FluidSynth,fluidsynth,v$(FLUIDSYNTH_VERSION))
+ FLUIDSYNTH_LICENSE = LGPL-2.1+
+ FLUIDSYNTH_LICENSE_FILES = LICENSE
+@@ -12,9 +12,6 @@ FLUIDSYNTH_CPE_ID_VENDOR = fluidsynth
+ FLUIDSYNTH_INSTALL_STAGING = YES
+ FLUIDSYNTH_DEPENDENCIES = libglib2
+ 
+-# 0001-Fix-a-nullpointer-dereference-during-legato-mode.patch
+-FLUIDSYNTH_IGNORE_CVES += CVE-2025-56225
+-
+ ifeq ($(BR2_PACKAGE_FLUIDSYNTH_ALSA_LIB),y)
+ FLUIDSYNTH_CONF_OPTS += -Denable-alsa=1
+ FLUIDSYNTH_DEPENDENCIES += alsa-lib

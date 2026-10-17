@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DROPBEAR_VERSION = 2025.88
+DROPBEAR_VERSION = 2025.89
 DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
 DROPBEAR_LICENSE = MIT, BSD-2-Clause, Public domain
@@ -139,7 +139,7 @@ define DROPBEAR_INSTALL_TARGET_CMDS
 	for f in $(DROPBEAR_TARGET_BINS); do \
 		ln -snf ../sbin/dropbear $(TARGET_DIR)/usr/bin/$$f ; \
 	done
-	ln -snf /var/run/dropbear $(TARGET_DIR)/etc/dropbear
+	ln -snf /userdata/system/.ssh $(TARGET_DIR)/etc/dropbear
 endef
 
 $(eval $(autotools-package))

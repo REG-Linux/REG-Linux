@@ -10,7 +10,10 @@ CLANG_VERSION = $(LLVM_PROJECT_VERSION)
 ifeq ($(BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE),y)
 
 CLANG_SITE = $(LLVM_PROJECT_SITE)
-CLANG_SOURCE = clang-$(CLANG_VERSION).src.tar.xz
+# reglinux - one shared llvm-project monolith, see llvm-project.mk
+CLANG_SOURCE = $(LLVM_PROJECT_SOURCE)
+CLANG_DL_SUBDIR = llvm-project
+CLANG_SUBDIR = clang
 CLANG_LICENSE = Apache-2.0 with exceptions
 CLANG_LICENSE_FILES = LICENSE.TXT
 CLANG_CPE_ID_VENDOR = llvm
@@ -57,7 +60,7 @@ CLANG_CONF_OPTS += \
 	-DCLANG_INCLUDE_TESTS=OFF \
 	-DLLVM_INCLUDE_TESTS=OFF
 
-# batocera - add LLVM_COMMON_CMAKE_UTILS
+# reglinux - add LLVM_COMMON_CMAKE_UTILS
 HOST_CLANG_CONF_OPTS += -DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \
 	-DCLANG_DEFAULT_LINKER=$(TARGET_LD) \
 	-DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
@@ -146,62 +149,28 @@ $(eval $(host-cmake-package))
 
 else
 
-# Download pre compiled files
-REGLINUX_CLANG_CPU = unknown
-ifeq ($(BR2_arm1176jzf_s),y)
-	REGLINUX_CLANG_CPU = arm1176jzf_s
-else ifeq ($(BR2_cortex_a7),y)
-	REGLINUX_CLANG_CPU = cortex_a7
-else ifeq ($(BR2_cortex_a9),y)
-	REGLINUX_CLANG_CPU = cortex_a9
-else ifeq ($(BR2_cortex_a15_a7),y)
-	REGLINUX_CLANG_CPU = cortex_a15_a7
-else ifeq ($(BR2_cortex_a17),y)
-	REGLINUX_CLANG_CPU = cortex_a17
-else ifeq ($(BR2_cortex_a35),y)
-	REGLINUX_CLANG_CPU = cortex_a35
-else ifeq ($(BR2_cortex_a53),y)
-	REGLINUX_CLANG_CPU = cortex_a53
-else ifeq ($(BR2_jz4770),y)
-	REGLINUX_CLANG_CPU = jz4770
-else ifeq ($(BR2_cortex_a55),y)
-	REGLINUX_CLANG_CPU = cortex_a55
-else ifeq ($(BR2_cortex_a72),y)
-	REGLINUX_CLANG_CPU = cortex_a72
-else ifeq ($(BR2_cortex_a72_a53),y)
-	REGLINUX_CLANG_CPU = cortex_a72_a53
-else ifeq ($(BR2_cortex_a73_a53),y)
-	REGLINUX_CLANG_CPU = cortex_a73_a53
-else ifeq ($(BR2_cortex_a75_a55),y)
-	REGLINUX_CLANG_CPU = cortex_a75_a55
-else ifeq ($(BR2_cortex_a76),y)
-	REGLINUX_CLANG_CPU = cortex_a76
-else ifeq ($(BR2_cortex_a76_a55),y)
-	REGLINUX_CLANG_CPU = cortex_a76_a55
-else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
-	REGLINUX_CLANG_CPU = cortex_a76_a55
-else ifeq ($(BR2_riscv),y)
-	REGLINUX_CLANG_CPU = riscv
-else ifeq ($(BR2_saphira),y)
-	REGLINUX_CLANG_CPU = saphira
-else ifeq ($(BR2_x86_x86_64_v3),y)
-	REGLINUX_CLANG_CPU = x86_64_v3
-else ifeq ($(BR2_x86_64),y)
-	REGLINUX_CLANG_CPU = x86_64
-endif
+# The prebuilt is two bundles owned by llvm.mk:
+#   reglinux-llvm-host-<ver>-<cpu>.tar.xz   -> HOST_DIR    (host-llvm)
+#   reglinux-llvm-target-<ver>-<cpu>.tar.xz -> TARGET_DIR  (llvm)
+# Both carry clang alongside llvm, so there is nothing to fetch or install
+# here - each variant just depends on the matching llvm variant, which is what
+# lets a consumer ask for host tools without dragging the rootfs payload along.
+#
+# _SOURCE is set to the empty string rather than left unset: buildroot's
+# `$(2)_SOURCE ?=` default would otherwise invent <pkg>-<version>.tar.gz, and an
+# explicitly-empty value still counts as defined, so download and extract both
+# become no-ops.
+CLANG_SOURCE =
+CLANG_DEPENDENCIES = llvm
+HOST_CLANG_SOURCE =
+HOST_CLANG_DEPENDENCIES = host-llvm
 
-CLANG_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(CLANG_VERSION)
-CLANG_SOURCE = reglinux-clang-$(CLANG_VERSION)-$(REGLINUX_CLANG_CPU).tar.xz
-HOST_CLANG_DEPENDENCIES = host-libxml2
-
-define RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak || :
-endef
-
-define RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash || :
-endef
-
+# Nothing is extracted on this path, but buildroot still runs the patch step and
+# still scans for patches - pkg-patches-dirs draws from both $(CLANG_PKGDIR) and
+# $(BR2_GLOBAL_PATCH_DIR)/clang, so there is no single switch to turn it off.
+# clang has three (two here, one in board/patches/clang) and they all fail with
+# "No file to patch" against the empty build directory. Move them aside for the
+# duration, exactly as llvm.mk does.
 define DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
 		mkdir -p $(dir)/tmp_disabled_patches ; mv -v $(dir)/*.patch $(dir)/tmp_disabled_patches/ ; \
@@ -214,20 +183,23 @@ define ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	)
 endef
 
-CLANG_PRE_DOWNLOAD_HOOKS += RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
-CLANG_POST_DOWNLOAD_HOOKS += RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
 CLANG_PRE_PATCH_HOOKS += DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 CLANG_POST_PATCH_HOOKS += ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_CLANG_PRE_PATCH_HOOKS += DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_CLANG_POST_PATCH_HOOKS += ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 
-define CLANG_EXTRACT_CMDS
-	# extract host folder
-	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(CLANG_DL_SUBDIR)/$(CLANG_SOURCE) host
-endef
-
-define CLANG_INSTALL_TARGET_CMDS
-	# extract target folder
-	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(CLANG_DL_SUBDIR)/$(CLANG_SOURCE) target
-endef
+# Both variants patch the SAME shared directories (package/llvm-project/clang/ and board/patches/clang/),
+# outside the per-package dirs, so under PARALLEL_BUILD=y their PRE hooks
+# race: whichever patches first moves the *.patch files aside and the
+# other's mv dies with "cannot stat ... No such file or directory",
+# failing .stamp_patched. Guarding the mv would only hide it - the first
+# package's POST hook would then restore the patches while the second is
+# still patching, and a source patch would land on a prebuilt tarball.
+# Order the two patch steps instead; buildroot turns this into an
+# order-only dependency on host-clang-patch (pkg-generic.mk), so each
+# move-aside/restore pair runs to completion before the next begins.
+CLANG_PATCH_DEPENDENCIES = host-clang
 
 $(eval $(generic-package))
+$(eval $(host-generic-package))
 endif

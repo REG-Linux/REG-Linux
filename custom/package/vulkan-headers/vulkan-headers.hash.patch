@@ -1,10 +1,12 @@
 diff --git a/package/vulkan-headers/vulkan-headers.hash b/package/vulkan-headers/vulkan-headers.hash
-index b38bfcff47..1b7022e864 100644
+index b38bfcff47..0cb13746c4 100644
 --- a/package/vulkan-headers/vulkan-headers.hash
 +++ b/package/vulkan-headers/vulkan-headers.hash
-@@ -1,3 +1,3 @@
+@@ -1,3 +1,5 @@
  # Locally calculated
 -sha256  317e467a5fb2eaa6a18b984ec70fdbfaccd93595a3e6f4bcceca7d3fab280505  vulkan-headers-1.3.262.tar.gz
 -sha256  ac24e5ea920e4318e4d02c4086ae51f53cfb03feed06c18df1019e7ada1ec7bc  LICENSE.md
-+sha256  5e1a06b3f27e7581b55d1dea176fd97ee0a2f299406db2f437c1d2f297ceba5b  vulkan-headers-v1.4.304.tar.gz
-+sha256  cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSE.txt
++sha256  e87dce08116151f6b6d7de6b6faf41498e87e6cf848ff16fa3bd5402190ad4a3  vulkan-headers-1.4.357.0.tar.gz
++sha256  95ad366d23fadf701d355bc45fb8b82ae2d700239471d35d41286ac3b08ff903  LICENSE.md
++sha256  cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSES/Apache-2.0.txt
++sha256  1ca3502222d967f3be5751c55f6b7ee735b5383909c3b501495f54b216dbf227  LICENSES/MIT.txt

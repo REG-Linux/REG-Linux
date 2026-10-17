@@ -1,34 +1,29 @@
 diff --git a/package/dropbear/S50dropbear b/package/dropbear/S50dropbear
-index 9474eaafaa..5046ed8d9a 100644
+index 9474eaafaa..5f97669be9 100644
 --- a/package/dropbear/S50dropbear
 +++ b/package/dropbear/S50dropbear
-@@ -1,61 +1,65 @@
+@@ -1,61 +1,42 @@
 -#!/bin/sh
+-#
 +#!/bin/dash
- #
  # Starts dropbear sshd.
- #
+-#
  
 -# Allow a few customizations from a config file
 -test -r /etc/default/dropbear && . /etc/default/dropbear
 +# REG-Linux
-+[ "$(/usr/bin/regmsg systemconf getconfigkey system.ssh.enabled)" = "0" ] && {
-+	echo "SSH services are disabled"
-+	exit 0
-+}
-+
++[ "$(/usr/bin/regmsg systemconf getconfigkey system.ssh.enabled)" = "0" ] && { echo "SSH services are disabled"; exit 0; }
+ 
+-start() {
+-	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
 +# Allow customizations from config file
 +[ -r /etc/default/dropbear ] && . /etc/default/dropbear
  
- start() {
--	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
-+	DROPBEAR_ARGS="${DROPBEAR_ARGS} -R"
- 
- 	# If /etc/dropbear is a symlink to /var/run/dropbear, and
- 	#   - the filesystem is RO (i.e. we can not rm the symlink),
- 	#     create the directory pointed to by the symlink.
- 	#   - the filesystem is RW (i.e. we can rm the symlink),
- 	#     replace the symlink with an actual directory
+-	# If /etc/dropbear is a symlink to /var/run/dropbear, and
+-	#   - the filesystem is RO (i.e. we can not rm the symlink),
+-	#     create the directory pointed to by the symlink.
+-	#   - the filesystem is RW (i.e. we can rm the symlink),
+-	#     replace the symlink with an actual directory
 -	if [ -L /etc/dropbear \
 -	     -a "$(readlink /etc/dropbear)" = "/var/run/dropbear" ]
 -	then
@@ -38,29 +33,21 @@ index 9474eaafaa..5046ed8d9a 100644
 -			echo "No persistent location to store SSH host keys. New keys will be"
 -			echo "generated at each boot. Are you sure this is what you want to do?"
 -			mkdir -p "$(readlink /etc/dropbear)"
-+	if [ -L /etc/dropbear ]; then
-+		target=$(readlink /etc/dropbear 2>/dev/null)
-+		if [ "$target" = "/var/run/dropbear" ]; then
-+			if rm -f /etc/dropbear 2>/dev/null; then
-+				mkdir -p /etc/dropbear
-+			else
-+				printf "No persistent location to store SSH host keys.\nNew keys will be generated at each boot.\n"
-+				mkdir -p /var/run/dropbear
-+			fi
- 		fi
- 	fi
+-		fi
+-	fi
++start() {
++	mkdir -p /userdata/system/.ssh
++	chown root:root /userdata/system/.ssh
++	chmod 700 /userdata/system/.ssh
  
++	DROPBEAR_ARGS="${DROPBEAR_ARGS} -R -D /etc/dropbear"
  	printf "Starting dropbear sshd: "
  	umask 077
 -
 -	start-stop-daemon -S -q -p /var/run/dropbear.pid \
 -		--exec /usr/sbin/dropbear -- $DROPBEAR_ARGS
 -	[ $? = 0 ] && echo "OK" || echo "FAIL"
-+	if start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- $DROPBEAR_ARGS; then
-+		echo "OK"
-+	else
-+		echo "FAIL"
-+	fi
++	{ start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- $DROPBEAR_ARGS && echo "OK"; } || echo "FAIL"
  }
 +
  stop() {

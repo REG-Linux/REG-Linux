@@ -1,5 +1,5 @@
 diff --git a/package/iwd/S40iwd b/package/iwd/S40iwd
-index 6714ca9956..9d6cb4d377 100644
+index 6714ca9956..4a714f0e3e 100644
 --- a/package/iwd/S40iwd
 +++ b/package/iwd/S40iwd
 @@ -1,42 +1,65 @@
@@ -13,18 +13,17 @@ index 6714ca9956..9d6cb4d377 100644
  
 -IWD_ARGS=""
 +# configure wifi files
++# $1: slot number (1 = wifi.ssid/key/hidden, 2..9 = wifiN.ssid/key/hidden)
 +system_wifi_configure() {
-+    case "$1" in
-+        1) ;;
-+        .hidden) settings_hide=true; X="$1" ;;
-+        *) X="$1" ;;
-+    esac
++    X=""
++    [ "$1" != "1" ] && X="$1"
 +    settings_ssid="$(sed -n "s/^wifi${X}\.ssid=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
  
 -[ -r "/etc/default/iwd" ] && . "/etc/default/iwd"
 +    # Create or remove wifi configuration files based on SSID
 +    if [ -n "$settings_ssid" ]; then
 +        settings_key="$(sed -n "s/^wifi${X}\.key=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
++        settings_hidden="$(sed -n "s/^wifi${X}\.hidden=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
 +
 +        if ! echo "$settings_ssid" | grep -q '^[a-zA-Z0-9_-]*$'; then
 +            # Contains invalid characters - do hex encode
@@ -34,7 +33,7 @@ index 6714ca9956..9d6cb4d377 100644
 +
 +        {  # create wifi config files
 +        printf '%s\n' "[Settings]" "AutoConnect=true"
-+        [ -n "$settings_hide" ] && printf '%s\n' "Hidden=true"
++        [ "$settings_hidden" = "1" ] && printf '%s\n' "Hidden=true"
 +        printf '%s\n' "[Security]" "Passphrase=$settings_key"
 +        } > "$settings_file"
 +    fi
@@ -58,7 +57,8 @@ index 6714ca9956..9d6cb4d377 100644
 +
 +    wifi_enabled="$(sed -n "s/^wifi\.enabled=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
 +    if [ "$wifi_enabled" = "1" ]; then
-+        for i in 1 2 3 .hidden; do
++        # Newest file will be tried first, so we loop from 9 to 1 to ensure the highest priority wifi slot is used first
++        for i in 9 8 7 6 5 4 3 2 1; do
 +            system_wifi_configure "$i"
 +        done
 +        wifi_country="$(sed -n "s/^wifi\.country=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"

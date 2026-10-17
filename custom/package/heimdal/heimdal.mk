@@ -10,7 +10,7 @@ HOST_HEIMDAL_DEPENDENCIES = host-e2fsprogs host-ncurses host-pkgconf host-libxcr
 HOST_HEIMDAL_AUTORECONF = YES
 HEIMDAL_INSTALL_STAGING = YES
 # static because of -fPIC issues with e2fsprogs on x86_64 host
-# batocera - ignore above, works fine. -fPIC required for Qt6
+# reglinux - ignore above, works fine. -fPIC required for Qt6
 # removed --disable-shared & --enable-static options
 HOST_HEIMDAL_CONF_OPTS = \
 	--without-openldap \
@@ -30,7 +30,7 @@ HOST_HEIMDAL_CONF_OPTS = \
 
 # Don't use compile_et from e2fsprogs as it raises a build failure with samba4
 HOST_HEIMDAL_CONF_ENV = ac_cv_prog_COMPILE_ET=no MAKEINFO=true
-# batocera - add the -fPIC flag.
+# reglinux - add the -fPIC flag.
 HOST_HEIMDAL_CONF_ENV += CFLAGS="$(HOST_CFLAGS) -fPIC"
 
 HEIMDAL_LICENSE = BSD-3-Clause

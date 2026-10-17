@@ -1,5 +1,5 @@
-# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qttools-everywhere-src-6.10.1.tar.xz.sha256
-sha256  8148408380ffea03101a26305c812b612ea30dbc07121e58707601522404d49b  qttools-everywhere-src-6.10.1.tar.xz
+# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.3/submodules/qttools-everywhere-src-6.10.3.tar.xz.sha256
+sha256  8f00b9e3d1f80973d81cff67684972b89993183ef19924404d5b8ff0f89675b6  qttools-everywhere-src-6.10.3.tar.xz
 
 # Hashes for license files:
 sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt
