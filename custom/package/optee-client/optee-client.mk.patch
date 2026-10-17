@@ -1,0 +1,15 @@
+diff --git a/package/optee-client/optee-client.mk b/package/optee-client/optee-client.mk
+index de3ff1df7f..7c0aac5a99 100644
+--- a/package/optee-client/optee-client.mk
++++ b/package/optee-client/optee-client.mk
+@@ -45,8 +45,8 @@ OPTEE_CLIENT_CONF_OPTS += -DWITH_TEEACL=OFF
+ endif
+ 
+ define OPTEE_CLIENT_INSTALL_INIT_SYSV
+-	$(INSTALL) -m 0755 -D $(OPTEE_CLIENT_PKGDIR)/S30tee-supplicant \
+-		$(TARGET_DIR)/etc/init.d/S30tee-supplicant
++	$(INSTALL) -m 0755 -D $(OPTEE_CLIENT_PKGDIR)/S30tee-supplicant $(TARGET_DIR)/etc/init.d/S20tee-supplicant
++	ln -s libteec.so.2.0.0 $(TARGET_DIR)/usr/lib/libteec.so.1
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_OPTEE_CLIENT_CUSTOM_TARBALL)$(BR_BUILDING),yy)

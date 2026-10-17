@@ -1,0 +1,13 @@
+diff --git a/package/glm/glm.mk b/package/glm/glm.mk
+index ce8efc11a7..c688f6af87 100644
+--- a/package/glm/glm.mk
++++ b/package/glm/glm.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GLM_VERSION = 1.0.0
++GLM_VERSION = 1.0.3
+ GLM_SITE = $(call github,g-truc,glm,$(GLM_VERSION))
+ GLM_LICENSE = MIT
+ GLM_LICENSE_FILES = copying.txt

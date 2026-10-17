@@ -1,0 +1,24 @@
+diff --git a/package/gnu-efi/gnu-efi.mk b/package/gnu-efi/gnu-efi.mk
+index 268e5350cf..5f63288c0f 100644
+--- a/package/gnu-efi/gnu-efi.mk
++++ b/package/gnu-efi/gnu-efi.mk
+@@ -41,4 +41,19 @@ define GNU_EFI_INSTALL_STAGING_CMDS
+ 		INSTALLROOT=$(STAGING_DIR) install
+ endef
+ 
++HOST_GNU_EFI_MAKE_OPTS = PREFIX=/usr SUBDIRS="lib gnuefi inc"
++
++define HOST_GNU_EFI_BUILD_CMDS
++	ARCH=$$(uname -m) && \
++	mkdir -p $(@D)/$$ARCH/lib/runtime $(@D)/$$ARCH/lib/$$ARCH \
++		$(@D)/$$ARCH/gnuefi/$$ARCH && \
++	$(HOST_CONFIGURE_OPTS) $(MAKE) -C $(@D) $(HOST_GNU_EFI_MAKE_OPTS)
++endef
++
++define HOST_GNU_EFI_INSTALL_CMDS
++	$(HOST_CONFIGURE_OPTS) $(MAKE) -C $(@D) $(HOST_GNU_EFI_MAKE_OPTS) \
++		INSTALLROOT=$(HOST_DIR) install
++endef
++
+ $(eval $(generic-package))
++$(eval $(host-generic-package))

@@ -1,0 +1,17 @@
+diff --git a/package/llvm-project/compiler-rt/compiler-rt.mk b/package/llvm-project/compiler-rt/compiler-rt.mk
+index cbd2e6cb8b..449e417dc5 100644
+--- a/package/llvm-project/compiler-rt/compiler-rt.mk
++++ b/package/llvm-project/compiler-rt/compiler-rt.mk
+@@ -5,8 +5,11 @@
+ ################################################################################
+ 
+ COMPILER_RT_VERSION = $(LLVM_PROJECT_VERSION)
+-COMPILER_RT_SOURCE = compiler-rt-$(COMPILER_RT_VERSION).src.tar.xz
++# reglinux - one shared llvm-project monolith, see llvm-project.mk
++COMPILER_RT_SOURCE = $(LLVM_PROJECT_SOURCE)
+ COMPILER_RT_SITE = $(LLVM_PROJECT_SITE)
++COMPILER_RT_DL_SUBDIR = llvm-project
++COMPILER_RT_SUBDIR = compiler-rt
+ COMPILER_RT_LICENSE = NCSA MIT
+ COMPILER_RT_LICENSE_FILES = LICENSE.TXT
+ COMPILER_RT_CPE_ID_VENDOR = llvm

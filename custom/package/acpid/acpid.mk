@@ -35,7 +35,7 @@ define ACPID_SET_EVENTS
 		>$(TARGET_DIR)/etc/acpi/events/powerbtn
 endef
 
-# batocera : we won't that
+# reglinux : we won't that
 #ACPID_POST_INSTALL_TARGET_HOOKS += ACPID_SET_EVENTS
 
 $(eval $(autotools-package))

@@ -1,5 +1,5 @@
 diff --git a/package/sdl2/Config.in b/package/sdl2/Config.in
-index f1c22e4f80..7bee38d293 100644
+index f1c22e4f80..7dac222efc 100644
 --- a/package/sdl2/Config.in
 +++ b/package/sdl2/Config.in
 @@ -11,6 +11,13 @@ config BR2_PACKAGE_SDL2
@@ -16,11 +16,18 @@ index f1c22e4f80..7bee38d293 100644
  config BR2_PACKAGE_SDL2_X11
  	bool "X11 video driver"
  	depends on BR2_PACKAGE_XORG7
-@@ -38,6 +45,16 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
+@@ -38,6 +45,23 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
  		!BR2_PACKAGE_HAS_LIBEGL || \
  		!(BR2_PACKAGE_SDL2_OPENGL || BR2_PACKAGE_SDL2_OPENGLES)
  
-+# batocera
++config BR2_PACKAGE_SDL2_MALI
++	bool "Mali fbdev EGL video driver"
++	depends on BR2_PACKAGE_POWERVR_GE8300_DRIVER
++	depends on BR2_PACKAGE_HAS_LIBEGL
++
++comment "Mali fbdev video driver needs the PowerVR GE8300 driver"
++	depends on !BR2_PACKAGE_POWERVR_GE8300_DRIVER
++
 +config BR2_PACKAGE_SDL2_WAYLAND
 +    bool "SDL2 Wayland support"
 +    depends on BR2_PACKAGE_WAYLAND

@@ -1,0 +1,11 @@
+diff --git a/package/seatd/seatd.hash b/package/seatd/seatd.hash
+index ce70480d50..0df25d347f 100644
+--- a/package/seatd/seatd.hash
++++ b/package/seatd/seatd.hash
+@@ -1,5 +1,5 @@
+ # Calculated locally
+-sha256  819979c922a0be258aed133d93920bce6a3d3565a60588d6d372ce9db2712cd3  0.9.1.tar.gz
++sha256  302564d54d8e28191fadfd734f2675ecb0c9e0615a58011b89ef15dfa4dbaa96  0.9.3.tar.gz
+ 
+ # License files
+ sha256  282a494803d666616bd726e0279636b5f6a31387ae19a707459074050f2600d3  LICENSE

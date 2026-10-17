@@ -1,5 +1,5 @@
 diff --git a/package/sdl2_mixer/sdl2_mixer.mk b/package/sdl2_mixer/sdl2_mixer.mk
-index 074e282205..09f9048870 100644
+index 074e282205..3c900b59e4 100644
 --- a/package/sdl2_mixer/sdl2_mixer.mk
 +++ b/package/sdl2_mixer/sdl2_mixer.mk
 @@ -4,7 +4,8 @@
@@ -44,13 +44,13 @@ index 074e282205..09f9048870 100644
  SDL2_MIXER_CONF_OPTS += --disable-music-ogg-tremor
  endif
  
-+# batocera
++# reglinux
 +ifeq ($(BR2_PACKAGE_LIBMAD),y)
 +SDL2_MIXER_CONF_OPTS += --enable-music-mp3-mad-gpl
 +SDL2_MIXER_DEPENDENCIES += libmad
 +endif
 +
-+# batocera
++# reglinux
 +ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
 +SDL2_MIXER_DEPENDENCIES += libvorbis
 +endif

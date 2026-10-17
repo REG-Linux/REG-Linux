@@ -44,6 +44,20 @@ ifeq ($(BR2_PACKAGE_QT6DECLARATIVE),y)
 QT6WAYLAND_DEPENDENCIES += qt6declarative
 endif
 
+# The adwaita client-side decoration plugin is gated on
+#   CONDITION ... AND TARGET Qt::DBus AND TARGET Qt::Svg
+# (src/client/configure.cmake), so qt6svg has to be a *declared* dependency,
+# not merely one that happened to build earlier. Under PARALLEL_BUILD=y a
+# package only sees its declared dependencies in its own per-package sysroot,
+# so without this Qt::Svg is invisible, the feature silently evaluates false,
+# and plugins/wayland-decoration-client/libadwaita.so is dropped - leaving only
+# Qt's default libbradient.so. PARALLEL_BUILD=n shares one staging dir and so
+# picks Qt::Svg up by accident, which is why CI tarballs have the plugin and
+# locally built ones did not.
+ifeq ($(BR2_PACKAGE_QT6SVG),y)
+QT6WAYLAND_DEPENDENCIES += qt6svg
+endif
+
 ifeq ($(BR2_PACKAGE_QT6WAYLAND_COMPOSITOR),y)
 QT6WAYLAND_CONF_OPTS += -DFEATURE_wayland_server=ON
 QT6WAYLAND_DEPENDENCIES += libxkbcommon

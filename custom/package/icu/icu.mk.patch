@@ -1,0 +1,20 @@
+diff --git a/package/icu/icu.mk b/package/icu/icu.mk
+index 73547a7537..f48961a69a 100644
+--- a/package/icu/icu.mk
++++ b/package/icu/icu.mk
+@@ -25,6 +25,15 @@ ICU_CONF_OPTS = \
+ 	--disable-samples \
+ 	--disable-tests
+ 
++# icu's top-level Makefile runs "install-recursive" and "install-local"
++# (which in turn runs "install-icu" and "install-manx") as independent,
++# unordered prerequisites of "install". Under parallel make these race on
++# regenerating/installing config/icu-config.1 via config.status, causing
++# intermittent "cannot change permissions of .../icu-config.1: No such
++# file or directory" install-staging failures.
++ICU_MAKE = $(MAKE1)
++HOST_ICU_MAKE = $(MAKE1)
++
+ # the icu build process breaks if the TARGET environment variable is
+ # non-empty
+ ICU_CONF_ENV += TARGET=""

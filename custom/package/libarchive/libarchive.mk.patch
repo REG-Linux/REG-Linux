@@ -1,5 +1,5 @@
 diff --git a/package/libarchive/libarchive.mk b/package/libarchive/libarchive.mk
-index 8568847493..4ee77da41f 100644
+index f3e90e5910..fbf6e5a9c8 100644
 --- a/package/libarchive/libarchive.mk
 +++ b/package/libarchive/libarchive.mk
 @@ -13,31 +13,34 @@ LIBARCHIVE_LICENSE_FILES = COPYING

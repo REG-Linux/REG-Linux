@@ -1,0 +1,9 @@
+diff --git a/package/json-for-modern-cpp/json-for-modern-cpp.mk b/package/json-for-modern-cpp/json-for-modern-cpp.mk
+index 345280b346..28b867426d 100644
+--- a/package/json-for-modern-cpp/json-for-modern-cpp.mk
++++ b/package/json-for-modern-cpp/json-for-modern-cpp.mk
+@@ -17,3 +17,4 @@ JSON_FOR_MODERN_CPP_INSTALL_TARGET = NO
+ JSON_FOR_MODERN_CPP_CONF_OPTS = -DJSON_BuildTests=OFF -DJSON_MultipleHeaders=ON
+ 
+ $(eval $(cmake-package))
++$(eval $(host-cmake-package))

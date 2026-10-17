@@ -1,0 +1,6 @@
+# From https://github.com/llvm/llvm-project/releases/tag/llvmorg-22.1.7
+sha256  5cc4a3f12bba50b6bdfb4b61bdc852117a0ff2517807c3902fc13267fb93562e  llvm-project-22.1.7.src.tar.xz
+# locally computed
+sha256  406d199ae3a16add84017f40458a5e7c31f9412937fcb518715af0a0eeafbc0c  libunwind-15.0.7.src.tar.xz
+sha256  10e650f436bc416674f01b5e01177405886f4d0f0b2568c6808044eacad52ea0  libunwind-19.1.7.src.tar.xz
+sha256  b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d  LICENSE.TXT

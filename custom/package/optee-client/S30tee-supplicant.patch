@@ -1,0 +1,42 @@
+diff --git a/package/optee-client/S30tee-supplicant b/package/optee-client/S30tee-supplicant
+index 8a605dbe5f..66faceed20 100644
+--- a/package/optee-client/S30tee-supplicant
++++ b/package/optee-client/S30tee-supplicant
+@@ -1,34 +1,16 @@
+-#!/bin/sh
+-
++#!/bin/dash
+ DAEMON="tee-supplicant"
+ PIDFILE="/var/run/$DAEMON.pid"
+-
+ DAEMON_ARGS="-d /dev/teepriv0"
+ 
+ start() {
+ 	printf 'Starting %s: ' "$DAEMON"
+-	# shellcheck disable=SC2086 # we need the word splitting
+-	start-stop-daemon -S -q -p "$PIDFILE" -x "/usr/sbin/$DAEMON" \
+-		-- $DAEMON_ARGS
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -S -q -p "$PIDFILE" -x "/usr/sbin/$DAEMON" -- $DAEMON_ARGS && echo "OK"; } || echo "FAIL"
+ }
+ 
+ stop() {
+ 	printf 'Stopping %s: ' "$DAEMON"
+-	start-stop-daemon -K -q -p "$PIDFILE"
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || echo "FAIL"
+ }
+ 
+ restart() {

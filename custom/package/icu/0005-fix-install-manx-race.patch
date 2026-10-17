@@ -1,0 +1,8 @@
+--- a/source/Makefile.in
++++ b/source/Makefile.in
+@@ -357,7 +357,7 @@ install-manx: $(MANX_FILES)
+ 	$(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(SECTION)
+ ifneq ($(MANX_FILES),)
+-	$(INSTALL_DATA) $? $(DESTDIR)$(mandir)/man$(SECTION)
++	$(INSTALL_DATA) $(MANX_FILES) $(DESTDIR)$(mandir)/man$(SECTION)
+ endif

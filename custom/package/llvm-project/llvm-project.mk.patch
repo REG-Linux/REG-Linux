@@ -1,16 +1,125 @@
 diff --git a/package/llvm-project/llvm-project.mk b/package/llvm-project/llvm-project.mk
-index 6f075793a5..903d3cd32d 100644
+index 6f075793a5..8ea371dcfa 100644
 --- a/package/llvm-project/llvm-project.mk
 +++ b/package/llvm-project/llvm-project.mk
-@@ -4,8 +4,9 @@
+@@ -4,8 +4,118 @@
  #
  ################################################################################
  
 -LLVM_PROJECT_VERSION_MAJOR = 15
 -LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).0.7
-+# reglinux -  bump to 19.1.7
-+LLVM_PROJECT_VERSION_MAJOR = 19
++# reglinux -  bump to 22.1.7
++LLVM_PROJECT_VERSION_MAJOR = 22
 +LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).1.7
  LLVM_PROJECT_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LLVM_PROJECT_VERSION)
  
++# reglinux - LLVM stopped publishing per-component source tarballs after 21.x:
++# llvmorg-22.x and later ship only llvm-project-<ver>.src.tar.xz. Every package
++# under here therefore takes this one tarball, shares a single dl/llvm-project/
++# subdir so it is fetched and hashed once rather than seven times, and picks its
++# own tree out of it with <PKG>_SUBDIR.
++LLVM_PROJECT_SOURCE = llvm-project-$(LLVM_PROJECT_VERSION).src.tar.xz
++
++# Which prebuilt CPU flavour this board takes. Defined here, outside the
++# BUILD_FROM_SOURCE branches, because four families are published side by side
++# under the same REG-llvm-binaries release tag and must agree on the name:
++# reglinux-llvm-{host,target}, reglinux-spirv-tools-{host,target} and
++# reglinux-spirv-llvm-translator-{host,target}. It used to be copy-pasted,
++# byte-identical, into llvm.mk, clang.mk and libclc.mk.
++REGLINUX_LLVM_CPU = unknown
++ifeq ($(BR2_arm1176jzf_s),y)
++	REGLINUX_LLVM_CPU = arm1176jzf_s
++else ifeq ($(BR2_cortex_a7),y)
++	REGLINUX_LLVM_CPU = cortex_a7
++else ifeq ($(BR2_cortex_a9),y)
++	REGLINUX_LLVM_CPU = cortex_a9
++else ifeq ($(BR2_cortex_a15_a7),y)
++	REGLINUX_LLVM_CPU = cortex_a15_a7
++else ifeq ($(BR2_cortex_a17),y)
++	REGLINUX_LLVM_CPU = cortex_a17
++else ifeq ($(BR2_cortex_a35),y)
++	REGLINUX_LLVM_CPU = cortex_a35
++else ifeq ($(BR2_cortex_a53),y)
++	REGLINUX_LLVM_CPU = cortex_a53
++else ifeq ($(BR2_mips_xburst),y)
++	REGLINUX_LLVM_CPU = xburst
++else ifeq ($(BR2_cortex_a55),y)
++	REGLINUX_LLVM_CPU = cortex_a55
++# Cortex A57 (l4t)
++else ifeq ($(BR2_cortex_a57),y)
++	REGLINUX_LLVM_CPU = cortex_a57
++else ifeq ($(BR2_cortex_a72),y)
++	REGLINUX_LLVM_CPU = cortex_a72
++else ifeq ($(BR2_cortex_a72_a53),y)
++	REGLINUX_LLVM_CPU = cortex_a72_a53
++else ifeq ($(BR2_cortex_a73_a53),y)
++	REGLINUX_LLVM_CPU = cortex_a73_a53
++else ifeq ($(BR2_cortex_a75_a55),y)
++	REGLINUX_LLVM_CPU = cortex_a75_a55
++else ifeq ($(BR2_cortex_a76),y)
++	REGLINUX_LLVM_CPU = cortex_a76
++else ifeq ($(BR2_cortex_a76_a55),y)
++	REGLINUX_LLVM_CPU = cortex_a76_a55
++else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
++	REGLINUX_LLVM_CPU = cortex_a76_a55
++else ifeq ($(BR2_riscv),y)
++	REGLINUX_LLVM_CPU = riscv64
++else ifeq ($(BR2_saphira),y)
++	REGLINUX_LLVM_CPU = saphira
++else ifeq ($(BR2_x86_x86_64_v3),y)
++	REGLINUX_LLVM_CPU = x86_64_v3
++else ifeq ($(BR2_x86_64),y)
++	REGLINUX_LLVM_CPU = x86_64
++endif
++
++# Rewrite the RUNPATHs of a prebuilt host bundle to be $ORIGIN-relative.
++#
++# The bundles are harvested from one representative board per CPU (the table at
++# the bottom of scripts/linux/prebuild/prebuild-llvm.sh), and every ELF in them
++# carries the RUNPATH cmake baked in at link time on *that* board -
++# /h3/per-package/host-spirv-tools/host/lib and the like. Consumed on any other
++# board sharing the CPU - cha is cortex_a7 just as h3 is - that path does not
++# exist: buildroot's check-host-rpath rejects the binaries at the end of
++# install-host, and since DT_RUNPATH does not propagate to a dependency's own
++# dependencies, the libraries could not resolve each other at runtime either.
++# $ORIGIN-relative is correct in every tree, and check-host-rpath accepts
++# '$ORIGIN/../lib' verbatim.
++#
++# The file list comes from the bundle rather than from a glob over HOST_DIR, and
++# that is load-bearing twice over. A hand-written glob rots - llvm.mk's did,
++# missing clang-offload-packager on the 22.x bump. And buildroot derives
++# .files-list-host.txt by diffing a stat snapshot taken around install, so
++# patchelf-ing a file enrols it in *this* package's file list and hence in the
++# next harvest of this package's bundle. The bundle's own members are exactly the
++# files this package installed, and nothing a dependency rsynced in.
++#
++# Two skips. Symlinks, because patchelf materialises one into a regular file -
++# 21 of the llvm bundle's 130 host/bin entries are symlinks, and the glob this
++# replaced was quietly turning the ones it matched into full copies; patching
++# the target they point at fixes them anyway. And anything with no RPATH at all,
++# so a binary that never needed one does not acquire one here.
++#
++# Everything else is rewritten, including cmake's "<HOST_DIR>/lib:$ORIGIN/../lib"
++# pair - a fifth of the files carry that shape. Merely mentioning $ORIGIN is not
++# good enough: check-host-rpath passes it on the second entry while the first
++# still names the board that built the bundle.
++#
++# $(1) = bundle tarball, $(2) = HOST_DIR
++define REGLINUX_PREBUILT_HOST_FIX_RPATH
++	tar -tf $(1) | sed -n \
++		-e 's|^host/\(bin/.*\)$$|\1|p' \
++		-e 's|^host/\(lib/[^/]*\.so[^/]*\)$$|\1|p' | \
++	while read f; do \
++		[ -f "$(2)/$$f" ] || continue; \
++		[ -L "$(2)/$$f" ] && continue; \
++		cur=$$($(2)/bin/patchelf --print-rpath "$(2)/$$f" 2>/dev/null) || continue; \
++		[ -n "$$cur" ] || continue; \
++		case $$f in \
++			bin/*) rp='$$ORIGIN/../lib';; \
++			*)     rp='$$ORIGIN';; \
++		esac; \
++		[ "$$cur" = "$$rp" ] && continue; \
++		$(2)/bin/patchelf --set-rpath "$$rp" "$(2)/$$f" || true; \
++	done
++endef
  include $(sort $(wildcard package/llvm-project/*/*.mk))

@@ -1,0 +1,17 @@
+diff --git a/package/rustc/Config.in.host b/package/rustc/Config.in.host
+index c3e9a13f39..58fa7dbf2e 100644
+--- a/package/rustc/Config.in.host
++++ b/package/rustc/Config.in.host
+@@ -104,6 +104,12 @@ config BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+ 	default y if BR2_PACKAGE_HOST_RUSTC_TARGET_TIER1_PLATFORMS
+ 	default y if BR2_PACKAGE_HOST_RUSTC_TARGET_TIER2_HOST_TOOLS_PLATFORMS
+ 	default y if BR2_PACKAGE_HOST_RUSTC_TARGET_TIER2_PLATFORMS
++	# REG-Linux: mipsel (jz4770) is a Tier *3* Rust target. rustc knows
++	# mipsel-unknown-linux-musl but ships no prebuilt std for it, so it is
++	# deliberately not in any TIER* list above -- only host-rust, which builds
++	# std from source itself, can serve it. host-rust-bin cannot, so a board
++	# using this must also set BR2_PACKAGE_HOST_RUST=y.
++	default y if BR2_mipsel && BR2_TOOLCHAIN_USES_MUSL
+ 	depends on BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_USES_MUSL
+ 	depends on BR2_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS
+ 

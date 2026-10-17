@@ -9,7 +9,10 @@ LLVM_VERSION = $(LLVM_PROJECT_VERSION)
 ifeq ($(BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE),y)
 
 LLVM_SITE = $(LLVM_PROJECT_SITE)
-LLVM_SOURCE = llvm-$(LLVM_VERSION).src.tar.xz
+# reglinux - one shared llvm-project monolith, see llvm-project.mk
+LLVM_SOURCE = $(LLVM_PROJECT_SOURCE)
+LLVM_DL_SUBDIR = llvm-project
+LLVM_SUBDIR = llvm
 LLVM_LICENSE = Apache-2.0 with exceptions
 LLVM_LICENSE_FILES = LICENSE.TXT
 LLVM_CPE_ID_VENDOR = llvm
@@ -21,7 +24,7 @@ LLVM_DEPENDENCIES = host-llvm
 
 # Path to cmake modules from host-llvm-cmake
 HOST_LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
-# batocera add LLVM_COMMON_CMAKE_UTILS
+# reglinux add LLVM_COMMON_CMAKE_UTILS
 HOST_LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
 LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
 LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
@@ -324,61 +327,39 @@ $(eval $(host-cmake-package))
 
 else
 
-# Download pre compiled files
-REGLINUX_LLVM_CPU = unknown
-ifeq ($(BR2_arm1176jzf_s),y)
-	REGLINUX_LLVM_CPU = arm1176jzf_s
-else ifeq ($(BR2_cortex_a7),y)
-	REGLINUX_LLVM_CPU = cortex_a7
-else ifeq ($(BR2_cortex_a9),y)
-	REGLINUX_LLVM_CPU = cortex_a9
-else ifeq ($(BR2_cortex_a15_a7),y)
-	REGLINUX_LLVM_CPU = cortex_a15_a7
-else ifeq ($(BR2_cortex_a17),y)
-	REGLINUX_LLVM_CPU = cortex_a17
-else ifeq ($(BR2_cortex_a35),y)
-	REGLINUX_LLVM_CPU = cortex_a35
-else ifeq ($(BR2_cortex_a53),y)
-	REGLINUX_LLVM_CPU = cortex_a53
-else ifeq ($(BR2_jz4770),y)
-	REGLINUX_LLVM_CPU = jz4770
-else ifeq ($(BR2_cortex_a55),y)
-	REGLINUX_LLVM_CPU = cortex_a55
-else ifeq ($(BR2_cortex_a72),y)
-	REGLINUX_LLVM_CPU = cortex_a72
-else ifeq ($(BR2_cortex_a72_a53),y)
-	REGLINUX_LLVM_CPU = cortex_a72_a53
-else ifeq ($(BR2_cortex_a73_a53),y)
-	REGLINUX_LLVM_CPU = cortex_a73_a53
-else ifeq ($(BR2_cortex_a75_a55),y)
-	REGLINUX_LLVM_CPU = cortex_a75_a55
-else ifeq ($(BR2_cortex_a76),y)
-	REGLINUX_LLVM_CPU = cortex_a76
-else ifeq ($(BR2_cortex_a76_a55),y)
-	REGLINUX_LLVM_CPU = cortex_a76_a55
-else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
-	REGLINUX_LLVM_CPU = cortex_a76_a55
-else ifeq ($(BR2_riscv),y)
-	REGLINUX_LLVM_CPU = riscv
-else ifeq ($(BR2_saphira),y)
-	REGLINUX_LLVM_CPU = saphira
-else ifeq ($(BR2_x86_x86_64_v3),y)
-	REGLINUX_LLVM_CPU = x86_64_v3
-else ifeq ($(BR2_x86_64),y)
-	REGLINUX_LLVM_CPU = x86_64
-endif
 
-LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LLVM_VERSION)
-LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
+# Two bundles, two package variants:
+#
+#   host-llvm : reglinux-llvm-host-<ver>-<cpu>.tar.xz   -> HOST_DIR
+#   llvm      : reglinux-llvm-target-<ver>-<cpu>.tar.xz -> STAGING_DIR + TARGET_DIR
+#
+# Each bundle carries llvm, clang and libclc together, so their byte-identical
+# CPU ladders are gone - clang.mk and libclc.mk have no download of their own
+# and just depend on the right variant.
+#
+# The split matters because the prebuilt branch used to define ONLY the target
+# package, whose EXTRACT_CMDS unpacked host/ into HOST_DIR. Anything that merely
+# wanted the cross-compiler - host-mesa3d, host-spirv-llvm-translator, the
+# bindgen users - therefore had to depend on `llvm`, and that dragged its
+# install-target along: ~40 MB of libLLVM.so into the rootfs of boards that
+# never link it (kconfig has BR2_PACKAGE_LLVM=n there, but a make-level
+# dependency builds the package anyway).
+LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/llvm-$(LLVM_VERSION)
+LLVM_SOURCE = reglinux-llvm-target-$(LLVM_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
+LLVM_DEPENDENCIES = host-llvm
+
+# Set explicitly: pkg-generic.mk only inherits _SITE/_SOURCE into the host
+# namespace when they are undefined there (ifndef $(2)_SOURCE), so naming them
+# here is what keeps the two variants on different tarballs.
+HOST_LLVM_SITE = $(LLVM_SITE)
+HOST_LLVM_SOURCE = reglinux-llvm-host-$(LLVM_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
 HOST_LLVM_DEPENDENCIES = host-python3
 
-define RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak || :
-endef
+# The prebuilt path must still populate STAGING_DIR: cross-compiled packages
+# (rpcs3, spirv-llvm-translator) look up LLVM via its cmake config there.
+LLVM_INSTALL_STAGING = YES
 
-define RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash || :
-endef
+
 
 define DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
@@ -392,20 +373,118 @@ define ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	)
 endef
 
-LLVM_PRE_DOWNLOAD_HOOKS += RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
-LLVM_POST_DOWNLOAD_HOOKS += RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
 LLVM_PRE_PATCH_HOOKS += DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_LLVM_PRE_PATCH_HOOKS += DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+HOST_LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+
+# Both variants patch the SAME shared directories (package/llvm-project/llvm/ and board/patches/llvm/),
+# outside the per-package dirs, so under PARALLEL_BUILD=y their PRE hooks
+# race: whichever patches first moves the *.patch files aside and the
+# other's mv dies with "cannot stat ... No such file or directory",
+# failing .stamp_patched. Guarding the mv would only hide it - the first
+# package's POST hook would then restore the patches while the second is
+# still patching, and a source patch would land on a prebuilt tarball.
+# Order the two patch steps instead; buildroot turns this into an
+# order-only dependency on host-llvm-patch (pkg-generic.mk), so each
+# move-aside/restore pair runs to completion before the next begins.
+LLVM_PATCH_DEPENDENCIES = host-llvm
+
+# The prebuilt tarball is per-CPU, so it cannot have a hash entry. Tell
+# buildroot's check-hash to skip it by name (support/download/check-hash matches
+# the basename against BR_NO_CHECK_HASH_FOR) instead of moving the .hash file
+# aside around the download. The old PRE/POST_DOWNLOAD rename hooks were not
+# failure-safe: a download error - a 404 for an unpublished asset, say - aborts
+# between the two, leaving the .hash renamed to .hash.bak and the next build
+# unable to find it.
+BR_NO_CHECK_HASH_FOR += $(LLVM_SOURCE) $(HOST_LLVM_SOURCE)
+
+# Both variants leave $(@D) empty and untar straight where the files belong -
+# unpacking a ~600 MB bundle into the build directory only to copy it across
+# would cost that much disk for nothing.
+define HOST_LLVM_EXTRACT_CMDS
+endef
+
+define HOST_LLVM_INSTALL_CMDS
+	tar -C $(HOST_DIR)/../ -xf $(HOST_LLVM_DL_DIR)/$(HOST_LLVM_SOURCE) host
+endef
+
+# The bundle's host binaries and libraries carry RUNPATHs from the board that
+# harvested them, so point them at their own lib dir. Only needed on this path -
+# a from-source host-llvm is built with -DCMAKE_INSTALL_RPATH=$(HOST_DIR)/lib
+# already. This lived on host-spirv-llvm-translator until 2026-08-27, where it
+# silently added all 81 patched binaries to *that* package's file list and hence
+# to its prebuilt bundle.
+#
+# The list used to be a hand-written glob of $(HOST_DIR)/bin - llvm-*, *ll*,
+# opt, bugpoint and eight more. It did cover all 69 host/bin files that
+# check-host-rpath flags, but it reached only host/bin, and libLLVM.so.22.1 and
+# its siblings need the same treatment: DT_RUNPATH does not carry over from the
+# executable to a library's own NEEDED entries, so it is libLLVM's own RUNPATH
+# that decides whether it finds libzstd.so.1. Deriving the list from the bundle
+# picks those up, needs no maintenance across LLVM bumps, and cannot stray onto
+# a file some dependency rsynced in.
+HOST_LLVM_DEPENDENCIES += host-patchelf
+define HOST_LLVM_FIX_RPATH
+	$(call REGLINUX_PREBUILT_HOST_FIX_RPATH,\
+		$(HOST_LLVM_DL_DIR)/$(HOST_LLVM_SOURCE),$(HOST_DIR))
+endef
+HOST_LLVM_POST_INSTALL_HOOKS += HOST_LLVM_FIX_RPATH
 
 define LLVM_EXTRACT_CMDS
-	# extract host folder
-	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) host
+endef
+
+define LLVM_INSTALL_STAGING_CMDS
+	# only target/usr (cmake config, headers, libs) goes to staging; the rest
+	# of target/ is rootfs skeleton and must not leak there - a var/run symlink
+	# in staging breaks the per-package rsync.
+	mkdir -p $(STAGING_DIR)
+	tar -C $(STAGING_DIR) --strip-components=1 -xf $(LLVM_DL_DIR)/$(LLVM_SOURCE) target/usr
 endef
 
 define LLVM_INSTALL_TARGET_CMDS
-	# extract target folder
-	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) target
+	mkdir -p $(TARGET_DIR)
+	tar -C $(TARGET_DIR)/../ -xf $(LLVM_DL_DIR)/$(LLVM_SOURCE) target
 endef
 
+# The target bundle carries clang's and libclc's payload too, but the hooks that
+# prune them hang off packages that may not be enabled (sm8250 has
+# BR2_PACKAGE_CLANG=n), so prune here where it always runs. The clang list is
+# inlined because CLANG_FILES_TO_REMOVE only exists in clang.mk's source branch -
+# referencing it here would expand to a bare `rm -rf`. Keep in step with
+# clang.mk's CLANG_FILES_TO_REMOVE.
+define LLVM_PRUNE_BUNDLED_TARGET_FILES
+	rm -rf $(TARGET_DIR)/usr/bin/clang* \
+		$(TARGET_DIR)/usr/bin/c-index-test \
+		$(TARGET_DIR)/usr/bin/git-clang-format \
+		$(TARGET_DIR)/usr/bin/scan-build \
+		$(TARGET_DIR)/usr/bin/scan-view \
+		$(TARGET_DIR)/usr/libexec/c++-analyzer \
+		$(TARGET_DIR)/usr/libexec/ccc-analyzer \
+		$(TARGET_DIR)/usr/share/clang \
+		$(TARGET_DIR)/usr/share/opt-viewer \
+		$(TARGET_DIR)/usr/share/scan-build \
+		$(TARGET_DIR)/usr/share/scan-view \
+		$(TARGET_DIR)/usr/share/man/man1/scan-build.1 \
+		$(TARGET_DIR)/usr/lib/clang
+endef
+LLVM_POST_INSTALL_TARGET_HOOKS += LLVM_PRUNE_BUNDLED_TARGET_FILES
+
+# The device bitcode libraries, on the other hand, are only unwanted on ARM -
+# there libclc is configured with LIBCLC_TARGETS_TO_BUILD="" and all the board
+# needs is the OpenCL C headers. On x86_64 the amdgcn/r600/nvptx sets are real
+# content that rusticl uses, so this must carry libclc.mk's own guard rather
+# than deleting unconditionally.
+ifeq ($(BR2_arm)$(BR2_aarch64),y)
+define LLVM_PRUNE_BUNDLED_CLC_TARGETS
+	rm -rf $(TARGET_DIR)/usr/share/clc/*amdgcn* \
+		$(TARGET_DIR)/usr/share/clc/*r600* \
+		$(TARGET_DIR)/usr/share/clc/*nvptx* \
+		$(TARGET_DIR)/usr/share/clc/*clspv*
+endef
+LLVM_POST_INSTALL_TARGET_HOOKS += LLVM_PRUNE_BUNDLED_CLC_TARGETS
+endif
+
 $(eval $(generic-package))
+$(eval $(host-generic-package))
 endif

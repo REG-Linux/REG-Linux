@@ -1,5 +1,5 @@
 diff --git a/package/qt6/qt6base/qt6base.mk b/package/qt6/qt6base/qt6base.mk
-index 51a4f1b5be..75c2f7122a 100644
+index 3bf4a1221b..d7284e83f6 100644
 --- a/package/qt6/qt6base/qt6base.mk
 +++ b/package/qt6/qt6base/qt6base.mk
 @@ -82,7 +82,8 @@ HOST_QT6BASE_DEPENDENCIES = \
@@ -42,3 +42,18 @@ index 51a4f1b5be..75c2f7122a 100644
  else
  QT6BASE_CONF_OPTS += -DFEATURE_xcb=OFF
  endif
+@@ -278,13 +282,8 @@ endif
+ ifeq ($(BR2_PACKAGE_QT6BASE_WIDGETS),y)
+ QT6BASE_CONF_OPTS += -DFEATURE_widgets=ON
+ 
+-# only enable gtk support if libgtk3 X11 backend is enabled
+-ifeq ($(BR2_PACKAGE_LIBGTK3)$(BR2_PACKAGE_LIBGTK3_X11),yy)
+-QT6BASE_CONF_OPTS += -DFEATURE_gtk3=ON
+-QT6BASE_DEPENDENCIES += libgtk3
+-else
++# REG disable gtk3 support
+ QT6BASE_CONF_OPTS += -DFEATURE_gtk3=OFF
+-endif
+ 
+ else
+ QT6BASE_CONF_OPTS += -DFEATURE_widgets=OFF

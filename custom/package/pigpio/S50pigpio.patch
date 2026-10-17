@@ -1,0 +1,57 @@
+diff --git a/package/pigpio/S50pigpio b/package/pigpio/S50pigpio
+index 8b7b6815c8..9d99a409f6 100644
+--- a/package/pigpio/S50pigpio
++++ b/package/pigpio/S50pigpio
+@@ -1,35 +1,18 @@
+-#!/bin/sh
++#!/bin/dash
+ 
+ DAEMON="pigpiod"
+ PIDFILE="/var/run/pigpio.pid"
+-
+ PIGPIOD_ARGS=""
+-
+ [ -r "/etc/default/pigpio" ] && . "/etc/default/pigpio"
+ 
+ start() {
+ 	printf 'Starting %s: ' "$DAEMON"
+-	start-stop-daemon -S -q -x "/usr/bin/$DAEMON" -- $PIGPIOD_ARGS
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -S -q -x "/usr/bin/$DAEMON" -- $PIGPIOD_ARGS && echo "OK"; } || { echo "FAIL"; return 1; }
+ }
+ 
+ stop() {
+ 	printf 'Stopping %s: ' "$DAEMON"
+-	start-stop-daemon -K -q -p "$PIDFILE"
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		rm -f "$PIDFILE"
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; return 1; }
+ }
+ 
+ restart() {
+@@ -44,7 +27,12 @@ case "$1" in
+ 	reload)
+ 		# Restart, since there is no true "reload" feature.
+ 		restart;;
++	status)
++		{ pgrep -x "pigpiod" > /dev/null && echo "pigpiod is running."; } || { echo "pigpiod is not running."; }
++		;;
++	enable|enabled|disable|disabled) ;;
+ 	*)
+-		echo "Usage: $0 {start|stop|restart|reload}"
++		printf '%s\n' "Usage: $0 {start|stop|restart|enable|disable|status}" >&2
+ 		exit 1
++		;;
+ esac

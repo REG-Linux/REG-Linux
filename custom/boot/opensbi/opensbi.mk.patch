@@ -1,0 +1,16 @@
+diff --git a/boot/opensbi/opensbi.mk b/boot/opensbi/opensbi.mk
+index f9f550176f..88900c8865 100644
+--- a/boot/opensbi/opensbi.mk
++++ b/boot/opensbi/opensbi.mk
+@@ -32,6 +32,11 @@ OPENSBI_MAKE_ENV = \
+ 	CROSS_COMPILE=$(TARGET_CROSS) \
+ 	$(call qstrip,$(BR2_TARGET_OPENSBI_ADDITIONAL_VARIABLES))
+ 
++# Vendor OpenSBI (e.g. SpacemiT K3) builds a FIT fw_dynamic.itb in its default
++# target, which needs mkimage. Build host-uboot-tools first so mkimage is on
++# $(HOST_DIR)/bin PATH during the OpenSBI build (per-package host dirs).
++OPENSBI_DEPENDENCIES += host-uboot-tools
++
+ OPENSBI_PLAT = $(call qstrip,$(BR2_TARGET_OPENSBI_PLAT))
+ ifneq ($(OPENSBI_PLAT),)
+ OPENSBI_MAKE_ENV += PLATFORM=$(OPENSBI_PLAT)

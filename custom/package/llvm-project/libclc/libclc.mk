@@ -9,13 +9,19 @@ LIBCLC_VERSION = $(LLVM_PROJECT_VERSION)
 ifeq ($(BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE),y)
 
 LIBCLC_SITE = $(LLVM_PROJECT_SITE)
-LIBCLC_SOURCE = libclc-$(LIBCLC_VERSION).src.tar.xz
+# reglinux - one shared llvm-project monolith, see llvm-project.mk
+LIBCLC_SOURCE = $(LLVM_PROJECT_SOURCE)
+LIBCLC_DL_SUBDIR = llvm-project
+LIBCLC_SUBDIR = libclc
 LIBCLC_LICENSE = Apache-2.0 with exceptions or MIT
 LIBCLC_LICENSE_FILES = LICENSE.TXT
 LIBCLC_SUPPORTS_IN_SOURCE_BUILD = NO
 HOST_LIBCLC_SUPPORTS_IN_SOURCE_BUILD = NO
 
-# REG we need host-libclc for prepare_builtins
+# REG - host-libclc was needed here for the prepare_builtins tool, which libclc
+# dropped in LLVM 22 (with it went patch-to-fix-prepare_builtins-not-found, whose
+# hunk no longer has a target). Kept as a dependency because host-mesa3d wants
+# host-libclc anyway and the ordering is free.
 LIBCLC_DEPENDENCIES = host-clang host-llvm host-spirv-llvm-translator host-libclc
 # REG add host package for host-mesa3d
 HOST_LIBCLC_DEPENDENCIES = host-clang host-llvm host-spirv-llvm-translator
@@ -52,96 +58,27 @@ HOST_LIBCLC_CONF_OPTS = \
 LIBCLC_CONF_OPTS += -DLIBCLC_TARGETS_TO_BUILD=""
 endif
 
-define APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
-    patch "$(@D)/CMakeLists.txt" < "$(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/patch-to-fix-prepare_builtins-not-found
-endef
-
-LIBCLC_PRE_CONFIGURE_HOOKS += APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
-
 $(eval $(cmake-package))
 $(eval $(host-cmake-package))
 
 else
 
-# Download pre compiled files
-REGLINUX_LIBCLC_CPU = unknown
-ifeq ($(BR2_arm1176jzf_s),y)
-	REGLINUX_LIBCLC_CPU = arm1176jzf_s
-else ifeq ($(BR2_cortex_a7),y)
-	REGLINUX_LIBCLC_CPU = cortex_a7
-else ifeq ($(BR2_cortex_a9),y)
-	REGLINUX_LIBCLC_CPU = cortex_a9
-else ifeq ($(BR2_cortex_a15_a7),y)
-	REGLINUX_LIBCLC_CPU = cortex_a15_a7
-else ifeq ($(BR2_cortex_a17),y)
-	REGLINUX_LIBCLC_CPU = cortex_a17
-else ifeq ($(BR2_cortex_a35),y)
-	REGLINUX_LIBCLC_CPU = cortex_a35
-else ifeq ($(BR2_cortex_a53),y)
-	REGLINUX_LIBCLC_CPU = cortex_a53
-else ifeq ($(BR2_jz4770),y)
-	REGLINUX_LIBCLC_CPU = jz4770
-else ifeq ($(BR2_cortex_a55),y)
-	REGLINUX_LIBCLC_CPU = cortex_a55
-else ifeq ($(BR2_cortex_a72),y)
-	REGLINUX_LIBCLC_CPU = cortex_a72
-else ifeq ($(BR2_cortex_a72_a53),y)
-	REGLINUX_LIBCLC_CPU = cortex_a72_a53
-else ifeq ($(BR2_cortex_a73_a53),y)
-	REGLINUX_LIBCLC_CPU = cortex_a73_a53
-else ifeq ($(BR2_cortex_a75_a55),y)
-	REGLINUX_LIBCLC_CPU = cortex_a75_a55
-else ifeq ($(BR2_cortex_a76),y)
-	REGLINUX_LIBCLC_CPU = cortex_a76
-else ifeq ($(BR2_cortex_a76_a55),y)
-	REGLINUX_LIBCLC_CPU = cortex_a76_a55
-else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
-	REGLINUX_LIBCLC_CPU = cortex_a76_a55
-else ifeq ($(BR2_riscv),y)
-	REGLINUX_LIBCLC_CPU = riscv
-else ifeq ($(BR2_saphira),y)
-	REGLINUX_LIBCLC_CPU = saphira
-else ifeq ($(BR2_x86_x86_64_v3),y)
-	REGLINUX_LIBCLC_CPU = x86_64_v3
-else ifeq ($(BR2_x86_64),y)
-	REGLINUX_LIBCLC_CPU = x86_64
-endif
-
-LIBCLC_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LIBCLC_VERSION)
-LIBCLC_SOURCE = reglinux-libclc-$(LIBCLC_VERSION)-$(REGLINUX_LIBCLC_CPU).tar.xz
-LIBCLC_DEPENDENCIES = host-spirv-llvm-translator
-
-define RENAME_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash.bak || :
-endef
-
-define RESTORE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
-	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash || :
-endef
-
-LIBCLC_PRE_DOWNLOAD_HOOKS += RENAME_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
-LIBCLC_POST_DOWNLOAD_HOOKS += RESTORE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
-
-define LIBCLC_EXTRACT_CMDS
-	# extract host folder
-	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(LIBCLC_DL_SUBDIR)/$(LIBCLC_SOURCE) host
-endef
-
-define LIBCLC_INSTALL_TARGET_CMDS
-	# extract target folder
-	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(LIBCLC_DL_SUBDIR)/$(LIBCLC_SOURCE) target
-endef
-
-define DELETE_LIBCLC_UNUSED_TARGETS
-	# remove amdgcn, r600, nvp targets
-	rm -Rf $(TARGET_DIR)/usr/share/clc/*amdgcn*
-	rm -Rf $(TARGET_DIR)/usr/share/clc/*r600*
-	rm -Rf $(TARGET_DIR)/usr/share/clc/*nvptx*
-endef
-
-ifeq ($(BR2_arm)$(BR2_aarch64),y)
-LIBCLC_POST_INSTALL_TARGET_HOOKS += DELETE_LIBCLC_UNUSED_TARGETS
-endif
+# The prebuilt is two bundles owned by llvm.mk:
+#   reglinux-llvm-host-<ver>-<cpu>.tar.xz   -> HOST_DIR    (host-llvm)
+#   reglinux-llvm-target-<ver>-<cpu>.tar.xz -> TARGET_DIR  (llvm)
+# Both carry libclc alongside llvm, so there is nothing to fetch or install
+# here - each variant just depends on the matching llvm variant, which is what
+# lets a consumer ask for host tools without dragging the rootfs payload along.
+#
+# _SOURCE is set to the empty string rather than left unset: buildroot's
+# `$(2)_SOURCE ?=` default would otherwise invent <pkg>-<version>.tar.gz, and an
+# explicitly-empty value still counts as defined, so download and extract both
+# become no-ops.
+LIBCLC_SOURCE =
+LIBCLC_DEPENDENCIES = llvm
+HOST_LIBCLC_SOURCE =
+HOST_LIBCLC_DEPENDENCIES = host-llvm
 
 $(eval $(generic-package))
+$(eval $(host-generic-package))
 endif

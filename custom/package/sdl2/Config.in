@@ -45,7 +45,14 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
 		!BR2_PACKAGE_HAS_LIBEGL || \
 		!(BR2_PACKAGE_SDL2_OPENGL || BR2_PACKAGE_SDL2_OPENGLES)
 
-# batocera
+config BR2_PACKAGE_SDL2_MALI
+	bool "Mali fbdev EGL video driver"
+	depends on BR2_PACKAGE_POWERVR_GE8300_DRIVER
+	depends on BR2_PACKAGE_HAS_LIBEGL
+
+comment "Mali fbdev video driver needs the PowerVR GE8300 driver"
+	depends on !BR2_PACKAGE_POWERVR_GE8300_DRIVER
+
 config BR2_PACKAGE_SDL2_WAYLAND
     bool "SDL2 Wayland support"
     depends on BR2_PACKAGE_WAYLAND

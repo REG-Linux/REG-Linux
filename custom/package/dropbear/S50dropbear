@@ -1,44 +1,21 @@
 #!/bin/dash
-#
 # Starts dropbear sshd.
-#
 
 # REG-Linux
-[ "$(/usr/bin/regmsg systemconf getconfigkey system.ssh.enabled)" = "0" ] && {
-	echo "SSH services are disabled"
-	exit 0
-}
+[ "$(/usr/bin/regmsg systemconf getconfigkey system.ssh.enabled)" = "0" ] && { echo "SSH services are disabled"; exit 0; }
 
 # Allow customizations from config file
 [ -r /etc/default/dropbear ] && . /etc/default/dropbear
 
 start() {
-	DROPBEAR_ARGS="${DROPBEAR_ARGS} -R"
+	mkdir -p /userdata/system/.ssh
+	chown root:root /userdata/system/.ssh
+	chmod 700 /userdata/system/.ssh
 
-	# If /etc/dropbear is a symlink to /var/run/dropbear, and
-	#   - the filesystem is RO (i.e. we can not rm the symlink),
-	#     create the directory pointed to by the symlink.
-	#   - the filesystem is RW (i.e. we can rm the symlink),
-	#     replace the symlink with an actual directory
-	if [ -L /etc/dropbear ]; then
-		target=$(readlink /etc/dropbear 2>/dev/null)
-		if [ "$target" = "/var/run/dropbear" ]; then
-			if rm -f /etc/dropbear 2>/dev/null; then
-				mkdir -p /etc/dropbear
-			else
-				printf "No persistent location to store SSH host keys.\nNew keys will be generated at each boot.\n"
-				mkdir -p /var/run/dropbear
-			fi
-		fi
-	fi
-
+	DROPBEAR_ARGS="${DROPBEAR_ARGS} -R -D /etc/dropbear"
 	printf "Starting dropbear sshd: "
 	umask 077
-	if start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- $DROPBEAR_ARGS; then
-		echo "OK"
-	else
-		echo "FAIL"
-	fi
+	{ start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- $DROPBEAR_ARGS && echo "OK"; } || echo "FAIL"
 }
 
 stop() {

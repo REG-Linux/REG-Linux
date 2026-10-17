@@ -1,0 +1,26 @@
+diff --git a/package/llvm-project/lld/lld.mk b/package/llvm-project/lld/lld.mk
+index 0c1fce4860..06a5ea8945 100644
+--- a/package/llvm-project/lld/lld.mk
++++ b/package/llvm-project/lld/lld.mk
+@@ -6,7 +6,10 @@
+ 
+ LLD_VERSION = $(LLVM_PROJECT_VERSION)
+ LLD_SITE = $(LLVM_PROJECT_SITE)
+-LLD_SOURCE = lld-$(LLD_VERSION).src.tar.xz
++# reglinux - one shared llvm-project monolith, see llvm-project.mk
++LLD_SOURCE = $(LLVM_PROJECT_SOURCE)
++LLD_DL_SUBDIR = llvm-project
++LLD_SUBDIR = lld
+ LLD_LICENSE = Apache-2.0 with exceptions
+ LLD_LICENSE_FILES = LICENSE.TXT
+ LLD_SUPPORTS_IN_SOURCE_BUILD = NO
+@@ -14,6 +17,9 @@ HOST_LLD_DEPENDENCIES = host-llvm host-llvm-libunwind
+ 
+ # build as static libs as is done in llvm & clang
+ HOST_LLD_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
++HOST_LLD_CONF_OPTS += \
++	-DCMAKE_MODULE_PATH="$(HOST_DIR)/lib/cmake/llvm/Modules" \
++	-DLLVM_COMMON_CMAKE_UTILS="$(HOST_DIR)/lib/cmake/llvm"
+ 
+ # GCC looks for tools in a different path from LLD's default installation path
+ define HOST_LLD_CREATE_SYMLINKS

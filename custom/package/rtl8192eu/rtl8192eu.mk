@@ -5,7 +5,7 @@
 ################################################################################
 
 # REG use latest bump for newer kernels
-RTL8192EU_VERSION = e670de06ebedc844f173cf8d377691ce7f237311
+RTL8192EU_VERSION = 0c01d67c609de752ac0b80a7e7152a3fa42b7234
 RTL8192EU_SITE = $(call github,clnhub,rtl8192eu-linux,$(RTL8192EU_VERSION))
 RTL8192EU_LICENSE = GPL-2.0
 

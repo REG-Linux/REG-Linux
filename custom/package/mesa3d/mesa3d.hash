@@ -1,4 +1,5 @@
-# https://lists.freedesktop.org/archives/mesa-dev/2026-January/226581.html
-sha256  b5dd1be0db87b0be03d5a8e8d8a1478cea6ebb448ee0791068898a79b15c6083  mesa-26.0.0-rc2.tar.xz
+# https://docs.mesa3d.org/relnotes/26.2.4.html
+sha256  bce5f7fbebb934373b86c999a064d52fb5065878dc57f287f95346648ec832e9  mesa-26.2.4.tar.xz
+sha512  42e793561661a567e72c7324d071ab9f82d3a9f1e000827ed989b8d5fcc2cd16e50c02808d43465b3135c25a3cad77649ba0bf9e35d95b848f8fc8d8b9ce327c  mesa-26.2.4.tar.xz
 # License
 sha256  a00275a53178e2645fb65be99a785c110513446a5071ff2c698ed260ad917d75  docs/license.rst

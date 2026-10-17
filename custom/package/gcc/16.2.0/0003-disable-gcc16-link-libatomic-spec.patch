@@ -1,0 +1,16 @@
+--- a/gcc/gcc.cc
++++ b/gcc/gcc.cc
+@@ -999,7 +999,12 @@
+ 
+ /* Here is the spec for running the linker, after compiling all files.  */
+ 
+-#if defined(TARGET_PROVIDES_LIBATOMIC) && defined(USE_LD_AS_NEEDED)
++/* reglinux: GCC 16 auto-injects -latomic_asneeded into the default link spec
++   (GCC PR122429). libatomic / the libatomic_asneeded ld script is not built
++   until after glibc during a cross-toolchain bootstrap, so this breaks the
++   glibc build ("cannot find -latomic_asneeded"). Force the <=gcc-15 behaviour:
++   never auto-link libatomic (packages that need it link -latomic explicitly).  */
++#if 0
+ #ifdef USE_LD_AS_NEEDED_LDSCRIPT
+ #define LINK_LIBATOMIC_SPEC "%{!fno-link-libatomic:-latomic_asneeded} "
+ #else

@@ -58,4 +58,22 @@ else
 SDL2_IMAGE_CONF_OPTS += --disable-webp
 endif
 
+# The autotools install bakes the target's exec-prefix into the installed CMake
+# config, which ends up with
+#     set(exec_prefix "/usr")
+#     set(libdir "${exec_prefix}/lib")
+# so find_package(SDL2_image CONFIG) hands every consumer an IMPORTED_LOCATION
+# of /usr/lib/libSDL2_image.so -- a path that only exists on the target. Under
+# the Makefile generator that becomes a file dependency nothing can build:
+#     No rule to make target '/usr/lib/libSDL2_image.so', needed by 'dosbox'
+# 'prefix', set immediately above it, is already derived from the config file's
+# own location; upstream SDL2 fixed this by spelling it
+# set(exec_prefix ${PACKAGE_PREFIX_DIR}), but SDL2_image never followed. Point
+# exec_prefix at the relocatable prefix so libdir lands inside the sysroot.
+define SDL2_IMAGE_FIXUP_CMAKE_EXEC_PREFIX
+	$(SED) 's|^set(exec_prefix "/usr")|set(exec_prefix "$${prefix}")|' \
+		$(STAGING_DIR)/usr/lib/cmake/SDL2_image/sdl2_image-config.cmake
+endef
+SDL2_IMAGE_POST_INSTALL_STAGING_HOOKS += SDL2_IMAGE_FIXUP_CMAKE_EXEC_PREFIX
+
 $(eval $(autotools-package))
