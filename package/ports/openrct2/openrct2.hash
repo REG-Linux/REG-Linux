@@ -1,7 +1,7 @@
 # Locally computed
-sha256  8b62c45f03d312a369a1b1c23e0f0db293556e8cad58b14ccef7b4e6b4c65964  openrct2-v0.5.5.tar.gz
+sha256  f4732724c1a709cfaff02ddff7fe3b6d027ad7827b343bf6f2a254114d32128b  openrct2-v0.5.6.tar.gz
 # From the upstream assets.json
-sha256  74e73bbd012339511bb359dd0fbb148fda899790ae37d7d69861d88183b19452  objects.zip
-sha256  dabb9787b1576342fca4dd9f64b3f8cfa04a7e6ce9c2bb9610f47b762905c858  title-sequences.zip
+sha256  949bee5cac9e941be63bb923b792738a507c155a6fea73edab0b23bede21d302  objects.zip
+sha256  37ac28985baf183bae27af72710613595f683dc24892c05989fb6bfd016bdb5d  title-sequences.zip
 sha256  06b90f3e19c216752df441d551b26a9e3e1ba7755bdd2102504b73bf993608be  opensound.zip
 sha256  994b350d3b180ee1cb9619fe27f7ebae3a1a5232840c4bd47a89f33fa89de1a1  openmusic.zip

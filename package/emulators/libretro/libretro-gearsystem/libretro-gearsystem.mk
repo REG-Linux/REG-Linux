@@ -3,7 +3,7 @@
 # libretro-gearsystem
 #
 ################################################################################
-LIBRETRO_GEARSYSTEM_VERSION = 3.9.21
+LIBRETRO_GEARSYSTEM_VERSION = 3.9.22
 LIBRETRO_GEARSYSTEM_SITE = $(call github,drhelius,Gearsystem,$(LIBRETRO_GEARSYSTEM_VERSION))
 LIBRETRO_GEARSYSTEM_LICENSE = GPLv3
 

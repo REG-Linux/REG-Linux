@@ -3,7 +3,7 @@
 # libretro-gearlynx
 #
 ################################################################################
-LIBRETRO_GEARLYNX_VERSION = 1.2.34
+LIBRETRO_GEARLYNX_VERSION = 1.2.35
 LIBRETRO_GEARLYNX_SITE = $(call github,drhelius,Gearlynx,$(LIBRETRO_GEARLYNX_VERSION))
 LIBRETRO_GEARLYNX_LICENSE = GPLv3
 
