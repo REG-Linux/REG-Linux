@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# AYANEO Pocket (ACE, DMG, DS, EVO, S, S Mini): switch the gamepad MCU on
+# /dev/ttyHS0 to its Xbox 360 mode, so the pad shows up as a 045e:028e USB
+# XInput device (the kernel cmdline sets its polling to 2 ms with
+# usbcore.interrupt_interval_override). Frame taken from ROCKNIX's
+# 020-set-xbox-gamepad quirk, identical for all those models.
+#
+
+SERIAL_DEVICE="/dev/ttyHS0"
+
+start() {
+	grep -q "^AYANEO Pocket" /proc/device-tree/model 2>/dev/null || return 0
+	[ -c "${SERIAL_DEVICE}" ] || return 0
+
+	printf "Switching AYANEO gamepad to Xbox mode: "
+	stty -F "${SERIAL_DEVICE}" 115200 -clocal -opost -isig -icanon -echo && \
+	printf "\xe7\x55\x05\x01\x00\x00\x00\x00\x00\x5b\xed" > "${SERIAL_DEVICE}" && \
+	sleep 0.1 && \
+	printf "\x35\x35\x30\x35\x30\x31\x30\x30\x30\x30\x30\x30\x30\x30\x30\x30" > "${SERIAL_DEVICE}" && \
+	sleep 0.1
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop|restart|reload)
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
