@@ -1,0 +1,3 @@
+# MANGMI Air X / Air Y serial MCU joypad (drivers/input/joystick/mangmi.c)
+SUBSYSTEM=="input", ATTRS{name}=="MANGMI Air X Joypad", MODE="0666", ENV{ID_INPUT_JOYSTICK}="1"
+SUBSYSTEM=="input", ATTRS{name}=="MANGMI Air Y Joypad", MODE="0666", ENV{ID_INPUT_JOYSTICK}="1"

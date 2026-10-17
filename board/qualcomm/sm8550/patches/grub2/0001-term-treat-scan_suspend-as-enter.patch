@@ -1,0 +1,23 @@
+From e3e5bdad96bd03a2c45eeb9a602400aa25c54402 Mon Sep 17 00:00:00 2001
+From: Kancy Joe <54024877+sunflower2333@users.noreply.github.com>
+Date: Tue, 19 Aug 2025 08:17:21 +0000
+Subject: [PATCH] term: treat scan_suspend as enter.
+
+---
+ grub-core/term/efi/console.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/term/efi/console.c b/grub-core/term/efi/console.c
+index 258b52737..340435661 100644
+--- a/grub-core/term/efi/console.c
++++ b/grub-core/term/efi/console.c
+@@ -219,6 +219,9 @@ grub_efi_translate_key (grub_efi_input_key_t key)
+       else
+ 	return key.unicode_char;
+     }
++  /* Treat UEFI SCAN_SUSPEND (0x0102) as Enter (\r). */
++  else if (key.scan_code == 0x0102)
++    return '\r';
+   /* Some devices send enter with scan_code 0x0d (F3) and unicode_char 0x0d. */
+   else if (key.scan_code == '\r' && key.unicode_char == '\r')
+     return key.unicode_char;

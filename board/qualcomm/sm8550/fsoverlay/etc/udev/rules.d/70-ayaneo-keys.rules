@@ -1,0 +1,5 @@
+# AYANEO Pocket: the pad MCU's HID keyboard reports the volume rocker as
+# usage 0x70068/0x70069 (F13/F14); map them to the volume keys (same mapping
+# as ROCKNIX's 10-ayaneo.hwdb, done here so no hwdb rebuild is needed).
+ACTION!="remove", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="AYANEO DEVICE*", \
+  ENV{KEYBOARD_KEY_70068}="volumeup", ENV{KEYBOARD_KEY_70069}="volumedown", RUN{builtin}+="keyboard"

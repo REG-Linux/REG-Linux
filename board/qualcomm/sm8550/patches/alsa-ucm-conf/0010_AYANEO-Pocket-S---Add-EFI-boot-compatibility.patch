@@ -1,0 +1,43 @@
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Subject: [PATCH] AYANEO Pocket S: Add EFI boot compatibility
+
+Under an EFI boot the ASoC card long name is built from DMI
+(vendor-product-), and ucm.conf only matches conf.d/<driver>/<longname>.conf
+or <driver>.conf, never the short card name "SM8550-APS". The other
+AYANEO Pockets get these links from ROCKNIX; the Pocket S family has none.
+
+The names below follow the "ayaneo-AYANEOPocketACE-" pattern and are a
+best guess: check /proc/asound/cards on the device and fix if needed.
+
+diff --git a/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS-.conf b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS-.conf
+new file mode 120000
+index 0000000..414976a
+--- /dev/null
++++ b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS-.conf
+@@ -0,0 +1 @@
++../../AYANEO/Pocket/AYANEO-Pocket.conf
+\ No newline at end of file
+diff --git a/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS1K-.conf b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS1K-.conf
+new file mode 120000
+index 0000000..414976a
+--- /dev/null
++++ b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS1K-.conf
+@@ -0,0 +1 @@
++../../AYANEO/Pocket/AYANEO-Pocket.conf
+\ No newline at end of file
+diff --git a/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS2K-.conf b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS2K-.conf
+new file mode 120000
+index 0000000..414976a
+--- /dev/null
++++ b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketS2K-.conf
+@@ -0,0 +1 @@
++../../AYANEO/Pocket/AYANEO-Pocket.conf
+\ No newline at end of file
+diff --git a/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketSMini-.conf b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketSMini-.conf
+new file mode 120000
+index 0000000..414976a
+--- /dev/null
++++ b/ucm2/conf.d/sm8550/ayaneo-AYANEOPocketSMini-.conf
+@@ -0,0 +1 @@
++../../AYANEO/Pocket/AYANEO-Pocket.conf
+\ No newline at end of file

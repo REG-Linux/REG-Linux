@@ -1,0 +1,84 @@
+From: cjom <cjom@reglinux.org>
+Subject: [PATCH] ksmbd: fix named-pipe RPC and restarted NTLMSSP logins on 7.2
+
+Two 7.2 regressions that break browsing the share from file managers.
+
+1. Upstream a3bcea7c819a ("ksmbd: exempt FSCTL_PIPE_TRANSCEIVE from the
+   generic file-id lookup", 7.3-rc1). RPC pipe IDs live in
+   sess->rpc_handle_list, not the ksmbd_file table smb2_ioctl() searches,
+   so every DCE/RPC call over a named pipe (srvsvc share enumeration,
+   wkssvc, samr, lsarpc) failed right after CREATE.
+
+2. KSMBD_MAX_PENDING_SESSIONS (1) refuses a second SessionId-zero
+   SESSION_SETUP while one is still in progress, with
+   STATUS_INSUFFICIENT_RESOURCES. libsmbclient (GNOME gvfs) abandons the
+   first NTLMSSP exchange after the CHALLENGE and restarts it on the same
+   connection, so gio/Nautilus mounts failed with "Invalid argument".
+   Drop the oldest idle pending session instead; the bound still holds.
+   Still present in 7.3-rc6.
+---
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index c3c0557..e3354dc 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -402,10 +402,18 @@ struct ksmbd_session *__session_lookup(unsigned long long id)
+ 	return NULL;
+ }
+ 
++static void ksmbd_drop_pending_session(struct ksmbd_conn *conn,
++				       struct ksmbd_session *sess)
++{
++	xa_erase(&conn->sessions, sess->id);
++	ksmbd_session_remove_from_table(sess);
++	ksmbd_session_destroy(sess);
++}
++
+ static bool ksmbd_too_many_session_setups(struct ksmbd_conn *conn)
+ {
+ 	unsigned long id;
+-	struct ksmbd_session *sess;
++	struct ksmbd_session *sess, *oldest = NULL;
+ 	unsigned int pending = 0;
+ 
+ 	down_write(&sessions_table_lock);
+@@ -417,12 +425,25 @@ static bool ksmbd_too_many_session_setups(struct ksmbd_conn *conn)
+ 		if (atomic_read(&sess->refcnt) <= 1 &&
+ 		    time_after(jiffies, sess->last_active +
+ 			       KSMBD_UNAUTHENTICATED_CONN_TIMEOUT)) {
+-			xa_erase(&conn->sessions, sess->id);
+-			ksmbd_session_remove_from_table(sess);
+-			ksmbd_session_destroy(sess);
++			ksmbd_drop_pending_session(conn, sess);
+ 			continue;
+ 		}
+ 		pending++;
++		if (atomic_read(&sess->refcnt) <= 1 &&
++		    (!oldest || time_before(sess->last_active,
++					    oldest->last_active)))
++			oldest = sess;
++	}
++
++	/*
++	 * A new SessionId-zero setup abandons the client's unfinished one:
++	 * libsmbclient (GNOME gvfs) restarts NTLMSSP on the same connection
++	 * after the CHALLENGE. Drop the oldest idle pending session instead
++	 * of refusing the new one, which keeps the bound.
++	 */
++	if (pending >= KSMBD_MAX_PENDING_SESSIONS && oldest) {
++		ksmbd_drop_pending_session(conn, oldest);
++		pending--;
+ 	}
+ 	up_write(&conn->session_lock);
+ 	up_write(&sessions_table_lock);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 07de36a..fea02e5 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -9634,6 +9634,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 	case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
+ 	case FSCTL_VALIDATE_NEGOTIATE_INFO:
+ 	case FSCTL_PIPE_WAIT:
++	case FSCTL_PIPE_TRANSCEIVE:
+ 		no_fileid_ioctl = true;
+ 		break;
+ 	default:
