@@ -21,7 +21,6 @@ BR2_PACKAGE_FINDUTILS=y
 BR2_PACKAGE_GAWK=y
 BR2_PACKAGE_GREP=y
 BR2_PACKAGE_GZIP=y
-BR2_PACKAGE_GESFTPSERVER=y
 BR2_PACKAGE_IFUPDOWN_SCRIPTS=n
 BR2_PACKAGE_IPUTILS=y
 BR2_PACKAGE_KMOD=y
@@ -68,7 +67,7 @@ BR2_TARGET_GENERIC_ROOT_PASSWD="linux"
 BR2_SYSTEM_ENABLE_NLS=y
 BR2_ENABLE_LOCALE=y
 BR2_ENABLE_LOCALE_WHITELIST="C ar ca cs_CZ cy cy_GB cy de en el es es_MX eu eu_ES fr fr_FR fi_FI gl_ES he hu id_ID it ja ja_JP ja ko nb nb_NO nl nn nn_NO oc oc_FR pl pt pt_PT pt_BR ru ru_RU uk uk_UA ro_RO sk_SK sv sv_SE tr vi_VN zh zh_CN zh_TW"
-BR2_GENERATE_LOCALE="en_US.UTF-8 ar_YE.UTF-8 ca_ES.UTF-8 cs_CZ.UTF-8 cy_GB.UTF-8 de_DE.UTF-8 el_GR.UTF-8 en_GB.UTF-8 es_ES.UTF-8 es_MX.UTF-8 eu_ES.UTF-8 fr_FR.UTF-8 fi_FI.UTF-8 gl_ES.UTF-8 he_IL.UTF-8 hu_HU.UTF-8 id_ID.UTF-8 it_IT.UTF-8 ja_JP.UTF-8 ko_KR.UTF-8 nb_NO.UTF-8 nl_NL.UTF-8 nn_NO.UTF-8 oc_FR.UTF-8 pl_PL.UTF-8 pt_BR.UTF-8 pt_PT.UTF-8 ru_RU.UTF-8 uk_UA.UTF-8 ro_RO.UTF-8 sk_SK.UTF-8 sv_SE.UTF-8 tr_TR.UTF-8 vi_VN.UTF-8 zh_CN.UTF-8 zh_TW.UTF-8"
+BR2_GENERATE_LOCALE="C.UTF-8 en_US.UTF-8 ar_YE.UTF-8 ca_ES.UTF-8 cs_CZ.UTF-8 cy_GB.UTF-8 de_DE.UTF-8 el_GR.UTF-8 en_GB.UTF-8 es_ES.UTF-8 es_MX.UTF-8 eu_ES.UTF-8 fr_FR.UTF-8 fi_FI.UTF-8 gl_ES.UTF-8 he_IL.UTF-8 hu_HU.UTF-8 id_ID.UTF-8 it_IT.UTF-8 ja_JP.UTF-8 ko_KR.UTF-8 nb_NO.UTF-8 nl_NL.UTF-8 nn_NO.UTF-8 oc_FR.UTF-8 pl_PL.UTF-8 pt_BR.UTF-8 pt_PT.UTF-8 ru_RU.UTF-8 uk_UA.UTF-8 ro_RO.UTF-8 sk_SK.UTF-8 sv_SE.UTF-8 tr_TR.UTF-8 vi_VN.UTF-8 zh_CN.UTF-8 zh_TW.UTF-8"
 BR2_TARGET_TZ_INFO=y
 BR2_TARGET_LOCALTIME="Europe/Paris"
 # BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW is not set
@@ -122,16 +121,19 @@ BR2_PACKAGE_REGLINUX_RESCUE=y
 BR2_PACKAGE_HOST_PIGZ=y
 BR2_PACKAGE_LIBV4L=y
 
+# Offline databases (Redump.org, GameTDB serial->checksum; MAME -listxml
+# distillation) for the scraper and arcade library
+BR2_PACKAGE_REGLINUX_GAMES_DATABASES=y
+
 # Always build SDL2 and SDL3
 BR2_PACKAGE_REGLINUX_SDL2=y
 BR2_PACKAGE_REGLINUX_SDL3=y
 
-# Always build MTP support
-BR2_PACKAGE_UMTP_RESPONDER=y
+# Always build FTP server
+BR2_PACKAGE_ZFTPD=y
 
-# Always build ADB daemon for USB gadget mode
-BR2_PACKAGE_ANDROID_TOOLS=y
-BR2_PACKAGE_ANDROID_TOOLS_ADBD=y
+# Always build USB gadget
+BR2_PACKAGE_REGLINUX_USBGADGET=y
 
 # Always build wayland protocols and seatd
 BR2_PACKAGE_WAYLAND=y
@@ -139,21 +141,23 @@ BR2_PACKAGE_WAYLAND_UTILS=y
 BR2_PACKAGE_WAYLAND_PROTOCOLS=y
 BR2_PACKAGE_SEATD=y
 
-# Prefer using prebuilt LLVM/CLANG/LIBCLC
+# If commented, will use prebuilt LLVM/CLANG/LIBCLC
 #BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE=y
+#BR2_PACKAGE_SPIRV_TOOLS_BUILD_FROM_SOURCE=y
+#BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR_BUILD_FROM_SOURCE=y
 
-# Prefer using prebuilt Qt6
+# If commented, will use prebuilt Qt6
 #BR2_PACKAGE_REGLINUX_QT6=y
 #BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y
 #BR2_PACKAGE_QT6BASE_DEFAULT_QPA="wayland"
 
-# Prefer using prebuilt MAME
+# If commented, will use prebuilt MAME
 #BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y
 
-# Prefer using prebuilt ScummVM
+# If commented, will use prebuilt ScummVM
 #BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y
 
-# Prefer using prebuilt REGMSG
+# If commented, will use prebuilt REGMSG
 #BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE=y
 
 # Enables ccache

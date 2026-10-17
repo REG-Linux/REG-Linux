@@ -1,3 +1,8 @@
+Subject: HID: wiimote: report the Classic Controller d-pad as ABS, not HAT
+Origin: Batocera, first committed by Nicolas Adenis-Lamarre on 2016-09-05 ("acpi: fix acpi power button"),
+        board/batocera/broadcom/linux_patches/linux-wiimote-abs-not-hat.patch
+Note: original patch carries no From:/Signed-off-by: header; author taken from the Batocera git history.
+
 diff --git a/drivers/hid/hid-wiimote-modules.c b/drivers/hid/hid-wiimote-modules.c
 index 4390eee..76ed60b 100644
 --- a/drivers/hid/hid-wiimote-modules.c
