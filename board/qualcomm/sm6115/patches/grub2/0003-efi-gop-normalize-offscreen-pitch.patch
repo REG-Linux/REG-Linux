@@ -1,0 +1,41 @@
+From: REG-Linux <dev@reglinux.org>
+Date: Sat, 21 Mar 2026 00:00:00 +0000
+Subject: [PATCH] efi_gop: normalize pitch to match offscreen buffer stride
+
+On Qualcomm ABL UEFI, pixels_per_scan_line is aligned to 64 pixels
+(e.g. 1088 for a 1080-pixel-wide panel). grub_video_gop_fill_mode_info()
+sets mode_info.pitch = pixels_per_scan_line * bpp, which is larger than
+width * bpp. However, the offscreen buffer is allocated as
+width * height * sizeof(BLT_PIXEL) with no scan-line padding, and
+gop->blt() is called with stride = mode_info.width * 4 (no padding).
+
+This mismatch causes the render target to write row y at offset
+y * pitch (padded), while gop->blt() reads row y at offset
+y * (width * 4) (unpadded), producing a fine horizontal stripe
+pattern on the display.
+
+Fix: after grub_video_gop_fill_mode_info(), normalize pitch to
+width * bytes_per_pixel so the render target and gop->blt() use the
+same row stride as the allocated offscreen buffer.
+
+Signed-off-by: REG-Linux <dev@reglinux.org>
+---
+ grub-core/video/efi_gop.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/grub-core/video/efi_gop.c b/grub-core/video/efi_gop.c
+--- a/grub-core/video/efi_gop.c
++++ b/grub-core/video/efi_gop.c
+@@ -469,6 +469,12 @@ grub_video_gop_setup (unsigned int width, unsigned int height,
+   grub_video_gop_fill_mode_info (gop->mode->mode, info,
+ 				 &framebuffer.mode_info);
+ 
++  /* Normalize pitch to match offscreen buffer stride.  The offscreen buffer
++     is allocated as width*height with no scan-line padding, and gop->blt()
++     uses width*bytes_per_pixel as the source stride.  Force pitch to match.  */
++  framebuffer.mode_info.pitch = framebuffer.mode_info.width
++    * (framebuffer.mode_info.bpp / 8);
++
+   framebuffer.ptr = (void *) (grub_addr_t) gop->mode->fb_base;
+   framebuffer.offscreen
+     = grub_malloc (framebuffer.mode_info.height

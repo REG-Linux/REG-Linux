@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Tue, 7 Jan 2026 10:40:00 +0100
+Subject: [PATCH] ASoC: qcom: sdw: guard against missing DAIs
+
+Avoid NULL dereferences when a PCM runtime has no CPU or codec DAIs
+and skip SoundWire stream setup in that case.
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+---
+ sound/soc/qcom/sdw.c | 3 +++
+ 1 file changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/sound/soc/qcom/sdw.c b/sound/soc/qcom/sdw.c
+index 0b8e9b5f1df7..95b23f8b8228 100644
+--- a/sound/soc/qcom/sdw.c
++++ b/sound/soc/qcom/sdw.c
+@@ -60,6 +60,9 @@
+ 	u32 rx_ch_cnt = 0, tx_ch_cnt = 0;
+ 	int ret, i, j;
+ 
++	if (!cpu_dai || !rtd->dai_link || !rtd->dai_link->num_codecs)
++		return 0;
++
+ 	if (!qcom_snd_is_sdw_dai(cpu_dai->id))
+ 		return 0;
+ 

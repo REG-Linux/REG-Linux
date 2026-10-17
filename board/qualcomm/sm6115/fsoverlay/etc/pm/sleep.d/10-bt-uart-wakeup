@@ -1,0 +1,17 @@
+#!/bin/dash
+# Suspend/resume hook for SM6115: the WCN3950 Bluetooth UART would wake the
+# system as soon as it is suspended, so drop it as a wakeup source while
+# asleep.
+
+BT_UART_WAKEUP=/sys/devices/platform/soc@0/4ac0000.geniqup/4a8c000.serial/power/wakeup
+
+[ -e "${BT_UART_WAKEUP}" ] || exit 0
+
+case "$1" in
+	suspend|hibernate)
+		echo disabled > "${BT_UART_WAKEUP}"
+		;;
+	resume|thaw)
+		echo enabled > "${BT_UART_WAKEUP}"
+		;;
+esac

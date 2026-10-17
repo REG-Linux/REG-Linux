@@ -23,13 +23,19 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/sm8550-ayaneo-ps.dtb"		"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pockets2k.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pockets1k.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketsmini.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketace.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketdmg.dtb" 	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketds.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketevo.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
 
 cp -f "${BOARD_DIR}/grub.cfg"                           "${BINARIES_DIR}/efi-part/EFI/BOOT/grub.cfg"    || exit 1
+
+# Seed a 1024-byte grubenv so that load_env/save_env work on first boot
+{ printf '%s\n' '# GRUB Environment Block'; head -c 999 < /dev/zero | tr '\0' '#'; } > "${BINARIES_DIR}/efi-part/EFI/BOOT/grubenv" || exit 1
+
 cp -r "${BINARIES_DIR}/efi-part/EFI/"                   "${REGLINUX_BINARIES_DIR}/boot/"                || exit 1
 
 exit 0
