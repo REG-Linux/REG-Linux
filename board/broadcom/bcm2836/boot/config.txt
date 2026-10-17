@@ -109,9 +109,9 @@ disable_fw_kms_setup=1
 # uncomment if you don't want the rainbow at startup
 disable_splash=1
 
-# enable UART (required for for retroflag)
-# affect rpi performances
-# enable_uart=1
+# enable UART (required for Retroflag GPICase communication)
+# Affects RPi performance slightly - required for button support
+#enable_uart=1
 
 # Uncomment some or all of these to enable the optional hardware interfaces
 #dtparam=i2c_arm=on
@@ -132,12 +132,22 @@ dtparam=audio=on
 dtparam=krnbt=on
 
 # Enable DRM VC4 V3D driver
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-kms-v3d,cma-128
 
 [DPI]
 # Put any DPI required display code here
 # i.e. Official 7" DSI Raspberry Pi Touch Display for 'Full' KMS
 #ignore_lcd=1
 #dtoverlay=vc4-kms-dsi-7inch
+
+# Retroflag GPI Case overlay - uncomment the appropriate line for your model
+# GPI Case (Pi Zero/1 - 240x320 portrait)
+# Note: Only enable ONE overlay based on your hardware
+# For Pi Zero 2 W, use gpicase2w below
+#dtoverlay=retroflag-gpicase
+
+# GPI Case 2W (Pi Zero 2 W - 640x480 landscape)
+# This is the recommended overlay for bcm2836 (RPi Zero 2 W)
+#dtoverlay=retroflag-gpicase2w
 
 [all]

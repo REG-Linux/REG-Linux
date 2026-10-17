@@ -1,3 +1,7 @@
+Subject: drm/panel-simple: add the Retroflag GPi Case DPI panel
+Origin: Batocera, first committed by Juliano Dorigão on 2024-05-01 ("gpicase: retroflag dpi panel")
+Note: original patch carries no From:/Signed-off-by: header; author taken from the Batocera git history.
+
 ---
  drivers/gpu/drm/panel/panel-simple.c | 29 ++++++++++++++++++++++++++++
  1 file changed, 29 insertions(+)

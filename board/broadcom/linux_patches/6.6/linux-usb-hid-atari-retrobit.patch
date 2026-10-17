@@ -1,0 +1,22 @@
+Subject: HID: handle out-of-range null-state values (Atari/Retro-Bit pads)
+Origin: Batocera, first committed by Nicolas Adenis-Lamarre on 2018-04-07 ("rpi3 plus"),
+        board/batocera/broadcom/linux_patches/linux-usb-hid-atari-retrobit.patch
+Note: original patch carries no From:/Signed-off-by: header; author taken from the Batocera git history.
+
+diff --git a/drivers/hid/hid-input.c b/drivers/hid/hid-input.c
+index 5974cf5..7727de2 100644
+--- a/drivers/hid/hid-input.c
++++ b/drivers/hid/hid-input.c
+@@ -1243,8 +1243,10 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct
+ 		if (field->flags & HID_MAIN_ITEM_NULL_STATE &&
+ 		    (value < field->logical_minimum ||
+ 		     value > field->logical_maximum)) {
+-			dbg_hid("Ignoring out-of-range value %x\n", value);
+-			return;
++		  if(value < field->logical_minimum)
++		    value = field->logical_minimum;
++		  else
++		    value = field->logical_maximum;
+ 		}
+ 		value = clamp(value,
+ 			      field->logical_minimum,

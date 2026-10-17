@@ -1,3 +1,8 @@
+Subject: Ignore ELAN HID battery reports (8bitdo battery quirks)
+Origin: Batocera, first committed by Nicolas Adenis-Lamarre on 2021-04-22 ("8bitdo battery quirks"),
+        board/batocera/broadcom/linux_patches/linux-battery-quircks.patch
+Note: original patch carries no From:/Signed-off-by: header; author taken from the Batocera git history.
+
 diff --git a/drivers/hid/hid-input.c b/drivers/hid/hid-input.c
 index 527fdd0..9c7df07 100644
 --- a/drivers/hid/hid-input.c

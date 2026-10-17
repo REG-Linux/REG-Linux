@@ -1,3 +1,8 @@
+Subject: media: uvc: add a bandwidth cap module parameter (Sinden lightgun)
+Origin: Batocera, first committed by Nicolas Adenis-Lamarre on 2024-03-20 ("linux bandwith usb for sinden guns"),
+        board/batocera/broadcom/linux_patches/uvc-bandwidth_cap_param-for-sinden.patch
+Note: original patch carries no From:/Signed-off-by: header; author taken from the Batocera git history.
+
 diff --git a/drivers/media/usb/uvc/uvc_driver.c b/drivers/media/usb/uvc/uvc_driver.c
 index 08fcd2f..63b7d4b 100644
 --- a/drivers/media/usb/uvc/uvc_driver.c

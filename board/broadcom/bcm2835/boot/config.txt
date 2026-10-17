@@ -26,8 +26,8 @@ disable_overscan=1
 
 # uncomment to force a console size. By default it will be display's size minus
 # overscan.
-#framebuffer_width=1280
-#framebuffer_height=720
+framebuffer_width=640
+framebuffer_height=480
 
 # uncomment if hdmi display is not detected and composite is being output
 #hdmi_force_hotplug=1
@@ -109,8 +109,8 @@ disable_fw_kms_setup=1
 # uncomment if you don't want the rainbow at startup
 disable_splash=1
 
-# enable UART (required for for retroflag)
-# affect rpi performances
+# enable UART (required for Retroflag GPICase communication)
+# Enables LED control, safe shutdown, and button support
 # enable_uart=1
 
 # Uncomment some or all of these to enable the optional hardware interfaces
@@ -139,5 +139,12 @@ dtoverlay=vc4-kms-v3d,cma-128
 # i.e. Official 7" DSI Raspberry Pi Touch Display for 'Full' KMS
 #ignore_lcd=1
 #dtoverlay=vc4-kms-dsi-7inch
+
+# Retroflag GPI Case overlay - uncomment the appropriate line for your model
+# GPI Case (Pi Zero/1 - 240x320 portrait)
+#dtoverlay=retroflag-gpicase
+
+# GPI Case 2W (Pi Zero 2 W - 640x480 landscape)
+#dtoverlay=retroflag-gpicase2w
 
 [all]

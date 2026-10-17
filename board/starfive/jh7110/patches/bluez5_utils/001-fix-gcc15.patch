@@ -1,0 +1,19 @@
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Subject: shared/shell: call rl_message() without arguments (GCC 15 / C23 build fix)
+
+GCC 15 defaults to C23, where an unprototyped declaration of rl_message()
+no longer accepts the extra argument.
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+---
+--- a/src/shared/shell.c	2026-02-23 01:32:39.342404394 +0100
++++ b/src/shared/shell.c	2026-02-23 01:32:48.692568850 +0100
+@@ -1421,7 +1421,7 @@
+ 	if (data.history[0] != '\0')
+ 		write_history(data.history);
+ 
+-	rl_message("");
++	rl_message();
+ 	rl_callback_handler_remove();
+ }
+ 
