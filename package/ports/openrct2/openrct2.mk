@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENRCT2_VERSION = v0.5.5
+OPENRCT2_VERSION = v0.5.6
 OPENRCT2_SITE = $(call github,OpenRCT2,OpenRCT2,$(OPENRCT2_VERSION))
 OPENRCT2_LICENSE = GPL-3.0
 
@@ -34,8 +34,8 @@ endif
 # Assets, as pinned by the upstream assets.json. CMake normally pulls these off
 # the network during the install step; fetch them the buildroot way instead so
 # they are cached in $(DL_DIR), hash checked, and usable offline.
-OPENRCT2_EXTRA_DOWNLOADS  = https://github.com/OpenRCT2/objects/releases/download/v1.7.11/objects.zip
-OPENRCT2_EXTRA_DOWNLOADS += https://github.com/OpenRCT2/title-sequences/releases/download/v0.4.26/title-sequences.zip
+OPENRCT2_EXTRA_DOWNLOADS  = https://github.com/OpenRCT2/objects/releases/download/v1.8.0/objects.zip
+OPENRCT2_EXTRA_DOWNLOADS += https://github.com/OpenRCT2/title-sequences/releases/download/v0.5.6/title-sequences.zip
 OPENRCT2_EXTRA_DOWNLOADS += https://github.com/OpenRCT2/OpenSoundEffects/releases/download/v1.0.6/opensound.zip
 OPENRCT2_EXTRA_DOWNLOADS += https://github.com/OpenRCT2/OpenMusic/releases/download/v1.6.1/openmusic.zip
 

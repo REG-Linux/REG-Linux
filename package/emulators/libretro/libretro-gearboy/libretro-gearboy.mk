@@ -3,7 +3,7 @@
 # libretro-gearboy
 #
 ################################################################################
-LIBRETRO_GEARBOY_VERSION = 3.8.17
+LIBRETRO_GEARBOY_VERSION = 3.8.18
 LIBRETRO_GEARBOY_SITE = $(call github,drhelius,Gearboy,$(LIBRETRO_GEARBOY_VERSION))
 LIBRETRO_GEARBOY_LICENSE = GPLv3
 

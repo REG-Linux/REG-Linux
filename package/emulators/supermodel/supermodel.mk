@@ -4,16 +4,15 @@
 #
 ################################################################################
 # Project uses automated date-based builds (alpha stage)
-SUPERMODEL_VERSION = v0.3a-20260928-git-8b4de23
+SUPERMODEL_VERSION = v0.3a-20261009-git-b23e6be
 SUPERMODEL_SITE = $(call github,trzy,Supermodel,$(SUPERMODEL_VERSION))
-SUPERMODEL_DEPENDENCIES = sdl2 zlib libzip sdl2_net
+# GLEW is bundled (Src/Pkgs, GLEW_STATIC) but includes GL/glu.h and the link
+# uses -lGLU, so libglu is always required.
+SUPERMODEL_DEPENDENCIES = sdl2 zlib libzip sdl2_net libglu
 SUPERMODEL_LICENSE = GPLv3
 
 ifeq ($(BR2_PACKAGE_LIBGLEW),y)
 SUPERMODEL_DEPENDENCIES += libglew
-endif
-ifeq ($(BR2_PACKAGE_LIBGLU),y)
-SUPERMODEL_DEPENDENCIES += libglu
 endif
 
 define SUPERMODEL_BUILD_CMDS

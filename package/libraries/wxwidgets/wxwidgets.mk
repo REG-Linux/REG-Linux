@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-WXWIDGETS_VERSION = v3.3.3
+WXWIDGETS_VERSION = v3.3.4
 WXWIDGETS_SITE = https://github.com/wxWidgets/wxWidgets
-WXWIDGETS_DEPENDENCIES = zlib libpng jpeg gdk-pixbuf libgtk3 libglu host-libgtk3 host-wayland wayland
+WXWIDGETS_DEPENDENCIES = zlib libpng jpeg gdk-pixbuf libgtk3 libglu host-libgtk3 host-wayland wayland wayland-protocols
 WXWIDGETS_SITE_METHOD = git
 WXWIDGETS_GIT_SUBMODULES = YES
 
@@ -19,14 +19,21 @@ WXWIDGETS_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
 
 # Generate Wayland protocol headers using host wayland-scanner
 # (CMake's pkg_get_variable returns the target path which is unusable in cross-compilation)
+# 3.3.4 wants every protocol in src/unix/protocols, plus xdg-shell from
+# wayland-protocols, once that package is found.
+WXWIDGETS_WAYLAND_PROTOCOLS = \
+	$(@D)/src/unix/protocols/*.xml \
+	$(STAGING_DIR)/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+
 define WXWIDGETS_GENERATE_WAYLAND_PROTOCOLS
 	mkdir -p $(@D)/include/wx/protocols
-	$(HOST_DIR)/bin/wayland-scanner client-header \
-		$(@D)/src/unix/protocols/pointer-warp-v1.xml \
-		$(@D)/include/wx/protocols/pointer-warp-v1-client-protocol.h
-	$(HOST_DIR)/bin/wayland-scanner private-code \
-		$(@D)/src/unix/protocols/pointer-warp-v1.xml \
-		$(@D)/include/wx/protocols/pointer-warp-v1-client-protocol.c
+	for xml in $(WXWIDGETS_WAYLAND_PROTOCOLS); do \
+		p=$$(basename $$xml .xml); \
+		$(HOST_DIR)/bin/wayland-scanner client-header $$xml \
+			$(@D)/include/wx/protocols/$$p-client-protocol.h || exit 1; \
+		$(HOST_DIR)/bin/wayland-scanner private-code $$xml \
+			$(@D)/include/wx/protocols/$$p-client-protocol.c || exit 1; \
+	done
 endef
 
 WXWIDGETS_POST_CONFIGURE_HOOKS += WXWIDGETS_GENERATE_WAYLAND_PROTOCOLS
