@@ -1,0 +1,43 @@
+# Modifier key
+set $alt Mod1
+
+# hide_cursor hides the cursor image after the specified timeout (in milliseconds) has elapsed with no activity on that cursor
+seat * hide_cursor 500
+
+# Default wallpaper
+output * bg #000000 solid_color
+
+# Set keyboard layout (default US)
+input * {
+    xkb_layout "us"
+}
+
+# kill focused window
+bindsym $alt+F4 kill
+
+# Make the current focus fullscreen
+bindsym $alt+f fullscreen
+
+# Disable visual effects
+set $animations off
+
+# Wayland natives
+for_window [app_id=".*"] opacity 1
+# Move every new window to the currently-focused output BEFORE we
+# fullscreen/focus it. Some emulators (SDL2 via XWayland, e.g. SDLPoP)
+# bind their surface directly to wl_output:0, which is often the
+# internal panel even when the TV is the active output.
+for_window [app_id=".*"] move container to output current, floating enable, fullscreen enable, border none, focus
+
+# X11 via XWayland (matched by class instead of app_id)
+for_window [class=".*"] opacity 1
+for_window [class=".*"] move container to output current, floating enable, fullscreen enable, border none, focus
+
+# Per-device overrides (REG_BOARD_MODEL from profile.d/50-board.sh); missing file is skipped.
+# After the rules above so its for_window rules win.
+include /etc/sway/boards/$REG_BOARD_MODEL.conf
+
+# Starts REG-Station when loading sway
+exec /usr/bin/system-mouse hide
+exec /usr/bin/regstation-standalone
+exec /usr/bin/regmsg screen maptouchscreen

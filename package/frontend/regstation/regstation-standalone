@@ -1,0 +1,262 @@
+#!/bin/dash
+
+# REG-Station launcher: configures display, runs regstation, restarts on
+# normal exit until --stop-rebooting clears the flag.
+
+RESTART_FLAG="/var/run/regstation-standalone"
+LOG_FILE="/userdata/system/logs/display.log"
+SWITCH_SCREEN_REQUEST="/var/run/switch_screen_request"
+SWITCH_SCREEN_CURRENT="/var/run/switch_screen_current"
+
+export HOME=/userdata/system
+export LD_LIBRARY_PATH=/usr/lib/rs-ffmpeg:$LD_LIBRARY_PATH
+
+# Stop glibc hoarding the top of the main heap.
+export MALLOC_TRIM_THRESHOLD_=131072
+
+log_message() {
+    printf '%s - %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "$LOG_FILE"
+}
+
+# sway-ipc lives at $XDG_RUNTIME_DIR/sway-ipc.<uid>.sock per XDG.
+# regmsgd is started by init with XDG_RUNTIME_DIR=/var/run before user
+# runtime exists, so its rotation queries fall back to KMSDRM and miss the
+# panel-orientation transform sway applies. Bypass regmsg and ask sway.
+_resolve_swaysock() {
+    _uid=$(id -u)
+    if [ -n "$SWAYSOCK" ] && [ -S "$SWAYSOCK" ]; then
+        echo "$SWAYSOCK"
+        return
+    fi
+    for _p in "${XDG_RUNTIME_DIR:-/run/user/$_uid}/sway-ipc.${_uid}.sock" \
+              "/run/user/${_uid}/sway-ipc.${_uid}.sock" \
+              "/run/sway-ipc.${_uid}.sock"; do
+        [ -S "$_p" ] && { echo "$_p"; return; }
+    done
+}
+
+# Prefer the user's configured output, then any external (DP/HDMI), then
+# whatever's left; internal panels (DSI/eDP) lose to externals on purpose.
+get_target_output() {
+    _outputs=$(regmsg screen listoutputs 2>/dev/null)
+    [ -z "$_outputs" ] && return
+    if [ -n "$settings_output" ] && echo "$_outputs" | grep -qxF "$settings_output"; then
+        echo "$settings_output"
+    else
+        _external=$(echo "$_outputs" | grep -vE "^(DSI|eDP)-" | head -1)
+        echo "${_external:-$(echo "$_outputs" | head -1)}"
+    fi
+}
+
+set_language() {
+    settings_lang="$(/usr/bin/regmsg systemconf getconfigkey system.language)"
+    LC_ALL="${settings_lang:-en_US}.UTF-8"
+    LANG="$LC_ALL"
+    export LANG LC_ALL
+}
+
+configure_rotation() {
+    effective_output=$(regmsg screen getoutput)
+    [ -z "$effective_output" ] && return
+
+    primary_display_rotate="$(/usr/bin/regmsg systemconf getconfigkey "display.rotate.${effective_output}")"
+    [ -z "$primary_display_rotate" ] && primary_display_rotate="$(/usr/bin/regmsg systemconf getconfigkey display.rotate)"
+
+    if [ -n "$primary_display_rotate" ]; then
+        if [ -n "$WAYLAND_DISPLAY" ]; then
+            regmsg screen setrotation "$primary_display_rotate"
+        else
+            rs_customsargs="$rs_customsargs --screenrotate $primary_display_rotate"
+        fi
+    fi
+
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        if [ -n "$2" ]; then
+            display_rotate2="$(/usr/bin/regmsg systemconf getconfigkey display.rotate2)"
+            [ -n "$display_rotate2" ] && regmsg screen setrotation "$display_rotate2" --output "$2"
+        fi
+        if [ -n "$3" ]; then
+            display_rotate3="$(/usr/bin/regmsg systemconf getconfigkey display.rotate3)"
+            [ -n "$display_rotate3" ] && regmsg screen setrotation "$display_rotate3" --output "$3"
+        fi
+    fi
+}
+
+configure_resolution() {
+    rs_resolution="$(/usr/bin/regmsg systemconf getconfigkey rs.resolution)"
+
+    # "auto" == unset: pick the connector's preferred mode and set it
+    # explicitly. `mintomaxresolution` only lowers the CRTC mode, never
+    # raises it — without this, switching back to "auto" after 720p stays
+    # at 720p.
+    if [ -z "$rs_resolution" ] || [ "$rs_resolution" = "auto" ]; then
+        rs_resolution="$(regmsg screen listmodes 2>/dev/null | head -1 | cut -d: -f1)"
+    fi
+
+    { [ -n "$rs_resolution" ] && regmsg screen setmode "$rs_resolution"; } || regmsg screen mintomaxresolution
+
+    # Pass the mode through so SDL3 doesn't fall back to the preferred
+    # mode and override what we just set. On panels with a DTS rotation
+    # hint (e.g. RP5: 1080x1920 portrait + rotation=<270>) the compositor
+    # exposes a transformed logical output; swap to match it or the
+    # wl_surface only fills part of the screen.
+    if [ -n "$rs_resolution" ]; then
+        _w="${rs_resolution%%x*}"
+        _rest="${rs_resolution#*x}"
+        _h="${_rest%%@*}"
+        case "$_w$_h" in
+            *[!0-9]*|"")
+                ;;
+            *)
+                if [ -n "$WAYLAND_DISPLAY" ]; then
+                    # Ask sway directly — regmsgd may have picked KMSDRM at
+                    # boot (before sway-ipc existed) and not see the transform.
+                    _sock=$(_resolve_swaysock)
+                    _xform=""
+                    if [ -n "$_sock" ]; then
+                        _xform=$(SWAYSOCK="$_sock" swaymsg -t get_outputs 2>/dev/null \
+                            | grep -m1 '"transform"' \
+                            | sed 's/.*"transform": *"\([^"]*\)".*/\1/')
+                    fi
+                    case "$_xform" in
+                        90|270|*-90|*-270)
+                            _tmp=$_w; _w=$_h; _h=$_tmp; unset _tmp
+                            ;;
+                    esac
+                    unset _sock _xform
+                fi
+                rs_customsargs="$rs_customsargs --resolution $_w $_h"
+                ;;
+        esac
+    fi
+
+    if [ -n "$2" ]; then
+        rs_resolution2="$(/usr/bin/regmsg systemconf getconfigkey rs.resolution2)"
+        if [ -z "$rs_resolution2" ] || [ "$rs_resolution2" = "auto" ]; then
+            rs_resolution2="$(regmsg screen listmodes --output "$2" 2>/dev/null | head -1 | cut -d: -f1)"
+        fi
+        { [ -n "$rs_resolution2" ] && regmsg screen setmode "$rs_resolution2" --output "$2"; } || regmsg screen mintomaxresolution --output "$2"
+    fi
+    if [ -n "$3" ]; then
+        rs_resolution3="$(/usr/bin/regmsg systemconf getconfigkey rs.resolution3)"
+        if [ -z "$rs_resolution3" ] || [ "$rs_resolution3" = "auto" ]; then
+            rs_resolution3="$(regmsg screen listmodes --output "$3" 2>/dev/null | head -1 | cut -d: -f1)"
+        fi
+        { [ -n "$rs_resolution3" ] && regmsg screen setmode "$rs_resolution3" --output "$3"; } || regmsg screen mintomaxresolution --output "$3"
+    fi
+}
+
+launch_regstation() {
+    regmsg screen getoutput > "${SWITCH_SCREEN_CURRENT}"
+
+    # SDL picks the first Wayland-registered output regardless of which
+    # one sway has focus on. Race a swaymsg loop against window creation
+    # to move it to the target output as soon as it appears.
+    if [ -n "$WAYLAND_DISPLAY" ] && [ -n "$target_output" ]; then
+        _sock=$(_resolve_swaysock)
+        if [ -n "$_sock" ]; then
+            (
+                _i=0
+                while [ "$_i" -lt 50 ]; do
+                    SWAYSOCK="$_sock" swaymsg \
+                        "[app_id=\"regstation\" title=\"^REG-Station\$\"] move container to output $target_output, fullscreen enable, focus" \
+                        2>/dev/null && break
+                    sleep 0.1
+                    _i=$((_i + 1))
+                done
+            ) &
+            _output_mover_pid=$!
+        fi
+        unset _sock
+    fi
+
+    # dbus needed for gio/gvfs/trash.
+    dbus_vars=$(dbus-launch --sh-syntax --exit-with-session) || {
+        log_message "Error: Failed to launch D-Bus session"
+        exit 1
+    }
+    eval "$dbus_vars"
+    cd /userdata || { log_message "Error: Failed to change directory to /userdata"; exit 1; }
+
+    %REGSTATION_PREFIX% regstation $game_launch_opt --exit-on-reboot-required %REGSTATION_ARGS% $rs_customsargs
+
+    # --exit-with-session ties dbus to the X session; with no X session it
+    # would outlive each iteration and fork-bomb if regstation respawns fast.
+    [ -n "$DBUS_SESSION_BUS_PID" ] && kill "$DBUS_SESSION_BUS_PID" 2>/dev/null
+    unset DBUS_SESSION_BUS_ADDRESS DBUS_SESSION_BUS_PID
+
+    kill "$_output_mover_pid" 2>/dev/null
+    unset _output_mover_pid
+}
+
+[ "$1" = "--stop-rebooting" ] && rm -f "$RESTART_FLAG" && exit 0
+
+touch "${RESTART_FLAG}" || { log_message "Error: Failed to create reboot flag"; exit 1; }
+
+if command -v system-switch-screen-checker > /dev/null 2>&1; then
+    system-switch-screen-checker --init || {
+        log_message "Error: Failed to initialize screen checker"
+        exit 1
+    }
+    # If an external display is already plugged in at boot, no DRM
+    # transition fires to wake udev — schedule a one-shot --force pass
+    # once regstation/RA have come up.
+    (sleep 10 && system-switch-screen-checker --force) >/dev/null 2>&1 &
+else
+    log_message "Error: Command 'system-switch-screen-checker' not found"
+    exit 1
+fi
+
+# Exponential backoff when regstation exits in under MIN_RUN_SECONDS,
+# so SDL-can't-find-display failures don't respawn ~10x/sec.
+MIN_RUN_SECONDS=5
+MAX_BACKOFF_SECONDS=30
+backoff=1
+
+while [ -e "$RESTART_FLAG" ]; do
+    set_language
+
+    if [ -f "$SWITCH_SCREEN_REQUEST" ]; then
+        settings_output=$(cat "$SWITCH_SCREEN_REQUEST")
+        rm -f "${SWITCH_SCREEN_REQUEST}"
+    else
+        settings_output="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput)"
+    fi
+    global_videooutput2="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput2)"
+    global_videooutput3="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput3)"
+    if [ -n "$settings_output" ]; then
+        regmsg screen setoutput "$settings_output" "$global_videooutput2" "$global_videooutput3"
+    fi
+
+    configure_rotation "$settings_output" "$global_videooutput2" "$global_videooutput3"
+    configure_resolution "$settings_output" "$global_videooutput2" "$global_videooutput3"
+
+    target_output=""
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        target_output=$(get_target_output)
+        if [ -n "$target_output" ]; then
+            _sock=$(_resolve_swaysock)
+            [ -n "$_sock" ] && SWAYSOCK="$_sock" swaymsg "focus output $target_output" 2>/dev/null || true
+            unset _sock
+        fi
+    fi
+
+    _start=$(date +%s)
+    launch_regstation
+    _elapsed=$(( $(date +%s) - _start ))
+
+    if [ "$_elapsed" -lt "$MIN_RUN_SECONDS" ]; then
+        log_message "regstation exited after ${_elapsed}s; backing off ${backoff}s before retry"
+        sleep "$backoff"
+        backoff=$((backoff * 2))
+        [ "$backoff" -gt "$MAX_BACKOFF_SECONDS" ] && backoff=$MAX_BACKOFF_SECONDS
+    else
+        backoff=1
+    fi
+
+    if [ -e "/tmp/reboot.please" ] || [ -e "/tmp/shutdown.please" ]; then
+        rm -f "$RESTART_FLAG"
+    fi
+
+    game_launch_opt="--no-startup-game"
+done

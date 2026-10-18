@@ -1,16 +1,38 @@
-With the exceptions below, Buildroot is distributed under the terms of
-the GNU General Public License, reproduced below; either version 2 of
-the License, or (at your option) any later version.
+With the exceptions below, REG Linux (this repository: the Buildroot
+external tree with its board support, package recipes, configurations,
+overlays and scripts) is distributed under the terms of the GNU General
+Public License, reproduced below; either version 2 of the License, or
+(at your option) any later version.
 
-Some files in Buildroot contain a different license statement. Those
+Some files in REG Linux contain a different license statement. Those
 files are licensed under the license contained in the file itself.
 
-Buildroot also bundles patch files, which are applied to the sources
-of the various packages. Those patches are not covered by the license
-of Buildroot. Instead, they are covered by the license of the software
-to which the patches are applied. When said software is available
-under multiple licenses, the Buildroot patches are only provided under
-the publicly accessible licenses.
+REG Linux also bundles patch files, which are applied to the sources of
+the various packages. Those patches are not covered by the license of
+REG Linux. Instead, they are covered by the license of the software to
+which the patches are applied. When said software is available under
+multiple licenses, the REG Linux patches are only provided under the
+publicly accessible licenses.
+
+The buildroot/ submodule is Buildroot, distributed under its own COPYING
+(GPL version 2 or later, with the same exceptions).
+
+The software these recipes build or download keeps its own license; a
+build's legal-info lists each package's license. A REG Linux image is an
+aggregate of separate programs. Not all of them are open source:
+
+  - REG-Station (the frontend) and regmsg (the system daemon) are
+    proprietary. Their source is not in this repository; the recipes
+    download prebuilt binaries from
+    https://github.com/REG-Linux/REG-Station-binaries and
+    https://github.com/REG-Linux/regmsg-binaries, under the licenses
+    published there and installed in /usr/share/regstation/ and
+    /usr/share/regmsg/.
+  - Some firmware, GPU drivers and other vendor components are binaries
+    under their own, non-free licenses.
+
+The GPL covering this repository does not extend to those components,
+and their licenses do not restrict anything covered by the GPL.
 
 -----------------------------------------------------------------
 

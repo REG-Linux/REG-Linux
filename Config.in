@@ -1,10 +1,10 @@
 menu "REG-Linux"
-menu "Emulationstation"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/reglinux-emulationstation/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/regstation/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-ffmpeg/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-background-musics/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package//emulationstation/es-system/Config.in"
+menu "Frontend"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/frontend/regstation/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/frontend/regplayer/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/frontend/rs-background-musics/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/frontend/rs-ffmpeg/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/frontend/es-system/Config.in"
 endmenu
 
 menu "System"
@@ -399,6 +399,7 @@ menu "Controllers"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/xpadneo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/xone/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/utils/xwiimote/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/utils/regmsg-sdl2-probe/Config.in"
 endmenu
 
 menu "Network"
