@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGSTATION_VERSION = 18aa0ba9be57891b3ed1b119d1142bd34afe9b10
+REGSTATION_VERSION = 06ef54814e2230c4408e3664ec1cecbba37efed4
 # Proprietary, with open-source parts compiled in or installed with it
 # (THIRD_PARTY_LICENSES). Neither the private source nor the binaries may be
 # published by legal-info.
