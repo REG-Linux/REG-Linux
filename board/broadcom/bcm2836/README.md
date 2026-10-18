@@ -209,4 +209,6 @@ zcat output/bcm2836/build/linux-*/.config.gz | grep "DEBUG_KERNEL"
 
 ## License
 
-REG Linux is released under the MIT license. See `COPYING` for details.
+The REG Linux repository is licensed GPL-2.0-or-later; see `COPYING`. A built
+image is not entirely open source (REG-Station, regmsg and some vendor
+firmware/drivers are proprietary) — see the README's License section.
