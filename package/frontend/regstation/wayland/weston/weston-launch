@@ -1,0 +1,32 @@
+#!/bin/sh
+# Weston kiosk launcher for libmali boards (busybox sysv equivalent of
+# Hardkernel's odroid-kiosk-weston.service).
+
+set -e
+
+# XDG_RUNTIME_DIR must be 0700 + user-owned; /var/run is shared 0755
+# and Wayland clients reject it.
+: "${XDG_RUNTIME_DIR:=/run/user/$(id -u)}"
+mkdir -p "$XDG_RUNTIME_DIR"
+chown "$(id -u):$(id -g)" "$XDG_RUNTIME_DIR"
+chmod 0700 "$XDG_RUNTIME_DIR"
+export XDG_RUNTIME_DIR
+
+# Active VT before DRM master acquisition; from a non-active VT (the
+# default S31 spawn path) DRM master can race and surfaces never reach
+# scanout. Redirect stdio to the new TTY so children don't fight the
+# previous getty for /dev/console.
+[ -w /dev/tty7 ] && /usr/bin/chvt 7 2>/dev/null || true
+exec </dev/tty7 >/dev/tty7 2>/dev/tty7
+
+# kiosk-shell auto-fullscreens xdg_toplevel without the configure
+# handshake desktop-shell expected from SDL3 (never arrived under
+# libmali). fullscreen-shell.so doesn't register xdg_wm_base so SDL3
+# can't bind there.
+exec /usr/bin/weston \
+    --backend=drm \
+    --shell=kiosk-shell.so \
+    --socket=wayland-0 \
+    --log=/userdata/system/logs/weston.log \
+    -c /etc/xdg/weston/weston.ini \
+    "$@"

@@ -1,5 +1,5 @@
 ## 🕹️🐧 REG Linux 🕹️🐧
-**REG Linux** (Retro Emulation Gaming Linux) is an **open-source, immutable operating system** built for **retro-gaming consoles, handhelds, and mini-PCs**.
+**REG Linux** (Retro Emulation Gaming Linux) is an **immutable operating system** built for **retro-gaming consoles, handhelds, and mini-PCs**.
 
 It is designed to be **lightweight, fast, and reliable**, with a modern toolchain, systemd-free init system, and optimized Buildroot base.  
 REG Linux runs on **ARM, AArch64, RISC-V 64-bit, and x86-64** architectures.
@@ -58,6 +58,21 @@ REG Linux is open to contributions from developers, designers, and testers:
 - 📢 **Spread the word:** talk about REG Linux on YouTube, X (Twitter), or in retro-gaming communities  
 
 Donations and hardware contributions will soon be accepted to support ongoing development.
+
+---
+
+### ⚖️ License
+
+REG Linux is built from open-source software, but it is **not entirely open source**:
+
+| Component | License |
+| --------- | ------- |
+| This repository (board support, package recipes, configurations, overlays, scripts) | GPL-2.0-or-later, see [COPYING](COPYING). Patches follow the license of the software they patch |
+| The software the recipes build (kernel, emulators, libraries…) | Each package's own license, listed by `make legal-info` |
+| **REG-Station** (frontend) and **regmsg** (system daemon) | **Proprietary.** Only binaries are published, at [REG-Station-binaries](https://github.com/REG-Linux/REG-Station-binaries) and [regmsg-binaries](https://github.com/REG-Linux/regmsg-binaries) |
+| Some firmware and GPU drivers | Vendor binaries under their own licenses |
+
+The open-source parts of REG-Station and regmsg are listed with their notices in `/usr/share/regstation/THIRD_PARTY_LICENSES` and `/usr/share/regmsg/THIRD_PARTY_LICENSES` on every image.
 
 ---
 

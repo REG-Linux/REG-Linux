@@ -1,0 +1,30 @@
+# Modifier key
+set $alt Mod1
+
+# hide_cursor hides the cursor image after the specified timeout (in milliseconds) has elapsed with no activity on that cursor
+seat * hide_cursor 500
+
+# Default wallpaper
+output * bg #000000 solid_color
+
+# Set keyboard layout (default US)
+input * {
+    xkb_layout "us"
+}
+
+# kill focused window
+bindsym $alt+F4 kill
+
+# Make the current focus fullscreen
+bindsym $alt+f fullscreen
+
+# Disable visual effects
+set $animations off
+
+# Wayland natives
+for_window [app_id=".*"] opacity 1
+for_window [app_id=".*"] floating enable, fullscreen enable, border none
+
+# X11 via XWayland
+for_window [class=".*"] opacity 1
+for_window [class=".*"] floating enable, fullscreen enable, border none

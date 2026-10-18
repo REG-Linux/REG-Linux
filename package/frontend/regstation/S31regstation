@@ -1,0 +1,115 @@
+#!/bin/dash
+
+# Redirect output to log
+exec >>/userdata/system/logs/regstation.log 2>&1
+
+case "$1" in
+start)
+    . /etc/profile.d/xdg.sh
+    . /etc/profile.d/dbus.sh
+    for f in /etc/profile.d/[5-9]*.sh; do [ -f "$f" ] && . "$f"; done
+
+    # Make SDL skip its HIDAPI driver for dead-hidraw controller clones so they fall back to the live joydev node.
+    _hidapi_ignore="$(/usr/bin/regmsg systemconf getconfigkey controller.hidapi.ignore 2>/dev/null)"
+    [ -n "$_hidapi_ignore" ] && export SDL_HIDAPI_IGNORE_DEVICES="$_hidapi_ignore"
+
+    /usr/bin/plymouth change-mode --reboot
+    _screens=0
+    for _s in /sys/class/drm/card*-*/status; do
+        # Skip virtual writeback connectors (capture-to-memory, not a physical output).
+        case "$_s" in *-Writeback-*) continue ;; esac
+        [ "$(cat "$_s" 2>/dev/null)" = "connected" ] && _screens=$((_screens+1))
+    done
+    { [ "$_screens" -gt 1 ] && /usr/bin/plymouth quit; } || /usr/bin/plymouth quit --retain-splash
+    unset _screens _s
+
+    if [ "$(/usr/bin/regmsg systemconf getconfigkey system.rs.atstartup)" != "0" ]; then
+        if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+            # Wait for external DP/HDMI connectors to be fully probed before sway.
+            # If a USB-C dock is mid-DP-Alt-Mode-negotiation, wlroots reads a partial EDID once, logs "Failed to parse EDID",
+            # falls back, and leaves every output inactive (DSI-1 included). regstation then traps in an SDL-init-fail respawn loop.
+            # Pass once the connector is "disconnected", or "connected" with a stable preferred mode >= 1280 wide (two equal samples 0.5s apart).
+            for _c in /sys/class/drm/card*-DP-* /sys/class/drm/card*-HDMI-A-*; do
+                [ -f "$_c/status" ] || continue
+                _prev=""
+                _i=0
+                while [ "$_i" -lt 30 ]; do
+                    _st=$(cat "$_c/status" 2>/dev/null)
+                    [ "$_st" = "disconnected" ] && break
+                    _modes=$(cat "$_c/modes" 2>/dev/null)
+                    _first=${_modes%%x*}
+                    if [ "$_st" = "connected" ] && [ -n "$_first" ] && \
+                       [ "$_first" -ge 1280 ] 2>/dev/null && \
+                       [ "$_modes" = "$_prev" ]; then
+                        break
+                    fi
+                    _prev=$_modes
+                    sleep 0.5
+                    _i=$((_i+1))
+                done
+            done
+            unset _c _i
+            if command -v sway >/dev/null 2>&1; then
+                # sway includes /etc/sway/boards/$REG_BOARD_MODEL.conf (from profile.d/50-board.sh)
+                WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway &
+                # sway autostarts regstation-standalone via /etc/sway/config
+            elif [ -x /usr/bin/weston-launch ]; then
+                # k1 and k3 (SpaceMiT) ship weston instead of sway.
+                /usr/bin/weston-launch &
+                # Give weston time to bring up its socket, then start ES.
+                # weston-launch passes --socket=wayland-0, but detect anyway so a manual or future-changed launcher works.
+                _xdg="${XDG_RUNTIME_DIR:-/run/user/0}"
+                _i=0
+                _wd=""
+                while [ -z "$_wd" ] && [ "$_i" -lt 20 ]; do
+                    for _n in 0 1 2; do
+                        if [ -S "$_xdg/wayland-$_n" ]; then
+                            _wd="wayland-$_n"
+                            break
+                        fi
+                    done
+                    [ -n "$_wd" ] && break
+                    sleep 0.25
+                    _i=$((_i + 1))
+                done
+                if [ -n "$_wd" ]; then
+                    export WAYLAND_DISPLAY="$_wd"
+                else
+                    echo "S31regstation: weston socket never appeared" >&2
+                    exit 1
+                fi
+                unset _i _wd _n _xdg
+                # regstation as a Weston client
+                /usr/bin/regstation-standalone &
+            else
+                echo "S31regstation: wayland session requested but neither sway nor weston is installed" >&2
+                exit 1
+            fi
+        else
+            %REGSTATION_CMD% %REGSTATION_POSTFIX%
+        fi
+    fi
+    ;;
+stop)
+    regstation-standalone --stop-rebooting
+    pkill -f sway
+    pkill -x weston
+    pkill -f weston-launch
+    pkill -x regstation
+
+    i=0 # Wait up to 5 seconds for regstation to exit
+    while pgrep -f regstation >/dev/null ; do
+        [ $i -gt 20 ] && break
+        sleep 0.25
+        i=$((i + 1))
+    done
+    ;;
+restart|reload)
+    "$0" stop
+    "$0" start
+    ;;
+*)
+    exec echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
+esac

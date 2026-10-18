@@ -1,0 +1,12 @@
+config BR2_PACKAGE_REGMSG_SDL2_PROBE
+	bool "regmsg-sdl2-probe"
+	depends on BR2_PACKAGE_SDL2
+	help
+	  Tiny SDL2 helper that enumerates game controllers the way an
+	  SDL2 emulator sees them (HIDAPI on) and prints one JSON object
+	  per pad. regmsgd runs it to learn each pad's true SDL device
+	  index, which differs from the kernel jsN order when HIDAPI
+	  claims a pad. Lets the launcher bind SDL-index emulators
+	  (DuckStation, mupen64plus) to the correct controller.
+
+	  https://github.com/REG-Linux/regmsg
