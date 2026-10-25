@@ -107,7 +107,7 @@ You are free to build this repository yourself. The build can still use REG-Stat
 
 > [!WARNING]
 > The whole project, including [our main site](https://reglinux.org/), is always a work in progress.
-> If we don't have a device in our site or repository with a link to download, we can't guarantee it builds and boots.
+> If we don't have a device on our site or repository with a link to download, we can't guarantee it builds and boots.
 
 | Directory | Description |
 |------------|-------------|
