@@ -4,11 +4,12 @@ Date: Wed, 8 Dec 2021 20:42:45 +0100
 Subject: [PATCH] wip: fix H6 4k@60
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+[The sun8i_hdmi_phy.c 594 MHz MPLL hunk is upstream since 6.12.110
+ ("drm/sun4i: hdmi-phy: Fix H6 8-bit MPLL config at 594 MHz").]
 ---
  drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 7 +++++++
  drivers/gpu/drm/bridge/synopsys/dw-hdmi.h | 4 ++++
- drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c    | 2 +-
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ 2 files changed, 11 insertions(+)
 
 diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
 index f08d0fded61f..bcd839a3ce80 100644
@@ -57,19 +58,6 @@ index 1999db05bc3b..05182418efbb 100644
  /* FC_DBGFORCE field values */
  	HDMI_FC_DBGFORCE_FORCEAUDIO = 0x10,
  	HDMI_FC_DBGFORCE_FORCEVIDEO = 0x1,
-diff --git a/drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c b/drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c
-index b64d93da651d..b70bc9de761f 100644
---- a/drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c
-+++ b/drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c
-@@ -90,7 +90,7 @@ static const struct dw_hdmi_mpll_config sun50i_h6_mpll_cfg[] = {
- 		},
- 	},  {
- 		594000000, {
--			{ 0x1a40, 0x0003 },
-+			{ 0x1a7c, 0x0003 },
- 			{ 0x3b4c, 0x0003 },
- 			{ 0x5a64, 0x0003 },
- 		},
--- 
+--
 2.34.1
 

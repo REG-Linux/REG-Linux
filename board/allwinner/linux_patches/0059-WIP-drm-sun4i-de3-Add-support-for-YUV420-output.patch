@@ -528,7 +528,7 @@ index 68d955c63b05..3b022bfb85ad 100644
 @@ -204,7 +366,7 @@ void sun8i_csc_set_ccsc(struct sun8i_mixer *mixer, int layer,
  	u32 base;
  
- 	if (mixer->cfg->is_de3) {
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
 -		sun8i_de3_ccsc_setup(mixer->engine.regs, layer,
 +		sun8i_de3_ccsc_setup(&mixer->engine, layer,
  				     fmt_type, encoding, range);
@@ -817,7 +817,7 @@ index 01382860aaee..b1525906a25d 100644
 @@ -653,6 +698,7 @@ static const struct sun8i_mixer_cfg sun50i_a64_mixer1_cfg = {
  static const struct sun8i_mixer_cfg sun50i_h6_mixer0_cfg = {
  	.ccsc		= CCSC_MIXER0_LAYOUT,
- 	.is_de3		= true,
+ 	.de_type	= SUN8I_MIXER_DE3,
 +	.has_formatter	= 1,
  	.mod_rate	= 600000000,
  	.scaler_mask	= 0xf,
@@ -829,7 +829,7 @@ index 85c94884fb9a..13401643c7bf 100644
 @@ -162,6 +162,7 @@ enum {
   * @mod_rate: module clock rate that needs to be set in order to have
   *	a functional block.
-  * @is_de3: true, if this is next gen display engine 3.0, false otherwise.
+  * @de_type: sun8i_mixer_type enum representing the display engine generation.
 + * @has_formatter: true, if mixer has formatter core, for 10-bit and YUV handling
   * @scaline_yuv: size of a scanline for VI scaler for YUV formats.
   */
@@ -837,7 +837,7 @@ index 85c94884fb9a..13401643c7bf 100644
 @@ -171,6 +172,7 @@ struct sun8i_mixer_cfg {
  	int		ccsc;
  	unsigned long	mod_rate;
- 	unsigned int	is_de3 : 1;
+ 	unsigned int	de_type;
 +	unsigned int    has_formatter : 1;
  	unsigned int	scanline_yuv;
  };

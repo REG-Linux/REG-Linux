@@ -16,13 +16,17 @@ BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL
 # Use ZSTD for this target. Do not change !
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
+# Kernel headers
+BR2_KERNEL_HEADERS_6_18=y
+
 # Kernel
 BR2_LINUX_KERNEL=y
-BR2_LINUX_KERNEL_LATEST_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.54"
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/arm"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/linux-sunxi32-current.config"
-BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/cha/linux-cha.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
@@ -41,3 +45,12 @@ BR2_TARGET_ROOTFS_CPIO_LZ4=y
 # Allow Amiga emulation on CHA
 BR2_PACKAGE_AMIBERRY_LITE=y
 BR2_PACKAGE_LIBRETRO_PUAE2021=y
+
+# USB gadget (MTP/ADB) is unsupported on CHA: the Allwinner H3 MUSB-sunxi
+# driver's suspend/resume path is broken upstream, so MTP sessions drop
+# every time the host autosuspends the bus. The CHA's only USB-A port is
+# used as host for pen drives instead.
+# BR2_PACKAGE_REGLINUX_USBGADGET is not set
+# BR2_PACKAGE_UMTP_RESPONDER is not set
+# BR2_PACKAGE_ANDROID_TOOLS is not set
+# BR2_PACKAGE_ANDROID_TOOLS_ADBD is not set

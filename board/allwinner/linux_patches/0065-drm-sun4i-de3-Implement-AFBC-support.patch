@@ -70,7 +70,7 @@ index 000000000000..27a771608eef
 +		return true;
 +	}
 +
-+	if (!mixer->cfg->is_de3)
++	if (mixer->cfg->de_type != SUN8I_MIXER_DE3)
 +		return false;
 +
 +	mode = AFBC_FORMAT_MOD_BLOCK_SIZE_16x16 |
@@ -387,7 +387,7 @@ diff --git a/drivers/gpu/drm/sun4i/sun8i_mixer.c b/drivers/gpu/drm/sun4i/sun8i_m
  		val = enable ? SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN : 0;
  		mask = SUN8I_MIXER_CHAN_VI_LAYER_ATTR_EN;
  		reg = SUN8I_MIXER_CHAN_VI_LAYER_ATTR(ch_base, layer->overlay);
-+		if (!enable && layer->mixer->cfg->is_de3)
++		if (!enable && layer->mixer->cfg->de_type == SUN8I_MIXER_DE3)
 +			sun50i_afbc_disable(layer->mixer, layer->channel);
  	}
  
@@ -473,7 +473,7 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
 +				   plane->state->color_encoding,
 +				   plane->state->color_range);
 +	} else {
-+		if (mixer->cfg->is_de3)
++		if (mixer->cfg->de_type == SUN8I_MIXER_DE3)
 +			sun50i_afbc_disable(mixer, layer->channel);
 +		sun8i_vi_layer_update_alpha(mixer, layer->channel,
 +					    layer->overlay, plane);
@@ -550,7 +550,7 @@ index 329e8bf8cd20..bda91c3e2bb7 100644
  	int ret;
  
 @@ -556,9 +615,11 @@ struct sun8i_vi_layer *sun8i_vi_layer_init_one(struct drm_device *drm,
- 	if (mixer->cfg->is_de3) {
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
  		formats = sun8i_vi_layer_de3_formats;
  		format_count = ARRAY_SIZE(sun8i_vi_layer_de3_formats);
 +		modifiers = sun50i_layer_de3_modifiers;

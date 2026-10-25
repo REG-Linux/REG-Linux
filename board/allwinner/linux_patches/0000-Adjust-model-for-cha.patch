@@ -1,24 +1,57 @@
-From 2f0673ba874d6651ab7a543f9952d793abc24e19 Mon Sep 17 00:00:00 2001
-From: Demetris Ierokipides <ierokipides.dem@gmail.com>
-Date: Wed, 23 Jun 2021 05:11:58 +0300
-Subject: [PATCH] Adjust model for cha
+From: REG-Linux <dev@reglinux.org>
+Date: Mon, 30 Mar 2026 00:00:00 +0000
+Subject: [PATCH] ARM: dts: cha: adjust model, disable ethernet, cap OPPs
+
+Rename the board model string to "Capcom Home Arcade".
+
+The Capcom Home Arcade (CHA) board has no Ethernet PHY populated. The
+inherited LibreTech DTS enables it, causing an EMAC reset timeout and
+PHY probe failure at boot. Disable the ethernet node.
+
+The CHA's Type-A USB port is used exclusively in host mode for pen drive
+access. MTP/ADB gadget mode is not supported on CHA because the MUSB-sunxi
+driver's suspend/resume path is broken upstream and MTP sessions drop every
+time the host autosuspends the bus. The LibreTech DTSI already sets
+dr_mode = "host" on the OTG port, which is what CHA needs - nothing to
+override for USB.
+
+The CHA vdd-cpux is a fixed 1.2V regulator. OPPs above 1008 MHz require
+1.32-1.40V and are silently rejected by the OPP framework at boot, generating
+spurious error messages. Mark them disabled so the framework skips them.
 
 ---
- arch/arm/boot/dts/allwinner/sun8i-h3-libretech-all-h3-cc.dts | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/allwinner/sun8i-h3-libretech-all-h3-cc.dts | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/sun8i-h3-libretech-all-h3-cc.dts b/arch/arm/boot/dts/allwinner/sun8i-h3-libretech-all-h3-cc.dts
-index a8b2f0f1c11d..8d804db73048 100644
 --- a/arch/arm/boot/dts/allwinner/sun8i-h3-libretech-all-h3-cc.dts
 +++ b/arch/arm/boot/dts/allwinner/sun8i-h3-libretech-all-h3-cc.dts
-@@ -9,6 +9,6 @@
+@@ -9,6 +9,28 @@
  #include "sunxi-libretech-all-h3-cc.dtsi"
- 
+
  / {
 -	model = "Libre Computer Board ALL-H3-CC H3";
 +	model = "Capcom Home Arcade";
  	compatible = "libretech,all-h3-cc-h3", "allwinner,sun8i-h3";
  };
--- 
-2.25.1
-
++
++/* CHA: no Ethernet PHY populated on this board */
++&emac {
++	status = "disabled";
++};
++
++/* CHA: vdd-cpux is a fixed 1.2V regulator; OPPs requiring >1.3V are unreachable */
++&{/opp-table-cpu/opp-1104000000} {
++	status = "disabled";
++};
++
++&{/opp-table-cpu/opp-1200000000} {
++	status = "disabled";
++};
++
++&{/opp-table-cpu/opp-1296000000} {
++	status = "disabled";
++};
++
++&{/opp-table-cpu/opp-1368000000} {
++	status = "disabled";
++};

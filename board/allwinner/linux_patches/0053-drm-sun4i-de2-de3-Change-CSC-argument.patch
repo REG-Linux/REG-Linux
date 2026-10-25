@@ -82,7 +82,7 @@ index 58480d8e4f70..6ebd1c3aa3ab 100644
  {
 @@ -214,14 +214,14 @@ void sun8i_csc_set_ccsc_coefficients(struct sun8i_mixer *mixer, int layer,
  
- 	if (mixer->cfg->is_de3) {
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
  		sun8i_de3_ccsc_set_coefficients(mixer->engine.regs, layer,
 -						mode, encoding, range);
 +						fmt_type, encoding, range);
