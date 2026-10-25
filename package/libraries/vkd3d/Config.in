@@ -6,7 +6,6 @@ config BR2_PACKAGE_VKD3D
 	depends on BR2_PACKAGE_SPIRV_HEADERS
 	depends on BR2_PACKAGE_VULKAN_HEADERS
 	depends on BR2_PACKAGE_VULKAN_LOADER
-	select BR2_PACKAGE_HOST_WINE
 	help
 	  VkD3D Wine is a compatibility layer capable of running Windows
 	  applications on Linux. Instead of simulating internal

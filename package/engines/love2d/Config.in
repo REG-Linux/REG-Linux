@@ -17,9 +17,7 @@ config BR2_PACKAGE_LOVE2D
 	select BR2_PACKAGE_REGLINUX_LUAJIT
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_ZLIB
-	select BR2_PACKAGE_LIBGL if BR2_PACKAGE_HAS_LIBGL
 	select BR2_PACKAGE_GL4ES if !BR2_PACKAGE_HAS_LIBGL
-	select BR2_PACKAGE_LIBGLES if BR2_PACKAGE_HAS_LIBGLES
 	help
 	  LOVE is a free 2D game engine which enables easy game
 	  creation in Lua. Games are packaged as .love files (Lua

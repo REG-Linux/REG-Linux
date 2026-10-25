@@ -6,8 +6,6 @@ config BR2_PACKAGE_APOTRIS
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL2_MIXER
 	select BR2_PACKAGE_OPUS
-	select BR2_PACKAGE_LIBGL if BR2_PACKAGE_HAS_LIBGL
-	select BR2_PACKAGE_LIBGLES if BR2_PACKAGE_HAS_LIBGLES
 	help
 	  Apotris is a feature-rich Tetris clone with hold, T-spins,
 	  combos, skins, and multiplayer. Fully free.

@@ -5,7 +5,6 @@ config BR2_PACKAGE_RAWGL
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL2_MIXER
 	select BR2_PACKAGE_ZLIB
-	select BR2_PACKAGE_LIBGL if BR2_PACKAGE_HAS_LIBGL
 	help
 	  rawgl is a reimplementation of the engine used in the game
 	  Another World / Out of This World by Eric Chahi.

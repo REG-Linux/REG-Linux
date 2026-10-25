@@ -1,7 +1,6 @@
 config BR2_PACKAGE_UBOOT_BANANAPI_F3
     bool "uboot for BananaPi F3 / SpaceMiT K1 - built from source"
     depends on BR2_PACKAGE_SYSTEM_TARGET_K1
-    select BR2_PACKAGE_OPENSBI
     help
         U-Boot bootloader for SpaceMiT K1 platforms,
         built from source with sysboot/extlinux support.
