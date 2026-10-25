@@ -1,0 +1,26 @@
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Subject: [PATCH] Makefile: build as gnu17
+
+GCC 15 defaults to C23, where "void (*)()" means "void (*)(void)".
+pigpio stores every callback as such an unprototyped pointer
+(callbk_t) and calls it with 1 to 3 arguments, which is now 17
+errors ("too many arguments to function", incompatible pointer
+types). Build with -std=gnu17, the dialect the code was written for.
+
+Buildroot passes CFLAGS on the make command line, so the flag needs
+"override" to be appended.
+
+Upstream: not applicable, pigpio has had no commit since 2021.
+---
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -12,7 +12,7 @@ STRIPLIB     = $(STRIP) --strip-unneeded
+ 
+ SOVERSION    = 1
+ 
+-CFLAGS	+= -O3 -Wall -pthread
++override CFLAGS	+= -std=gnu17 -O3 -Wall -pthread
+ 
+ LIB1     = libpigpio.so
+ OBJ1     = pigpio.o command.o

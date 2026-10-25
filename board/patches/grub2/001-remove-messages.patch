@@ -31,7 +31,7 @@ index 6a90e09..b4daaf3 100644
 -      grub_printf ("\n\n");
 +      //grub_printf ("  ");
 +      //grub_printf_ (N_("Booting `%s'"), entry->title);
-+      grub_printf ("\nREG-Linux\n");
++      grub_printf ("\nBooting REG-Linux\n");
      }
  }
  

@@ -1,0 +1,32 @@
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Subject: [PATCH] Avoid compilation issues with ncurses on GCC 15
+
+ncurses built by GCC 15 (C23 by default) makes NCURSES_BOOL an int and
+leaves NCURSES_ENABLE_STDBOOL_H at 0, so in htop (built as -std=c99)
+curses.h redefines bool to int and CommandLine.c fails:
+
+  passing argument 3 of 'MainPanel_updateLabels' makes integer from
+  pointer without a cast [-Wint-conversion]
+
+Upstream fixed it in 04d0a5456c87 by AC_DEFINE'ing
+NCURSES_ENABLE_STDBOOL_H in configure.ac, but Buildroot does not
+autoreconf htop, so that patch has no effect here. Define it in
+ProvideCurses.h, before curses.h is included, instead.
+
+Upstream: https://github.com/htop-dev/htop/commit/04d0a5456c87c6ce7a77bef18b26e4b6dbb05265
+---
+--- a/ProvideCurses.h
++++ b/ProvideCurses.h
+@@ -10,6 +10,12 @@
+ 
+ #include "config.h" // IWYU pragma: keep
+ 
++// Same as upstream 04d0a545 (configure.ac), without needing autoreconf:
++// make ncurses use <stdbool.h> so bool matches the C compiler's bool.
++#ifndef NCURSES_ENABLE_STDBOOL_H
++#define NCURSES_ENABLE_STDBOOL_H 1
++#endif
++
+ // IWYU pragma: begin_exports
+ 
+ #if defined(HAVE_NCURSESW_CURSES_H)

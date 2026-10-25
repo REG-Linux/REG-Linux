@@ -1,29 +1,26 @@
---- a/src/osdep/sigsegv_handler.cpp	2025-08-31 18:05:22.304253551 +0200
-+++ b/src/osdep/sigsegv_handler.cpp	2025-08-31 18:07:06.209228302 +0200
-@@ -364,8 +364,13 @@
- 
- #ifndef __MACH__
+--- a/src/osdep/sigsegv_handler.cpp	2026-09-19 14:59:48.241933748 +0100
++++ b/src/osdep/sigsegv_handler.cpp	2026-09-19 14:59:48.250028482 +0100
+@@ -393,8 +393,10 @@
  	mcontext_t* context = &(ucontext->uc_mcontext);
-+#if defined(__GLIBC__)
+ #if defined(__FreeBSD__) && defined(CPU_AARCH64)
+ 	unsigned long long* regs = reinterpret_cast<unsigned long long*>(context->mc_gpregs.gp_x);
+-#else
++#elif defined(__GLIBC__)
  	unsigned long long* regs = context->regs;
- #else
-+	unsigned long* regs = context->regs;
-+#endif
-+
 +#else
- 	mcontext_t context = ucontext->uc_mcontext;
- 	unsigned long long* regs = context->__ss.__x;
++	unsigned long* regs = context->regs;
  #endif
-@@ -475,8 +480,12 @@
- 
- #ifndef __MACH__
+ #else
+ 	mcontext_t context = ucontext->uc_mcontext;
+@@ -516,8 +518,10 @@
  	mcontext_t* context = &(ucontext->uc_mcontext);
-+#if defined(__GLIBC__)
+ #if defined(__FreeBSD__) && defined(CPU_AARCH64)
+ 	unsigned long long* regs = reinterpret_cast<unsigned long long*>(context->mc_gpregs.gp_x);
+-#else
++#elif defined(__GLIBC__)
  	unsigned long long* regs = context->regs;
- #else
-+	unsigned long* regs = context->regs;
-+#endif
 +#else
- 	mcontext_t context = ucontext->uc_mcontext;
- 	unsigned long long* regs = context->__ss.__x;
++	unsigned long* regs = context->regs;
  #endif
+ #else
+ 	mcontext_t context = ucontext->uc_mcontext;

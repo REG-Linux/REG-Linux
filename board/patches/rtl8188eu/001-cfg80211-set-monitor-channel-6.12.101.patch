@@ -1,0 +1,21 @@
+From: Carlos Martins <cjom@reglinux.org>
+Subject: [PATCH] cfg80211: set_monitor_channel takes a net_device from 6.12.101
+
+Upstream 9c4f83092775 ("wifi: cfg80211: pass net_device to
+.set_monitor_channel") landed in 6.13 and was backported to 6.12.101 as a
+Stable-dep-of the pmsr_free_wk deadlock fix, so gating the new signature
+on 6.13 fails to build against 6.12.101+ with -Wincompatible-pointer-types.
+
+Signed-off-by: Carlos Martins <cjom@reglinux.org>
+---
+--- a/ioctl_cfg80211.c
++++ b/ioctl_cfg80211.c
+@@ -4418,7 +4418,7 @@
+ }
+ 
+ static int cfg80211_rtw_set_monitor_channel(struct wiphy *wiphy
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 13, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 101))
+ 	, struct net_device *dev
+ 	, struct cfg80211_chan_def *chandef
+ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))

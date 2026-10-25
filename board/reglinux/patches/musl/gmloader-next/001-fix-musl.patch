@@ -1,0 +1,59 @@
+diff --git a/3rdparty/libbsd-config/libbsd.aarch64-linux-gnu.h b/3rdparty/libbsd-config/libbsd.aarch64-linux-gnu.h
+index 5e9999f..ff19fe9 100644
+--- a/3rdparty/libbsd-config/libbsd.aarch64-linux-gnu.h
++++ b/3rdparty/libbsd-config/libbsd.aarch64-linux-gnu.h
+@@ -78,7 +78,9 @@
+ #define HAVE_STDINT_H 1
+ 
+ /* Define to 1 if you have the <stdio_ext.h> header file. */
++#ifdef __GLIBC__
+ #define HAVE_STDIO_EXT_H 1
++#endif
+ 
+ /* Define to 1 if you have the <stdio.h> header file. */
+ #define HAVE_STDIO_H 1
+diff --git a/3rdparty/libbsd-config/libbsd.arm-linux-gnueabihf.h b/3rdparty/libbsd-config/libbsd.arm-linux-gnueabihf.h
+index b337d0d..8bb0658 100644
+--- a/3rdparty/libbsd-config/libbsd.arm-linux-gnueabihf.h
++++ b/3rdparty/libbsd-config/libbsd.arm-linux-gnueabihf.h
+@@ -78,7 +78,9 @@
+ #define HAVE_STDINT_H 1
+ 
+ /* Define to 1 if you have the <stdio_ext.h> header file. */
++#ifdef __GLIBC__
+ #define HAVE_STDIO_EXT_H 1
++#endif
+ 
+ /* Define to 1 if you have the <stdio.h> header file. */
+ #define HAVE_STDIO_H 1
+diff --git a/thunks/libc/stdio.cpp b/thunks/libc/stdio.cpp
+index 30fa45b..fc58470 100644
+--- a/thunks/libc/stdio.cpp
++++ b/thunks/libc/stdio.cpp
+@@ -1,6 +1,8 @@
+ #include <fcntl.h>
+ #include <stdio.h>
++#ifdef __GLIBC__
+ #include <stdio_ext.h>
++#endif
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdarg.h>
+@@ -35,7 +37,7 @@ ABI_ATTR BIONIC_FILE *fopen_impl(const char *arg1, const char* arg2)
+ 
+ ABI_ATTR BIONIC_FILE *fopen64_impl(const char *arg1, const char* arg2)
+ {
+-    FILE *f = fopen64(arg1, arg2);
++    FILE *f = fopen(arg1, arg2);
+     if (!f)
+         return NULL;
+ 
+@@ -70,7 +72,7 @@ ABI_ATTR BIONIC_FILE *freopen_impl(const char * arg1, const char * arg2, BIONIC_
+ ABI_ATTR BIONIC_FILE *freopen64_impl(const char * arg1, const char * arg2, BIONIC_FILE * _arg3)
+ {
+     FILE *arg3 = _get_from(_arg3);
+-    _arg3->_cookie = freopen64(arg1, arg2, arg3);
++    _arg3->_cookie = freopen(arg1, arg2, arg3);
+     if (!_arg3->_cookie) {
+         free(_arg3);
+         return NULL;

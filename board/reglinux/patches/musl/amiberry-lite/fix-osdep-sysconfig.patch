@@ -1,14 +1,6 @@
---- a/src/osdep/sysconfig.h	2025-11-26 23:15:48.569130707 +0100
-+++ b/src/osdep/sysconfig.h	2025-11-26 23:17:02.536289508 +0100
-@@ -630,6 +630,7 @@
- #define _timezone           timezone
- #define _daylight           daylight
- // Ftello and fseeko on OSX are alerady 64bit
-+
- #if defined ANDROID || defined __MACH__
- #define _ftelli64(x)        ftello(x)
- #define _fseeki64(x,y,z)    fseeko(x,y,z)
-@@ -637,5 +638,17 @@
+--- a/src/osdep/sysconfig.h	2026-09-19 14:59:48.209981861 +0100
++++ b/src/osdep/sysconfig.h	2026-09-19 14:59:48.236886395 +0100
+@@ -637,5 +637,17 @@
  #define _ftelli64(x)        ftello64(x)
  #define _fseeki64(x,y,z)    fseeko64(x,y,z)
  #endif

@@ -1,12 +1,19 @@
 --- a/src/burner/libretro/Makefile	2025-09-04 17:19:00.546245574 +0200
 +++ b/src/burner/libretro/Makefile	2025-09-04 17:20:13.968617474 +0200
-@@ -20,6 +20,10 @@
+@@ -20,6 +20,17 @@
  SPLIT_UP_LINK ?= 0
  REGEN_HEADERS ?= 0
  
 +CFLAGS += -flto=auto
 +CXXFLAGS += -flto=auto
 +LDFLAGS += -flto=auto -static-libgcc -static-libstdc++
++
++# Cyclone.S (ARM 68000 core) uses "ldr reg,=CycloneJumpTab" absolute
++# literal-pool addressing since the upstream jump-table refactor, which
++# puts a real R_ARM_ABS32 relocation inside the read-only .text of this
++# shared object. Hand-written ASM like this was never made GOT/PIC-safe,
++# so accept the text relocation instead of failing the link.
++LDFLAGS += -Wl,-z,notext
 +
  SPACE :=
  SPACE := $(SPACE) $(SPACE)
