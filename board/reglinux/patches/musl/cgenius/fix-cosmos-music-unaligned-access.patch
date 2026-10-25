@@ -14,7 +14,7 @@
 -                        *(reinterpret_cast<Sint16*>(
 -                              stream+j*audioConfig.numChannels*audioConfig.bytesPerSample) );
 -
--                for(unsigned int k=0 ; k<audioConfig.numChannels ; k++)
+-                for(int k=0 ; k<audioConfig.numChannels ; k++)
 -                {
 -                    *buf16 = static_cast<Sint16>((val*vol)/MIX_MAX_VOLUME);
 -                    buf16++;

@@ -20,19 +20,19 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 diff --git a/drivers/gpu/drm/sun4i/Kconfig b/drivers/gpu/drm/sun4i/Kconfig
 --- a/drivers/gpu/drm/sun4i/Kconfig
 +++ b/drivers/gpu/drm/sun4i/Kconfig
-@@ -3,6 +3,7 @@
+@@ -3,6 +3,7 @@ config DRM_SUN4I
  	tristate "DRM Support for Allwinner A10 Display Engine"
  	depends on DRM && COMMON_CLK
  	depends on ARCH_SUNXI || COMPILE_TEST
 +	select DRM_BRIDGE_CONNECTOR
+ 	select DRM_CLIENT_SELECTION
  	select DRM_GEM_DMA_HELPER
  	select DRM_KMS_HELPER
- 	select DRM_PANEL
 diff --git a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 index 8f8d3bdba5ce..93831cdf1917 100644
 --- a/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
 +++ b/drivers/gpu/drm/sun4i/sun8i_dw_hdmi.c
-@@ -8,14 +8,90 @@
+@@ -8,14 +8,91 @@
  #include <linux/of.h>
  #include <linux/platform_device.h>
  
@@ -53,11 +53,12 @@ index 8f8d3bdba5ce..93831cdf1917 100644
 +	container_of(x, struct sun8i_dw_hdmi, enc_bridge)
 +
 +static int sun8i_hdmi_enc_attach(struct drm_bridge *bridge,
++				 struct drm_encoder *encoder,
 +				 enum drm_bridge_attach_flags flags)
 +{
 +	struct sun8i_dw_hdmi *hdmi = bridge_to_sun8i_dw_hdmi(bridge);
 +
-+	return drm_bridge_attach(&hdmi->encoder, hdmi->hdmi_bridge,
++	return drm_bridge_attach(encoder, hdmi->hdmi_bridge,
 +				 &hdmi->enc_bridge, flags);
 +}
 +
@@ -83,7 +84,7 @@ index 8f8d3bdba5ce..93831cdf1917 100644
 +
 +		drm_edid = drm_bridge_edid_read(hdmi->hdmi_bridge,
 +						hdmi->connector);
-+		if (drm_edid)
++		if (!drm_edid)
 +			return;
 +
 +		edid = drm_edid_raw(drm_edid);

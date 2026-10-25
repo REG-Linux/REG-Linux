@@ -1,6 +1,5 @@
 config BR2_PACKAGE_DXX_REBIRTH
 	bool "dxx-rebirth"
-	select BR2_PACKAGE_HOST_SCONS
 	select BR2_PACKAGE_LIBPNG
 	select BR2_PACKAGE_PHYSFS
 	select BR2_PACKAGE_SDL2

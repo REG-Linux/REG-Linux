@@ -1,0 +1,33 @@
+Drop the pid from the sway IPC socket path
+
+REG-Linux hardcodes the socket location in
+package/frontend/regstation/wayland/sway/04-sway.sh:
+
+    export SWAYSOCK="$runtime_dir/sway-ipc.0.sock"
+
+That profile script runs for every login shell and cannot know sway's pid,
+so upstream's "%s/sway-ipc.%u.%i.sock" would leave SWAYSOCK pointing at a
+socket that does not exist and break swaymsg everywhere. Only one sway
+instance runs on these images, so dropping the pid is safe.
+
+Note: this patch used to be called 000-allow-running-as-root.patch and also
+carried three hunks against sway/main.c that neutered detect_suid(). sway
+1.12 removed the SUID check upstream (no detect_suid() remains in main.c),
+so running as root needs no patch any more and those hunks are gone. Keeping
+them would not merely have been dead weight -- the third hunk still applied
+with fuzz and re-inserted a call to the now-deleted function, which would
+have failed to compile.
+
+Signed-off-by: REG-Linux <reglinux@reglinux.org>
+
+--- a/sway/ipc-server.c
++++ b/sway/ipc-server.c
+@@ -138,7 +138,7 @@
+ 		dir = "/tmp";
+ 	}
+ 	if (path_size <= snprintf(ipc_sockaddr->sun_path, path_size,
+-			"%s/sway-ipc.%u.%i.sock", dir, getuid(), getpid())) {
++			"%s/sway-ipc.%u.sock", dir, getuid())) {
+ 		sway_abort("Socket path won't fit into ipc_sockaddr->sun_path");
+ 	}
+

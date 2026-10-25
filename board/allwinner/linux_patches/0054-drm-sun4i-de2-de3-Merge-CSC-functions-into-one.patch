@@ -145,7 +145,7 @@ index 6ebd1c3aa3ab..0dcbc0866ae8 100644
  {
  	u32 base;
  
- 	if (mixer->cfg->is_de3) {
+ 	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
 -		sun8i_de3_ccsc_set_coefficients(mixer->engine.regs, layer,
 -						fmt_type, encoding, range);
 +		sun8i_de3_ccsc_setup(mixer->engine.regs, layer,
@@ -163,7 +163,7 @@ index 6ebd1c3aa3ab..0dcbc0866ae8 100644
 -{
 -	u32 base;
 -
--	if (mixer->cfg->is_de3) {
+-	if (mixer->cfg->de_type == SUN8I_MIXER_DE3) {
 -		sun8i_de3_ccsc_enable(mixer->engine.regs, layer, enable);
 -		return;
 -	}

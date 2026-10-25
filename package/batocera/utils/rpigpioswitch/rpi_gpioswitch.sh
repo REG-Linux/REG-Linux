@@ -857,7 +857,7 @@ case "$CONFVALUE" in
 
         # Write values and display MsgBox
         [[ -n "$switch" ]] || { echo "Abort! Nothing changed...."; exit 1; }
-        /usr/bin/system-settings-set system.power.switch "$switch"
+        /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.power.switch "$switch"
         [[ $? -eq 0 ]] && info_msg="No error! Everything went okay!" || info_msg="An error occurred!"
         dialog --ascii-lines --backtitle "BATOCERA Power Switch Selection Toolkit" \
                --title " STATUS OF NEW VALUE " \

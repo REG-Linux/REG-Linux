@@ -15,11 +15,18 @@ DOCKER		?= docker
 
 -include $(LOCAL_MK)
 
+# Wrapper-level make variables that must NOT leak into the Buildroot container:
+# a command-line `PKG=...` propagates via MAKEFLAGS and overrides Buildroot's
+# internal PKG variable, emptying package paths. Strip them before forwarding.
+WRAPPER_VARS := PKG CMD BR_PKG DEBUG_BUILD MINI_BUILD PARALLEL_BUILD \
+	BUILD_PROGRESS BATCH_MODE CONTAINER DOCKER BOARD DEV LOCAL_MK EXTRA_OPTS
+CONTAINER_MAKEFLAGS = $(filter-out $(foreach v,$(WRAPPER_VARS),$(v)=%),$(MAKEFLAGS))
+
 ifeq ($(PARALLEL_BUILD), y)
 	EXTRA_OPTS += BR2_PER_PACKAGE_DIRECTORIES=y
 	MAKE_OPTS += -j$(MAKE_JLEVEL)
 	MAKE_OPTS += -l$(MAKE_LLEVEL)
-	DOCKER_OPTS += -e MAKEFLAGS="$(MAKEFLAGS)"
+	DOCKER_OPTS += -e MAKEFLAGS="$(CONTAINER_MAKEFLAGS)"
 endif
 
 ifeq ($(DEBUG_BUILD), y)
@@ -29,6 +36,14 @@ endif
 ifndef BATCH_MODE
 	DOCKER_OPTS += -i
 endif
+
+# Authenticate the container's git to github.com with gh_token (copied in by
+# the gh-token target), for packages fetched from private repositories. Only the
+# helper travels through the environment, so the token never shows in a URL
+# or in the build log.
+DOCKER_OPTS += -e GIT_CONFIG_COUNT=1 \
+	-e GIT_CONFIG_KEY_0=credential.https://github.com.helper \
+	-e GIT_CONFIG_VALUE_0='!f() { test "$$1" = get && printf "username=x-access-token\npassword=%s\n" "$$(cat /build/gh_token)"; }; f'
 
 DOCKER_REPO := reglinux
 IMAGE_NAME  := reglinux-build
@@ -192,7 +207,7 @@ remove-dl-dups:
 	done
 
 merge:
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/mergeToBR.sh
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/mergeToBR.sh
 
 generate:
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/generateCustom.sh
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/generateCustom.sh

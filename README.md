@@ -76,7 +76,38 @@ The open-source parts of REG-Station and regmsg are listed with their notices in
 
 ---
 
+### ⚠️ Release Images: REG-Station and regmsg
+
+Our release images are built with our proprietary frontend, **REG-Station**, and our proprietary system daemon, **regmsg**. Read their terms before using an image:
+
+- **REG-Station:** [README](https://github.com/REG-Linux/REG-Station-binaries#readme) · [LICENSE](https://github.com/REG-Linux/REG-Station-binaries/blob/main/LICENSE.md)
+- **regmsg:** [README](https://github.com/REG-Linux/regmsg-binaries#readme) · [LICENSE](https://github.com/REG-Linux/regmsg-binaries/blob/main/LICENSE.md)
+
+Every image also carries both licences, in `/usr/share/regstation/` and `/usr/share/regmsg/`.
+
+> [!WARNING]
+> regmsgd checks the files below. If any of them is changed or you attach a debugger/tracer to the daemon, the system **stops launching games and authenticated scraping** without any warning:
+>
+> - `/usr/bin/regmsgd`
+> - `/etc/init.d/S06regmsgd`
+> - `/etc/init.d/S002plymouth`
+> - `/etc/plymouth/plymouthd.conf`
+> - `/usr/share/plymouth/themes/reglinux-arcade/reglinux-arcade.plymouth`
+> - `/usr/share/plymouth/themes/reglinux-arcade/logo_frame_9.png`
+>
+> This applies both to edits made on a device and to images you build yourself with our prebuilt regmsg. The boot-splash files above come from `package/boot/plymouth/` in this repository.
+
+**If you do not agree with this, do not use our release images or our frontend+daemon.**
+
+You are free to build this repository yourself. The build can still use REG-Station and regmsg as prebuilt binaries under the terms above. Using a different frontend is possible but not supported, and will likely need fixes to packages, init scripts and game-launch integration.
+
+---
+
 ### 🗂️ Repository Overview
+
+> [!WARNING]
+> The whole project, including [our main site](https://reglinux.org/), is always a work in progress.
+> If we don't have a device on our site or repository with a link to download, we can't guarantee it builds and boots.
 
 | Directory | Description |
 |------------|-------------|

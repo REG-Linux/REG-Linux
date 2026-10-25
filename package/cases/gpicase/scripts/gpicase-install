@@ -36,7 +36,7 @@ ACTION=$1
 case "${ACTION}" in
 "gpicase")
     video="dtoverlay=retroflag-gpicase"
-    /usr/bin/system-settings-set system.rs.environment wayland
+    /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.rs.environment wayland
     do_config
     ;;
 "gpicase2")

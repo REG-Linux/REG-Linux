@@ -72,7 +72,7 @@ REG Linux images ship as GPT disks with a vendor-friendly VFAT boot partition an
   - The early helper shipped with `reglinux-msg` starts the custom IPC daemon so other boot scripts can issue commands through it.
   - `S08connman` configures ConnMan, and optionally toggles Wi-Fi radios.
   - `S11share` and `S12populateshare` mount `/userdata` and seed it before higher-level daemons start.
-  - `S18governor`, `S26system`, `S27brightness`, `S31sixad`, etc. apply CPU governors, keyboard layouts, brightness, PS3 pad modes, and timezone settings.
+  - `S18governor`, `S26system`, `S31sixad`, etc. apply CPU governors, keyboard layouts, PS3 pad modes, and timezone settings.
   - `S61cec` emits HDMI-CEC standby commands when requested, and `S99userservices` starts user-defined scripts located in `/userdata/system/services`.
 
 ### 5.2 Service selection
@@ -93,7 +93,7 @@ REG Linux images ship as GPT disks with a vendor-friendly VFAT boot partition an
 - **Emulators** – Standalone engines reside in `package/emulators/` (e.g., DuckStation, PCSX2, PPSSPP, Ryujinx, Vita3K, RPCS3, Yuzu replacements). Buildroot `.mk` files copy BIOS stubs, shaders, or configs into `datainit`.
 - **RetroArch & libretro** – `package/retroarch/` contains RetroArch itself, assets, joypad autoconfigs, shaders, and per-core Buildroot packages under `package/emulators/libretro/`.
 - **Engines & Ports** – Native ports (OpenJazz, Cannonball, TheForceEngine) live in `package/ports/`, often installing default config to `/usr/share/reglinux/datainit/system/configs`.
-- **System helpers** – `package/system/reglinux-configgen` (Python + ZeroMQ) generates emulator configuration per game, reading from `/usr/share/reglinux/datainit/system`.
+- **System helpers** – `package/system/reglinux-msg` (regmsgd, Rust + Lua) generates emulator configuration per game, resolving systems against `/usr/share/regmsg/launcher/launcher-defaults*.yml`.
 
 ## 8. Networking & External Storage
 

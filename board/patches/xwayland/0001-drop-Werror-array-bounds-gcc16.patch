@@ -1,0 +1,10 @@
+--- a/meson.build
++++ b/meson.build
+@@ -41,7 +41,6 @@
+         '-Werror=sequence-point',
+         '-Werror=return-type',
+         '-Werror=trigraphs',
+-        '-Werror=array-bounds',
+         '-Werror=write-strings',
+         '-Werror=address',
+         '-Werror=int-to-pointer-cast',

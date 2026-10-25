@@ -1,0 +1,83 @@
+#!/bin/dash
+#
+# Force deterministic /dev/input/jsN ordering for the two internal CHA gamepads.
+#
+# CHA1 is wired to OHCI1 (1c1b400.usb) and CHA2 to OHCI2 (1c1c400.usb). The two
+# root hubs enumerate in parallel through usb_hub_wq, so the winner of the
+# input_register_device() race is non-deterministic. SDL-based consumers
+# (RetroArch, standalone emulators) follow kernel jsN numbering for player
+# order, so the race is user-visible.
+#
+# Fix: unbind every USB joystick, then rebind CHA1 first, CHA2 second, and
+# any other externally attached joysticks after. Linux's input core reuses
+# freed minors and always allocates the lowest free one, so serial rebind
+# in this order yields CHA1=js0, CHA2=js1, externals=js2+.
+
+case "$1" in start) ;; *) exit 0 ;; esac
+
+CHA1_LINK=/dev/input/by-id/usb-CHA1_CHA1-joystick
+CHA2_LINK=/dev/input/by-id/usb-CHA2_CHA2-joystick
+
+# Hot path: wait up to 5s, exiting as soon as the desired layout is present.
+# Also break out early (for the fix path) once both CHA pads have enumerated.
+i=0
+while [ $i -lt 50 ]; do
+    set -- /sys/class/input/js*
+    if [ "$#" = 2 ] \
+        && [ "$(readlink "$CHA1_LINK" 2>/dev/null)" = ../js0 ] \
+        && [ "$(readlink "$CHA2_LINK" 2>/dev/null)" = ../js1 ]; then
+        exit 0
+    fi
+    [ -L "$CHA1_LINK" ] && [ -L "$CHA2_LINK" ] && break
+    sleep 0.1
+    i=$((i + 1))
+done
+
+# Resolve CHA1/CHA2 USB device names via their platform OHCI parent.
+# Bus numbers are probe-order-dependent; the controller address is stable.
+for d in /sys/bus/usb/devices/*-*; do
+    name=${d##*/}
+    case "$name" in *:*) continue ;; esac
+    case "$(readlink "$d" 2>/dev/null)" in
+        *1c1b400.usb*) CHA1_DEV=$name ;;
+        *1c1c400.usb*) CHA2_DEV=$name ;;
+    esac
+    [ -n "$CHA1_DEV" ] && [ -n "$CHA2_DEV" ] && break
+done
+[ -n "$CHA1_DEV" ] && [ -n "$CHA2_DEV" ] || exit 0
+
+# Collect any external USB joystick devices, deduplicated.
+OTHER_DEVS=
+for js in /sys/class/input/js*; do
+    [ -e "$js" ] || continue
+    p=$(readlink -f "$js/device" 2>/dev/null)
+    usb_dev=
+    while [ -n "$p" ] && [ "$p" != / ]; do
+        if [ -f "$p/bDeviceClass" ]; then
+            usb_dev=${p##*/}
+            break
+        fi
+        p=${p%/*}
+    done
+    [ -n "$usb_dev" ] || continue
+    [ "$usb_dev" = "$CHA1_DEV" ] && continue
+    [ "$usb_dev" = "$CHA2_DEV" ] && continue
+    case " $OTHER_DEVS " in *" $usb_dev "*) continue ;; esac
+    OTHER_DEVS="$OTHER_DEVS $usb_dev"
+done
+
+# Unbind every joystick device.
+echo "$CHA1_DEV" > /sys/bus/usb/drivers/usb/unbind 2>/dev/null
+echo "$CHA2_DEV" > /sys/bus/usb/drivers/usb/unbind 2>/dev/null
+for d in $OTHER_DEVS; do
+    echo "$d" > /sys/bus/usb/drivers/usb/unbind 2>/dev/null
+done
+
+# Rebind in the desired order: CHA1 -> js0, CHA2 -> js1, externals -> js2+.
+echo "$CHA1_DEV" > /sys/bus/usb/drivers/usb/bind 2>/dev/null
+sleep 0.2
+echo "$CHA2_DEV" > /sys/bus/usb/drivers/usb/bind 2>/dev/null
+for d in $OTHER_DEVS; do
+    sleep 0.2
+    echo "$d" > /sys/bus/usb/drivers/usb/bind 2>/dev/null
+done

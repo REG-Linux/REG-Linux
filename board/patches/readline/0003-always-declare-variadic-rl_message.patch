@@ -1,0 +1,21 @@
+Always declare the variadic rl_message() prototype
+
+Without USE_VARARGS and PREFER_STDARG the header declared
+"extern int rl_message ();", which C23 (the GCC 15+ default) reads as
+taking no arguments, so callers such as bluez fail with "too many
+arguments to function rl_message". readline 8.3 does the same.
+
+--- a/readline.h	2026-09-29 12:25:17.852271876 +0200
++++ b/readline.h	2026-09-29 12:25:17.870414595 +0200
+@@ -404,11 +404,7 @@
+ extern void rl_deactivate_mark (void);
+ extern int rl_mark_active_p (void);
+ 
+-#if defined (USE_VARARGS) && defined (PREFER_STDARG)
+ extern int rl_message (const char *, ...)  __attribute__((__format__ (printf, 1, 2)));
+-#else
+-extern int rl_message ();
+-#endif
+ 
+ extern int rl_show_char (int);
+ 

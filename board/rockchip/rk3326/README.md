@@ -6,7 +6,7 @@ This directory contains the RK3326-specific pieces that get pulled into a REG-Li
 
 - `boot/` – board-specific U-Boot `boot.ini` along with variant `boot.batlexp-g350.ini`.
 - `create-boot-script.sh` – invoked by REG-Linux to stage kernel, rootfs, device trees and overlays into the final `boot/` image.
-- `fsoverlay/` – root-owned overlay content that gets merged into the target rootfs (init scripts and REG-Linux configgen helpers).
+- `fsoverlay/` – root-owned overlay content that gets merged into the target rootfs (init scripts and REG-Linux launcher hooks).
 - `genimage.cfg` – RK3326 partition layout responsible for the VFAT boot partition, userdata EXT4, and the `reglinux.img` container that bundles IDB loader, U-Boot, Trust, boot, and userdata partitions.
 - `linux_patches/` – kernel patch series applied when building the RK3326 kernel.
 - `linux-rk3326-defconfig.config` – the full Linux kernel configuration used for the RK3326 builds.
@@ -37,7 +37,7 @@ The script assumes the standard REG-Linux binary exports for `Image`, `rootfs.sq
 The overlay adds:
 
 - `etc/init.d/S32colorbuttonled` – a GameForce Chi hook that restores saved button and power LED colors at boot by invoking `system-gameforce`.
-- `usr/share/reglinux/configgen/scripts/governor.sh` – ConfigGen event hook called on `gameStart`/`gameStop` to toggle the GPU/DMC governors between `performance` and ondemand profiles based on the saved `system.cpu.governor` setting.
+- `usr/share/reglinux/scripts/game{Start,Stop}/governor.sh` – launcher event hooks run by regmsgd on `gameStart`/`gameStop` to toggle the GPU/DMC devfreq governors between `performance` and ondemand profiles based on the saved `system.cpu.governor` setting.
 
 These files are merged into the built rootfs by ConfigGen, so editing them requires re-running the REG-Linux build to pick up the overlay changes.
 

@@ -1,14 +1,8 @@
---- a/src/engine/CMakeLists.txt	2024-06-02 14:22:14.155964943 +0200
-+++ b/src/engine/CMakeLists.txt	2024-06-02 14:22:30.912571995 +0200
-@@ -98,4 +98,4 @@
-                       unzip
-                       depklite)
- 
--TARGET_LINK_LIBRARIES(engine ${CURL_LIBRARIES})
-+TARGET_LINK_LIBRARIES(engine curl execinfo backtrace)
---- a/GsKit/base/interface/Debug.cpp	2024-06-02 14:28:56.353068224 +0200
-+++ b/GsKit/base/interface/Debug.cpp	2024-06-02 14:29:16.221654405 +0200
-@@ -414,6 +414,7 @@
+diff --git a/GsKit/base/interface/Debug.cpp b/GsKit/base/interface/Debug.cpp
+index 73e3d5b..3905a65 100644
+--- a/GsKit/base/interface/Debug.cpp
++++ b/GsKit/base/interface/Debug.cpp
+@@ -415,6 +415,7 @@ void OlxWriteCoreDump(const char* file_postfix) {
  #include <execinfo.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -16,3 +10,14 @@
  
  void DumpCallstackPrintf(void* callpnt) {
  	void *callstack[128];
+diff --git a/src/engine/CMakeLists.txt b/src/engine/CMakeLists.txt
+index 044ee74..45f3d83 100644
+--- a/src/engine/CMakeLists.txt
++++ b/src/engine/CMakeLists.txt
+@@ -113,5 +113,5 @@ target_link_libraries(engine
+                       depklite)
+ 
+ if(DOWNLOADER)
+-    TARGET_LINK_LIBRARIES(engine ${CURL_LIBRARIES})
++    TARGET_LINK_LIBRARIES(engine ${CURL_LIBRARIES} execinfo backtrace)
+ endif()

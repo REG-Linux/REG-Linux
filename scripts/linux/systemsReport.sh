@@ -1,11 +1,19 @@
 #!/bin/bash
 
-ARCHS="x86_64 odroidxu4 bcm2835 bcm2836 bcm2837 bcm2711 bcm2712 rk3128 rk3288 rk3326 rk3328 rk3399 rk3568 rk3588 s812 s905 s905gen2 s905gen3 s9gen4 s922x a3gen2 cha h3 h5 h6 h616 h700 jh7110 k1 jz4770"
+# Derived from the board configs rather than hardcoded: the old fixed list had
+# drifted badly (still named h5/h6, merged into sun50i, while missing 20 live
+# boards including odroidc5/sm8250/x86_64_v3).
+ARCHS=$(ls "${BR2_EXTERNAL_REGLINUX_PATH}"/configs/reglinux-*.board 2>/dev/null |
+            sed 's#.*/reglinux-##; s#\.board$##')
 
 BR_DIR=$1
 REGLINUX_BINARIES_DIR=$2
-if ! test -d "${BR_DIR}"; then
-    echo "${0} <BR_DIR>" >&2
+if ! test -d "${BR_DIR}" || test -z "${REGLINUX_BINARIES_DIR}"; then
+    echo "${0} <BR_DIR> <REGLINUX_BINARIES_DIR>" >&2
+    exit 1
+fi
+if test -z "${ARCHS}"; then
+    echo "${0}: no board configs found under ${BR2_EXTERNAL_REGLINUX_PATH}/configs" >&2
     exit 1
 fi
 
@@ -42,11 +50,11 @@ while [[ $(jobs -r -p | wc -l) -ge 1 ]]; do wait -n; done
 sync
 
 # reporting
-ES_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/emulationstation/es-system/es_systems.yml"
-EXP_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/emulationstation/es-system/systems-explanations.yml"
-PYGEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/emulationstation/es-system/report-system.py"
-HTML_GEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/emulationstation/es-system/systemsReport.html"
-DEFAULTSDIR="${BR2_EXTERNAL_REGLINUX_PATH}/package/system/reglinux-configgen/configs"
+ES_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/frontend/es-system/es_systems.yml"
+EXP_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/frontend/es-system/systems-explanations.yml"
+PYGEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/frontend/es-system/report-system.py"
+HTML_GEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/frontend/es-system/systemsReport.html"
+DEFAULTSDIR="${BR2_EXTERNAL_REGLINUX_PATH}/package/system/reglinux-launcher-defaults/configs"
 mkdir -p "${REGLINUX_BINARIES_DIR}" || exit 1
 echo python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}"
 python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}" >"${REGLINUX_BINARIES_DIR}/reglinux_systemsReport.json" || exit 1

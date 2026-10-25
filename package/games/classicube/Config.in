@@ -3,9 +3,7 @@ config BR2_PACKAGE_CLASSICUBE
 	depends on !BR2_STATIC_LIBS
 	depends on BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_HAS_LIBGLES
 	select BR2_PACKAGE_SDL2
-	select BR2_PACKAGE_LIBGL if BR2_PACKAGE_HAS_LIBGL
 	select BR2_PACKAGE_GL4ES if !BR2_PACKAGE_HAS_LIBGL
-	select BR2_PACKAGE_LIBGLES if BR2_PACKAGE_HAS_LIBGLES
 	help
 	  ClassiCube is a custom Minecraft Classic compatible client
 	  written in C. Pure C, minimal dependencies.

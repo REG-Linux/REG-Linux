@@ -1,0 +1,35 @@
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Subject: [PATCH] config.in: disable AF and HW ROSE by default
+
+Linux 7.x removed the ROSE packet radio protocol and its UAPI header,
+so with 7.x kernel headers lib/rose.c fails:
+
+  rose.c:41:10: fatal error: linux/rose.h: No such file or directory
+
+Buildroot configures net-tools with the config.in defaults. NET/ROM
+support does not need linux/netrom.h and keeps building.
+
+Upstream: https://github.com/ecki/net-tools/commit/4f5bfb239d0e (backported,
+without the version string changes)
+---
+diff --git a/config.in b/config.in
+--- a/config.in
++++ b/config.in
+@@ -54,7 +54,7 @@
+ bool 'Appletalk DDP protocol family' HAVE_AFATALK y
+ bool 'AX25 (packet radio) protocol family' HAVE_AFAX25 y
+ bool 'NET/ROM (packet radio) protocol family' HAVE_AFNETROM y
+-bool 'Rose (packet radio) protocol family' HAVE_AFROSE y
++bool 'Rose (packet radio) protocol family' HAVE_AFROSE n
+ bool 'X.25 (CCITT) protocol family' HAVE_AFX25 y
+ bool 'Econet protocol family' HAVE_AFECONET n
+ bool 'DECnet protocol family' HAVE_AFDECnet n
+@@ -72,7 +72,7 @@
+ bool 'STRIP (Metricom radio) support' HAVE_HWSTRIP n
+ bool 'Token ring (generic) support' HAVE_HWTR n
+ bool 'AX25 (packet radio) support' HAVE_HWAX25 y
+-bool 'Rose (packet radio) support' HAVE_HWROSE y
++bool 'Rose (packet radio) support' HAVE_HWROSE n
+ bool 'NET/ROM (packet radio) support' HAVE_HWNETROM y
+ bool 'X.25 (generic) support' HAVE_HWX25 y
+ bool 'DLCI/FRAD (frame relay) support' HAVE_HWFR y

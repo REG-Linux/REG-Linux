@@ -111,12 +111,8 @@ Stored in:
 
 ### Integration
 
-- **EmulationStation:** Listed in `es-systems.yml` (Atari ST section)
-- **Config Generator:** Python generators in `reglinux-configgen` handle:
-    - `hatariConfig.py` - Main configuration
-    - `hatariControllers.py` - Controller mappings
-    - `hatariKeys.py` - Keyboard to joystick mapping
-    - `hatariGenerator.py` - System integration
+- **REG-Station:** Listed in `es_systems.yml` (Atari ST section)
+- **Launcher:** regmsgd's `hatari` Lua generator writes the configuration, controller mappings and keyboard-to-joystick mapping at launch
 
 ### Installed Binaries
 
@@ -147,5 +143,5 @@ Stored in:
 ## Future Improvements
 
 - [ ] Evaluate shader cache support for OpenGL video backend
-- [ ] Add per-game configuration support in configgen
+- [ ] Add per-game configuration support in the regmsgd launcher
 - [ ] Consider shader packs for CRT emulation (if supported by upstream)
