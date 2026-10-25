@@ -31,7 +31,10 @@ package/emulationstation/reglinux-emulationstation/keys.txt
 .directory
 *.po~
 batocera-mok.key
+reglinux-mok.key
+package/boot/reglinux-shim-signed/reglinux-mok.key
 gh_token
 .idea
 scripts/nvchecker/*.json
 scripts/nvchecker/*.toml
+*.log

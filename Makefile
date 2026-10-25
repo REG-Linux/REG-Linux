@@ -1,4 +1,4 @@
-# Build system for RegLinux using Buildroot and Docker
+# Build system for RegLinux using Buildroot with Docker/Podman support
 
 # =============================================================================
 # Configuration Variables
@@ -9,7 +9,7 @@ OUTPUT_DIR     ?= $(PROJECT_DIR)/output
 CCACHE_DIR     ?= $(PROJECT_DIR)/buildroot-ccache
 LOCAL_MK       ?= $(PROJECT_DIR)/reglinux.mk
 EXTRA_OPTS     ?=
-DOCKER_OPTS    ?=
+CONTAINER_OPTS ?=
 NPROC          := $(shell nproc)
 MAKE_JLEVEL    ?= $(NPROC)
 MAKE_LLEVEL    ?= $(NPROC)
@@ -17,18 +17,88 @@ BATCH_MODE     ?=
 PARALLEL_BUILD ?= y
 DEBUG_BUILD    ?= y
 MINI_BUILD     ?= n
-DOCKER         ?= docker
+# Container runtime selection (default: docker)
+CONTAINER      ?= docker
+BUILD_PROGRESS ?= y
+
+# Local source trees. Point either of these at a working checkout to build that
+# package from YOUR tree instead of the commit pinned in its .mk:
+#
+#   make bcm2711-build REGMSG_SRCDIR=/path/to/regmsg
+#   make bcm2711-build ES_THEME_CANVAS_SRCDIR=/path/to/es-theme-canvas
+#
+# or persist them in reglinux.mk (see LOCAL_MK above). The directory is
+# bind-mounted read-only into the build container and handed to Buildroot's own
+# <pkg>_OVERRIDE_SRCDIR mechanism, which rsyncs it into the package build dir
+# instead of downloading — so uncommitted work builds, and the tree is never
+# written to. Setting REGMSG_SRCDIR / REGSTATION_SRCDIR also forces that
+# package's BUILD_FROM_SOURCE symbol on, since the prebuilt-binary branch has no
+# source to override (the canvas theme has no prebuilt branch).
+#
+# Rebuild the package after editing: the rsync only reruns on
+# `make <target>-cleanpkg PKG=<pkg>` (or -pkg after a dirclean).
+REGMSG_SRCDIR     ?=
+REGSTATION_SRCDIR ?=
+ES_THEME_CANVAS_SRCDIR ?=
 
 -include $(LOCAL_MK)
 
 # =============================================================================
+# Legacy Support: Allow DOCKER variable for backwards compatibility
+# =============================================================================
+ifneq ($(DOCKER),)
+ifeq ($(CONTAINER),docker)
+CONTAINER := $(DOCKER)
+endif
+endif
+
+# =============================================================================
+# Build Scripts
+# =============================================================================
+BUILD_INSTRUMENTATION := /build/scripts/build-instrumentation.sh
+BUILD_LOGGER          := $(PROJECT_DIR)/scripts/build-logger.sh
+VALIDATE_CONTAINER    := $(PROJECT_DIR)/scripts/validate-container.sh
+
+# =============================================================================
 # Build Options
 # =============================================================================
+# Wrapper-level make variables that must NOT leak into the Buildroot container.
+# A make command-line assignment (e.g. `make ... PKG=lzo`) is propagated through
+# MAKEFLAGS; when forwarded with `-e MAKEFLAGS` it becomes a command-line
+# variable inside the container's make and overrides Buildroot's internal
+# variables of the same name. In particular PKG collides with Buildroot's own
+# PKG (the uppercase package prefix), which empties package paths and breaks
+# the build. Strip these assignments from the MAKEFLAGS passed to the container.
+WRAPPER_VARS := PKG CMD BR_PKG DEBUG_BUILD MINI_BUILD PARALLEL_BUILD \
+	BUILD_PROGRESS BATCH_MODE CONTAINER DOCKER BOARD DEV LOCAL_MK EXTRA_OPTS \
+	REGMSG_SRCDIR REGSTATION_SRCDIR ES_THEME_CANVAS_SRCDIR
+CONTAINER_MAKEFLAGS = $(filter-out $(foreach v,$(WRAPPER_VARS),$(v)=%),$(MAKEFLAGS))
+
+# Hand the in-container mount point to Buildroot's <pkg>_OVERRIDE_SRCDIR, and
+# force the package's BUILD_FROM_SOURCE symbol on — both packages default to a
+# prebuilt binary, whose branch of the .mk has no source for the override to
+# replace, so without this the override would silently do nothing.
+ifneq ($(REGMSG_SRCDIR),)
+	MAKE_OPTS  += REGLINUX_MSG_OVERRIDE_SRCDIR=/opt/local-src/regmsg
+	EXTRA_OPTS += BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE=y
+endif
+ifneq ($(REGSTATION_SRCDIR),)
+	MAKE_OPTS  += REGSTATION_OVERRIDE_SRCDIR=/opt/local-src/REG-Station
+	EXTRA_OPTS += BR2_PACKAGE_REGSTATION_BUILD_FROM_SOURCE=y
+endif
+ifneq ($(ES_THEME_CANVAS_SRCDIR),)
+	MAKE_OPTS  += ES_THEME_CANVAS_OVERRIDE_SRCDIR=/opt/local-src/es-theme-canvas
+endif
+
 ifeq ($(PARALLEL_BUILD), y)
 	EXTRA_OPTS += BR2_PER_PACKAGE_DIRECTORIES=y
 	MAKE_OPTS += -j$(MAKE_JLEVEL)
 	MAKE_OPTS += -l$(MAKE_LLEVEL)
-	DOCKER_OPTS += -e MAKEFLAGS="$(MAKEFLAGS)"
+	CONTAINER_OPTS += -e MAKEFLAGS="$(CONTAINER_MAKEFLAGS)"
+endif
+
+ifeq ($(BUILD_PROGRESS), y)
+	BUILD_MAKE_OPTS += BR2_INSTRUMENTATION_SCRIPTS=$(BUILD_INSTRUMENTATION)
 endif
 
 ifeq ($(DEBUG_BUILD), y)
@@ -37,25 +107,132 @@ endif
 
 ifeq ($(MINI_BUILD), y)
 	MAKE_OPTS += MINI_BUILD=y
-	DOCKER_OPTS += -e MINI_BUILD=y
+	CONTAINER_OPTS += -e MINI_BUILD=y
 endif
 
 ifndef BATCH_MODE
-	DOCKER_OPTS += -i
+	CONTAINER_OPTS += -i
+endif
+
+# GitHub 401s a share of the anonymous git-upload-pack POSTs coming from one IP,
+# and git then dies asking for a username -- so any package whose source is not
+# already in dl/ fails to download. Authenticate the container's git with
+# gh_token when it exists. Only the helper script travels through the
+# environment; the token itself stays in the file.
+ifneq ($(wildcard $(PROJECT_DIR)/gh_token),)
+	CONTAINER_OPTS += -e GIT_CONFIG_COUNT=1 \
+		-e GIT_CONFIG_KEY_0=credential.https://github.com.helper \
+		-e GIT_CONFIG_VALUE_0='!f() { test "$$1" = get && printf "username=x-access-token\npassword=%s\n" "$$(cat /build/gh_token)"; }; f'
 endif
 
 # =============================================================================
-# Docker Configuration
+# Container Runtime Configuration
 # =============================================================================
-DOCKER_REPO := reglinux
-IMAGE_NAME  := reglinux-build
+# Containers inherit an effectively unlimited RLIMIT_NOFILE (Docker defaults to
+# 2147483584). Buildroot's host-gawk sizes its open_pipes table from that limit,
+# so the first `... | "sort"` in an awk script tries to malloc 32 GiB and gets
+# OOM-killed -- which wedges glibc's Versions.def rule in an endless make restart
+# loop. Pin a sane limit (hard limit stays under any rootless podman ceiling).
+CONTAINER_ULIMITS := --ulimit nofile=8192:65536
 
-# Common Docker volume mounts (DRY principle)
-DOCKER_VOLUMES := \
-	-v $(PROJECT_DIR):/build \
-	-v $(DL_DIR):/build/buildroot/dl \
-	-v /etc/passwd:/etc/passwd:ro \
-	-v /etc/group:/etc/group:ro
+# Docker configuration
+ifeq ($(CONTAINER),docker)
+    CONTAINER_CMD := docker
+    CONTAINER_RUN_OPTS := --init --rm $(CONTAINER_ULIMITS)
+    CONTAINER_REQUIRES_DAEMON := yes
+endif
+
+# Podman configuration
+ifeq ($(CONTAINER),podman)
+    CONTAINER_CMD := podman
+    # Podman-specific options:
+    # - daemonless by design
+    # - --userns=keep-id for proper UID/GID mapping in rootless mode
+    CONTAINER_RUN_OPTS := --init --rm $(CONTAINER_ULIMITS) --userns=keep-id -e CONTAINER_RUNTIME=podman
+    CONTAINER_REQUIRES_DAEMON := no
+endif
+
+# Fallback safety (should not be reached due to validation below)
+CONTAINER_CMD ?= docker
+CONTAINER_RUN_OPTS ?= --init --rm $(CONTAINER_ULIMITS)
+
+# Container repository and image name
+CONTAINER_REPO := reglinux
+CONTAINER_IMAGE := reglinux-build
+
+# =============================================================================
+# Container Helper Functions
+# =============================================================================
+# Common container volume mounts (works with both Docker and Podman)
+# Local source trees, mounted read-only so a build can never write back into
+# the checkout. Buildroot rsyncs out of these paths (see the <pkg>_OVERRIDE_SRCDIR
+# assignments above); empty unless one of the *_SRCDIR variables is set.
+LOCAL_SRC_MOUNTS :=
+ifneq ($(REGMSG_SRCDIR),)
+LOCAL_SRC_MOUNTS += -v $(REGMSG_SRCDIR):/opt/local-src/regmsg:ro
+endif
+ifneq ($(REGSTATION_SRCDIR),)
+LOCAL_SRC_MOUNTS += -v $(REGSTATION_SRCDIR):/opt/local-src/REG-Station:ro
+endif
+ifneq ($(ES_THEME_CANVAS_SRCDIR),)
+LOCAL_SRC_MOUNTS += -v $(ES_THEME_CANVAS_SRCDIR):/opt/local-src/es-theme-canvas:ro
+endif
+
+define CONTAINER_MOUNTS
+-v $(PROJECT_DIR):/build \
+-v $(DL_DIR):/build/buildroot/dl \
+-v /etc/passwd:/etc/passwd:ro \
+-v /etc/group:/etc/group:ro \
+$(LOCAL_SRC_MOUNTS)
+endef
+
+# Mount project, download, and user/group mapping
+define CONTAINER_MOUNTS_BASIC
+$(CONTAINER_MOUNTS)
+endef
+
+# Mount with ccache support
+define CONTAINER_MOUNTS_CCACHE
+$(CONTAINER_MOUNTS) \
+-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache
+endef
+
+# Helper function to run container with standard options
+# Usage: $(call CONTAINER_RUN,<additional-options>,<command>)
+define CONTAINER_RUN
+$(CONTAINER_CMD) run $(CONTAINER_RUN_OPTS) $(CONTAINER_MOUNTS) $(1) $(CONTAINER_OPTS) $(CONTAINER_REPO)/$(CONTAINER_IMAGE) $(2)
+endef
+
+# Helper function to run container with ccache
+# Usage: $(call CONTAINER_RUN_CCACHE,<additional-options>,<command>)
+define CONTAINER_RUN_CCACHE
+$(CONTAINER_CMD) run $(CONTAINER_RUN_OPTS) $(CONTAINER_MOUNTS_CCACHE) $(1) $(CONTAINER_OPTS) $(CONTAINER_REPO)/$(CONTAINER_IMAGE) $(2)
+endef
+
+# =============================================================================
+# Container Diagnostics and Testing
+# =============================================================================
+.PHONY: container-info test-container
+
+container-info:
+	@echo "Container Runtime Information"
+	@echo "=============================="
+	@echo "Runtime:        $(CONTAINER_CMD)"
+	@echo "Version:        $$($(CONTAINER_CMD) --version 2>&1 | head -1)"
+ifeq ($(CONTAINER),docker)
+	@echo "Storage Driver: $$($(CONTAINER_CMD) info --format '{{.Driver}}' 2>/dev/null || echo 'N/A')"
+	@echo "Rootless:       No"
+else ifeq ($(CONTAINER),podman)
+	@echo "Storage Driver: $$($(CONTAINER_CMD) info --format '{{.Store.GraphDriverName}}' 2>/dev/null || echo 'N/A')"
+	@echo "Rootless:       $$($(CONTAINER_CMD) info --format '{{.Host.Security.Rootless}}' 2>/dev/null || echo 'N/A')"
+endif
+	@echo "Image:          $(CONTAINER_REPO)/$(CONTAINER_IMAGE)"
+	@echo "Requires Daemon: $(CONTAINER_REQUIRES_DAEMON)"
+
+test-container:
+	@echo "Testing $(CONTAINER_CMD) runtime..."
+	@$(CONTAINER_CMD) run --rm $(CONTAINER_RUN_OPTS) $(CONTAINER_MOUNTS) $(CONTAINER_OPTS) $(CONTAINER_REPO)/$(CONTAINER_IMAGE) echo "Container runtime test successful"
+	@echo "Container runtime test completed successfully"
 
 # =============================================================================
 # Target Discovery and Validation
@@ -64,14 +241,8 @@ TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'r*' 2>/dev/null | 
 UID := $(shell id -u)
 GID := $(shell id -g)
 
-# Verify Docker is available
-$(if $(shell which $(DOCKER) 2>/dev/null),, $(error "$(DOCKER) not found! Please install Docker."))
-
-# Verify Docker is running
-DOCKER_RUNNING := $(shell $(DOCKER) info > /dev/null 2>&1 && echo yes || echo no)
-ifneq ($(DOCKER_RUNNING),yes)
-    $(warning "Docker daemon is not running. Some targets may fail.")
-endif
+# Validate container runtime using helper script
+$(shell $(VALIDATE_CONTAINER) $(CONTAINER) 2>&1)
 
 # Utility function for uppercase conversion
 UC = $(shell echo '$1' | tr '[:lower:]' '[:upper:]')
@@ -88,71 +259,90 @@ help:
 	@echo "Available targets:"
 	@echo "  vars                    - Show configuration variables"
 	@echo "  list-targets            - List all supported board targets"
+	@echo "  container-info          - Show container runtime information"
+	@echo "  test-container          - Test container runtime availability"
 	@echo "  <target>-build          - Build image for target"
 	@echo "  <target>-config         - Configure target"
 	@echo "  <target>-clean          - Clean target build"
 	@echo "  <target>-shell          - Open shell in build container"
 	@echo "  <target>-webserver      - Start HTTP server for images"
 	@echo "  <target>-flash DEV=...  - Flash image to device"
-	@echo "  build-docker-image      - Build Docker image locally"
-	@echo "  update-docker-image     - Update Docker image from registry"
+	@echo "  <target>-build-errors   - Show build failures and log paths"
+	@echo "  <target>-build-log PKG= - Show per-package build log"
+	@echo "  <target>-monitor        - Live build progress (in another terminal)"
+	@echo "  <target>-pkg PKG=       - Build specific package for target"
+	@echo "  <target>-cleanpkg PKG=  - Clean specific package for target (dirclean)"
+	@echo "  build-docker-image      - Build Docker/Podman image locally"
+	@echo "  update-docker-image     - Update Docker/Podman image from registry"
 	@echo "  merge                   - Merge custom configurations to Buildroot"
 	@echo "  generate                - Generate custom configurations from Buildroot"
 	@echo ""
+	@echo "Container Runtime:"
+	@echo "  By default, Docker is used. To use Podman instead:"
+	@echo "  make CONTAINER=podman <target>-build"
+	@echo "  Or set in reglinux.mk: CONTAINER=podman"
+	@echo ""
 	@echo "Examples:"
-	@echo "  make bcm2711-build         - Build for Raspberry Pi 4"
+	@echo "  make bcm2711-build         - Build for Raspberry Pi 4 (Docker)"
+	@echo "  make CONTAINER=podman bcm2711-build  - Build using Podman"
 	@echo "  make bcm2711-flash DEV=/dev/sdb"
 	@echo "  make merge                 - Merge custom configurations"
 	@echo "  make merge MERGE_ARGS='--update-md5'  - Merge and update MD5 hashes"
+	@echo "  make bcm2711-pkg PKG=regstation      - Build regstation package"
+	@echo "  make bcm2711-cleanpkg PKG=regstation - Clean regstation package"
 	@echo ""
 
 vars:
 	@echo "Configuration Variables:"
 	@echo "========================"
-	@echo "Supported targets:  $(TARGETS)"
-	@echo "Project directory:  $(PROJECT_DIR)"
-	@echo "Download directory: $(DL_DIR)"
-	@echo "Build directory:    $(OUTPUT_DIR)"
-	@echo "ccache directory:   $(CCACHE_DIR)"
-	@echo "Extra options:      $(EXTRA_OPTS)"
-	@echo "Docker options:     $(DOCKER_OPTS)"
-	@echo "Make options:       $(MAKE_OPTS)"
-	@echo "Parallel build:     $(PARALLEL_BUILD)"
-	@echo "Debug build:        $(DEBUG_BUILD)"
-	@echo "Mini build:         $(MINI_BUILD)"
-	@echo "CPU cores:          $(NPROC)"
+	@echo "Supported targets:   $(TARGETS)"
+	@echo "Project directory:   $(PROJECT_DIR)"
+	@echo "Download directory:  $(DL_DIR)"
+	@echo "Build directory:     $(OUTPUT_DIR)"
+	@echo "ccache directory:    $(CCACHE_DIR)"
+	@echo "Container runtime:   $(CONTAINER_CMD)"
+	@echo "Container image:     $(CONTAINER_REPO)/$(CONTAINER_IMAGE)"
+	@echo "Requires daemon:     $(CONTAINER_REQUIRES_DAEMON)"
+	@echo "Extra options:       $(EXTRA_OPTS)"
+	@echo "Container options:   $(CONTAINER_OPTS)"
+	@echo "Make options:        $(MAKE_OPTS)"
+	@echo "Build progress:      $(BUILD_PROGRESS)"
+	@echo "Parallel build:      $(PARALLEL_BUILD)"
+	@echo "Debug build:         $(DEBUG_BUILD)"
+	@echo "Mini build:          $(MINI_BUILD)"
+	@echo "CPU cores:           $(NPROC)"
 
 list-targets:
 	@echo "Supported targets:"
 	@for target in $(TARGETS); do echo "  - $$target"; done
 
 # =============================================================================
-# Docker Image Management
+# Container Image Management
 # =============================================================================
 .PHONY: build-docker-image update-docker-image publish-docker-image reglinux-docker-image
 
 build-docker-image:
-	@echo "Building Docker image..."
-	$(DOCKER) build . -t $(DOCKER_REPO)/$(IMAGE_NAME)
+	@echo "Building container image with $(CONTAINER_CMD)..."
+	$(CONTAINER_CMD) build . -t $(CONTAINER_REPO)/$(CONTAINER_IMAGE)
 	@touch .ba-docker-image-available
-	@echo "Docker image built successfully"
+	@echo "Container image built successfully"
 
 .ba-docker-image-available:
-	@echo "Pulling Docker image from registry..."
-	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
+	@echo "Pulling container image from registry..."
+	@$(CONTAINER_CMD) pull $(CONTAINER_REPO)/$(CONTAINER_IMAGE)
 	@touch .ba-docker-image-available
 
 reglinux-docker-image: merge .ba-docker-image-available
 
 update-docker-image:
-	@echo "Updating Docker image..."
+	@echo "Updating container image..."
 	-@rm .ba-docker-image-available > /dev/null 2>&1
 	@$(MAKE) reglinux-docker-image
 
 publish-docker-image:
-	@echo "Publishing Docker image to registry..."
-	@$(DOCKER) push $(DOCKER_REPO)/$(IMAGE_NAME):latest
-	@echo "Docker image published successfully"
+	@echo "Publishing container image to registry..."
+	@$(CONTAINER_CMD) push $(CONTAINER_REPO)/$(CONTAINER_IMAGE):latest
+	@echo "Container image published successfully"
 
 # =============================================================================
 # Directory Management
@@ -174,17 +364,11 @@ dl-dir:
 # =============================================================================
 # Build Targets
 # =============================================================================
-.PHONY: %-clean %-config %-build %-source %-cleanbuild
+.PHONY: %-clean %-config %-build %-source %-cleanbuild %-pkg %-cleanpkg
 
 %-clean: reglinux-docker-image output-dir-%
 	@echo "Cleaning $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
+	@$(call CONTAINER_RUN,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean)
 	@echo "Clean completed for $*"
 
 %-config: reglinux-docker-image output-dir-%
@@ -193,37 +377,40 @@ dl-dir:
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
 	done
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
+ifneq ($(DEBUG_BUILD),y)
+	@echo "Appending linux-no-debug.config kernel fragment (DEBUG_BUILD=n)"
+	@sed -i -e 's|^\(BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="[^"]*\)"|\1 $$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-no-debug.config"|' $(PROJECT_DIR)/configs/reglinux-$*_defconfig
+endif
+	@$(call CONTAINER_RUN,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig)
 	@echo "Configuration completed for $*"
 
-%-build: reglinux-docker-image %-config %-ccache-dir dl-dir
+# The build command below is piped into BUILD_LOGGER, and a shell reports only
+# the LAST element of a pipeline - so buildroot could die and the recipe would
+# still succeed, because the logger exited 0. That is not hypothetical: a make
+# fatal error ("*** ... Stop.") carries no target brackets, the logger's "*** ["
+# scan misses it, and the build is announced as successful having built nothing.
+# Run this recipe under bash with pipefail so buildroot's real exit code wins and
+# the logger's verdict is only a supplement. Target-specific, because a global
+# pipefail would break recipes that legitimately pipe into head/grep -q.
+%-build: SHELL := /bin/bash
+%-build: .SHELLFLAGS := -o pipefail -c
+
+%-build: reglinux-docker-image %-config %-ccache-dir dl-dir %-log-dir
+ifeq ($(BUILD_PROGRESS), y)
+	@echo "Building $* (progress tracking enabled)..."
+	@total=$$($(MAKE) --no-print-directory $*-count-packages-only 2>/dev/null) ; \
+	if [ -z "$$total" ] || [ "$$total" = "0" ] ; then total="?" ; fi ; \
+	echo "Estimated packages to build: $$total" ; \
+	$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID) -e REG_BUILD_TOTAL=$$total -e REG_BUILD_DIR=/$*/build,$(MAKE) $(MAKE_OPTS) $(BUILD_MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD) 2>&1 | $(BUILD_LOGGER) $(OUTPUT_DIR)/$*)
+else
 	@echo "Building $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD))
+endif
 	@echo "Build completed for $*"
 
 %-source: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@echo "Downloading sources for $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source)
 
 %-cleanbuild: %-clean %-build
 	@echo "Clean build completed for $*"
@@ -232,57 +419,77 @@ dl-dir:
 	$(if $(PKG),,$(error "PKG not specified! Use: make <target>-pkg PKG=<package-name>"))
 	@$(MAKE) $(MAKE_OPTS) $*-build CMD=$(PKG)
 
+%-cleanpkg:
+	$(if $(PKG),,$(error "PKG not specified! Use: make <target>-cleanpkg PKG=<package-name>"))
+	@echo "Cleaning $(PKG) for $*..."
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(PKG)-dirclean)
+	@echo "Package $(PKG) cleaned successfully for $*"
+
 # =============================================================================
 # Development and Debug Targets
 # =============================================================================
-.PHONY: %-shell %-kernel %-show-build-order %-ccache-stats %-tail
+.PHONY: %-shell %-kernel %-show-build-order %-ccache-stats %-tail %-log-dir %-count-packages %-count-packages-only %-build-errors %-build-log %-monitor
 
-%-shell: reglinux-docker-image output-dir-%
+%-shell: reglinux-docker-image %-config output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "Not supported in BATCH_MODE if CMD not specified!")),)
-	@$(DOCKER) run -it --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-w /$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(CMD)
+	@$(CONTAINER_CMD) run -it $(CONTAINER_RUN_OPTS) $(CONTAINER_MOUNTS) -v $(OUTPUT_DIR)/$*:/$* -w /$* -v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache -u $(UID):$(GID) $(CONTAINER_OPTS) $(CONTAINER_REPO)/$(CONTAINER_IMAGE) $(CMD)
 
 %-kernel: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@echo "Opening kernel menuconfig for $*..."
-	@$(DOCKER) run -it --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig)
 
 %-show-build-order: reglinux-docker-image %-config %-ccache-dir dl-dir
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order)
 
 %-ccache-stats: reglinux-docker-image %-config %-ccache-dir dl-dir
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot ccache-stats
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot ccache-stats)
 
 %-tail: output-dir-%
 	@echo "Tailing build log for $*..."
 	@tail -F $(OUTPUT_DIR)/$*/build/build-time.log
+
+%-log-dir: output-dir-%
+	@mkdir -p $(OUTPUT_DIR)/$*/build/logs
+
+%-count-packages: reglinux-docker-image %-config
+	@$(MAKE) --no-print-directory $*-count-packages-only
+
+# Counts packages without running prereqs — callers (e.g. %-build) must have
+# already configured the target. Keeps stdout to just the package count.
+%-count-packages-only:
+	@$(call CONTAINER_RUN,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) --no-print-directory O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order 2>/dev/null | wc -l)
+
+%-build-errors: output-dir-%
+	@if [ -s $(OUTPUT_DIR)/$*/build/build-errors.log ]; then \
+		echo "" ; \
+		echo "======================================================================" ; \
+		echo " Build failures for $*:" ; \
+		echo "======================================================================" ; \
+		while IFS='|' read -r pkg step ts logfile; do \
+			echo "  - $$pkg (step: $$step)" ; \
+			echo "    Log: $$logfile" ; \
+			echo "    Rebuild: make $*-pkg PKG=$$pkg-dirclean && make $*-pkg PKG=$$pkg" ; \
+			echo "" ; \
+		done < $(OUTPUT_DIR)/$*/build/build-errors.log ; \
+		echo " Full build log: $(OUTPUT_DIR)/$*/build/full-build.log" ; \
+		echo "======================================================================" ; \
+	else \
+		echo "No build errors recorded for $*." ; \
+	fi
+
+%-build-log: output-dir-%
+	$(if $(PKG),,$(error "PKG not specified! Use: make <target>-build-log PKG=<package>"))
+	@if [ -f $(OUTPUT_DIR)/$*/build/logs/$(PKG).log ]; then \
+		cat $(OUTPUT_DIR)/$*/build/logs/$(PKG).log ; \
+	else \
+		echo "No log found for $(PKG). Available logs:" ; \
+		ls $(OUTPUT_DIR)/$*/build/logs/*.log 2>/dev/null | sed 's/.*\///;s/\.log$$//' | column ; \
+	fi
+
+%-monitor: output-dir-%
+	@echo "Monitoring build progress for $*..."
+	@echo "(Press Ctrl+C to stop)"
+	@watch -n2 'cat $(OUTPUT_DIR)/$*/build/.build-progress/status.json 2>/dev/null || echo "No build in progress"'
 
 # =============================================================================
 # Graph Generation Targets
@@ -291,36 +498,15 @@ dl-dir:
 
 %-graph-depends: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@echo "Generating dependency graph for $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends)
 
 %-graph-build: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@echo "Generating build graph for $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-build
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-build)
 
 %-graph-size: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@echo "Generating size graph for $*..."
-	@$(DOCKER) run --init --rm \
-		$(DOCKER_VOLUMES) \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-size
+	@$(call CONTAINER_RUN_CCACHE,-v $(OUTPUT_DIR)/$*:/$* -u $(UID):$(GID),$(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-size)
 
 # =============================================================================
 # Deployment Targets
@@ -456,11 +642,11 @@ uart:
 
 merge:
 	@echo "Merging custom configuration to Buildroot..."
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/mergeToBR.sh $(MERGE_ARGS)
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/mergeToBR.sh $(MERGE_ARGS)
 
 generate:
 	@echo "Generating custom configuration..."
-	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/generateCustom.sh
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/buildroot/generateCustom.sh
 
 # =============================================================================
 # Default Target
