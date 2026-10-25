@@ -28,7 +28,7 @@ function tz_get() {
 }
 
 function tz_set() {
-	/usr/bin/system-settings-set system.timezone "$1"
+	/usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.timezone "$1"
 }
 
 ###############################
