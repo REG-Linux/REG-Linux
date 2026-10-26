@@ -29,7 +29,7 @@ GLIBC_SIDECAR_PREFIX = $(if $(BR2_arm),/usr/glibc32,/usr/glibc)
 # Release tag of the sidecars, in their VERSION file and in the images that
 # expect them. Bump it when the sidecar contents change; images keep using a
 # sidecar until then.
-GLIBC_SIDECAR_TAG = glibc-sidecar-2
+GLIBC_SIDECAR_TAG = glibc-sidecar-3
 
 # Runtime only: the loader, libc and its split-out libraries, the NSS modules
 # getaddrinfo() & co need. Not every arch has all of them (libmvec: aarch64
@@ -37,7 +37,7 @@ GLIBC_SIDECAR_TAG = glibc-sidecar-2
 GLIBC_SIDECAR_LIBS = \
 	ld-linux*.so.* libc.so.* libm.so.* libmvec.so.* libpthread.so.* \
 	libdl.so.* librt.so.* libresolv.so.* libutil.so.* libanl.so.* \
-	libnss_files.so.* libnss_dns.so.*
+	libnss_files.so.* libnss_dns.so.* libnsl.so.*
 
 # iconv: UTF-8, ASCII, UCS-2/4 and ISO-8859-1 are built into libc. Add the
 # Unicode encodings and the Western, Japanese, Chinese and Korean charsets
