@@ -1,0 +1,52 @@
+From: Romain Tisserand <romain@playdigious.com>
+Subject: [PATCH] elf: glibc sidecar: skip system dirs in RPATH/RUNPATH/LD_LIBRARY_PATH
+
+REG builds this glibc only for its glibc sidecar, installed under its own
+prefix (/usr/glibc, /usr/glibc32) on musl systems, where /lib, /usr/lib and
+friends hold the musl system's libraries. Prebuilt PortMaster programs
+often carry RUNPATH=/usr/lib (206 of the ports with ARM binaries, often via
+the shared tools/splash helper), and port scripts put system directories in
+LD_LIBRARY_PATH: the loader then picked the musl copy of a library and
+failed on libc.musl-*.so.1. Those directories are now ignored in RPATH,
+RUNPATH and LD_LIBRARY_PATH; the default search path is the prefix.
+---
+--- a/elf/dl-load.c
++++ b/elf/dl-load.c
+@@ -438,6 +438,23 @@
+ 
+ static size_t max_dirnamelen;
+ 
++/* REG glibc sidecar: this glibc lives under its own prefix on musl systems,
++   where /lib, /usr/lib & co hold the musl system's libraries. Prebuilt
++   programs often carry RUNPATH=/usr/lib, and scripts put system directories
++   in LD_LIBRARY_PATH: loading a musl library from there breaks the process.
++   DIR has LEN bytes and ends with '/'.  */
++static bool
++reg_musl_system_dir (const char *dir, size_t len)
++{
++  static const char *const dirs[] =
++    { "/lib/", "/usr/lib/", "/usr/local/lib/", "/lib64/", "/usr/lib64/",
++      "/lib32/", "/usr/lib32/" };
++  for (size_t i = 0; i < sizeof dirs / sizeof dirs[0]; ++i)
++    if (len == strlen (dirs[i]) && memcmp (dir, dirs[i], len) == 0)
++      return true;
++  return false;
++}
++
+ static struct r_search_path_elem **
+ fillin_rpath (char *rpath, struct r_search_path_elem **result, const char *sep,
+ 	      const char *what, const char *where, struct link_map *l)
+@@ -477,6 +494,13 @@
+ 	  /* Now add one if there is none so far.  */
+ 	  if (len > 0 && cp[len - 1] != '/')
+ 	    cp[len++] = '/';
++
++	  /* REG: never search the musl system's library directories.  */
++	  if (reg_musl_system_dir (cp, len))
++	    {
++	      free (to_free);
++	      continue;
++	    }
+ 	}
+ 
+       /* See if this directory is already known.  */

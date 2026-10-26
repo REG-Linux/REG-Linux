@@ -1,0 +1,17 @@
+config BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	bool "reglinux glibc sidecar"
+	depends on BR2_TOOLCHAIN_BUILDROOT_GLIBC
+	depends on BR2_aarch64 || BR2_arm
+	select BR2_PACKAGE_GLIBC_SIDECAR
+	select BR2_PACKAGE_HOST_SQUASHFS
+	help
+	  Builds glibc-<arch>.squashfs: a glibc userland (glibc, libstdc++,
+	  Mesa, SDL2, audio clients and the libraries PortMaster ports expect)
+	  that musl boards mount on /usr/glibc (armhf: /usr/glibc32) to run
+	  prebuilt glibc programs. The board's /lib/ld-linux-* link points at
+	  its loader.
+
+	  Only meant for the reglinux-glibc-sidecar-<arch> configs: it
+	  relocates the plugin and config paths of Mesa, alsa-lib,
+	  alsa-plugins, vulkan-loader and glib into that prefix, so a glibc
+	  program never loads one of the musl system's plugins.

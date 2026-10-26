@@ -1,0 +1,22 @@
+include toolchain-gcc14-glibc.common
+include reglinux-glibc-sidecar.common
+# glibc-armhf.squashfs, mounted on /usr/glibc32. Two uses:
+#  - the ARMv7 musl boards (h3, mini, cha, rk3128, s812, rk3288, odroidxu4,
+#    bcm2836, de10nano)
+#  - 32-bit PortMaster ports (old GameMaker gmloader, box86) on the aarch64
+#    musl boards, which run AArch32 code
+# Lowest common CPU: Cortex-A9 with NEON but no VFPv4 (s812, de10nano). Kernel
+# headers no newer than the oldest of the boards' kernels (5.15).
+BR2_arm=y
+BR2_cortex_a9=y
+# Cortex-A9's NEON/VFP are optional: without these, buildroot falls back to
+# soft-float, whose loader (ld-linux.so.3) PortMaster's armhf binaries don't use
+BR2_ARM_ENABLE_NEON=y
+BR2_ARM_ENABLE_VFP=y
+BR2_ARM_EABIHF=y
+BR2_ARM_FPU_NEON=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+BR2_KERNEL_HEADERS_5_15=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles"
+# No software rasterizer: REG's swrast is softpipe+llvmpipe, which needs LLVM,
+# and de10nano (no GPU) isn't a PortMaster target
