@@ -1,0 +1,14 @@
+include toolchain-gcc14-glibc.common
+include reglinux-glibc-sidecar.common
+# glibc-aarch64.squashfs for every aarch64 musl board (rk3326, h700, h616,
+# s905, s905gen2, s9gen4, rk3328, sun50i, bcm2837): generic ARMv8-A,
+# kernel headers no newer than the oldest of their kernels (5.15)
+BR2_aarch64=y
+BR2_cortex_a53=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+BR2_KERNEL_HEADERS_5_15=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles"
+# PowerVR (Imagination) GPUs: GL through Zink over Mesa's Imagination Vulkan driver
+BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK=y
+BR2_PACKAGE_MESA3D_VULKAN_DRIVER_IMAGINATION=y
+BR2_PACKAGE_VULKAN_LOADER=y

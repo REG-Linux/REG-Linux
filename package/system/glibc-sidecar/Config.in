@@ -1,0 +1,18 @@
+config BR2_PACKAGE_GLIBC_SIDECAR
+	bool "glibc-sidecar"
+	depends on BR2_TOOLCHAIN_BUILDROOT_GLIBC
+	help
+	  The toolchain's glibc built a second time with --prefix=/usr/glibc
+	  (/usr/glibc32 on 32-bit ARM), for the glibc sidecar that runs PortMaster's prebuilt glibc programs
+	  on the musl boards.
+
+	  Same source, patches and configure options as the toolchain glibc;
+	  only the prefix differs. Its loader therefore searches <prefix>/lib
+	  only and reads its config from <prefix>/etc, so a glibc program
+	  never picks up a library of the musl system.
+
+	  Only the runtime is installed (loader, libc and friends, a few gconv
+	  modules), into $(TARGET_DIR)<prefix>.
+
+comment "glibc-sidecar needs a buildroot glibc toolchain"
+	depends on !BR2_TOOLCHAIN_BUILDROOT_GLIBC

@@ -1,0 +1,140 @@
+# glibc sidecar: a glibc userland for the musl boards, mounted on /usr/glibc
+# to run PortMaster's prebuilt glibc programs. No kernel, bootloader or rootfs
+# image: package/system/reglinux-glibc-sidecar/pack.sh builds
+# output/<config>/images/glibc-<arch>.squashfs (+ .md5, .VERSION, .paths.txt).
+#
+# Library set from a scan of every PortMaster port (2026-10-25): the sonames
+# ports link against without bundling them. Covers ~94% of the ports that
+# ship aarch64 or armhf binaries.
+# Not yet: sdl12-compat (~7), FFmpeg 4 / ICU 63 compat builds (~12).
+
+# Libraries only
+BR2_INIT_NONE=y
+BR2_SYSTEM_BIN_SH_NONE=y
+# BR2_PACKAGE_BUSYBOX is not set
+# BR2_TARGET_ROOTFS_TAR is not set
+BR2_SSP_NONE=y
+BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-glibc-sidecar/pack.sh"
+BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR=y
+
+# GPU: Mesa for the musl boards' GPUs (Panfrost: Mali Midgard to Valhall incl.
+# Panthor, Lima: Mali-4xx, VC4: Raspberry Pi), EGL/GLES/GBM, KMS and Wayland
+BR2_PACKAGE_MESA3D=y
+BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST=y
+BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LIMA=y
+BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4=y
+BR2_PACKAGE_MESA3D_OPENGL_EGL=y
+BR2_PACKAGE_MESA3D_OPENGL_ES=y
+BR2_PACKAGE_MESA3D_GBM=y
+BR2_PACKAGE_LIBDRM=y
+BR2_PACKAGE_WAYLAND=y
+BR2_PACKAGE_WAYLAND_PROTOCOLS=y
+BR2_PACKAGE_LIBXKBCOMMON=y
+# REG's prebuilt SPIRV-Tools is per CPU and musl-linked; Mesa links it at
+# runtime, so build it against glibc (LLVM/clang and the SPIR-V translator stay
+# prebuilt: build-time only, pack.sh leaves them out)
+BR2_PACKAGE_SPIRV_TOOLS_BUILD_FROM_SOURCE=y
+
+# X11 client libraries and desktop GL (libGL.so.1, Mesa GLX), no X server:
+# ports built on desktop distros link libX11/libGL even when they draw through
+# SDL on KMS/DRM or Wayland, where desktop GL contexts come from EGL. Under
+# PortMaster's Weston pack the same libs talk to its Xwayland.
+BR2_PACKAGE_XORG7=y
+BR2_PACKAGE_MESA3D_OPENGL_GLX=y
+BR2_PACKAGE_LIBGLU=y
+BR2_PACKAGE_XLIB_LIBXCURSOR=y
+BR2_PACKAGE_XLIB_LIBXI=y
+BR2_PACKAGE_XLIB_LIBXINERAMA=y
+BR2_PACKAGE_XLIB_LIBXRENDER=y
+BR2_PACKAGE_XLIB_LIBXSCRNSAVER=y
+BR2_PACKAGE_XLIB_LIBXCOMPOSITE=y
+BR2_PACKAGE_XLIB_LIBXXF86DGA=y
+BR2_PACKAGE_XLIB_LIBXT=y
+
+# SDL2 (KMS/DRM or Wayland, depending on the board's frontend)
+BR2_PACKAGE_SDL2=y
+BR2_PACKAGE_SDL2_KMSDRM=y
+BR2_PACKAGE_SDL2_OPENGLES=y
+BR2_PACKAGE_SDL2_WAYLAND=y
+BR2_PACKAGE_SDL2_X11=y
+BR2_PACKAGE_SDL2_IMAGE=y
+BR2_PACKAGE_SDL2_MIXER=y
+BR2_PACKAGE_SDL2_TTF=y
+BR2_PACKAGE_SDL2_NET=y
+BR2_PACKAGE_SDL2_GFX=y
+
+# Audio: ALSA (default device: pulse plugin) and libpulse, both to REG's
+# pipewire-pulse; no PulseAudio daemon
+BR2_PACKAGE_ALSA_LIB=y
+BR2_PACKAGE_ALSA_PLUGINS=y
+BR2_PACKAGE_PULSEAUDIO=y
+# BR2_PACKAGE_PULSEAUDIO_DAEMON is not set
+BR2_PACKAGE_OPENAL=y
+BR2_PACKAGE_LIBOGG=y
+BR2_PACKAGE_LIBVORBIS=y
+BR2_PACKAGE_OPUS=y
+BR2_PACKAGE_OPUSFILE=y
+BR2_PACKAGE_FLAC=y
+BR2_PACKAGE_MPG123=y
+BR2_PACKAGE_LAME=y
+BR2_PACKAGE_SPEEX=y
+BR2_PACKAGE_LIBSNDFILE=y
+BR2_PACKAGE_LIBMODPLUG=y
+BR2_PACKAGE_LIBTHEORA=y
+BR2_PACKAGE_LIBSOXR=y
+BR2_PACKAGE_FLUIDSYNTH=y
+
+# Images and fonts (jpeg-turbo builds libjpeg.so.8, the soname ports expect)
+BR2_PACKAGE_LIBPNG=y
+BR2_PACKAGE_JPEG=y
+BR2_PACKAGE_JPEG_TURBO=y
+BR2_PACKAGE_WEBP=y
+BR2_PACKAGE_WEBP_DEMUX=y
+BR2_PACKAGE_WEBP_MUX=y
+BR2_PACKAGE_OPENJPEG=y
+BR2_PACKAGE_FREETYPE=y
+BR2_PACKAGE_HARFBUZZ=y
+BR2_PACKAGE_FONTCONFIG=y
+BR2_PACKAGE_LIBFRIBIDI=y
+BR2_PACKAGE_PIXMAN=y
+BR2_PACKAGE_CAIRO=y
+
+# General purpose
+BR2_PACKAGE_ZLIB=y
+BR2_PACKAGE_BZIP2=y
+BR2_PACKAGE_XZ=y
+BR2_PACKAGE_ZSTD=y
+BR2_PACKAGE_EXPAT=y
+BR2_PACKAGE_LIBXML2=y
+BR2_PACKAGE_LIBGLIB2=y
+BR2_PACKAGE_DBUS=y
+BR2_PACKAGE_LIBCURL=y
+BR2_PACKAGE_NGHTTP2=y
+BR2_PACKAGE_LIBIDN2=y
+BR2_PACKAGE_GNUTLS=y
+BR2_PACKAGE_OPENSSL=y
+BR2_PACKAGE_LIBOPENSSL=y
+BR2_PACKAGE_SQLITE=y
+BR2_PACKAGE_GMP=y
+BR2_PACKAGE_LIBEVDEV=y
+# libudev (eudev): PortMaster's Weston pack and a few ports need it; it reads
+# the musl system's udev database in /run/udev. Nothing else from eudev runs.
+BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
+# avahi client libs: the Weston pack's bundled libcups links them
+BR2_PACKAGE_AVAHI=y
+BR2_PACKAGE_UTIL_LINUX=y
+BR2_PACKAGE_UTIL_LINUX_LIBUUID=y
+BR2_PACKAGE_LIBBSD=y
+BR2_PACKAGE_LIBMD=y
+BR2_PACKAGE_LIBGPG_ERROR=y
+BR2_PACKAGE_LIBGCRYPT=y
+BR2_PACKAGE_LIBFFI=y
+BR2_PACKAGE_READLINE=y
+BR2_PACKAGE_NCURSES=y
+BR2_PACKAGE_LIBUNISTRING=y
+
+# Older sonames ports link (package/system/glibc-sidecar-compat): FLAC 1.3
+# (libFLAC.so.8, 13 ports), OpenSSL 1.1 (13), libxml2 2.13 (libxml2.so.2, 6)
+BR2_PACKAGE_FLAC_COMPAT=y
+BR2_PACKAGE_LIBOPENSSL_COMPAT=y
+BR2_PACKAGE_LIBXML2_COMPAT=y
