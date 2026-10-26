@@ -22,6 +22,9 @@ REGLINUX_GLIBC_SIDECAR_DEPENDENCIES = glibc-sidecar
 ifeq ($(BR2_PACKAGE_WAYLAND),y)
 REGLINUX_GLIBC_SIDECAR_DEPENDENCIES += wayland
 endif
+ifeq ($(BR2_PACKAGE_LIBDRM),y)
+REGLINUX_GLIBC_SIDECAR_DEPENDENCIES += libdrm
+endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR),y)
 
@@ -97,7 +100,7 @@ define REGLINUX_GLIBC_SIDECAR_ALSA_CONF
 endef
 
 ifeq ($(BR2_PACKAGE_WAYLAND),y)
-define REGLINUX_GLIBC_SIDECAR_BUILD_CMDS
+define REGLINUX_GLIBC_SIDECAR_BUILD_WL_FIXES
 	$(TARGET_CC) $(TARGET_CFLAGS) -shared -fPIC -nostdlib \
 		-Wl,-soname,libwayland-fixes-compat.so \
 		-o $(@D)/libwayland-fixes-compat.so \
@@ -110,11 +113,32 @@ define REGLINUX_GLIBC_SIDECAR_INSTALL_WL_FIXES
 endef
 endif
 
-# The image compares this with its own version to offer a sidecar refresh
+# libdrmhook.so: regmsg's DRM mode hook (drmhook.c, copied from regmsg's
+# lib/), built against glibc. REG's launcher preloads /usr/lib/libdrmhook.so;
+# the sidecar loader takes this one instead (sidecar-patches/0002).
+ifeq ($(BR2_PACKAGE_LIBDRM),y)
+define REGLINUX_GLIBC_SIDECAR_BUILD_DRMHOOK
+	$(TARGET_CC) $(TARGET_CFLAGS) -shared -fPIC \
+		-I$(STAGING_DIR)/usr/include/libdrm \
+		-o $(@D)/libdrmhook.so $(REGLINUX_GLIBC_SIDECAR_PKGDIR)/drmhook.c
+endef
+define REGLINUX_GLIBC_SIDECAR_INSTALL_DRMHOOK
+	$(INSTALL) -D -m 0755 $(@D)/libdrmhook.so \
+		$(TARGET_DIR)$(SIDECAR_P)/lib/libdrmhook.so
+endef
+endif
+
+define REGLINUX_GLIBC_SIDECAR_BUILD_CMDS
+	$(REGLINUX_GLIBC_SIDECAR_BUILD_WL_FIXES)
+	$(REGLINUX_GLIBC_SIDECAR_BUILD_DRMHOOK)
+endef
+
+# The image compares this with the tag it expects to offer a sidecar refresh
 define REGLINUX_GLIBC_SIDECAR_INSTALL_TARGET_CMDS
 	$(REGLINUX_GLIBC_SIDECAR_INSTALL_WL_FIXES)
+	$(REGLINUX_GLIBC_SIDECAR_INSTALL_DRMHOOK)
 	mkdir -p $(TARGET_DIR)$(SIDECAR_P)
-	echo "$(REGLINUX_SYSTEM_VERSION) glibc-$(GLIBC_VERSION)" > $(TARGET_DIR)$(SIDECAR_P)/VERSION
+	echo "$(GLIBC_SIDECAR_TAG)" > $(TARGET_DIR)$(SIDECAR_P)/VERSION
 	$(if $(BR2_PACKAGE_ALSA_LIB),$(REGLINUX_GLIBC_SIDECAR_ALSA_CONF))
 endef
 

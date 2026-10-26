@@ -26,6 +26,11 @@ GLIBC_SIDECAR_DEPENDENCIES = glibc
 
 GLIBC_SIDECAR_PREFIX = $(if $(BR2_arm),/usr/glibc32,/usr/glibc)
 
+# Release tag of the sidecars, in their VERSION file and in the images that
+# expect them. Bump it when the sidecar contents change; images keep using a
+# sidecar until then.
+GLIBC_SIDECAR_TAG = glibc-sidecar-2
+
 # Runtime only: the loader, libc and its split-out libraries, the NSS modules
 # getaddrinfo() & co need. Not every arch has all of them (libmvec: aarch64
 # and x86 only); the loader must be there.

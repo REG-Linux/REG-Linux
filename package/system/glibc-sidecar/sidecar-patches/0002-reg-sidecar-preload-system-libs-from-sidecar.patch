@@ -1,0 +1,66 @@
+From: Romain Tisserand <romain@playdigious.com>
+Subject: [PATCH] elf: glibc sidecar: LD_PRELOAD of system libraries comes from the sidecar
+
+REG builds this glibc only for its glibc sidecar, under its own prefix on
+musl systems. Their launcher sets LD_PRELOAD=/usr/lib/libdrmhook.so (a
+musl library) for every program: a glibc program then failed to start,
+on libc.musl-*.so.1. An LD_PRELOAD entry in /lib, /usr/lib & co is now
+replaced by the sidecar's library of the same name (the sidecar ships a
+glibc libdrmhook.so), or dropped if it has none.
+---
+--- a/elf/rtld.c
++++ b/elf/rtld.c
+@@ -840,6 +840,43 @@
+ 
+ #include <setup-vdso.h>
+ 
++/* REG glibc sidecar: this glibc lives under its own prefix on musl systems,
++   where /lib, /usr/lib & co hold the musl system's libraries, which a glibc
++   process can't load.  An LD_PRELOAD entry in one of those directories (set
++   for the system's own programs) is replaced by the sidecar's library of the
++   same name, or dropped if the sidecar has none.  Returns false to drop it.  */
++#include "trusted-dirs.h"
++static bool
++reg_sidecar_preload (char *fname, size_t size)
++{
++  static const char *const dirs[] =
++    { "/lib/", "/usr/lib/", "/usr/local/lib/", "/lib64/", "/usr/lib64/",
++      "/lib32/", "/usr/lib32/" };
++  const char *base = strrchr (fname, '/');
++  if (base == NULL)
++    return true;
++  ++base;
++  size_t dirlen = base - fname;
++  for (size_t i = 0; i < sizeof dirs / sizeof dirs[0]; ++i)
++    if (dirlen == strlen (dirs[i]) && memcmp (fname, dirs[i], dirlen) == 0)
++      {
++	/* SYSTEM_DIRS starts with the sidecar's library directory.  */
++	const char *libdir = SYSTEM_DIRS;
++	size_t libdirlen = strlen (libdir);
++	size_t baselen = strlen (base);
++	char path[SECURE_PATH_LIMIT];
++	if (libdirlen + baselen >= sizeof path || libdirlen + baselen >= size)
++	  return false;
++	memcpy (path, libdir, libdirlen);
++	memcpy (path + libdirlen, base, baselen + 1);
++	if (__access (path, R_OK) != 0)
++	  return false;
++	memcpy (fname, path, libdirlen + baselen + 1);
++	return true;
++      }
++  return true;
++}
++
+ /* The LD_PRELOAD environment variable gives list of libraries
+    separated by white space or colons that are loaded before the
+    executable's dependencies and prepended to the global scope list.
+@@ -871,7 +908,8 @@
+       if (*p != '\0')
+ 	++p;
+ 
+-      if (dso_name_valid_for_suid (fname))
++      if (dso_name_valid_for_suid (fname)
++	  && reg_sidecar_preload (fname, sizeof (fname)))
+ 	npreloads += do_preload (fname, main_map, where);
+     }
+   return npreloads;

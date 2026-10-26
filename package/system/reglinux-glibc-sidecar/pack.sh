@@ -8,7 +8,7 @@
 #           only search dir), plus plugin subdirs (dri/, gbm/, alsa-lib/, ...)
 #   share/  data installed under the prefix (alsa) + Vulkan ICDs
 #   etc/    ld.so.conf, asound.conf, alsa conf.d
-#   VERSION REG version the sidecar was built with
+#   VERSION its release tag (GLIBC_SIDECAR_TAG)
 # then refuses the result if a library still points at a plugin directory of
 # the musl system (check-paths.sh).
 #
