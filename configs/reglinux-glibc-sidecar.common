@@ -6,7 +6,7 @@
 # Library set from a scan of every PortMaster port (2026-10-25): the sonames
 # ports link against without bundling them. Covers ~94% of the ports that
 # ship aarch64 or armhf binaries.
-# Not yet: sdl12-compat (~7), FFmpeg 4 / ICU 63 compat builds (~12).
+# Not yet: ICU 63 compat build.
 
 # Libraries only
 BR2_INIT_NONE=y
@@ -116,6 +116,8 @@ BR2_PACKAGE_OPENSSL=y
 BR2_PACKAGE_LIBOPENSSL=y
 BR2_PACKAGE_SQLITE=y
 BR2_PACKAGE_GMP=y
+# libphysfs.so.1: the Solarus runtime
+BR2_PACKAGE_PHYSFS=y
 BR2_PACKAGE_LIBEVDEV=y
 # libudev (eudev): PortMaster's Weston pack and a few ports need it; it reads
 # the musl system's udev database in /run/udev. Nothing else from eudev runs.
@@ -138,3 +140,13 @@ BR2_PACKAGE_LIBUNISTRING=y
 BR2_PACKAGE_FLAC_COMPAT=y
 BR2_PACKAGE_LIBOPENSSL_COMPAT=y
 BR2_PACKAGE_LIBXML2_COMPAT=y
+# SDL 1.2 on SDL2 (sdl12-compat) and its add-ons, FFmpeg 4.4 (libavcodec.so.58)
+BR2_PACKAGE_SDL12_COMPAT=y
+BR2_PACKAGE_SDL_IMAGE_COMPAT=y
+BR2_PACKAGE_SDL_MIXER_COMPAT=y
+BR2_PACKAGE_SDL_TTF_COMPAT=y
+BR2_PACKAGE_FFMPEG_COMPAT=y
+# libzip.so.4, libreadline.so.7, libsndio.so.7 (2 ports each)
+BR2_PACKAGE_LIBZIP_COMPAT=y
+BR2_PACKAGE_READLINE_COMPAT=y
+BR2_PACKAGE_SNDIO_COMPAT=y

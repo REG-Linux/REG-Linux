@@ -24,3 +24,67 @@ config BR2_PACKAGE_LIBXML2_COMPAT
 	help
 	  libxml2 2.13 (soname libxml2.so.2): 2.14 changed it to
 	  libxml2.so.16.
+
+config BR2_PACKAGE_SDL12_COMPAT
+	bool "sdl12-compat (libSDL-1.2.so.0)"
+	depends on BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	depends on BR2_PACKAGE_SDL2
+	help
+	  SDL 1.2 on top of SDL2 (sdl12-compat), for SDL 1.2 ports.
+
+config BR2_PACKAGE_SDL_IMAGE_COMPAT
+	bool "sdl-image-compat (libSDL_image-1.2.so.0)"
+	depends on BR2_PACKAGE_SDL12_COMPAT
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_WEBP
+	help
+	  SDL_image 1.2, on sdl12-compat.
+
+config BR2_PACKAGE_SDL_MIXER_COMPAT
+	bool "sdl-mixer-compat (libSDL_mixer-1.2.so.0)"
+	depends on BR2_PACKAGE_SDL12_COMPAT
+	depends on BR2_PACKAGE_FLUIDSYNTH
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_LIBMODPLUG
+	help
+	  SDL_mixer 1.2, on sdl12-compat.
+
+config BR2_PACKAGE_SDL_TTF_COMPAT
+	bool "sdl-ttf-compat (libSDL_ttf-2.0.so.0)"
+	depends on BR2_PACKAGE_SDL12_COMPAT
+	select BR2_PACKAGE_FREETYPE
+	help
+	  SDL_ttf 2.0 for SDL 1.2, on sdl12-compat.
+
+config BR2_PACKAGE_FFMPEG_COMPAT
+	bool "ffmpeg-compat (FFmpeg 4.4)"
+	depends on BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_BZIP2
+	help
+	  FFmpeg 4.4 libraries (libavcodec.so.58, libavformat.so.58,
+	  libavutil.so.56, libswscale.so.5, libswresample.so.3).
+
+config BR2_PACKAGE_LIBZIP_COMPAT
+	bool "libzip-compat (libzip.so.4)"
+	depends on BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	select BR2_PACKAGE_ZLIB
+	help
+	  libzip 1.1 (soname libzip.so.4), next to libzip 1.10's
+	  libzip.so.5.
+
+config BR2_PACKAGE_READLINE_COMPAT
+	bool "readline-compat (libreadline.so.7)"
+	depends on BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	select BR2_PACKAGE_NCURSES
+	help
+	  readline 7.0 (libreadline.so.7, libhistory.so.7), next to
+	  readline 8.
+
+config BR2_PACKAGE_SNDIO_COMPAT
+	bool "sndio-compat (libsndio.so.7)"
+	depends on BR2_PACKAGE_REGLINUX_GLIBC_SIDECAR
+	select BR2_PACKAGE_ALSA_LIB
+	help
+	  The sndio client library on ALSA, no sndiod.
